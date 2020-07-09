@@ -7,7 +7,7 @@
         </Console>
         <RollingFile name="RollingFile"
                      fileName="./logs/teho-log.log"
-                     filePattern="./logs/$${date:yyyy-MM}/teho-log-%d{-dd-MMMM-yyyy-hh-mm}-%i.log.gz">
+                     filePattern="./logs/$${date:yyyy-MM}/teho-log.log.gz">
             <PatternLayout>
                 <pattern>%d %p %C{1.} [%t] %m%n</pattern>
             </PatternLayout>

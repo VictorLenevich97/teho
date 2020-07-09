@@ -67,7 +67,8 @@
                 <artifactId>frontend-maven-plugin</artifactId>
                 <version>1.6</version>
                 <configuration>
-                    <workingDirectory>teho-ui</workingDirectory>
+<!--                    <workingDirectory>teho-ui</workingDirectory>-->
+                    <workingDirectory>../teho-frontend</workingDirectory>
                     <installDirectory>target</installDirectory>
                 </configuration>
                 <executions>
@@ -109,7 +110,8 @@
                         <configuration>
                             <target>
                                 <copy todir="${project.build.directory}/classes/public">
-                                    <fileset dir="${project.basedir}/teho-ui/build"/>
+<!--                                    <fileset dir="${project.basedir}/teho-ui/build"/>-->
+                                    <fileset dir="../teho-frontend/build"/>
                                 </copy>
                             </target>
                         </configuration>
@@ -121,5 +123,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

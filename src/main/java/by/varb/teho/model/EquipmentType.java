@@ -3,7 +3,7 @@ package by.varb.teho.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "equipment_type")
+@Table(name = "equipment_type", schema = "teho")
 public class EquipmentType {
 
     @Id
