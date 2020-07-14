@@ -5,16 +5,13 @@ import by.varb.teho.entity.EquipmentType;
 import by.varb.teho.repository.EquipmentRepository;
 import by.varb.teho.repository.EquipmentTypeRepository;
 import by.varb.teho.service.EquipmentService;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-
-import static by.varb.teho.enums.Equipment.*;
+import java.util.Optional;
 
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
@@ -30,48 +27,35 @@ public class EquipmentServiceImpl implements EquipmentService {
         this.equipmentTypeRepository = equipmentTypeRepository;
     }
 
-    private static final String EMPTY_STRING = "";
-
-    public List<Equipment> getEquipmentInfo() {
+    public List<Equipment> getAll() {
         return (List<Equipment>) equipmentRepository.findAll();
     }
 
     @Override
-    public void addNewVehicle(Map<String, Object> data) throws ChangeSetPersister.NotFoundException {
-        if (checkDataForNull(data) || checkDataIfEmpty(data)) {
-            log.error("Недостаточно данных - одно или несколько полей не заполнены");
+    public void add(String name, Long typeId) throws ChangeSetPersister.NotFoundException {
+        Optional<EquipmentType> equipmentType = equipmentTypeRepository.findById(typeId);
+        if (!equipmentType.isPresent()) {
+            log.error("Неверный тип");
             return;
         }
-        List<Equipment> equipmentList = (List<Equipment>) equipmentRepository.findAll();
-        for (Equipment element : equipmentList) {
-            if (checkEquipmentExistence(data, element)) {
-                log.error("Такой образец ВВСТ уже существует в базе даныых");
-                return;
-            }
+
+        if (equipmentRepository.findByName(name).isPresent()) {
+            log.error("Уже существует");
+            return;
         }
-        Equipment equipment = new Equipment();
-        EquipmentType equipmentType = equipmentTypeRepository.findById((Long) data.get(EQUIPMENT_TYPE_KEY)).orElseThrow(ChangeSetPersister.NotFoundException::new);
-        equipment.setEquipmentType(equipmentType);
-        equipment.setName((String) data.get(NAME_KEY));
-        equipmentRepository.save(equipment);
+        equipmentRepository.save(new Equipment(name, equipmentType.get()));
     }
 
     @Override
-    public List<EquipmentType> getEquipmentTypes() {
+    public List<EquipmentType> getAllTypes() {
         return (List<EquipmentType>) equipmentTypeRepository.findAll();
     }
 
-    private boolean checkDataForNull(Map<String, Object> data) {
-        return data.get(EQUIPMENT_TYPE_KEY) == null || data.get(NAME_KEY) == null;
+    @Override
+    public void addType(String shortName, String longName) {
+        EquipmentType equipmentType = new EquipmentType(shortName, longName);
+        equipmentTypeRepository.save(equipmentType);
     }
 
 
-    private boolean checkDataIfEmpty(Map<String, Object> data) {
-        return data.get(EQUIPMENT_TYPE_KEY).equals(EMPTY_STRING) || data.get(NAME_KEY).equals(EMPTY_STRING);
-    }
-
-    private boolean checkEquipmentExistence(Map<String, Object> data, Equipment equipment) {
-        return data.get(NAME_KEY).equals(equipment.getName()) ||
-                data.get(EQUIPMENT_TYPE_KEY).equals(equipment.getEquipmentType().toString());
-    }
 }

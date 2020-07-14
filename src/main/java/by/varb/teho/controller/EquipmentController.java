@@ -2,12 +2,14 @@ package by.varb.teho.controller;
 
 import by.varb.teho.entity.Equipment;
 import by.varb.teho.entity.EquipmentType;
+import by.varb.teho.model.BaseModel;
+import by.varb.teho.model.EquipmentModel;
+import by.varb.teho.model.EquipmentTypeModel;
 import by.varb.teho.service.EquipmentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("equipment")
@@ -19,21 +21,28 @@ public class EquipmentController {
         this.equipmentService = equipmentService;
     }
 
-    @GetMapping("/getEquipmentInfo")
+    @GetMapping
     @ResponseBody
     public List<Equipment> getEquipmentInfo() {
-        return equipmentService.getEquipmentInfo();
+        return equipmentService.getAll();
     }
 
-    @GetMapping("/getEquipmentTypesList")
+    @GetMapping("/type")
     @ResponseBody
     public List<EquipmentType> getEquipmentTypes() {
-        return equipmentService.getEquipmentTypes();
+        return equipmentService.getAllTypes();
     }
 
-    @PostMapping("/addNewVehicle")
+    @PostMapping
     @ResponseBody
-    public void addNewVehicle(@RequestBody Map<String, Object> data) throws Exception {
-        equipmentService.addNewVehicle(data);
+    public void addNewVehicle(@RequestBody EquipmentModel equipmentModel) throws Exception {
+        equipmentService.add(equipmentModel.getName(), equipmentModel.getTypeId());
     }
+
+    @PostMapping("/type")
+    public void addEquipmentType(@RequestBody EquipmentTypeModel equipmentTypeModel) {
+        equipmentService.addType(equipmentTypeModel.getShortName(), equipmentTypeModel.getFullName());
+    }
+
+
 }
