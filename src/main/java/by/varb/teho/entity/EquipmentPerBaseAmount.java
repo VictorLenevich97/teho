@@ -5,10 +5,34 @@ import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-class EquipmentPerBaseAmount implements Serializable {
+public class EquipmentPerBaseAmount implements Serializable {
+
+    public EquipmentPerBaseAmount() {
+    }
+
+    public EquipmentPerBaseAmount(Long baseId, Long equipmentId) {
+        this.baseId = baseId;
+        this.equipmentId = equipmentId;
+    }
 
     @Column(name = "base_id")
     Long baseId;
+
+    public Long getBaseId() {
+        return baseId;
+    }
+
+    public void setBaseId(Long baseId) {
+        this.baseId = baseId;
+    }
+
+    public Long getEquipmentId() {
+        return equipmentId;
+    }
+
+    public void setEquipmentId(Long equipmentId) {
+        this.equipmentId = equipmentId;
+    }
 
     @Column(name = "equipment_id")
     Long equipmentId;

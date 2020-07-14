@@ -15,6 +15,11 @@ public class EquipmentType {
     public EquipmentType() {
     }
 
+    public EquipmentType(String shortName, String fullName) {
+        this.shortName = shortName;
+        this.fullName = fullName;
+    }
+
     public Long getId() {
         return id;
     }

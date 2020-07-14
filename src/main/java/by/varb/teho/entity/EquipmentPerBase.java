@@ -23,6 +23,13 @@ public class EquipmentPerBase {
     public EquipmentPerBase() {
     }
 
+    public EquipmentPerBase(Base base, Equipment equipment, int amount) {
+        this.id = new EquipmentPerBaseAmount(base.getId(), equipment.getId());
+        this.base = base;
+        this.equipment = equipment;
+        this.amount = amount;
+    }
+
     public EquipmentPerBaseAmount getId() {
         return id;
     }

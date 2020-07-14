@@ -17,6 +17,11 @@ public class Base {
     public Base() {
     }
 
+    public Base(String shortName, String fullName) {
+        this.shortName = shortName;
+        this.fullName = fullName;
+    }
+
     public Long getId() {
         return id;
     }

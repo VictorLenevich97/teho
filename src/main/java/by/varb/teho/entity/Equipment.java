@@ -22,6 +22,11 @@ public class Equipment {
     public Equipment() {
     }
 
+    public Equipment(String name, EquipmentType equipmentType) {
+        this.name = name;
+        this.equipmentType = equipmentType;
+    }
+
     public Set<EquipmentPerBase> getEquipmentPerBases() {
         return equipmentPerBases;
     }

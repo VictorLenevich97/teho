@@ -5,7 +5,7 @@ import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-class EquipmentLaborInputPerTypeAmount implements Serializable {
+public class EquipmentLaborInputPerTypeAmount implements Serializable {
     @Column(name = "equipment_id")
     private Long equipmentId;
     @Column(name = "repair_type_id")
