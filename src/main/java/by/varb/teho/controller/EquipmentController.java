@@ -1,7 +1,7 @@
 package by.varb.teho.controller;
 
-import by.varb.teho.model.Equipment;
-import by.varb.teho.model.EquipmentType;
+import by.varb.teho.entity.Equipment;
+import by.varb.teho.entity.EquipmentType;
 import by.varb.teho.service.EquipmentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

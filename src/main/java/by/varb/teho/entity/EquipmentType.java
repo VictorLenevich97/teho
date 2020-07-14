@@ -1,15 +1,19 @@
-package by.varb.teho.model;
+package by.varb.teho.entity;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "base")
-public class Base {
+@Table(name = "equipment_type")
+public class EquipmentType {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String shortName;
     private String fullName;
+
+    public EquipmentType() {
+    }
 
     public Long getId() {
         return id;
@@ -23,8 +27,8 @@ public class Base {
         return shortName;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
+    public void setShortName(String type) {
+        this.shortName = type;
     }
 
     public String getFullName() {

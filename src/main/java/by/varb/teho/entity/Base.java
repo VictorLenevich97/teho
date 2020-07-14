@@ -1,16 +1,21 @@
-package by.varb.teho.model;
+package by.varb.teho.entity;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
-@Table(name = "equipment_type", schema = "teho")
-public class EquipmentType {
-
+@Table(name = "base")
+public class Base {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String shortName;
     private String fullName;
+    @OneToMany(mappedBy = "base")
+    private Set<EquipmentPerBase> equipmentPerBases;
+
+    public Base() {
+    }
 
     public Long getId() {
         return id;
@@ -24,8 +29,8 @@ public class EquipmentType {
         return shortName;
     }
 
-    public void setShortName(String type) {
-        this.shortName = type;
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     public String getFullName() {

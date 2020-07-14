@@ -1,7 +1,7 @@
 package by.varb.teho.service.implementation;
 
-import by.varb.teho.model.Equipment;
-import by.varb.teho.model.EquipmentType;
+import by.varb.teho.entity.Equipment;
+import by.varb.teho.entity.EquipmentType;
 import by.varb.teho.repository.EquipmentRepository;
 import by.varb.teho.repository.EquipmentTypeRepository;
 import by.varb.teho.service.EquipmentService;
