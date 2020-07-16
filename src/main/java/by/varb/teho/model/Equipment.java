@@ -7,9 +7,19 @@ import javax.persistence.*;
 public class Equipment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
+
+    public Equipment() {
+    }
+
+    public Equipment(String name, EquipmentType equipmentType) {
+        this.name = name;
+        this.equipmentType = equipmentType;
+    }
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "equipment_type_id", referencedColumnName = "id")
     private EquipmentType equipmentType;
