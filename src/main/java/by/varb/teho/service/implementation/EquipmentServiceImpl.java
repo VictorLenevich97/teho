@@ -1,20 +1,20 @@
 package by.varb.teho.service.implementation;
 
+import by.varb.teho.dto.AddNewEquipmentDTO;
+import by.varb.teho.exception.EmptyFieldException;
+import by.varb.teho.exception.NotFoundException;
+import by.varb.teho.exception.TehoException;
+import by.varb.teho.exception.EquipmentNotUniqueException;
 import by.varb.teho.model.Equipment;
 import by.varb.teho.model.EquipmentType;
 import by.varb.teho.repository.EquipmentRepository;
 import by.varb.teho.repository.EquipmentTypeRepository;
 import by.varb.teho.service.EquipmentService;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-
-import static by.varb.teho.enums.Equipment.*;
 
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
@@ -30,48 +30,45 @@ public class EquipmentServiceImpl implements EquipmentService {
         this.equipmentTypeRepository = equipmentTypeRepository;
     }
 
-    private static final String EMPTY_STRING = "";
-
     public List<Equipment> getEquipmentInfo() {
         return (List<Equipment>) equipmentRepository.findAll();
     }
 
     @Override
-    public void addNewVehicle(Map<String, Object> data) throws ChangeSetPersister.NotFoundException {
-        if (checkDataForNull(data) || checkDataIfEmpty(data)) {
-            log.error("Недостаточно данных - одно или несколько полей не заполнены");
-            return;
+    public void addNewEquipment(AddNewEquipmentDTO addNewEquipmentDTO) throws TehoException {
+        checkDTOFieldsForEmptiness(addNewEquipmentDTO);
+        checkNewEquipmentUniqueness(addNewEquipmentDTO);
+
+        EquipmentType equipmentType = equipmentTypeRepository.findById(addNewEquipmentDTO.getEquipmentTypeId())
+                .orElseThrow(() -> new NotFoundException("Запись с введённым equipmentTypeId не найдена"));
+        Equipment equipment = new Equipment(addNewEquipmentDTO.getName(), equipmentType);
+        equipmentRepository.save(equipment);
+    }
+
+    private void checkDTOFieldsForEmptiness(AddNewEquipmentDTO addNewEquipmentDTO) throws EmptyFieldException {
+        boolean oneOfDTOFieldsIsEmpty = addNewEquipmentDTO.getName() == null || addNewEquipmentDTO.getName().isEmpty()
+                || addNewEquipmentDTO.getEquipmentTypeId() == null;
+
+        if (oneOfDTOFieldsIsEmpty) {
+            throw new EmptyFieldException();
         }
+    }
+
+    private void checkNewEquipmentUniqueness(AddNewEquipmentDTO addNewEquipmentDTO) throws EquipmentNotUniqueException {
         List<Equipment> equipmentList = (List<Equipment>) equipmentRepository.findAll();
-        for (Equipment element : equipmentList) {
-            if (checkEquipmentExistence(data, element)) {
-                log.error("Такой образец ВВСТ уже существует в базе даныых");
-                return;
+
+        for (Equipment equipment : equipmentList) {
+            boolean newEquipmentIsNotUnique = equipment.getName().equals(addNewEquipmentDTO.getName())
+                    && equipment.getEquipmentType().getId().equals(addNewEquipmentDTO.getEquipmentTypeId());
+
+            if (newEquipmentIsNotUnique) {
+                throw new EquipmentNotUniqueException();
             }
         }
-        Equipment equipment = new Equipment();
-        EquipmentType equipmentType = equipmentTypeRepository.findById((Long) data.get(EQUIPMENT_TYPE_KEY)).orElseThrow(ChangeSetPersister.NotFoundException::new);
-        equipment.setEquipmentType(equipmentType);
-        equipment.setName((String) data.get(NAME_KEY));
-        equipmentRepository.save(equipment);
     }
 
     @Override
     public List<EquipmentType> getEquipmentTypes() {
         return (List<EquipmentType>) equipmentTypeRepository.findAll();
-    }
-
-    private boolean checkDataForNull(Map<String, Object> data) {
-        return data.get(EQUIPMENT_TYPE_KEY) == null || data.get(NAME_KEY) == null;
-    }
-
-
-    private boolean checkDataIfEmpty(Map<String, Object> data) {
-        return data.get(EQUIPMENT_TYPE_KEY).equals(EMPTY_STRING) || data.get(NAME_KEY).equals(EMPTY_STRING);
-    }
-
-    private boolean checkEquipmentExistence(Map<String, Object> data, Equipment equipment) {
-        return data.get(NAME_KEY).equals(equipment.getName()) ||
-                data.get(EQUIPMENT_TYPE_KEY).equals(equipment.getEquipmentType().toString());
     }
 }

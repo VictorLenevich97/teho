@@ -1,5 +1,7 @@
 package by.varb.teho.controller;
 
+import by.varb.teho.dto.AddNewEquipmentDTO;
+import by.varb.teho.exception.TehoException;
 import by.varb.teho.model.Equipment;
 import by.varb.teho.model.EquipmentType;
 import by.varb.teho.service.EquipmentService;
@@ -7,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("equipment")
@@ -31,9 +32,9 @@ public class EquipmentController {
         return equipmentService.getEquipmentTypes();
     }
 
-    @PostMapping("/addNewVehicle")
+    @PostMapping("/addNewEquipment")
     @ResponseBody
-    public void addNewVehicle(@RequestBody Map<String, Object> data) throws Exception {
-        equipmentService.addNewVehicle(data);
+    public void addNewEquipment(@RequestBody AddNewEquipmentDTO addNewEquipmentDTO) throws TehoException {
+        equipmentService.addNewEquipment(addNewEquipmentDTO);
     }
 }
