@@ -2,7 +2,7 @@ package by.varb.teho.utils;
 
 public final class Calculation {
 	
-	//расчёт предполагаемого выхода из строя групп ВВСТ
+    //расчёт предполагаемого выхода из строя групп ВВСТ
     public static double [] calculateEquipmentFailure(int [] groups, double [] dailyAverageLoss, double kM) {
   		double[] wJ = new double [groups.length];
   		for (int i = 0; i < groups.length; i++) {
