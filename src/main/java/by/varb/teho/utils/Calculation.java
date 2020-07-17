@@ -31,5 +31,5 @@ public final class Calculation {
   				qjArray[i][j] = 0.75 * wjArray[i][j] * qMaxArray[i];
   			}
   		return qjArray;
-  	}
+    }
 }
