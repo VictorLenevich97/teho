@@ -71,4 +71,5 @@ public class EquipmentServiceImpl implements EquipmentService {
     public List<EquipmentType> getEquipmentTypes() {
         return (List<EquipmentType>) equipmentTypeRepository.findAll();
     }
+    
 }
