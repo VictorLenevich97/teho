@@ -1,5 +1,7 @@
 package by.varb.teho.service;
 
+import by.varb.teho.dto.AddNewEquipmentDTO;
+import by.varb.teho.exception.TehoException;
 import by.varb.teho.entity.Equipment;
 import by.varb.teho.entity.EquipmentType;
 
