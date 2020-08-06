@@ -1,10 +1,7 @@
 package by.varb.teho.controller;
 
-import by.varb.teho.dto.AddNewEquipmentDTO;
-import by.varb.teho.exception.TehoException;
 import by.varb.teho.entity.Equipment;
 import by.varb.teho.entity.EquipmentType;
-import by.varb.teho.model.BaseModel;
 import by.varb.teho.model.EquipmentModel;
 import by.varb.teho.model.EquipmentTypeModel;
 import by.varb.teho.service.EquipmentService;
@@ -37,7 +34,7 @@ public class EquipmentController {
 
     @PostMapping
     @ResponseBody
-    public void addNewVehicle(@RequestBody EquipmentModel equipmentModel) throws Exception {
+    public void addNewEquipment(@RequestBody EquipmentModel equipmentModel) {
         equipmentService.add(equipmentModel.getName(), equipmentModel.getTypeId());
     }
 

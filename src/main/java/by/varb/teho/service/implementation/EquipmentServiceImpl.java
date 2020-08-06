@@ -32,7 +32,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public void add(String name, Long typeId) throws ChangeSetPersister.NotFoundException {
+    public void add(String name, Long typeId) {
         Optional<EquipmentType> equipmentType = equipmentTypeRepository.findById(typeId);
         if (!equipmentType.isPresent()) {
             log.error("Неверный тип");
