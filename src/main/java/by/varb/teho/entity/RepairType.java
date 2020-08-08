@@ -11,6 +11,9 @@ public class RepairType {
     private Long id;
     private String name;
 
+    public RepairType() {
+    }
+
     public Long getId() {
         return id;
     }

@@ -1,6 +1,9 @@
-package by.varb.teho.model;
+package by.varb.teho.dto;
 
-public class BaseModel {
+/**
+ * DTO с кратким и полным именами.
+ */
+public abstract class AbstractNamedDTO {
     private String shortName;
     private String fullName;
 
@@ -20,6 +23,8 @@ public class BaseModel {
         this.fullName = fullName;
     }
 
-    public BaseModel() {
+    public AbstractNamedDTO(String shortName, String fullName) {
+        this.shortName = shortName;
+        this.fullName = fullName;
     }
 }

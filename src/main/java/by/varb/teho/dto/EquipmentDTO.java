@@ -1,13 +1,13 @@
-package by.varb.teho.model;
+package by.varb.teho.dto;
 
-public class EquipmentModel {
+public class EquipmentDTO {
     private String name;
     private Long typeId;
 
-    public EquipmentModel() {
+    public EquipmentDTO() {
     }
 
-    public EquipmentModel(String name, Long typeId) {
+    public EquipmentDTO(String name, Long typeId) {
         this.name = name;
         this.typeId = typeId;
     }

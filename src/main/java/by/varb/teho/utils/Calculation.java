@@ -32,4 +32,16 @@ public final class Calculation {
   			}
   		return qjArray;
     }
+
+	/**
+	 * Расчет производственных возможностей по ремонту
+	 * @param totalStaff общее количество специалистов-ремонтников
+	 * @param workingTime время работы ремонтника, часы
+	 * @param avgLaborInput средняя трудоемкость ремонта, чел-часы
+	 * @return производственные возможности по ремонту, ед./сут.
+	 */
+    public static double calculateRepairCapabilities(int totalStaff, int workingTime, long avgLaborInput) {
+    	//0.78 - коэффициент использования рабочего времени на основные работы. Находится в интервале 0.75 - 0.8
+    	return (totalStaff * workingTime * 0.78) / avgLaborInput;
+	}
 }

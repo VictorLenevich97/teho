@@ -3,7 +3,7 @@ package by.varb.teho.entity;
 import javax.persistence.*;
 
 @Entity
-public class RepairStationEquipmentCapabilities {
+public class RepairStationEquipmentStaff {
 
     @EmbeddedId
     EquipmentPerRepairStation equipmentPerRepairStation;
@@ -19,7 +19,7 @@ public class RepairStationEquipmentCapabilities {
     int totalStaff;
     int availableStaff;
 
-    public RepairStationEquipmentCapabilities() {
+    public RepairStationEquipmentStaff() {
     }
 
     public EquipmentPerRepairStation getEquipmentPerRepairStation() {

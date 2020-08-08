@@ -1,9 +1,9 @@
 package by.varb.teho.controller;
 
+import by.varb.teho.dto.EquipmentDTO;
+import by.varb.teho.dto.EquipmentTypeDTO;
 import by.varb.teho.entity.Equipment;
 import by.varb.teho.entity.EquipmentType;
-import by.varb.teho.model.EquipmentModel;
-import by.varb.teho.model.EquipmentTypeModel;
 import by.varb.teho.service.EquipmentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -34,12 +34,12 @@ public class EquipmentController {
 
     @PostMapping
     @ResponseBody
-    public void addNewEquipment(@RequestBody EquipmentModel equipmentModel) {
-        equipmentService.add(equipmentModel.getName(), equipmentModel.getTypeId());
+    public void addNewEquipment(@RequestBody EquipmentDTO equipmentDTO) {
+        equipmentService.add(equipmentDTO.getName(), equipmentDTO.getTypeId());
     }
 
     @PostMapping("/type")
-    public void addEquipmentType(@RequestBody EquipmentTypeModel equipmentTypeModel) {
+    public void addEquipmentType(@RequestBody EquipmentTypeDTO equipmentTypeModel) {
         equipmentService.addType(equipmentTypeModel.getShortName(), equipmentTypeModel.getFullName());
     }
 

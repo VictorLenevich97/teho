@@ -6,7 +6,7 @@ import javax.persistence.*;
 public class CalculatedRepairCapabilitesPerDay {
 
     @EmbeddedId
-    EquipmentPerRepairStation capabilitiesPerDayAmount;
+    EquipmentPerRepairStation equipmentPerRepairStation;
     @ManyToOne
     @MapsId("repair_station_id")
     @JoinColumn(name = "repair_station_id")
@@ -15,17 +15,24 @@ public class CalculatedRepairCapabilitesPerDay {
     @MapsId("equipment_id")
     @JoinColumn(name = "equipment_id")
     Equipment equipment;
-    int capability;
+    double capability;
 
     public CalculatedRepairCapabilitesPerDay() {
     }
 
-    public EquipmentPerRepairStation getCapabilitiesPerDayAmount() {
-        return capabilitiesPerDayAmount;
+    public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStation equipmentPerRepairStation, RepairStation repairStation, Equipment equipment, double capability) {
+        this.equipmentPerRepairStation = equipmentPerRepairStation;
+        this.repairStation = repairStation;
+        this.equipment = equipment;
+        this.capability = capability;
     }
 
-    public void setCapabilitiesPerDayAmount(EquipmentPerRepairStation capabilitiesPerDayAmount) {
-        this.capabilitiesPerDayAmount = capabilitiesPerDayAmount;
+    public EquipmentPerRepairStation getEquipmentPerRepairStation() {
+        return equipmentPerRepairStation;
+    }
+
+    public void setEquipmentPerRepairStation(EquipmentPerRepairStation equipmentPerRepairStation) {
+        this.equipmentPerRepairStation = equipmentPerRepairStation;
     }
 
     public RepairStation getRepairStation() {
@@ -44,11 +51,11 @@ public class CalculatedRepairCapabilitesPerDay {
         this.equipment = equipment;
     }
 
-    public int getCapability() {
+    public double getCapability() {
         return capability;
     }
 
-    public void setCapability(int capability) {
+    public void setCapability(double capability) {
         this.capability = capability;
     }
 }

@@ -1,6 +1,6 @@
 package by.varb.teho.controller;
 
-import by.varb.teho.model.BaseModel;
+import by.varb.teho.dto.BaseDTO;
 import by.varb.teho.service.BaseService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +19,7 @@ public class BaseController {
     }
 
     @PostMapping("/base")
-    public void addBase(@RequestBody BaseModel baseModel) {
+    public void addBase(@RequestBody BaseDTO baseModel) {
         baseService.add(baseModel.getShortName(), baseModel.getFullName());
     }
 
