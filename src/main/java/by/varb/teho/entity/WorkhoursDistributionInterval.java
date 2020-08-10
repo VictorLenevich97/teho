@@ -16,6 +16,7 @@ public class WorkhoursDistributionInterval {
     private int upperBound;
 
     public WorkhoursDistributionInterval() {
+        //Пустой конструктор для автоматической инициализации
     }
 
     public Long getId() {

@@ -1,49 +1,15 @@
 package by.varb.teho.entity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
 
 @Entity
-public class RepairStationEquipmentStaff {
+public class RepairStationEquipmentStaff extends AbstractRepairStationEquipmentEntity {
 
-    @EmbeddedId
-    EquipmentPerRepairStation equipmentPerRepairStation;
-
-    @ManyToOne
-    @MapsId("repair_station_id")
-    @JoinColumn(name = "repair_station_id")
-    RepairStation repairStation;
-    @ManyToOne
-    @MapsId("equipment_id")
-    @JoinColumn(name = "equipment_id")
-    Equipment equipment;
     int totalStaff;
     int availableStaff;
 
     public RepairStationEquipmentStaff() {
-    }
-
-    public EquipmentPerRepairStation getEquipmentPerRepairStation() {
-        return equipmentPerRepairStation;
-    }
-
-    public void setEquipmentPerRepairStation(EquipmentPerRepairStation equipmentPerRepairStation) {
-        this.equipmentPerRepairStation = equipmentPerRepairStation;
-    }
-
-    public RepairStation getRepairStation() {
-        return repairStation;
-    }
-
-    public void setRepairStation(RepairStation repairStation) {
-        this.repairStation = repairStation;
-    }
-
-    public Equipment getEquipment() {
-        return equipment;
-    }
-
-    public void setEquipment(Equipment equipment) {
-        this.equipment = equipment;
+        //Пустой конструктор для автоматической инициализации
     }
 
     public int getTotalStaff() {

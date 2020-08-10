@@ -6,7 +6,7 @@ import javax.persistence.*;
 public class EquipmentInRepair {
 
     @EmbeddedId
-    EquipmentInRepairEmbeddable equipmentInRepair;
+    EquipmentInRepairEmbeddable equipmentInRepairId;
 
     @ManyToOne
     @MapsId("repair_station_id")
@@ -26,14 +26,15 @@ public class EquipmentInRepair {
     private Double qij;
 
     public EquipmentInRepair() {
+        //Пустой конструктор для инициализации
     }
 
-    public EquipmentInRepairEmbeddable getEquipmentInRepair() {
-        return equipmentInRepair;
+    public EquipmentInRepairEmbeddable getEquipmentInRepairId() {
+        return equipmentInRepairId;
     }
 
-    public void setEquipmentInRepair(EquipmentInRepairEmbeddable equipmentInRepair) {
-        this.equipmentInRepair = equipmentInRepair;
+    public void setEquipmentInRepairId(EquipmentInRepairEmbeddable equipmentInRepairId) {
+        this.equipmentInRepairId = equipmentInRepairId;
     }
 
     public RepairStation getRepairStation() {

@@ -3,52 +3,16 @@ package by.varb.teho.entity;
 import javax.persistence.*;
 
 @Entity
-public class CalculatedRepairCapabilitesPerDay {
-
-    @EmbeddedId
-    EquipmentPerRepairStation equipmentPerRepairStation;
-    @ManyToOne
-    @MapsId("repair_station_id")
-    @JoinColumn(name = "repair_station_id")
-    RepairStation repairStation;
-    @ManyToOne
-    @MapsId("equipment_id")
-    @JoinColumn(name = "equipment_id")
-    Equipment equipment;
+public class CalculatedRepairCapabilitesPerDay extends AbstractRepairStationEquipmentEntity {
     double capability;
 
     public CalculatedRepairCapabilitesPerDay() {
+        //Пустой конструктор для автоматической инициализации
     }
 
     public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStation equipmentPerRepairStation, RepairStation repairStation, Equipment equipment, double capability) {
-        this.equipmentPerRepairStation = equipmentPerRepairStation;
-        this.repairStation = repairStation;
-        this.equipment = equipment;
+        super(equipmentPerRepairStation, repairStation, equipment);
         this.capability = capability;
-    }
-
-    public EquipmentPerRepairStation getEquipmentPerRepairStation() {
-        return equipmentPerRepairStation;
-    }
-
-    public void setEquipmentPerRepairStation(EquipmentPerRepairStation equipmentPerRepairStation) {
-        this.equipmentPerRepairStation = equipmentPerRepairStation;
-    }
-
-    public RepairStation getRepairStation() {
-        return repairStation;
-    }
-
-    public void setRepairStation(RepairStation repairStation) {
-        this.repairStation = repairStation;
-    }
-
-    public Equipment getEquipment() {
-        return equipment;
-    }
-
-    public void setEquipment(Equipment equipment) {
-        this.equipment = equipment;
     }
 
     public double getCapability() {

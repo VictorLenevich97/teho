@@ -17,6 +17,10 @@ public class RepairStationType {
 
     private int workingHoursMax;
 
+    public RepairStationType() {
+        //Пустой конструктор для автоматической инициализации
+    }
+
     public Long getId() {
         return id;
     }
@@ -49,6 +53,4 @@ public class RepairStationType {
         this.workingHoursMax = workingHoursMax;
     }
 
-    public RepairStationType() {
-    }
 }

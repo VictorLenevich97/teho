@@ -17,6 +17,7 @@ public class EquipmentLaborInputPerType {
     int amount;
 
     public EquipmentLaborInputPerType() {
+        //Пустой конструктор для автоматической инициализации
     }
 
     public EquipmentLaborInputPerTypeAmount getEquipmentLaborInputPerTypeAmount() {

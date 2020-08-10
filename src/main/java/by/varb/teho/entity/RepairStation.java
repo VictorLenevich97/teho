@@ -19,6 +19,7 @@ public class RepairStation {
     private int stationAmount;
 
     public RepairStation() {
+        //Пустой конструктор для автоматической инициализации
     }
 
     public Long getId() {

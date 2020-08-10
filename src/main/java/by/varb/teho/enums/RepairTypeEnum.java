@@ -1,7 +1,10 @@
 package by.varb.teho.enums;
 
 public enum RepairTypeEnum {
-    CURRENT_REPAIR("Текущий"), AVG_REPAIR("Средний"), FULL_REPAIR("Капитальный"), LOSS("Безвозвратные потери");
+    CURRENT_REPAIR("Текущий"),
+    AVG_REPAIR("Средний"),
+    FULL_REPAIR("Капитальный"),
+    LOSS("Безвозвратные потери");
 
     private final String name;
 
