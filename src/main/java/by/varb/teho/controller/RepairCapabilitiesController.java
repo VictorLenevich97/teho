@@ -3,10 +3,10 @@ package by.varb.teho.controller;
 import by.varb.teho.entity.*;
 import by.varb.teho.enums.RepairTypeEnum;
 import by.varb.teho.exception.NotFoundException;
+import by.varb.teho.service.CalculationService;
 import by.varb.teho.service.EquipmentService;
 import by.varb.teho.service.RepairCapabilitiesService;
 import by.varb.teho.service.RepairStationService;
-import by.varb.teho.utils.Calculation;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,15 +25,18 @@ public class RepairCapabilitiesController {
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final EquipmentService equipmentService;
     private final RepairStationService repairStationService;
+    private final CalculationService calculationService;
 
 
     public RepairCapabilitiesController(
             RepairCapabilitiesService repairCapabilitiesService,
             EquipmentService equipmentService,
-            RepairStationService repairStationService) {
+            RepairStationService repairStationService,
+            CalculationService calculationService) {
         this.repairCapabilitiesService = repairCapabilitiesService;
         this.equipmentService = equipmentService;
         this.repairStationService = repairStationService;
+        this.calculationService = calculationService;
     }
 
     /**
@@ -42,7 +45,7 @@ public class RepairCapabilitiesController {
     @PostMapping("/calculate")
     public void calculate() {
         List<Equipment> equipmentList = this.equipmentService.getAll();
-        List<RepairStation> repairStations = this.repairStationService.getRepairStations();
+        List<RepairStation> repairStations = this.repairStationService.getAll();
         for (Equipment e : equipmentList) {
             for (RepairStation repairStation : repairStations) {
                 EquipmentPerRepairStation equipmentPerRepairStation = new EquipmentPerRepairStation(repairStation.getId(), e.getId());
@@ -70,7 +73,7 @@ public class RepairCapabilitiesController {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Трудоемкость ремонта \"" + RepairTypeEnum.AVG_REPAIR.getName() + "\" не задана для ВВСТ с id = " + e.getId()))
                 .getAmount();
-        double calculatedCapabilities = Calculation.calculateRepairCapabilities(
+        double calculatedCapabilities = calculationService.calculateRepairCapabilities(
                 rsec.getTotalStaff(),
                 rsec.getRepairStation().getRepairStationType().getWorkingHoursMax(),
                 laborInputAmount);

@@ -24,7 +24,7 @@ public class BaseController {
     }
 
     @PostMapping("/base/{baseId}/equipment/{equipmentId}/{amount}")
-    public void addEquipmentPerBase(@PathVariable Long equipmentId, @PathVariable Long baseId, @PathVariable int amount) {
-        baseService.addEquipmentToBase(baseId, equipmentId, amount);
+    public void addEquipmentPerBase(@PathVariable Long equipmentId, @PathVariable Long baseId, @PathVariable int intensity, @PathVariable int amount) {
+        baseService.addEquipmentToBase(baseId, equipmentId, intensity, amount);
     }
 }

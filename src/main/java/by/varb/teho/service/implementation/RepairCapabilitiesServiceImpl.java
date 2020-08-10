@@ -31,6 +31,11 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
 
     @Override
     public void saveCalculatedRepairCapabilities(CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay) {
+        Optional<CalculatedRepairCapabilitesPerDay> updated = updateIfPresent(calculatedRepairCapabilitesPerDay);
+        this.calculatedRepairCapabilitiesPerDayRepository.save(updated.orElse(calculatedRepairCapabilitesPerDay));
+    }
+
+    private Optional<CalculatedRepairCapabilitesPerDay> updateIfPresent(CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay) {
         EquipmentPerRepairStation equipmentPerRepairStation =
                 new EquipmentPerRepairStation(
                         calculatedRepairCapabilitesPerDay.getRepairStation().getId(),
@@ -38,7 +43,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
         Optional<CalculatedRepairCapabilitesPerDay> oldRepairCapabilitesPerDay =
                 this.calculatedRepairCapabilitiesPerDayRepository.findById(equipmentPerRepairStation);
         oldRepairCapabilitesPerDay.ifPresent(rcpd -> rcpd.setCapability(calculatedRepairCapabilitesPerDay.getCapability()));
-        this.calculatedRepairCapabilitiesPerDayRepository.save(calculatedRepairCapabilitesPerDay);
+        return oldRepairCapabilitesPerDay;
     }
 
     @Override

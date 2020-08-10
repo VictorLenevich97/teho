@@ -18,15 +18,26 @@ public class EquipmentPerBase {
     @JoinColumn(name = "equipment_id")
     Equipment equipment;
 
+    //Интенсивность выхода в ремонт, 0-100 (%)
+    int intensity;
     int amount;
 
     public EquipmentPerBase() {
     }
 
-    public EquipmentPerBase(Base base, Equipment equipment, int amount) {
+    public int getIntensity() {
+        return intensity;
+    }
+
+    public void setIntensity(int intensity) {
+        this.intensity = intensity;
+    }
+
+    public EquipmentPerBase(Base base, Equipment equipment, int intensity, int amount) {
         this.id = new EquipmentPerBaseAmount(base.getId(), equipment.getId());
         this.base = base;
         this.equipment = equipment;
+        this.intensity = intensity;
         this.amount = amount;
     }
 

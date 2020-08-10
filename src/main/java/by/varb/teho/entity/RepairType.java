@@ -14,6 +14,10 @@ public class RepairType {
     public RepairType() {
     }
 
+    public RepairType(String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }

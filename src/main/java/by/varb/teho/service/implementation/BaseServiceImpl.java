@@ -31,10 +31,10 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
-    public void addEquipmentToBase(Long baseId, Long equipmentId, int amount) {
+    public void addEquipmentToBase(Long baseId, Long equipmentId, int intensity, int amount) {
         //TODO: Throw exceptions on .orElseThrow
         Base b = baseRepository.findById(baseId).get();
         Equipment e = equipmentRepository.findById(equipmentId).get();
-        this.equipmentPerBaseRepository.save(new EquipmentPerBase(b, e, amount));
+        this.equipmentPerBaseRepository.save(new EquipmentPerBase(b, e, intensity, amount));
     }
 }
