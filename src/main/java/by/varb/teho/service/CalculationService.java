@@ -1,11 +1,36 @@
 package by.varb.teho.service;
 
 public interface CalculationService {
-    double[] calculateEquipmentFailure(int[] groups, double[] dailyAverageLoss, double kM);
 
-    double[][] calculateEquipmentRequiringRepair(int[] qMinArray, int[] qMaxArray, double[] wJ, int[] qjMax);
+    /**
+     * Расчет предполагаемого выхода из строя в ремонт
+     *
+     * @param totalAmount количество образцов ВВСТ
+     * @param intensity   интенсивность выхода в ремонт (среднесуточная, в %)
+     * @param k           поправочный коэффициент
+     * @return значение среднесуточного выхода в ремонт (в единицах, штуках, комплектах)
+     */
+    double calculateEquipmentFailureAmount(int totalAmount, int intensity, double k);
 
-    double[][] calculateAverageComplexityRepair(double[][] wjArray, int[] qMaxArray);
+    /**
+     * Расчет количества образцов ВВСТ, требующих ремонта в данном диапазоне
+     *
+     * @param upperBound         верхняя граница диапазона
+     * @param lowerBound         нижняя граница диапазона
+     * @param avgDailyFailure    значение среднесуточного выхода в ремонт
+     * @param standardLaborInput нормативная трудоемкость ремонта
+     * @return количество образцов, требующих ремонта в данном диапазоне
+     */
+    int calculateEquipmentRequiringRepair(int upperBound, int lowerBound, double avgDailyFailure, int standardLaborInput);
+
+    /**
+     * Расчет средней трудоемкости ремонта ВВСТ для диапазона
+     *
+     * @param count      количество образцов ВВСТ, требующих ремонта в конкретном диапазоне
+     * @param upperBound верхняя граница диапазона
+     * @return средняя трудоемкость ВВСТ в заданном диапазоне
+     */
+    int calculateEquipmentRepairComplexity(int count, int upperBound);
 
     /**
      * Расчет производственных возможностей по ремонту

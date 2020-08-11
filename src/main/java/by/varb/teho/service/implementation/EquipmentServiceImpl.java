@@ -7,7 +7,6 @@ import by.varb.teho.repository.EquipmentTypeRepository;
 import by.varb.teho.service.EquipmentService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,11 +15,9 @@ import java.util.Optional;
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
 
-    private final EquipmentRepository equipmentRepository;
-
-    private final EquipmentTypeRepository equipmentTypeRepository;
-
     public static final Logger log = LogManager.getLogger(EquipmentServiceImpl.class);
+    private final EquipmentRepository equipmentRepository;
+    private final EquipmentTypeRepository equipmentTypeRepository;
 
     public EquipmentServiceImpl(EquipmentRepository equipmentRepository, EquipmentTypeRepository equipmentTypeRepository) {
         this.equipmentRepository = equipmentRepository;

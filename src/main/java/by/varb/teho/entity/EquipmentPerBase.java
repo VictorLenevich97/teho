@@ -25,20 +25,20 @@ public class EquipmentPerBase {
     public EquipmentPerBase() {
     }
 
-    public int getIntensity() {
-        return intensity;
-    }
-
-    public void setIntensity(int intensity) {
-        this.intensity = intensity;
-    }
-
     public EquipmentPerBase(Base base, Equipment equipment, int intensity, int amount) {
         this.id = new EquipmentPerBaseAmount(base.getId(), equipment.getId());
         this.base = base;
         this.equipment = equipment;
         this.intensity = intensity;
         this.amount = amount;
+    }
+
+    public int getIntensity() {
+        return intensity;
+    }
+
+    public void setIntensity(int intensity) {
+        this.intensity = intensity;
     }
 
     public EquipmentPerBaseAmount getId() {

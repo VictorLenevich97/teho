@@ -7,6 +7,11 @@ public abstract class AbstractNamedDTO {
     private String shortName;
     private String fullName;
 
+    public AbstractNamedDTO(String shortName, String fullName) {
+        this.shortName = shortName;
+        this.fullName = fullName;
+    }
+
     public String getShortName() {
         return shortName;
     }
@@ -20,11 +25,6 @@ public abstract class AbstractNamedDTO {
     }
 
     public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public AbstractNamedDTO(String shortName, String fullName) {
-        this.shortName = shortName;
         this.fullName = fullName;
     }
 }

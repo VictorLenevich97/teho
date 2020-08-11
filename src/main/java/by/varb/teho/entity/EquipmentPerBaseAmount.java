@@ -7,6 +7,11 @@ import java.io.Serializable;
 @Embeddable
 public class EquipmentPerBaseAmount implements Serializable {
 
+    @Column(name = "base_id")
+    Long baseId;
+    @Column(name = "equipment_id")
+    Long equipmentId;
+
     public EquipmentPerBaseAmount() {
     }
 
@@ -14,9 +19,6 @@ public class EquipmentPerBaseAmount implements Serializable {
         this.baseId = baseId;
         this.equipmentId = equipmentId;
     }
-
-    @Column(name = "base_id")
-    Long baseId;
 
     public Long getBaseId() {
         return baseId;
@@ -33,8 +35,5 @@ public class EquipmentPerBaseAmount implements Serializable {
     public void setEquipmentId(Long equipmentId) {
         this.equipmentId = equipmentId;
     }
-
-    @Column(name = "equipment_id")
-    Long equipmentId;
 
 }

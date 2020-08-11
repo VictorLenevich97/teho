@@ -1,6 +1,7 @@
 package by.varb.teho.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "equipment_type")
@@ -42,5 +43,20 @@ public class EquipmentType {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquipmentType that = (EquipmentType) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(shortName, that.shortName) &&
+                Objects.equals(fullName, that.fullName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, shortName, fullName);
     }
 }

@@ -23,10 +23,27 @@ public class EquipmentInRepair {
     @JoinColumn(name = "workhours_distribution_interval_id")
     WorkhoursDistributionInterval workhoursDistributionInterval;
 
-    private Double qij;
+    private int count;
+    private int avgLaborInput;
 
     public EquipmentInRepair() {
         //Пустой конструктор для инициализации
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public int getAvgLaborInput() {
+        return avgLaborInput;
+    }
+
+    public void setAvgLaborInput(int avgLaborInput) {
+        this.avgLaborInput = avgLaborInput;
     }
 
     public EquipmentInRepairEmbeddable getEquipmentInRepairId() {
@@ -61,11 +78,4 @@ public class EquipmentInRepair {
         this.workhoursDistributionInterval = workhoursDistributionInterval;
     }
 
-    public Double getQij() {
-        return qij;
-    }
-
-    public void setQij(Double qij) {
-        this.qij = qij;
-    }
 }

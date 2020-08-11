@@ -9,6 +9,8 @@ import by.varb.teho.repository.EquipmentRepository;
 import by.varb.teho.service.BaseService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BaseServiceImpl implements BaseService {
 
@@ -36,5 +38,10 @@ public class BaseServiceImpl implements BaseService {
         Base b = baseRepository.findById(baseId).get();
         Equipment e = equipmentRepository.findById(equipmentId).get();
         this.equipmentPerBaseRepository.save(new EquipmentPerBase(b, e, intensity, amount));
+    }
+
+    @Override
+    public List<Base> getAll() {
+        return (List<Base>) this.baseRepository.findAll();
     }
 }

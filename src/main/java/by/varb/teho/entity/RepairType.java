@@ -10,12 +10,18 @@ public class RepairType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @OneToMany(mappedBy = "repairType")
+    private Set<EquipmentLaborInputPerType> laborInputPerTypes;
 
     public RepairType() {
     }
 
     public RepairType(String name) {
         this.name = name;
+    }
+
+    public RepairType(Long id) {
+        this.id = id;
     }
 
     public Long getId() {
@@ -41,11 +47,4 @@ public class RepairType {
     public void setLaborInputPerTypes(Set<EquipmentLaborInputPerType> laborInputPerTypes) {
         this.laborInputPerTypes = laborInputPerTypes;
     }
-
-    public RepairType(Long id) {
-        this.id = id;
-    }
-
-    @OneToMany(mappedBy = "repairType")
-    private Set<EquipmentLaborInputPerType> laborInputPerTypes;
 }

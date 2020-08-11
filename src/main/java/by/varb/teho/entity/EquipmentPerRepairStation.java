@@ -7,6 +7,11 @@ import java.io.Serializable;
 @Embeddable
 public class EquipmentPerRepairStation implements Serializable {
 
+    @Column(name = "repair_station_id")
+    private Long repairStationId;
+    @Column(name = "equipment_id")
+    private Long equipmentId;
+
     public EquipmentPerRepairStation() {
     }
 
@@ -14,11 +19,5 @@ public class EquipmentPerRepairStation implements Serializable {
         this.repairStationId = repairStationId;
         this.equipmentId = equipmentId;
     }
-
-    @Column(name = "repair_station_id")
-    private Long repairStationId;
-
-    @Column(name = "equipment_id")
-    private Long equipmentId;
 
 }

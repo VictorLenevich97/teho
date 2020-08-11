@@ -45,4 +45,8 @@ public class Base {
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
+
+    public Set<EquipmentPerBase> getEquipmentPerBases() {
+        return equipmentPerBases;
+    }
 }

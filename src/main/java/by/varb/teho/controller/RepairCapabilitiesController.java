@@ -2,7 +2,7 @@ package by.varb.teho.controller;
 
 import by.varb.teho.entity.*;
 import by.varb.teho.enums.RepairTypeEnum;
-import by.varb.teho.exception.NotFoundException;
+import by.varb.teho.exception.RepairTypeLaborInputNotFoundException;
 import by.varb.teho.service.CalculationService;
 import by.varb.teho.service.EquipmentService;
 import by.varb.teho.service.RepairCapabilitiesService;
@@ -71,7 +71,7 @@ public class RepairCapabilitiesController {
                 .stream()
                 .filter(lipt -> lipt.getRepairType().getName().equals(RepairTypeEnum.AVG_REPAIR.getName()))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Трудоемкость ремонта \"" + RepairTypeEnum.AVG_REPAIR.getName() + "\" не задана для ВВСТ с id = " + e.getId()))
+                .orElseThrow(() -> new RepairTypeLaborInputNotFoundException(RepairTypeEnum.AVG_REPAIR, e))
                 .getAmount();
         double calculatedCapabilities = calculationService.calculateRepairCapabilities(
                 rsec.getTotalStaff(),
