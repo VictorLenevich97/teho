@@ -17,6 +17,12 @@ public class RepairStationType {
 
     private int workingHoursMax;
 
+    public RepairStationType(String name, int workingHoursMin, int workingHoursMax) {
+        this.name = name;
+        this.workingHoursMin = workingHoursMin;
+        this.workingHoursMax = workingHoursMax;
+    }
+
     public RepairStationType() {
         //Пустой конструктор для автоматической инициализации
     }

@@ -18,7 +18,7 @@ public interface RepairCapabilitiesService {
      *
      * @param equipmentId     идентификатор ВВСТ
      * @param repairStationId идентификатор РВО
-     * @return объект, включающий в себя количество ремонтников в РВО, занимающихся ремонтом конкретного ВВСТ
+     * @return объект, включающий в себя количество ремонтников в РВО, занимающихся ремонтом конкретного вида ВВСТ
      */
     Optional<RepairStationEquipmentStaff> getRepairStationEquipmentStaff(Long equipmentId, Long repairStationId);
 

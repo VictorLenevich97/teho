@@ -31,9 +31,9 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
 
 
     @Override
-    public Map<EquipmentType, List<EquipmentLaborInputDistribution>> calculateLaborDistribution() {
+    public Map<EquipmentType, List<EquipmentLaborInputDistribution>> calculateLaborInputDistribution() {
         RepairTypeEnum repairType = RepairTypeEnum.CURRENT_REPAIR;
-        List<Base> bases = baseService.getAll();
+        List<Base> bases = baseService.list();
         List<WorkhoursDistributionInterval> distributionIntervals =
                 (List<WorkhoursDistributionInterval>) workhoursDistributionIntervalRepository.findAll();
         Map<EquipmentType, List<EquipmentLaborInputDistribution>> result = new HashMap<>();

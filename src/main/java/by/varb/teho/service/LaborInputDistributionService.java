@@ -16,6 +16,6 @@ public interface LaborInputDistributionService {
      *
      * @return Map, ключ это тип ВВСТ, значение - список данных о записи
      */
-    Map<EquipmentType, List<EquipmentLaborInputDistribution>> calculateLaborDistribution();
+    Map<EquipmentType, List<EquipmentLaborInputDistribution>> calculateLaborInputDistribution();
 
 }

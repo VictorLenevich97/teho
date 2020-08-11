@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface RepairStationService {
 
-    List<RepairStation> getAll();
+    List<RepairStation> list();
 
     Optional<RepairStation> find(Long repairStationId);
 
-    void add(RepairStation repairStation);
+    Long add(String name, Long baseId, Long typeId, int amount);
 
-    void addType(RepairStationType repairStationType);
+    Long addType(String name, int workingHoursMin, int workingHoursMax);
 
-    List<RepairStationType> getAllTypes();
+    List<RepairStationType> listTypes();
 }

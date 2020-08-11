@@ -1,9 +1,12 @@
 package by.varb.teho.service.implementation;
 
+import by.varb.teho.entity.Base;
 import by.varb.teho.entity.RepairStation;
 import by.varb.teho.entity.RepairStationType;
+import by.varb.teho.exception.NotFoundException;
 import by.varb.teho.repository.RepairStationRepository;
 import by.varb.teho.repository.RepairStationTypeRepository;
+import by.varb.teho.service.BaseService;
 import by.varb.teho.service.RepairStationService;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +19,18 @@ public class RepairStationServiceImpl implements RepairStationService {
 
     private final RepairStationRepository repairStationRepository;
     private final RepairStationTypeRepository repairStationTypeRepository;
+    private final BaseService baseService;
 
     public RepairStationServiceImpl(
             RepairStationRepository repairStationRepository,
-            RepairStationTypeRepository repairStationTypeRepository) {
+            RepairStationTypeRepository repairStationTypeRepository, BaseService baseService) {
         this.repairStationRepository = repairStationRepository;
         this.repairStationTypeRepository = repairStationTypeRepository;
+        this.baseService = baseService;
     }
 
     @Override
-    public List<RepairStation> getAll() {
+    public List<RepairStation> list() {
         return (ArrayList<RepairStation>) this.repairStationRepository.findAll();
     }
 
@@ -35,17 +40,24 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
-    public void add(RepairStation repairStation) {
-        this.repairStationRepository.save(repairStation);
+    public Long add(String name, Long baseId, Long typeId, int amount) {
+        Base base = baseService.get(baseId);
+        RepairStationType repairStationType =
+                repairStationTypeRepository
+                        .findById(typeId)
+                        .orElseThrow(() -> new NotFoundException("Тип РВО с id = " + typeId + " не найден"));
+        RepairStation repairStation = new RepairStation(name, repairStationType, base, amount);
+        return repairStation.getId();
     }
 
     @Override
-    public void addType(RepairStationType repairStationType) {
-        this.repairStationTypeRepository.save(repairStationType);
+    public Long addType(String name, int workingHoursMin, int workingHoursMax) {
+        RepairStationType repairStationType = new RepairStationType(name, workingHoursMin, workingHoursMax);
+        return repairStationTypeRepository.save(repairStationType).getId();
     }
 
     @Override
-    public List<RepairStationType> getAllTypes() {
+    public List<RepairStationType> listTypes() {
         return (ArrayList<RepairStationType>) this.repairStationTypeRepository.findAll();
     }
 }

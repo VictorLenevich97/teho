@@ -23,13 +23,13 @@ public class EquipmentController {
     @GetMapping
     @ResponseBody
     public List<Equipment> getEquipmentInfo() {
-        return equipmentService.getAll();
+        return equipmentService.list();
     }
 
     @GetMapping("/type")
     @ResponseBody
     public List<EquipmentType> getEquipmentTypes() {
-        return equipmentService.getAllTypes();
+        return equipmentService.listTypes();
     }
 
     @PostMapping

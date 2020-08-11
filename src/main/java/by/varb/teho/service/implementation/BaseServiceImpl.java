@@ -3,6 +3,8 @@ package by.varb.teho.service.implementation;
 import by.varb.teho.entity.Base;
 import by.varb.teho.entity.Equipment;
 import by.varb.teho.entity.EquipmentPerBase;
+import by.varb.teho.exception.BaseNotFoundException;
+import by.varb.teho.exception.EquipmentNotFoundException;
 import by.varb.teho.repository.BaseRepository;
 import by.varb.teho.repository.EquipmentPerBaseRepository;
 import by.varb.teho.repository.EquipmentRepository;
@@ -28,20 +30,26 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
-    public void add(String shortName, String fullName) {
-        this.baseRepository.save(new Base(shortName, fullName));
+    public Long add(String shortName, String fullName) {
+        Base base = this.baseRepository.save(new Base(shortName, fullName));
+        return base.getId();
     }
 
     @Override
     public void addEquipmentToBase(Long baseId, Long equipmentId, int intensity, int amount) {
-        //TODO: Throw exceptions on .orElseThrow
-        Base b = baseRepository.findById(baseId).get();
-        Equipment e = equipmentRepository.findById(equipmentId).get();
+        Base b = baseRepository.findById(baseId).orElseThrow(() -> new BaseNotFoundException(baseId));
+        Equipment e =
+                equipmentRepository.findById(equipmentId).orElseThrow(() -> new EquipmentNotFoundException(equipmentId));
         this.equipmentPerBaseRepository.save(new EquipmentPerBase(b, e, intensity, amount));
     }
 
     @Override
-    public List<Base> getAll() {
+    public Base get(Long baseId) {
+        return baseRepository.findById(baseId).orElseThrow(() -> new BaseNotFoundException(baseId));
+    }
+
+    @Override
+    public List<Base> list() {
         return (List<Base>) this.baseRepository.findAll();
     }
 }

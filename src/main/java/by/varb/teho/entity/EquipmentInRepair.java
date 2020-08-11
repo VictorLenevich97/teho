@@ -9,9 +9,9 @@ public class EquipmentInRepair {
     EquipmentInRepairEmbeddable equipmentInRepairId;
 
     @ManyToOne
-    @MapsId("repair_station_id")
-    @JoinColumn(name = "repair_station_id")
-    RepairStation repairStation;
+    @MapsId("base_id")
+    @JoinColumn(name = "base_id")
+    Base base;
 
     @ManyToOne
     @MapsId("equipment_id")
@@ -54,12 +54,12 @@ public class EquipmentInRepair {
         this.equipmentInRepairId = equipmentInRepairId;
     }
 
-    public RepairStation getRepairStation() {
-        return repairStation;
+    public Base getBase() {
+        return base;
     }
 
-    public void setRepairStation(RepairStation repairStation) {
-        this.repairStation = repairStation;
+    public void setBase(Base base) {
+        this.base = base;
     }
 
     public Equipment getEquipment() {

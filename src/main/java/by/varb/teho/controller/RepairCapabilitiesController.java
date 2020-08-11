@@ -44,8 +44,8 @@ public class RepairCapabilitiesController {
      */
     @PostMapping("/calculate")
     public void calculate() {
-        List<Equipment> equipmentList = this.equipmentService.getAll();
-        List<RepairStation> repairStations = this.repairStationService.getAll();
+        List<Equipment> equipmentList = this.equipmentService.list();
+        List<RepairStation> repairStations = this.repairStationService.list();
         for (Equipment e : equipmentList) {
             for (RepairStation repairStation : repairStations) {
                 EquipmentPerRepairStation equipmentPerRepairStation = new EquipmentPerRepairStation(repairStation.getId(), e.getId());

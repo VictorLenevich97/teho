@@ -7,8 +7,8 @@ import java.io.Serializable;
 @Embeddable
 public class EquipmentInRepairEmbeddable implements Serializable {
 
-    @Column(name = "repair_station_id")
-    private Long repairStationId;
+    @Column(name = "base_id")
+    private Long baseId;
 
     @Column(name = "equipment_id")
     private Long equipmentId;

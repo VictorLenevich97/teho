@@ -5,8 +5,8 @@ import by.varb.teho.entity.EquipmentType;
 import by.varb.teho.repository.EquipmentRepository;
 import by.varb.teho.repository.EquipmentTypeRepository;
 import by.varb.teho.service.EquipmentService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +15,8 @@ import java.util.Optional;
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
 
-    public static final Logger log = LogManager.getLogger(EquipmentServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentServiceImpl.class);
+
     private final EquipmentRepository equipmentRepository;
     private final EquipmentTypeRepository equipmentTypeRepository;
 
@@ -24,34 +25,38 @@ public class EquipmentServiceImpl implements EquipmentService {
         this.equipmentTypeRepository = equipmentTypeRepository;
     }
 
-    public List<Equipment> getAll() {
+    public List<Equipment> list() {
         return (List<Equipment>) equipmentRepository.findAll();
     }
 
     @Override
-    public void add(String name, Long typeId) {
+    public Long add(String name, Long typeId) {
+        LOGGER.debug(String.format("Добавление ВВСТ \"%s\", typeId = %d", name, typeId));
         Optional<EquipmentType> equipmentType = equipmentTypeRepository.findById(typeId);
         if (!equipmentType.isPresent()) {
-            log.error("Неверный тип");
-            return;
+            LOGGER.error("Неверный тип");
+            return -1L;
         }
 
         if (equipmentRepository.findByName(name).isPresent()) {
-            log.error("Уже существует");
-            return;
+            LOGGER.error("Уже существует");
+            return -1L;
         }
-        equipmentRepository.save(new Equipment(name, equipmentType.get()));
+        Equipment saved = equipmentRepository.save(new Equipment(name, equipmentType.get()));
+        return saved.getId();
     }
 
     @Override
-    public List<EquipmentType> getAllTypes() {
+    public List<EquipmentType> listTypes() {
         return (List<EquipmentType>) equipmentTypeRepository.findAll();
     }
 
     @Override
-    public void addType(String shortName, String longName) {
+    public Long addType(String shortName, String longName) {
+        LOGGER.debug(String.format("Добавление типа ВВСТ: \"%s\" (\"%s\")", shortName, longName));
         EquipmentType equipmentType = new EquipmentType(shortName, longName);
-        equipmentTypeRepository.save(equipmentType);
+        EquipmentType type = equipmentTypeRepository.save(equipmentType);
+        return type.getId();
     }
 
 

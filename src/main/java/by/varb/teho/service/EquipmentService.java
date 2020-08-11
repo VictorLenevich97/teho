@@ -6,12 +6,13 @@ import by.varb.teho.entity.EquipmentType;
 import java.util.List;
 
 public interface EquipmentService {
-    List<Equipment> getAll();
 
-    void add(String name, Long typeId);
+    List<Equipment> list();
 
-    List<EquipmentType> getAllTypes();
+    Long add(String name, Long typeId);
 
-    void addType(String shortName, String longName);
+    List<EquipmentType> listTypes();
+
+    Long addType(String shortName, String longName);
 
 }

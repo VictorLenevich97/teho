@@ -22,6 +22,13 @@ public class RepairStation {
         //Пустой конструктор для автоматической инициализации
     }
 
+    public RepairStation(String name, RepairStationType repairStationType, Base baseId, int stationAmount) {
+        this.name = name;
+        this.repairStationType = repairStationType;
+        this.baseId = baseId;
+        this.stationAmount = stationAmount;
+    }
+
     public Long getId() {
         return id;
     }
