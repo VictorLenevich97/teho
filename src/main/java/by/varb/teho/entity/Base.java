@@ -1,6 +1,7 @@
-package by.varb.teho.model;
+package by.varb.teho.entity;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "base")
@@ -10,6 +11,16 @@ public class Base {
     private Long id;
     private String shortName;
     private String fullName;
+    @OneToMany(mappedBy = "base")
+    private Set<EquipmentPerBase> equipmentPerBases;
+
+    public Base() {
+    }
+
+    public Base(String shortName, String fullName) {
+        this.shortName = shortName;
+        this.fullName = fullName;
+    }
 
     public Long getId() {
         return id;
@@ -33,5 +44,9 @@ public class Base {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public Set<EquipmentPerBase> getEquipmentPerBases() {
+        return equipmentPerBases;
     }
 }

@@ -1,6 +1,6 @@
 package by.varb.teho.repository;
 
-import by.varb.teho.model.EquipmentType;
+import by.varb.teho.entity.EquipmentType;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

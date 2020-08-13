@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class TehoApplication {
 
-	public static void main(String[] args){
-		SpringApplication.run(TehoApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TehoApplication.class, args);
+    }
 }

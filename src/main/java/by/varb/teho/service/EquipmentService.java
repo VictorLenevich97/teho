@@ -1,17 +1,18 @@
 package by.varb.teho.service;
 
-import by.varb.teho.dto.AddNewEquipmentDTO;
-import by.varb.teho.exception.TehoException;
-import by.varb.teho.model.Equipment;
-import by.varb.teho.model.EquipmentType;
+import by.varb.teho.entity.Equipment;
+import by.varb.teho.entity.EquipmentType;
 
 import java.util.List;
 
 public interface EquipmentService {
 
-    List<Equipment> getEquipmentInfo();
+    List<Equipment> list();
 
-    void addNewEquipment(AddNewEquipmentDTO addNewEquipmentDTO) throws TehoException;
+    Long add(String name, Long typeId);
 
-    List<EquipmentType> getEquipmentTypes();
+    List<EquipmentType> listTypes();
+
+    Long addType(String shortName, String longName);
+
 }
