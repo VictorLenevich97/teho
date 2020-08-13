@@ -20,7 +20,10 @@ public class CalculatedRepairCapabilitesPerDay {
     public CalculatedRepairCapabilitesPerDay() {
     }
 
-    public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStation equipmentPerRepairStation, RepairStation repairStation, Equipment equipment, double capability) {
+    public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStation equipmentPerRepairStation,
+                                             RepairStation repairStation,
+                                             Equipment equipment,
+                                             double capability) {
         this.equipmentPerRepairStation = equipmentPerRepairStation;
         this.repairStation = repairStation;
         this.equipment = equipment;

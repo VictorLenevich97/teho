@@ -12,10 +12,22 @@ import java.util.Map;
 public interface LaborInputDistributionService {
 
     /**
-     * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ.
+     * Получение данных о распределении ремонтного фонда по трудоемкости ремонта по всем ВВСТ.
      *
      * @return Map, ключ это тип ВВСТ, значение - список данных о записи
      */
-    Map<EquipmentType, List<EquipmentLaborInputDistribution>> calculateLaborInputDistribution();
+    Map<EquipmentType, List<EquipmentLaborInputDistribution>> getLaborInputDistribution();
+
+    /**
+     * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ.
+     */
+    void updateLaborInputDistribution();
+
+    /**
+     * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ, относящихся к Base с id = baseId.
+     *
+     * @param baseId id Base
+     */
+    void updateLaborInputDistribution(Long baseId);
 
 }

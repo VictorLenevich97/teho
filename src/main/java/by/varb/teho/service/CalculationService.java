@@ -21,7 +21,10 @@ public interface CalculationService {
      * @param standardLaborInput нормативная трудоемкость ремонта
      * @return количество образцов, требующих ремонта в данном диапазоне
      */
-    int calculateEquipmentRequiringRepair(int upperBound, int lowerBound, double avgDailyFailure, int standardLaborInput);
+    double calculateEquipmentRequiringRepair(Integer upperBound,
+                                             Integer lowerBound,
+                                             double avgDailyFailure,
+                                             int standardLaborInput);
 
     /**
      * Расчет средней трудоемкости ремонта ВВСТ для диапазона
@@ -30,7 +33,7 @@ public interface CalculationService {
      * @param upperBound верхняя граница диапазона
      * @return средняя трудоемкость ВВСТ в заданном диапазоне
      */
-    int calculateEquipmentRepairComplexity(int count, int upperBound);
+    double calculateEquipmentRepairComplexity(double count, Integer upperBound);
 
     /**
      * Расчет производственных возможностей по ремонту

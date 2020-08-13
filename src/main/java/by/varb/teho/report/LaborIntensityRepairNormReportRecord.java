@@ -11,7 +11,11 @@ public class LaborIntensityRepairNormReportRecord {
     public LaborIntensityRepairNormReportRecord() {
     }
 
-    public LaborIntensityRepairNormReportRecord(String equipmentBrand, String equipmentTypeName, int currentRepairCost, int averageRepairCost, int capitalRepairCost) {
+    public LaborIntensityRepairNormReportRecord(String equipmentBrand,
+                                                String equipmentTypeName,
+                                                int currentRepairCost,
+                                                int averageRepairCost,
+                                                int capitalRepairCost) {
         this.equipmentBrand = equipmentBrand;
         this.equipmentTypeName = equipmentTypeName;
         this.currentRepairCost = currentRepairCost;

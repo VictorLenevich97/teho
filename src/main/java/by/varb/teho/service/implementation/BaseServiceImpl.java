@@ -39,7 +39,9 @@ public class BaseServiceImpl implements BaseService {
     public void addEquipmentToBase(Long baseId, Long equipmentId, int intensity, int amount) {
         Base b = baseRepository.findById(baseId).orElseThrow(() -> new BaseNotFoundException(baseId));
         Equipment e =
-                equipmentRepository.findById(equipmentId).orElseThrow(() -> new EquipmentNotFoundException(equipmentId));
+                equipmentRepository
+                        .findById(equipmentId)
+                        .orElseThrow(() -> new EquipmentNotFoundException(equipmentId));
         this.equipmentPerBaseRepository.save(new EquipmentPerBase(b, e, intensity, amount));
     }
 

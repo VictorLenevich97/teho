@@ -12,17 +12,19 @@ public class CalculationServiceImpl implements CalculationService {
     }
 
     @Override
-    public int calculateEquipmentRequiringRepair(
-            int upperBound,
-            int lowerBound,
+    public double calculateEquipmentRequiringRepair(
+            Integer upperBound,
+            Integer lowerBound,
             double avgDailyFailure,
             int standardLaborInput) {
-        return (int) Math.abs(avgDailyFailure * (Math.sin(Math.PI * upperBound / (2 * standardLaborInput)) - Math.sin(Math.PI * lowerBound / (2 * standardLaborInput))));
+        return Math.abs(avgDailyFailure *
+                                (Math.sin((Math.PI * upperBound) / (2 * standardLaborInput)) -
+                                        Math.sin((Math.PI * lowerBound) / (2 * standardLaborInput))));
     }
 
     @Override
-    public int calculateEquipmentRepairComplexity(int count, int upperBound) {
-        return (int) (0.75 * count * upperBound);
+    public double calculateEquipmentRepairComplexity(double count, Integer upperBound) {
+        return 0.75 * count * upperBound;
     }
 
     public double calculateRepairCapabilities(int totalStaff, int workingTime, long avgLaborInput) {

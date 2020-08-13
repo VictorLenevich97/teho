@@ -47,8 +47,12 @@ public class EquipmentType {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         EquipmentType that = (EquipmentType) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(shortName, that.shortName) &&
