@@ -24,8 +24,10 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     }
 
     @Override
-    public Optional<RepairStationEquipmentStaff> getRepairStationEquipmentStaff(Long equipmentId, Long repairStationId) {
-        EquipmentPerRepairStation equipmentPerRepairStation = new EquipmentPerRepairStation(repairStationId, equipmentId);
+    public Optional<RepairStationEquipmentStaff> getRepairStationEquipmentStaff(Long equipmentId,
+                                                                                Long repairStationId) {
+        EquipmentPerRepairStation equipmentPerRepairStation = new EquipmentPerRepairStation(repairStationId,
+                                                                                            equipmentId);
         return repairStationEquipmentCapabilitiesRepository.findById(equipmentPerRepairStation);
     }
 
@@ -49,10 +51,13 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     @Override
     public Map<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> getTotalCalculatedRepairCapabilities() {
         Map<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> result = new HashMap<>();
-        for (CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay : this.calculatedRepairCapabilitiesPerDayRepository.findAll()) {
+        for (CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay : this.calculatedRepairCapabilitiesPerDayRepository
+                .findAll()) {
             RepairStation repairStation = calculatedRepairCapabilitesPerDay.getRepairStation();
             result.computeIfAbsent(repairStation, rs -> new HashMap<>());
-            result.get(repairStation).put(calculatedRepairCapabilitesPerDay.getEquipment(), calculatedRepairCapabilitesPerDay);
+            result
+                    .get(repairStation)
+                    .put(calculatedRepairCapabilitesPerDay.getEquipment(), calculatedRepairCapabilitesPerDay);
         }
         return result;
     }

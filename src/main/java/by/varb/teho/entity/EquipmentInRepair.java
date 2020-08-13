@@ -6,7 +6,7 @@ import javax.persistence.*;
 public class EquipmentInRepair {
 
     @EmbeddedId
-    EquipmentInRepairEmbeddable equipmentInRepairId;
+    EquipmentInRepairId equipmentInRepairId;
 
     @ManyToOne
     @MapsId("base_id")
@@ -23,14 +23,28 @@ public class EquipmentInRepair {
     @JoinColumn(name = "workhours_distribution_interval_id")
     WorkhoursDistributionInterval workhoursDistributionInterval;
 
-    private int count;
-    private int avgLaborInput;
+    private double count;
+    private double avgLaborInput;
 
     public EquipmentInRepair() {
         //Пустой конструктор для инициализации
     }
 
-    public int getCount() {
+    public EquipmentInRepair(EquipmentInRepairId equipmentInRepairId,
+                             Base base,
+                             Equipment equipment,
+                             WorkhoursDistributionInterval workhoursDistributionInterval,
+                             double count,
+                             double avgLaborInput) {
+        this.equipmentInRepairId = equipmentInRepairId;
+        this.base = base;
+        this.equipment = equipment;
+        this.workhoursDistributionInterval = workhoursDistributionInterval;
+        this.count = count;
+        this.avgLaborInput = avgLaborInput;
+    }
+
+    public double getCount() {
         return count;
     }
 
@@ -38,7 +52,7 @@ public class EquipmentInRepair {
         this.count = count;
     }
 
-    public int getAvgLaborInput() {
+    public double getAvgLaborInput() {
         return avgLaborInput;
     }
 
@@ -46,11 +60,11 @@ public class EquipmentInRepair {
         this.avgLaborInput = avgLaborInput;
     }
 
-    public EquipmentInRepairEmbeddable getEquipmentInRepairId() {
+    public EquipmentInRepairId getEquipmentInRepairId() {
         return equipmentInRepairId;
     }
 
-    public void setEquipmentInRepairId(EquipmentInRepairEmbeddable equipmentInRepairId) {
+    public void setEquipmentInRepairId(EquipmentInRepairId equipmentInRepairId) {
         this.equipmentInRepairId = equipmentInRepairId;
     }
 

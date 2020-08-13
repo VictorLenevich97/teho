@@ -11,7 +11,7 @@ public class EquipmentLaborInputDistribution {
     private final double avgDailyFailure;
     private final int standardLaborInput;
     private final Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap;
-    private final int totalRepairComplexity;
+    private final double totalRepairComplexity;
 
     public EquipmentLaborInputDistribution(
             String baseName,
@@ -20,7 +20,7 @@ public class EquipmentLaborInputDistribution {
             double avgDailyFailure,
             int standardLaborInput,
             Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap,
-            int totalRepairComplexity) {
+            double totalRepairComplexity) {
         this.baseName = baseName;
         this.equipmentType = equipmentType;
         this.equipment = equipment;
@@ -30,7 +30,11 @@ public class EquipmentLaborInputDistribution {
         this.totalRepairComplexity = totalRepairComplexity;
     }
 
-    public int getTotalRepairComplexity() {
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public double getTotalRepairComplexity() {
         return totalRepairComplexity;
     }
 
@@ -59,26 +63,30 @@ public class EquipmentLaborInputDistribution {
     }
 
     public static class CountAndLaborInput {
-        private final int count;
-        private final int laborInput;
+        private final double count;
+        private final double laborInput;
 
-        public CountAndLaborInput(int count, int laborInput) {
+        public CountAndLaborInput(double count, double laborInput) {
             this.count = count;
             this.laborInput = laborInput;
         }
 
-        public int getCount() {
+        public double getCount() {
             return count;
         }
 
-        public int getLaborInput() {
+        public double getLaborInput() {
             return laborInput;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             CountAndLaborInput that = (CountAndLaborInput) o;
             return count == that.count &&
                     laborInput == that.laborInput;
@@ -87,6 +95,65 @@ public class EquipmentLaborInputDistribution {
         @Override
         public int hashCode() {
             return Objects.hash(count, laborInput);
+        }
+    }
+
+    public static class Builder {
+        private String baseName;
+        private EquipmentType equipmentType;
+        private Equipment equipment;
+        private double avgDailyFailure;
+        private int standardLaborInput;
+        private Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap;
+        private double totalRepairComplexity;
+
+        public Builder baseName(String baseName) {
+            this.baseName = baseName;
+            return this;
+        }
+
+        public Builder equipmentType(EquipmentType equipmentType) {
+            this.equipmentType = equipmentType;
+            return this;
+        }
+
+        public Builder equipment(Equipment equipment) {
+            this.equipment = equipment;
+            return this;
+        }
+
+        public Builder avgDailyFailure(double avgDailyFailure) {
+            this.avgDailyFailure = avgDailyFailure;
+            return this;
+        }
+
+        public Builder standardLaborInput(int standardLaborInput) {
+            this.standardLaborInput = standardLaborInput;
+            return this;
+        }
+
+        public Builder intervalCountAndLaborInputMap(Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap) {
+            this.intervalCountAndLaborInputMap = intervalCountAndLaborInputMap;
+            return this;
+        }
+
+        public Builder totalRepairComplexity(double totalRepairComplexity) {
+            this.totalRepairComplexity = totalRepairComplexity;
+            return this;
+        }
+
+        public EquipmentLaborInputDistribution build() {
+            return new EquipmentLaborInputDistribution(baseName,
+                                                       equipmentType,
+                                                       equipment,
+                                                       avgDailyFailure,
+                                                       standardLaborInput,
+                                                       intervalCountAndLaborInputMap,
+                                                       totalRepairComplexity);
+        }
+
+        public Map<WorkhoursDistributionInterval, CountAndLaborInput> getIntervalCountAndLaborInputMap() {
+            return intervalCountAndLaborInputMap;
         }
     }
 }

@@ -20,6 +20,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("repair-capabilities")
+//TODO: Перенести логику в сервис
 public class RepairCapabilitiesController {
 
     private final RepairCapabilitiesService repairCapabilitiesService;
@@ -48,7 +49,8 @@ public class RepairCapabilitiesController {
         List<RepairStation> repairStations = this.repairStationService.list();
         for (Equipment e : equipmentList) {
             for (RepairStation repairStation : repairStations) {
-                EquipmentPerRepairStation equipmentPerRepairStation = new EquipmentPerRepairStation(repairStation.getId(), e.getId());
+                EquipmentPerRepairStation equipmentPerRepairStation = new EquipmentPerRepairStation(repairStation.getId(),
+                                                                                                    e.getId());
                 Optional<RepairStationEquipmentStaff> repairStationEquipmentCapabilities =
                         repairCapabilitiesService.getRepairStationEquipmentStaff(e.getId(), repairStation.getId());
                 repairStationEquipmentCapabilities.ifPresent(rsec -> {
@@ -77,7 +79,10 @@ public class RepairCapabilitiesController {
                 rsec.getTotalStaff(),
                 rsec.getRepairStation().getRepairStationType().getWorkingHoursMax(),
                 laborInputAmount);
-        return new CalculatedRepairCapabilitesPerDay(equipmentPerRepairStation, repairStation, e, calculatedCapabilities);
+        return new CalculatedRepairCapabilitesPerDay(equipmentPerRepairStation,
+                                                     repairStation,
+                                                     e,
+                                                     calculatedCapabilities);
     }
 
     @GetMapping
@@ -86,11 +91,15 @@ public class RepairCapabilitiesController {
         Map<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> totalCalculatedRepairCapabilities =
                 this.repairCapabilitiesService.getTotalCalculatedRepairCapabilities();
         Map<String, Map<String, Double>> result = new HashMap<>();
-        for (Map.Entry<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> entry : totalCalculatedRepairCapabilities.entrySet()) {
+        for (Map.Entry<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> entry : totalCalculatedRepairCapabilities
+                .entrySet()) {
             Map<String, Double> equipmentCapabilities = new HashMap<>();
             result.put(entry.getKey().getName(), equipmentCapabilities);
-            for (Map.Entry<Equipment, CalculatedRepairCapabilitesPerDay> capabilitesPerDayEntry : entry.getValue().entrySet()) {
-                equipmentCapabilities.put(capabilitesPerDayEntry.getKey().getName(), capabilitesPerDayEntry.getValue().getCapability());
+            for (Map.Entry<Equipment, CalculatedRepairCapabilitesPerDay> capabilitesPerDayEntry : entry
+                    .getValue()
+                    .entrySet()) {
+                equipmentCapabilities.put(capabilitesPerDayEntry.getKey().getName(),
+                                          capabilitesPerDayEntry.getValue().getCapability());
             }
         }
         return result;

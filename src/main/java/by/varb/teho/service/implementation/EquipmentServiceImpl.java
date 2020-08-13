@@ -20,7 +20,8 @@ public class EquipmentServiceImpl implements EquipmentService {
     private final EquipmentRepository equipmentRepository;
     private final EquipmentTypeRepository equipmentTypeRepository;
 
-    public EquipmentServiceImpl(EquipmentRepository equipmentRepository, EquipmentTypeRepository equipmentTypeRepository) {
+    public EquipmentServiceImpl(EquipmentRepository equipmentRepository,
+                                EquipmentTypeRepository equipmentTypeRepository) {
         this.equipmentRepository = equipmentRepository;
         this.equipmentTypeRepository = equipmentTypeRepository;
     }
