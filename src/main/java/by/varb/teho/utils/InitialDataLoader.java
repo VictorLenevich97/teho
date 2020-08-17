@@ -24,14 +24,12 @@ public class InitialDataLoader implements ApplicationRunner {
 
     private final RepairTypeRepository repairTypeRepository;
     private final RestorationTypeRepository restorationTypeRepository;
-    private final WorkhoursDistributionIntervalRepository workhoursDistributionIntervalRepository;
 
     public InitialDataLoader(RepairTypeRepository repairTypeRepository,
                              RestorationTypeRepository restorationTypeRepository,
                              WorkhoursDistributionIntervalRepository workhoursDistributionIntervalRepository) {
         this.repairTypeRepository = repairTypeRepository;
         this.restorationTypeRepository = restorationTypeRepository;
-        this.workhoursDistributionIntervalRepository = workhoursDistributionIntervalRepository;
     }
 
     private void loadRepairTypes() {
@@ -50,7 +48,7 @@ public class InitialDataLoader implements ApplicationRunner {
         LOGGER.info("Типы ремонта загружены!");
     }
 
-    private Iterable<RestorationType> loadRestorationTypes() {
+    private void loadRestorationTypes() {
         LOGGER.info("Загружаются типы восстановления...");
         List<String> restorationTypes = ((List<RestorationType>) this.restorationTypeRepository.findAll())
                 .stream()
@@ -64,7 +62,6 @@ public class InitialDataLoader implements ApplicationRunner {
                                                                .filter(rt -> !restorationTypes.contains(rt.getName()))
                                                                .collect(Collectors.toList()));
         LOGGER.info("Типы восстановления загружены!");
-        return types;
     }
 
     @Override

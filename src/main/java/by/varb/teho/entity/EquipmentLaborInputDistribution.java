@@ -1,11 +1,10 @@
 package by.varb.teho.entity;
 
 import java.util.Map;
-import java.util.Objects;
 
 public class EquipmentLaborInputDistribution {
 
-    private final String baseName;
+    private final Base base;
     private final EquipmentType equipmentType;
     private final Equipment equipment;
     private final double avgDailyFailure;
@@ -14,14 +13,14 @@ public class EquipmentLaborInputDistribution {
     private final double totalRepairComplexity;
 
     public EquipmentLaborInputDistribution(
-            String baseName,
+            Base base,
             EquipmentType equipmentType,
             Equipment equipment,
             double avgDailyFailure,
             int standardLaborInput,
             Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap,
             double totalRepairComplexity) {
-        this.baseName = baseName;
+        this.base = base;
         this.equipmentType = equipmentType;
         this.equipment = equipment;
         this.avgDailyFailure = avgDailyFailure;
@@ -38,8 +37,8 @@ public class EquipmentLaborInputDistribution {
         return totalRepairComplexity;
     }
 
-    public String getBaseName() {
-        return baseName;
+    public Base getBase() {
+        return base;
     }
 
     public EquipmentType getEquipmentType() {
@@ -62,44 +61,8 @@ public class EquipmentLaborInputDistribution {
         return intervalCountAndLaborInputMap;
     }
 
-    public static class CountAndLaborInput {
-        private final double count;
-        private final double laborInput;
-
-        public CountAndLaborInput(double count, double laborInput) {
-            this.count = count;
-            this.laborInput = laborInput;
-        }
-
-        public double getCount() {
-            return count;
-        }
-
-        public double getLaborInput() {
-            return laborInput;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            CountAndLaborInput that = (CountAndLaborInput) o;
-            return count == that.count &&
-                    laborInput == that.laborInput;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(count, laborInput);
-        }
-    }
-
     public static class Builder {
-        private String baseName;
+        private Base base;
         private EquipmentType equipmentType;
         private Equipment equipment;
         private double avgDailyFailure;
@@ -107,8 +70,8 @@ public class EquipmentLaborInputDistribution {
         private Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap;
         private double totalRepairComplexity;
 
-        public Builder baseName(String baseName) {
-            this.baseName = baseName;
+        public Builder base(Base base) {
+            this.base = base;
             return this;
         }
 
@@ -143,7 +106,7 @@ public class EquipmentLaborInputDistribution {
         }
 
         public EquipmentLaborInputDistribution build() {
-            return new EquipmentLaborInputDistribution(baseName,
+            return new EquipmentLaborInputDistribution(base,
                                                        equipmentType,
                                                        equipment,
                                                        avgDailyFailure,

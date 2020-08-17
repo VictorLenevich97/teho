@@ -3,6 +3,7 @@ package by.varb.teho.service.implementation;
 import by.varb.teho.entity.*;
 import by.varb.teho.enums.RepairTypeEnum;
 import by.varb.teho.exception.RepairTypeLaborInputNotFoundException;
+import by.varb.teho.model.Pair;
 import by.varb.teho.repository.EquipmentInRepairRepository;
 import by.varb.teho.repository.WorkhoursDistributionIntervalRepository;
 import by.varb.teho.service.BaseService;
@@ -33,77 +34,47 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     }
 
     @Override
-    //TODO: Simplify
     public Map<EquipmentType, List<EquipmentLaborInputDistribution>> getLaborInputDistribution() {
-        List<EquipmentInRepair> equipmentInRepair = (List<EquipmentInRepair>) equipmentInRepairRepository.findAll();
-        Map<EquipmentType, Map<Long, Map<Long, List<EquipmentLaborInputDistribution.Builder>>>> temporalResult = new HashMap<>();
-        for (EquipmentInRepair eir : equipmentInRepair) {
-            Equipment eirEquipment = eir.getEquipment();
-            List<EquipmentLaborInputDistribution.Builder> distributionList =
-                    temporalResult
-                            .computeIfAbsent(eirEquipment.getEquipmentType(), et -> new HashMap<>())
-                            .computeIfAbsent(eir.getBase().getId(), bid -> new HashMap<>())
-                            .computeIfAbsent(eir.getEquipment().getId(), id -> new ArrayList<>());
-            EquipmentLaborInputDistribution.Builder equipmentLaborInputDistribution =
-                    getEquipmentLaborInputDistribution(eir);
-            distributionList.add(equipmentLaborInputDistribution);
-        }
-        Map<EquipmentType, List<EquipmentLaborInputDistribution>> result = new HashMap<>();
-        for (Map.Entry<EquipmentType, Map<Long, Map<Long, List<EquipmentLaborInputDistribution.Builder>>>> equipmentTypeMapEntry : temporalResult
-                .entrySet()) {
-            List<EquipmentLaborInputDistribution> distributionList = result.computeIfAbsent(equipmentTypeMapEntry.getKey(),
-                                                                                            et -> new ArrayList<>());
-            for (Map.Entry<Long, Map<Long, List<EquipmentLaborInputDistribution.Builder>>> baseMapEntry : equipmentTypeMapEntry
-                    .getValue()
-                    .entrySet()) {
-                for (Map.Entry<Long, List<EquipmentLaborInputDistribution.Builder>> equipmentMapEntry : baseMapEntry
-                        .getValue()
-                        .entrySet()) {
-                    Optional<EquipmentLaborInputDistribution> equipmentLaborInputDistribution = populateWithLaborInputMapAndTotal(
-                            equipmentMapEntry);
-                    equipmentLaborInputDistribution.ifPresent(distributionList::add);
-                }
-            }
-        }
-        return result;
-    }
-
-    private Optional<EquipmentLaborInputDistribution> populateWithLaborInputMapAndTotal(Map.Entry<Long, List<EquipmentLaborInputDistribution.Builder>> equipmentMapEntry) {
-        Optional<EquipmentLaborInputDistribution.Builder> summarized =
-                equipmentMapEntry
-                        .getValue()
+        Map<Pair<Long, Long>, List<EquipmentInRepair>> equipmentInRepair = equipmentInRepairRepository.findAllGroupedByBaseAndEquipment();
+        return
+                equipmentInRepair
+                        .entrySet()
                         .stream()
-                        .reduce((l, r) -> {
-                            Map<WorkhoursDistributionInterval, EquipmentLaborInputDistribution.CountAndLaborInput> m =
-                                    new HashMap<>(l.getIntervalCountAndLaborInputMap());
-                            m.putAll(r.getIntervalCountAndLaborInputMap());
-                            return l.intervalCountAndLaborInputMap(m);
-                        });
-        return summarized
-                .map(elid -> elid.totalRepairComplexity(
-                        elid
-                                .getIntervalCountAndLaborInputMap()
-                                .values()
-                                .stream()
-                                .mapToDouble(EquipmentLaborInputDistribution.CountAndLaborInput::getLaborInput)
-                                .sum())
-                                 .build());
+                        .collect(Collectors.toMap(Map.Entry::getKey,
+                                                  eirs -> eirs
+                                                          .getValue()
+                                                          .stream()
+                                                          .reduce(Pair.of(new EquipmentInRepair(), new HashMap<>()),
+                                                                  this::getEquipmentInRepairHashMapPair,
+                                                                  (l, r) -> l)))
+                        .values()
+                        .stream()
+                        .map(this::getEquipmentLaborInputDistribution)
+                        .collect(Collectors.groupingBy(EquipmentLaborInputDistribution::getEquipmentType));
     }
 
-    private EquipmentLaborInputDistribution.Builder getEquipmentLaborInputDistribution(EquipmentInRepair eir) {
+    private Pair<EquipmentInRepair, HashMap<WorkhoursDistributionInterval, Pair<Double, Double>>> getEquipmentInRepairHashMapPair(
+            Pair<EquipmentInRepair, HashMap<WorkhoursDistributionInterval, Pair<Double, Double>>> p,
+            EquipmentInRepair eir) {
+        p.getRight().put(eir.getWorkhoursDistributionInterval(), Pair.of(eir.getCount(), eir.getAvgLaborInput()));
+        return Pair.of(eir, p.getRight());
+    }
+
+    private EquipmentLaborInputDistribution getEquipmentLaborInputDistribution(
+            Pair<EquipmentInRepair, HashMap<WorkhoursDistributionInterval, Pair<Double, Double>>> pair) {
+        EquipmentInRepair eir = pair.getLeft();
         Equipment eirEquipment = eir.getEquipment();
         return EquipmentLaborInputDistribution
                 .builder()
-                .baseName(eir.getBase().getFullName())
+                .base(eir.getBase())
                 .equipmentType(eirEquipment.getEquipmentType())
                 .equipment(eirEquipment)
                 .avgDailyFailure(eir.getCount())
                 .standardLaborInput(getStandardLaborInput(eirEquipment))
-                .intervalCountAndLaborInputMap(
-                        Collections.singletonMap(
-                                eir.getWorkhoursDistributionInterval(),
-                                new EquipmentLaborInputDistribution.CountAndLaborInput(eir.getCount(),
-                                                                                       eir.getAvgLaborInput())));
+                .intervalCountAndLaborInputMap(pair.getRight().entrySet().stream().collect(
+                        Collectors.toMap(Map.Entry::getKey, e -> new CountAndLaborInput(e.getValue().getLeft(),
+                                                                                        e.getValue().getRight()))))
+                .build();
     }
 
     @Override
@@ -121,7 +92,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         List<EquipmentInRepair> calculated = new ArrayList<>();
         for (Base base : bases) {
             for (EquipmentPerBase equipmentPerBase : base.getEquipmentPerBases()) {
-                Map<WorkhoursDistributionInterval, EquipmentLaborInputDistribution.CountAndLaborInput> equipmentLaborInputDistribution =
+                Map<WorkhoursDistributionInterval, CountAndLaborInput> equipmentLaborInputDistribution =
                         calculateEquipmentLaborInputDistribution(distributionIntervals, equipmentPerBase);
                 calculated.addAll(filterAndMap(equipmentPerBase, equipmentLaborInputDistribution));
             }
@@ -142,7 +113,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     private List<EquipmentInRepair> filterAndMap(
             EquipmentPerBase equipmentPerBase,
             Map<WorkhoursDistributionInterval,
-                    EquipmentLaborInputDistribution.CountAndLaborInput> equipmentLaborInputDistribution) {
+                    CountAndLaborInput> equipmentLaborInputDistribution) {
         return equipmentLaborInputDistribution
                 .entrySet()
                 .stream()
@@ -161,7 +132,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 .collect(Collectors.toList());
     }
 
-    private Map<WorkhoursDistributionInterval, EquipmentLaborInputDistribution.CountAndLaborInput> calculateEquipmentLaborInputDistribution(
+    private Map<WorkhoursDistributionInterval, CountAndLaborInput> calculateEquipmentLaborInputDistribution(
             List<WorkhoursDistributionInterval> distributionIntervals,
             EquipmentPerBase equipmentPerBase) {
         Equipment equipment = equipmentPerBase.getEquipment();
@@ -177,27 +148,28 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         return equipment
                 .getLaborInputPerTypes()
                 .stream()
-                .filter(lipt -> lipt.getRepairType()
-                                    .getName()
-                                    .equals(LaborInputDistributionServiceImpl.REPAIR_TYPE.getName()))
+                .filter(lipt -> lipt
+                        .getRepairType()
+                        .getName()
+                        .equals(LaborInputDistributionServiceImpl.REPAIR_TYPE.getName()))
                 .findFirst()
                 .orElseThrow(() -> new RepairTypeLaborInputNotFoundException(LaborInputDistributionServiceImpl.REPAIR_TYPE,
                                                                              equipment))
                 .getAmount();
     }
 
-    private Map<WorkhoursDistributionInterval, EquipmentLaborInputDistribution.CountAndLaborInput> mapEquipmentCountAndComplexity(
+    private Map<WorkhoursDistributionInterval, CountAndLaborInput> mapEquipmentCountAndComplexity(
             List<WorkhoursDistributionInterval> intervals,
             double avgDailyFailure,
             int standardLaborInput) {
-        Map<WorkhoursDistributionInterval, EquipmentLaborInputDistribution.CountAndLaborInput> result = new HashMap<>();
+        Map<WorkhoursDistributionInterval, CountAndLaborInput> result = new HashMap<>();
         for (WorkhoursDistributionInterval interval : intervals) {
             double count = calculationService.calculateEquipmentRequiringRepair(interval.getUpperBound(),
                                                                                 interval.getLowerBound(),
                                                                                 avgDailyFailure,
                                                                                 standardLaborInput);
             double laborInput = calculationService.calculateEquipmentRepairComplexity(count, interval.getUpperBound());
-            result.put(interval, new EquipmentLaborInputDistribution.CountAndLaborInput(count, laborInput));
+            result.put(interval, new CountAndLaborInput(count, laborInput));
         }
         return result;
     }
