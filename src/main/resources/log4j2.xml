@@ -26,7 +26,7 @@
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Root>
-        <!-- LOG "by.varb" at TRACE level -->
-        <Logger name="by.varb" level="trace"/>
+        <!-- LOG "va.rit" at TRACE level -->
+        <Logger name="va.rit" level="trace"/>
     </Loggers>
 </Configuration>

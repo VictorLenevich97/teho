@@ -1,5 +1,5 @@
 # teho-backend
-[![Quality gate](https://sonarqube.rit/api/project_badges/quality_gate?project=by.varb.teho%3Ateho)](https://sonarqube.rit/dashboard?id=by.varb.teho%3Ateho)
+[![Quality gate](https://sonarqube.rit/api/project_badges/quality_gate?project=va.rit.teho%3Ateho)](https://sonarqube.rit/dashboard?id=va.rit.teho%3Ateho)
 
 Поддержка принятия решений по техническому обеспечению
 
