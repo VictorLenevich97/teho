@@ -1,12 +1,12 @@
 package va.rit.teho.controller;
 
-import va.rit.teho.dto.BaseDTO;
-import va.rit.teho.service.BaseService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import va.rit.teho.dto.BaseDTO;
+import va.rit.teho.service.BaseService;
 
 @Controller
 @RequestMapping("/base")

@@ -1,5 +1,7 @@
 package va.rit.teho.service.implementation;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.*;
 import va.rit.teho.enums.RepairTypeEnum;
 import va.rit.teho.exception.RepairTypeLaborInputNotFoundException;
@@ -9,9 +11,6 @@ import va.rit.teho.repository.WorkhoursDistributionIntervalRepository;
 import va.rit.teho.service.BaseService;
 import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.LaborInputDistributionService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import va.rit.teho.entity.*;
 
 import java.util.*;
 import java.util.stream.Collectors;

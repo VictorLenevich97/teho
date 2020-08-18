@@ -1,11 +1,11 @@
 package va.rit.teho.controller;
 
-import va.rit.teho.exception.TehoException;
-import va.rit.teho.service.ReportService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import va.rit.teho.exception.TehoException;
+import va.rit.teho.service.ReportService;
 
 @Controller
 @RequestMapping("/report")

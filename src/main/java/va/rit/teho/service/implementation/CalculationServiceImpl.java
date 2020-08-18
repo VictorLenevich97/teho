@@ -1,7 +1,7 @@
 package va.rit.teho.service.implementation;
 
-import va.rit.teho.service.CalculationService;
 import org.springframework.stereotype.Service;
+import va.rit.teho.service.CalculationService;
 
 @Service
 public class CalculationServiceImpl implements CalculationService {

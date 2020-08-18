@@ -1,9 +1,9 @@
 package va.rit.teho.repository;
 
-import va.rit.teho.entity.Equipment;
-import va.rit.teho.entity.EquipmentType;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import va.rit.teho.entity.Equipment;
+import va.rit.teho.entity.EquipmentType;
 
 import java.util.List;
 import java.util.Map;

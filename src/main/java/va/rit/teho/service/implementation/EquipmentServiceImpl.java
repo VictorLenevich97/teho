@@ -1,13 +1,13 @@
 package va.rit.teho.service.implementation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.EquipmentType;
 import va.rit.teho.repository.EquipmentRepository;
 import va.rit.teho.repository.EquipmentTypeRepository;
 import va.rit.teho.service.EquipmentService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;

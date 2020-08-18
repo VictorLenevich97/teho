@@ -1,5 +1,10 @@
 package va.rit.teho.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
 import va.rit.teho.entity.RepairType;
 import va.rit.teho.entity.RestorationType;
 import va.rit.teho.enums.RepairTypeEnum;
@@ -7,11 +12,6 @@ import va.rit.teho.enums.RestorationTypeEnum;
 import va.rit.teho.repository.RepairTypeRepository;
 import va.rit.teho.repository.RestorationTypeRepository;
 import va.rit.teho.repository.WorkhoursDistributionIntervalRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;

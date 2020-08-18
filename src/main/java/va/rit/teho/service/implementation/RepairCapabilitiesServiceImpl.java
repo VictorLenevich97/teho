@@ -1,5 +1,6 @@
 package va.rit.teho.service.implementation;
 
+import org.springframework.stereotype.Service;
 import va.rit.teho.entity.*;
 import va.rit.teho.enums.RepairTypeEnum;
 import va.rit.teho.exception.RepairTypeLaborInputNotFoundException;
@@ -9,8 +10,6 @@ import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.EquipmentService;
 import va.rit.teho.service.RepairCapabilitiesService;
 import va.rit.teho.service.RepairStationService;
-import org.springframework.stereotype.Service;
-import va.rit.teho.entity.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

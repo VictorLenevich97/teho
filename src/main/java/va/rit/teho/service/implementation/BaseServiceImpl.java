@@ -1,5 +1,6 @@
 package va.rit.teho.service.implementation;
 
+import org.springframework.stereotype.Service;
 import va.rit.teho.entity.Base;
 import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.EquipmentPerBase;
@@ -9,7 +10,6 @@ import va.rit.teho.repository.BaseRepository;
 import va.rit.teho.repository.EquipmentPerBaseRepository;
 import va.rit.teho.repository.EquipmentRepository;
 import va.rit.teho.service.BaseService;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

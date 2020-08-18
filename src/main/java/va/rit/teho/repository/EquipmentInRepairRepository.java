@@ -1,10 +1,10 @@
 package va.rit.teho.repository;
 
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 import va.rit.teho.entity.EquipmentInRepair;
 import va.rit.teho.entity.EquipmentInRepairId;
 import va.rit.teho.model.Pair;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;

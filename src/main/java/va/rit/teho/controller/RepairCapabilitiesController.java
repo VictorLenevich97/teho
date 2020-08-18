@@ -1,15 +1,15 @@
 package va.rit.teho.controller;
 
-import va.rit.teho.entity.CalculatedRepairCapabilitesPerDay;
-import va.rit.teho.entity.Equipment;
-import va.rit.teho.entity.RepairStation;
-import va.rit.teho.service.EquipmentService;
-import va.rit.teho.service.RepairCapabilitiesService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import va.rit.teho.entity.CalculatedRepairCapabilitesPerDay;
+import va.rit.teho.entity.Equipment;
+import va.rit.teho.entity.RepairStation;
+import va.rit.teho.service.EquipmentService;
+import va.rit.teho.service.RepairCapabilitiesService;
 
 import java.util.HashMap;
 import java.util.Map;

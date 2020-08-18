@@ -1,12 +1,12 @@
 package va.rit.teho.controller;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.EquipmentDTO;
 import va.rit.teho.dto.EquipmentTypeDTO;
 import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.EquipmentType;
 import va.rit.teho.service.EquipmentService;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 

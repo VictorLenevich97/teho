@@ -1,5 +1,6 @@
 package va.rit.teho.service.implementation;
 
+import org.springframework.stereotype.Service;
 import va.rit.teho.entity.Base;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationType;
@@ -8,7 +9,6 @@ import va.rit.teho.repository.RepairStationRepository;
 import va.rit.teho.repository.RepairStationTypeRepository;
 import va.rit.teho.service.BaseService;
 import va.rit.teho.service.RepairStationService;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
