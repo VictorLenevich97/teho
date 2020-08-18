@@ -1,4 +1,4 @@
-package va.rit.teho;
+package va.rit.teho.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,6 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TehoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(TehoApplication.class, args);
+        SpringApplication.run(TehoApplication.class);
     }
 }
