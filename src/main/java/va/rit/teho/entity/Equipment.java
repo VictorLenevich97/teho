@@ -12,8 +12,8 @@ public class Equipment {
     private Long id;
     private String name;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "equipment_type_id", referencedColumnName = "id")
-    private EquipmentType equipmentType;
+    @JoinColumn(name = "equipment_sub_type_id", referencedColumnName = "id")
+    private EquipmentSubType equipmentSubType;
     @OneToMany(mappedBy = "equipment")
     private Set<EquipmentPerBase> equipmentPerBases;
     @OneToMany(mappedBy = "equipment")
@@ -22,9 +22,9 @@ public class Equipment {
     public Equipment() {
     }
 
-    public Equipment(String name, EquipmentType equipmentType) {
+    public Equipment(String name, EquipmentSubType equipmentSubType) {
         this.name = name;
-        this.equipmentType = equipmentType;
+        this.equipmentSubType = equipmentSubType;
     }
 
     public Set<EquipmentPerBase> getEquipmentPerBases() {
@@ -59,11 +59,11 @@ public class Equipment {
         this.name = name;
     }
 
-    public EquipmentType getEquipmentType() {
-        return equipmentType;
+    public EquipmentSubType getEquipmentSubType() {
+        return equipmentSubType;
     }
 
-    public void setEquipmentType(EquipmentType equipmentType) {
-        this.equipmentType = equipmentType;
+    public void setEquipmentSubType(EquipmentSubType equipmentSubType) {
+        this.equipmentSubType = equipmentSubType;
     }
 }

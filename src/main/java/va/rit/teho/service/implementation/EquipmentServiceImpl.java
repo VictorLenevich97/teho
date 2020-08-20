@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.Equipment;
+import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
 import va.rit.teho.repository.EquipmentRepository;
+import va.rit.teho.repository.EquipmentSubTypeRepository;
 import va.rit.teho.repository.EquipmentTypeRepository;
 import va.rit.teho.service.EquipmentService;
 
@@ -19,11 +21,14 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     private final EquipmentRepository equipmentRepository;
     private final EquipmentTypeRepository equipmentTypeRepository;
+    private final EquipmentSubTypeRepository equipmentSubTypeRepository;
 
     public EquipmentServiceImpl(EquipmentRepository equipmentRepository,
-                                EquipmentTypeRepository equipmentTypeRepository) {
+                                EquipmentTypeRepository equipmentTypeRepository,
+                                EquipmentSubTypeRepository equipmentSubTypeRepository) {
         this.equipmentRepository = equipmentRepository;
         this.equipmentTypeRepository = equipmentTypeRepository;
+        this.equipmentSubTypeRepository = equipmentSubTypeRepository;
     }
 
     public List<Equipment> list() {
@@ -31,10 +36,10 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Long add(String name, Long typeId) {
-        LOGGER.debug(String.format("Добавление ВВСТ \"%s\", typeId = %d", name, typeId));
-        Optional<EquipmentType> equipmentType = equipmentTypeRepository.findById(typeId);
-        if (!equipmentType.isPresent()) {
+    public Long add(String name, Long subTypeId) {
+        LOGGER.debug(String.format("Добавление ВВСТ \"%s\", subTypeId = %d", name, subTypeId));
+        Optional<EquipmentSubType> equipmentSubType = equipmentSubTypeRepository.findById(subTypeId);
+        if (!equipmentSubType.isPresent()) {
             LOGGER.error("Неверный тип");
             return -1L;
         }
@@ -43,7 +48,8 @@ public class EquipmentServiceImpl implements EquipmentService {
             LOGGER.error("Уже существует");
             return -1L;
         }
-        Equipment saved = equipmentRepository.save(new Equipment(name, equipmentType.get()));
+        Equipment s = new Equipment(name, equipmentSubType.get());
+        Equipment saved = equipmentRepository.save(s);
         return saved.getId();
     }
 

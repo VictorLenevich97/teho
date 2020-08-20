@@ -9,7 +9,7 @@ public interface EquipmentService {
 
     List<Equipment> list();
 
-    Long add(String name, Long typeId);
+    Long add(String name, Long subTypeId);
 
     List<EquipmentType> listTypes();
 
