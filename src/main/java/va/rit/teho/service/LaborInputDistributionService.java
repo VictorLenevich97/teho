@@ -1,6 +1,7 @@
 package va.rit.teho.service;
 
 import va.rit.teho.entity.EquipmentLaborInputDistribution;
+import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface LaborInputDistributionService {
      *
      * @return Map, ключ это тип ВВСТ, значение - список данных о записи
      */
-    Map<EquipmentType, List<EquipmentLaborInputDistribution>> getLaborInputDistribution();
+    Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> getLaborInputDistribution(List<Long> equipmentTypeIds);
 
     /**
      * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ.

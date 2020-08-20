@@ -4,25 +4,33 @@ import java.util.Map;
 
 public class EquipmentLaborInputDistribution {
 
-    private final Base base;
+    private final String baseName;
     private final EquipmentType equipmentType;
-    private final Equipment equipment;
+
+    public EquipmentSubType getEquipmentSubType() {
+        return equipmentSubType;
+    }
+
+    private final EquipmentSubType equipmentSubType;
+    private final String equipmentName;
     private final double avgDailyFailure;
     private final int standardLaborInput;
-    private final Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap;
+    private final Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap;
     private final double totalRepairComplexity;
 
     public EquipmentLaborInputDistribution(
-            Base base,
+            String baseName,
             EquipmentType equipmentType,
-            Equipment equipment,
+            EquipmentSubType equipmentSubType,
+            String equipmentName,
             double avgDailyFailure,
             int standardLaborInput,
-            Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap,
+            Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap,
             double totalRepairComplexity) {
-        this.base = base;
+        this.baseName = baseName;
         this.equipmentType = equipmentType;
-        this.equipment = equipment;
+        this.equipmentSubType = equipmentSubType;
+        this.equipmentName = equipmentName;
         this.avgDailyFailure = avgDailyFailure;
         this.standardLaborInput = standardLaborInput;
         this.intervalCountAndLaborInputMap = intervalCountAndLaborInputMap;
@@ -37,16 +45,16 @@ public class EquipmentLaborInputDistribution {
         return totalRepairComplexity;
     }
 
-    public Base getBase() {
-        return base;
+    public String getBaseName() {
+        return baseName;
     }
 
     public EquipmentType getEquipmentType() {
         return equipmentType;
     }
 
-    public Equipment getEquipment() {
-        return equipment;
+    public String getEquipmentName() {
+        return equipmentName;
     }
 
     public double getAvgDailyFailure() {
@@ -57,21 +65,22 @@ public class EquipmentLaborInputDistribution {
         return standardLaborInput;
     }
 
-    public Map<WorkhoursDistributionInterval, CountAndLaborInput> getIntervalCountAndLaborInputMap() {
+    public Map<Long, CountAndLaborInput> getIntervalCountAndLaborInputMap() {
         return intervalCountAndLaborInputMap;
     }
 
     public static class Builder {
-        private Base base;
+        private String baseName;
         private EquipmentType equipmentType;
-        private Equipment equipment;
+        private EquipmentSubType equipmentSubType;
+        private String equipmentName;
         private double avgDailyFailure;
         private int standardLaborInput;
-        private Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap;
+        private Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap;
         private double totalRepairComplexity;
 
-        public Builder base(Base base) {
-            this.base = base;
+        public Builder baseName(String baseName) {
+            this.baseName = baseName;
             return this;
         }
 
@@ -80,8 +89,13 @@ public class EquipmentLaborInputDistribution {
             return this;
         }
 
-        public Builder equipment(Equipment equipment) {
-            this.equipment = equipment;
+        public Builder equipmentSubType(EquipmentSubType equipmentSubType) {
+            this.equipmentSubType = equipmentSubType;
+            return this;
+        }
+
+        public Builder equipmentName(String equipmentName) {
+            this.equipmentName = equipmentName;
             return this;
         }
 
@@ -95,7 +109,7 @@ public class EquipmentLaborInputDistribution {
             return this;
         }
 
-        public Builder intervalCountAndLaborInputMap(Map<WorkhoursDistributionInterval, CountAndLaborInput> intervalCountAndLaborInputMap) {
+        public Builder intervalCountAndLaborInputMap(Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap) {
             this.intervalCountAndLaborInputMap = intervalCountAndLaborInputMap;
             return this;
         }
@@ -106,16 +120,17 @@ public class EquipmentLaborInputDistribution {
         }
 
         public EquipmentLaborInputDistribution build() {
-            return new EquipmentLaborInputDistribution(base,
+            return new EquipmentLaborInputDistribution(baseName,
                                                        equipmentType,
-                                                       equipment,
+                                                       equipmentSubType,
+                                                       equipmentName,
                                                        avgDailyFailure,
                                                        standardLaborInput,
                                                        intervalCountAndLaborInputMap,
                                                        totalRepairComplexity);
         }
 
-        public Map<WorkhoursDistributionInterval, CountAndLaborInput> getIntervalCountAndLaborInputMap() {
+        public Map<Long, CountAndLaborInput> getIntervalCountAndLaborInputMap() {
             return intervalCountAndLaborInputMap;
         }
     }

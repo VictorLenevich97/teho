@@ -8,11 +8,20 @@ INSERT INTO repair_station VALUES (1, 'вто 1', 1, 1, 1);
 INSERT INTO repair_station VALUES (2, 'ремр 1', 1, 1, 2);
 
 INSERT INTO equipment_type VALUES (1, 'РАВ', 'РАВ');
+INSERT INTO equipment_type VALUES (2, 'test', 'test');
+INSERT INTO equipment_sub_type VALUES (1, 'РА', 'РА', 1);
+INSERT INTO equipment_sub_type VALUES (2, 'НА', 'НА', 1);
+INSERT INTO equipment_sub_type VALUES (3, 'tester', 'tester', 2);
 
-INSERT INTO equipment VALUES (1, 'РА', 1);
-INSERT INTO equipment VALUES (2, 'НА', 1);
+INSERT INTO equipment VALUES (1, 'equipment1', 1);
+INSERT INTO equipment VALUES (2, 'equipment2', 2);
+INSERT INTO equipment VALUES (3, 'equipment3', 1);
+INSERT INTO equipment VALUES (4, 'equipment4', 3);
 
 INSERT INTO equipment_per_base values (1, 1, 20, 3);
+INSERT INTO equipment_per_base values (2, 2, 3, 14);
+INSERT INTO equipment_per_base values (1, 3, 9, 7);
+INSERT INTO equipment_per_base values (2, 4, 12, 22);
 
 INSERT INTO repair_station_equipment_staff VALUES (1, 1, 5, 10);
 INSERT INTO repair_station_equipment_staff VALUES (2, 1, 3, 5);
@@ -28,6 +37,8 @@ INSERT INTO restoration_type VALUES (3, 'Стратегический');
 
 INSERT INTO equipment_labor_input_per_type VALUES (1, 1, 140);
 INSERT INTO equipment_labor_input_per_type VALUES (2, 1, 220);
+INSERT INTO equipment_labor_input_per_type VALUES (3, 1, 123);
+INSERT INTO equipment_labor_input_per_type VALUES (4, 1, 412);
 INSERT INTO equipment_labor_input_per_type VALUES (1, 2, 240);
 INSERT INTO equipment_labor_input_per_type VALUES (2, 2, 320);
 
