@@ -100,9 +100,13 @@ public class LaborInputDistributionDTO {
                             .getIntervalCountAndLaborInputMap()
                             .entrySet()
                             .stream()
-                            .map(e -> new IntervalWithCountAndLaborInputDTO(e.getKey(),
-                                                                            e.getValue().getCount(),
-                                                                            e.getValue().getLaborInput()))
+                            .map(laborInputEntry -> new IntervalWithCountAndLaborInputDTO(laborInputEntry.getKey(),
+                                                                                          laborInputEntry
+                                                                                                  .getValue()
+                                                                                                  .getCount(),
+                                                                                          laborInputEntry
+                                                                                                  .getValue()
+                                                                                                  .getLaborInput()))
                             .collect(Collectors.toList()),
                     entity.getTotalRepairComplexity());
         }

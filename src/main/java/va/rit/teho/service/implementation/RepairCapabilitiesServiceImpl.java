@@ -67,9 +67,9 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
         List<EquipmentPerRepairStation> equipmentPerRepairStations =
                 equipmentList
                         .stream()
-                        .flatMap(e -> repairStations
+                        .flatMap(equipment -> repairStations
                                 .stream()
-                                .map(rs -> new EquipmentPerRepairStation(rs.getId(), e.getId())))
+                                .map(rs -> new EquipmentPerRepairStation(rs.getId(), equipment.getId())))
                         .collect(Collectors.toList());
         Iterable<RepairStationEquipmentStaff> repairStationEquipmentStaffList =
                 repairStationEquipmentCapabilitiesRepository.findAllById(equipmentPerRepairStations);

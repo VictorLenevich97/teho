@@ -17,7 +17,7 @@ public interface EquipmentRepository extends CrudRepository<Equipment, Long> {
     default Map<EquipmentType, List<Equipment>> getEquipmentGroupedByType() {
         return StreamSupport
                 .stream(findAll().spliterator(), false)
-                .collect(Collectors.groupingBy(e -> e.getEquipmentSubType().getEquipmentType()));
+                .collect(Collectors.groupingBy(equipment -> equipment.getEquipmentSubType().getEquipmentType()));
     }
 
     Optional<Equipment> findByName(String name);

@@ -38,21 +38,22 @@ public class LaborInputDistributionController {
                 .collect(Collectors.toList());
     }
 
-    private LaborInputDistributionDTO mapLaborInputDistributionDTO(Map.Entry<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> e) {
-        List<LaborInputDistributionDTO.SubTypeDistributionDTO> subTypeDistribution = e
-                .getValue()
-                .entrySet()
-                .stream()
-                .map(subTypeEntry -> new LaborInputDistributionDTO.SubTypeDistributionDTO(
-                        EquipmentSubTypeDTO.from(subTypeEntry.getKey()),
-                        subTypeEntry
-                                .getValue()
-                                .stream()
-                                .map(LaborInputDistributionDTO.EquipmentLaborInputDistributionDTO::from)
-                                .collect(Collectors.toList())))
-                .collect(Collectors.toList());
-        return new LaborInputDistributionDTO(EquipmentTypeDTO.from(e.getKey()),
-                                             subTypeDistribution);
+    private LaborInputDistributionDTO mapLaborInputDistributionDTO(
+            Map.Entry<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> typeEntry) {
+        List<LaborInputDistributionDTO.SubTypeDistributionDTO> subTypeDistribution =
+                typeEntry
+                        .getValue()
+                        .entrySet()
+                        .stream()
+                        .map(subTypeEntry -> new LaborInputDistributionDTO.SubTypeDistributionDTO(
+                                EquipmentSubTypeDTO.from(subTypeEntry.getKey()),
+                                subTypeEntry
+                                        .getValue()
+                                        .stream()
+                                        .map(LaborInputDistributionDTO.EquipmentLaborInputDistributionDTO::from)
+                                        .collect(Collectors.toList())))
+                        .collect(Collectors.toList());
+        return new LaborInputDistributionDTO(EquipmentTypeDTO.from(typeEntry.getKey()), subTypeDistribution);
     }
 
     @PostMapping

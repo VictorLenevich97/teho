@@ -20,10 +20,8 @@ public class RepairCapabilitiesController {
 
     private final RepairCapabilitiesService repairCapabilitiesService;
 
-
     public RepairCapabilitiesController(
-            RepairCapabilitiesService repairCapabilitiesService,
-            EquipmentService equipmentService) {
+            RepairCapabilitiesService repairCapabilitiesService) {
         this.repairCapabilitiesService = repairCapabilitiesService;
     }
 

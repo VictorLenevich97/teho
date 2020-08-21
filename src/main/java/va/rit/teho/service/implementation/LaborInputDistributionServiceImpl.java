@@ -77,10 +77,10 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 equipmentInRepairDataList
                         .stream()
                         .reduce(Pair.of(new EquipmentInRepairData(), new HashMap<>()),
-                                (p, eir) -> {
-                                    p.getRight()
+                                (pair, eir) -> {
+                                    pair.getRight()
                                      .put(eir.getIntervalId(), Pair.of(eir.getCount(), eir.getAvgLaborInput()));
-                                    return Pair.of(eir, p.getRight());
+                                    return Pair.of(eir, pair.getRight());
                                 },
                                 (l, r) -> l);
         result.computeIfAbsent(equipmentType, k -> new HashMap<>())
