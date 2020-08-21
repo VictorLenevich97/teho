@@ -29,6 +29,10 @@ public interface LaborInputDistributionService {
      *
      * @param baseId id Base
      */
-    void updateLaborInputDistribution(Long baseId);
+    void updateLaborInputDistributionPerBase(Long baseId);
+
+    void updateLaborInputDistributionPerEquipmentSubType(Long equipmentSubTypeId);
+
+    void updateLaborInputDistributionPerEquipmentType(Long equipmentType);
 
 }
