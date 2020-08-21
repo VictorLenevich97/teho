@@ -3,6 +3,7 @@ package va.rit.teho.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import va.rit.teho.dto.DistributionIntervalDTO;
 import va.rit.teho.dto.EquipmentSubTypeDTO;
 import va.rit.teho.dto.EquipmentTypeDTO;
 import va.rit.teho.dto.LaborInputDistributionDTO;
@@ -23,6 +24,16 @@ public class LaborInputDistributionController {
 
     public LaborInputDistributionController(LaborInputDistributionService laborInputDistributionService) {
         this.laborInputDistributionService = laborInputDistributionService;
+    }
+
+    @GetMapping("/intervals")
+    public ResponseEntity<List<DistributionIntervalDTO>> getDistributionIntervals() {
+        return ResponseEntity.ok(
+                laborInputDistributionService
+                        .getDistributionIntervals()
+                        .stream()
+                        .map(DistributionIntervalDTO::from)
+                        .collect(Collectors.toList()));
     }
 
     @GetMapping
@@ -79,4 +90,5 @@ public class LaborInputDistributionController {
         laborInputDistributionService.updateLaborInputDistributionPerBase(baseId);
         return ResponseEntity.ok().build();
     }
+
 }

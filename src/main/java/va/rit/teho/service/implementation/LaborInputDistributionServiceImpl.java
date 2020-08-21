@@ -197,4 +197,9 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         calculateAndSave(equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentType(getDefaultRepairTypeId(),
                                                                                           equipmentType));
     }
+
+    @Override
+    public List<WorkhoursDistributionInterval> getDistributionIntervals() {
+        return (List<WorkhoursDistributionInterval>) workhoursDistributionIntervalRepository.findAll();
+    }
 }
