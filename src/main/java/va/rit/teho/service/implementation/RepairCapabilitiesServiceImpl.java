@@ -1,21 +1,21 @@
 package va.rit.teho.service.implementation;
 
 import org.springframework.stereotype.Service;
-import va.rit.teho.entity.*;
+import va.rit.teho.entity.CalculatedRepairCapabilitesPerDay;
+import va.rit.teho.entity.Equipment;
+import va.rit.teho.entity.RepairStation;
+import va.rit.teho.entity.RepairStationEquipmentStaff;
 import va.rit.teho.enums.RepairTypeEnum;
 import va.rit.teho.exception.RepairTypeLaborInputNotFoundException;
 import va.rit.teho.repository.CalculatedRepairCapabilitiesPerDayRepository;
 import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.service.CalculationService;
-import va.rit.teho.service.EquipmentService;
 import va.rit.teho.service.RepairCapabilitiesService;
-import va.rit.teho.service.RepairStationService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService {
@@ -23,20 +23,14 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     private final RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository;
     private final CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository;
 
-    private final EquipmentService equipmentService;
-    private final RepairStationService repairStationService;
     private final CalculationService calculationService;
 
     public RepairCapabilitiesServiceImpl(
             RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository,
             CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository,
-            EquipmentService equipmentService,
-            RepairStationService repairStationService,
             CalculationService calculationService) {
         this.repairStationEquipmentCapabilitiesRepository = repairStationEquipmentCapabilitiesRepository;
         this.calculatedRepairCapabilitiesPerDayRepository = calculatedRepairCapabilitiesPerDayRepository;
-        this.equipmentService = equipmentService;
-        this.repairStationService = repairStationService;
         this.calculationService = calculationService;
     }
 
@@ -62,17 +56,11 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
 
     @Override
     public void calculateAndUpdateRepairCapabilities() {
-        List<Equipment> equipmentList = this.equipmentService.list();
-        List<RepairStation> repairStations = this.repairStationService.list();
-        List<EquipmentPerRepairStation> equipmentPerRepairStations =
-                equipmentList
-                        .stream()
-                        .flatMap(equipment -> repairStations
-                                .stream()
-                                .map(rs -> new EquipmentPerRepairStation(rs.getId(), equipment.getId())))
-                        .collect(Collectors.toList());
-        Iterable<RepairStationEquipmentStaff> repairStationEquipmentStaffList =
-                repairStationEquipmentCapabilitiesRepository.findAllById(equipmentPerRepairStations);
+        calculateAndUpdateRepairCapabilities(
+                (List<RepairStationEquipmentStaff>) this.repairStationEquipmentCapabilitiesRepository.findAll());
+    }
+
+    private void calculateAndUpdateRepairCapabilities(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList) {
         List<CalculatedRepairCapabilitesPerDay> capabilitesPerDayList = new ArrayList<>();
         for (RepairStationEquipmentStaff repairStationEquipmentStaff : repairStationEquipmentStaffList) {
             capabilitesPerDayList.add(getCalculatedRepairCapabilitesPerDay(repairStationEquipmentStaff));
@@ -81,15 +69,28 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     }
 
     @Override
-    public Map<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> getTotalCalculatedRepairCapabilities() {
-        Map<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> result = new HashMap<>();
-        for (CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay :
-                this.calculatedRepairCapabilitiesPerDayRepository.findAll()) {
+    public void calculateAndUpdateRepairCapabilitiesPerStation(Long repairStationId) {
+        calculateAndUpdateRepairCapabilities(
+                repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId));
+    }
+
+    @Override
+    public Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(List<Long> repairStationIds) {
+        Iterable<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDays;
+        if (repairStationIds == null || repairStationIds.isEmpty()) {
+            calculatedRepairCapabilitesPerDays = calculatedRepairCapabilitiesPerDayRepository.findAll();
+        } else {
+            calculatedRepairCapabilitesPerDays =
+                    calculatedRepairCapabilitiesPerDayRepository.findByRepairStationIdIn(repairStationIds);
+        }
+        Map<RepairStation, Map<Equipment, Double>> result = new HashMap<>();
+        for (CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay : calculatedRepairCapabilitesPerDays) {
             RepairStation repairStation = calculatedRepairCapabilitesPerDay.getRepairStation();
             result.computeIfAbsent(repairStation, rs -> new HashMap<>());
             result
                     .get(repairStation)
-                    .put(calculatedRepairCapabilitesPerDay.getEquipment(), calculatedRepairCapabilitesPerDay);
+                    .put(calculatedRepairCapabilitesPerDay.getEquipment(),
+                         calculatedRepairCapabilitesPerDay.getCapability());
         }
         return result;
     }

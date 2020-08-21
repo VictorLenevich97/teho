@@ -1,9 +1,9 @@
 package va.rit.teho.service;
 
-import va.rit.teho.entity.CalculatedRepairCapabilitesPerDay;
 import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.RepairStation;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,5 +13,7 @@ public interface RepairCapabilitiesService {
 
     void calculateAndUpdateRepairCapabilities();
 
-    Map<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> getTotalCalculatedRepairCapabilities();
+    void calculateAndUpdateRepairCapabilitiesPerStation(Long repairStationId);
+
+    Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(List<Long> repairStationIds);
 }

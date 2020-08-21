@@ -1,18 +1,15 @@
 package va.rit.teho.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import va.rit.teho.entity.CalculatedRepairCapabilitesPerDay;
-import va.rit.teho.entity.Equipment;
-import va.rit.teho.entity.RepairStation;
-import va.rit.teho.service.EquipmentService;
+import org.springframework.web.bind.annotation.*;
+import va.rit.teho.dto.RepairCapabilitiesDTO;
+import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.service.RepairCapabilitiesService;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("repair-capabilities")
@@ -28,29 +25,48 @@ public class RepairCapabilitiesController {
     /**
      * Расчет производственных возможностей РВО по ремонту (сразу для всех РВО по всем ВВСТ).
      */
-    @PostMapping("/calculate")
-    public Map<String, Map<String, Double>> calculateAndGet() {
+    @PostMapping
+    @ResponseBody
+    public List<RepairCapabilitiesDTO> calculateAndGet() {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilities();
-        return getCalculatedRepairCapabilities();
+        return getCalculatedRepairCapabilities(Collections.emptyList());
+    }
+
+    @PostMapping("/repair-station/{repairStationId}")
+    @ResponseBody
+    public RepairCapabilitiesDTO calculateAndGetPerStation(@PathVariable Long repairStationId) {
+        this.repairCapabilitiesService.calculateAndUpdateRepairCapabilitiesPerStation(repairStationId);
+        return getCalculatedRepairCapabilities(Collections.singletonList(repairStationId))
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Производственные возможности РВО с id = " + repairStationId + " не найдены!"));
+    }
+
+    private RepairCapabilitiesDTO buildRepairCapabilitiesDTO(
+            Map.Entry<va.rit.teho.entity.RepairStation, Map<va.rit.teho.entity.Equipment, Double>> repairStationCapabilitiesEntry) {
+        return new RepairCapabilitiesDTO(
+                repairStationCapabilitiesEntry.getKey().getName(),
+                repairStationCapabilitiesEntry
+                        .getValue()
+                        .entrySet()
+                        .stream()
+                        .map(equipmentCapabilityEntry ->
+                                     new RepairCapabilitiesDTO.EquipmentRepairCapabilityDTO(
+                                             equipmentCapabilityEntry.getKey().getId(),
+                                             equipmentCapabilityEntry.getValue()))
+                        .collect(Collectors.toList()));
     }
 
     @GetMapping
     @ResponseBody
-    public Map<String, Map<String, Double>> getCalculatedRepairCapabilities() {
-        Map<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> totalCalculatedRepairCapabilities =
-                this.repairCapabilitiesService.getTotalCalculatedRepairCapabilities();
-        Map<String, Map<String, Double>> result = new HashMap<>();
-        for (Map.Entry<RepairStation, Map<Equipment, CalculatedRepairCapabilitesPerDay>> entry : totalCalculatedRepairCapabilities
-                .entrySet()) {
-            Map<String, Double> equipmentCapabilities = new HashMap<>();
-            result.put(entry.getKey().getName(), equipmentCapabilities);
-            for (Map.Entry<Equipment, CalculatedRepairCapabilitesPerDay> capabilitesPerDayEntry : entry
-                    .getValue()
-                    .entrySet()) {
-                equipmentCapabilities.put(capabilitesPerDayEntry.getKey().getName(),
-                                          capabilitesPerDayEntry.getValue().getCapability());
-            }
-        }
-        return result;
+    public List<RepairCapabilitiesDTO> getCalculatedRepairCapabilities(@RequestParam(required = false) List<Long> repairStationIds) {
+        return repairCapabilitiesService
+                .getCalculatedRepairCapabilities(repairStationIds)
+                .entrySet()
+                .stream()
+                .map(this::buildRepairCapabilitiesDTO)
+                .collect(Collectors.toList());
     }
+
+
 }
