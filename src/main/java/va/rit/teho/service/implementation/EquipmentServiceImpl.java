@@ -12,6 +12,7 @@ import va.rit.teho.repository.EquipmentTypeRepository;
 import va.rit.teho.service.EquipmentService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -56,6 +57,16 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public List<EquipmentType> listTypes() {
         return (List<EquipmentType>) equipmentTypeRepository.findAll();
+    }
+
+    @Override
+    public Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes() {
+        return equipmentRepository.getEquipmentGroupedByType();
+    }
+
+    @Override
+    public Map<EquipmentType, List<EquipmentSubType>> listSubTypesPerTypes() {
+        return equipmentSubTypeRepository.findAllGroupedByType();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package va.rit.teho.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -14,8 +16,11 @@ public class Equipment {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "equipment_sub_type_id", referencedColumnName = "id")
     private EquipmentSubType equipmentSubType;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "equipment")
     private Set<EquipmentPerBase> equipmentPerBases;
+    @JsonIgnore
     @OneToMany(mappedBy = "equipment")
     private Set<EquipmentLaborInputPerType> laborInputPerTypes;
 
