@@ -3,16 +3,16 @@ package va.rit.teho.dto;
 import java.util.List;
 
 public class RepairCapabilitiesDTO {
-    private final String repairStation;
+    private final RepairStationDTO repairStation;
     private final List<EquipmentRepairCapabilityDTO> capabilities;
 
-    public RepairCapabilitiesDTO(String repairStation,
+    public RepairCapabilitiesDTO(RepairStationDTO repairStation,
                                  List<EquipmentRepairCapabilityDTO> capabilities) {
         this.repairStation = repairStation;
         this.capabilities = capabilities;
     }
 
-    public String getRepairStation() {
+    public RepairStationDTO getRepairStation() {
         return repairStation;
     }
 

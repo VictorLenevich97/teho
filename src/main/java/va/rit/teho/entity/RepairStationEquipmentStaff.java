@@ -22,6 +22,14 @@ public class RepairStationEquipmentStaff {
     public RepairStationEquipmentStaff() {
     }
 
+    public RepairStationEquipmentStaff(EquipmentPerRepairStation equipmentPerRepairStation,
+                                       int totalStaff,
+                                       int availableStaff) {
+        this.equipmentPerRepairStation = equipmentPerRepairStation;
+        this.totalStaff = totalStaff;
+        this.availableStaff = availableStaff;
+    }
+
     public EquipmentPerRepairStation getEquipmentPerRepairStation() {
         return equipmentPerRepairStation;
     }

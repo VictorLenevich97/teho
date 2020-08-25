@@ -15,17 +15,17 @@ public class RepairStation {
     private RepairStationType repairStationType;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "base_id", referencedColumnName = "id")
-    private Base baseId;
+    private Base base;
     private int stationAmount;
 
     public RepairStation() {
         //Пустой конструктор для автоматической инициализации
     }
 
-    public RepairStation(String name, RepairStationType repairStationType, Base baseId, int stationAmount) {
+    public RepairStation(String name, RepairStationType repairStationType, Base base, int stationAmount) {
         this.name = name;
         this.repairStationType = repairStationType;
-        this.baseId = baseId;
+        this.base = base;
         this.stationAmount = stationAmount;
     }
 
@@ -53,12 +53,12 @@ public class RepairStation {
         this.repairStationType = repairStationType;
     }
 
-    public Base getBaseId() {
-        return baseId;
+    public Base getBase() {
+        return base;
     }
 
-    public void setBaseId(Base baseId) {
-        this.baseId = baseId;
+    public void setBase(Base base) {
+        this.base = base;
     }
 
     public int getStationAmount() {

@@ -1,10 +1,10 @@
 package va.rit.teho.service.implementation;
 
 import org.springframework.stereotype.Service;
-import va.rit.teho.entity.Base;
-import va.rit.teho.entity.RepairStation;
-import va.rit.teho.entity.RepairStationType;
+import va.rit.teho.entity.*;
 import va.rit.teho.exception.NotFoundException;
+import va.rit.teho.model.Pair;
+import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.repository.RepairStationRepository;
 import va.rit.teho.repository.RepairStationTypeRepository;
 import va.rit.teho.service.BaseService;
@@ -12,18 +12,21 @@ import va.rit.teho.service.RepairStationService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RepairStationServiceImpl implements RepairStationService {
 
+    private final RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository;
     private final RepairStationRepository repairStationRepository;
     private final RepairStationTypeRepository repairStationTypeRepository;
     private final BaseService baseService;
 
     public RepairStationServiceImpl(
+            RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository,
             RepairStationRepository repairStationRepository,
-            RepairStationTypeRepository repairStationTypeRepository, BaseService baseService) {
+            RepairStationTypeRepository repairStationTypeRepository,
+            BaseService baseService) {
+        this.repairStationEquipmentCapabilitiesRepository = repairStationEquipmentCapabilitiesRepository;
         this.repairStationRepository = repairStationRepository;
         this.repairStationTypeRepository = repairStationTypeRepository;
         this.baseService = baseService;
@@ -35,8 +38,11 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
-    public Optional<RepairStation> find(Long repairStationId) {
-        return this.repairStationRepository.findById(repairStationId);
+    public Pair<RepairStation, List<RepairStationEquipmentStaff>> get(Long repairStationId) {
+        return Pair.of(repairStationRepository
+                               .findById(repairStationId)
+                               .orElseThrow(() -> new NotFoundException("РВО с id = " + repairStationId + " не найден!")),
+                       repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId));
     }
 
     @Override
@@ -48,6 +54,14 @@ public class RepairStationServiceImpl implements RepairStationService {
                         .orElseThrow(() -> new NotFoundException("Тип РВО с id = " + typeId + " не найден"));
         RepairStation repairStation = new RepairStation(name, repairStationType, base, amount);
         return repairStation.getId();
+    }
+
+    @Override
+    public void setEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff) {
+        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentPerRepairStation(
+                repairStationId,
+                equipmentId), totalStaff, availableStaff);
+        repairStationEquipmentCapabilitiesRepository.save(repairStationEquipmentStaff);
     }
 
     @Override
