@@ -1,5 +1,7 @@
 package va.rit.teho.dto;
 
+import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
+import va.rit.teho.dto.equipment.EquipmentTypeDTO;
 import va.rit.teho.entity.EquipmentLaborInputDistribution;
 
 import java.util.List;
@@ -10,6 +12,12 @@ public class LaborInputDistributionDTO {
 
     private final List<SubTypeDistributionDTO> subTypeDistribution;
 
+    public LaborInputDistributionDTO(EquipmentTypeDTO type,
+                                     List<SubTypeDistributionDTO> subTypeDistribution) {
+        this.type = type;
+        this.subTypeDistribution = subTypeDistribution;
+    }
+
     public EquipmentTypeDTO getType() {
         return type;
     }
@@ -18,14 +26,15 @@ public class LaborInputDistributionDTO {
         return subTypeDistribution;
     }
 
-    public LaborInputDistributionDTO(EquipmentTypeDTO type,
-                                     List<SubTypeDistributionDTO> subTypeDistribution) {
-        this.type = type;
-        this.subTypeDistribution = subTypeDistribution;
-    }
-
     public static class SubTypeDistributionDTO {
         private final EquipmentSubTypeDTO subType;
+        private final List<EquipmentLaborInputDistributionDTO> equipmentDistribution;
+
+        public SubTypeDistributionDTO(EquipmentSubTypeDTO subType,
+                                      List<EquipmentLaborInputDistributionDTO> equipmentDistribution) {
+            this.subType = subType;
+            this.equipmentDistribution = equipmentDistribution;
+        }
 
         public EquipmentSubTypeDTO getSubType() {
             return subType;
@@ -34,14 +43,6 @@ public class LaborInputDistributionDTO {
         public List<EquipmentLaborInputDistributionDTO> getEquipmentDistribution() {
             return equipmentDistribution;
         }
-
-        public SubTypeDistributionDTO(EquipmentSubTypeDTO subType,
-                                      List<EquipmentLaborInputDistributionDTO> equipmentDistribution) {
-            this.subType = subType;
-            this.equipmentDistribution = equipmentDistribution;
-        }
-
-        private final List<EquipmentLaborInputDistributionDTO> equipmentDistribution;
     }
 
     public static class EquipmentLaborInputDistributionDTO {
@@ -51,30 +52,6 @@ public class LaborInputDistributionDTO {
         private final int standardLaborInput;
         private final List<IntervalWithCountAndLaborInputDTO> countAndLaborInputs;
         private final double totalLaborInput;
-
-        public String getBaseName() {
-            return baseName;
-        }
-
-        public String getEquipmentName() {
-            return equipmentName;
-        }
-
-        public double getAvgDailyFailure() {
-            return avgDailyFailure;
-        }
-
-        public int getStandardLaborInput() {
-            return standardLaborInput;
-        }
-
-        public List<IntervalWithCountAndLaborInputDTO> getCountAndLaborInputs() {
-            return countAndLaborInputs;
-        }
-
-        public double getTotalLaborInput() {
-            return totalLaborInput;
-        }
 
         public EquipmentLaborInputDistributionDTO(String baseName,
                                                   String equipmentName,
@@ -110,12 +87,42 @@ public class LaborInputDistributionDTO {
                             .collect(Collectors.toList()),
                     entity.getTotalRepairComplexity());
         }
+
+        public String getBaseName() {
+            return baseName;
+        }
+
+        public String getEquipmentName() {
+            return equipmentName;
+        }
+
+        public double getAvgDailyFailure() {
+            return avgDailyFailure;
+        }
+
+        public int getStandardLaborInput() {
+            return standardLaborInput;
+        }
+
+        public List<IntervalWithCountAndLaborInputDTO> getCountAndLaborInputs() {
+            return countAndLaborInputs;
+        }
+
+        public double getTotalLaborInput() {
+            return totalLaborInput;
+        }
     }
 
     public static class IntervalWithCountAndLaborInputDTO {
         private final Long key;
         private final Double count;
         private final Double laborInput;
+
+        public IntervalWithCountAndLaborInputDTO(Long key, Double count, Double laborInput) {
+            this.key = key;
+            this.count = count;
+            this.laborInput = laborInput;
+        }
 
         public Long getKey() {
             return key;
@@ -127,12 +134,6 @@ public class LaborInputDistributionDTO {
 
         public Double getLaborInput() {
             return laborInput;
-        }
-
-        public IntervalWithCountAndLaborInputDTO(Long key, Double count, Double laborInput) {
-            this.key = key;
-            this.count = count;
-            this.laborInput = laborInput;
         }
     }
 }

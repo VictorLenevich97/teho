@@ -19,7 +19,8 @@ public class ReportServiceImpl implements ReportService {
         List<LaborIntensityRepairNormReportRecord> reportData = createTestLaborIntensityRepairNormReportData();
         ExcelReportGenerator<LaborIntensityRepairNormReportRecord> excelReportGenerator = new ExcelReportGenerator<>();
 
-        return excelReportGenerator.generateFileFromTemplate(ReportTemplatePathEnum.REPAIR_NORM_REPORT_TEMPLATE_PATH.getPath(), reportData);
+        return excelReportGenerator.generateFileFromTemplate(ReportTemplatePathEnum.REPAIR_NORM_REPORT_TEMPLATE_PATH.getPath(),
+                                                             reportData);
     }
 
     //todo Метод-заглушка для генерации тестовых данных для отчёта.
@@ -37,7 +38,8 @@ public class ReportServiceImpl implements ReportService {
         List<AverageDailyOutputReportRecord> reportData = createTestAverageDailyOutputReportData();
         ExcelReportGenerator<AverageDailyOutputReportRecord> excelReportGenerator = new ExcelReportGenerator<>();
 
-        return excelReportGenerator.generateFileFromTemplate(ReportTemplatePathEnum.AVERAGE_DAILY_OUTPUT_TEMPLATE_PATH.getPath(), reportData);
+        return excelReportGenerator.generateFileFromTemplate(ReportTemplatePathEnum.AVERAGE_DAILY_OUTPUT_TEMPLATE_PATH.getPath(),
+                                                             reportData);
     }
 
     //todo Метод-заглушка для генерации тестовых данных для отчёта.

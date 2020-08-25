@@ -1,4 +1,4 @@
-package va.rit.teho.dto;
+package va.rit.teho.dto.equipment;
 
 import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.EquipmentSubType;
@@ -14,12 +14,12 @@ public class EquipmentSubTypeDTOWithEquipment extends EquipmentSubTypeDTO {
         this.equipment = equipment;
     }
 
-    public List<EquipmentDTO> getEquipment() {
-        return equipment;
-    }
-
     public static EquipmentSubTypeDTOWithEquipment from(EquipmentSubType st, List<Equipment> equipment) {
         List<EquipmentDTO> equipmentDTOList = equipment.stream().map(EquipmentDTO::from).collect(Collectors.toList());
         return new EquipmentSubTypeDTOWithEquipment(st.getShortName(), st.getFullName(), equipmentDTOList);
+    }
+
+    public List<EquipmentDTO> getEquipment() {
+        return equipment;
     }
 }

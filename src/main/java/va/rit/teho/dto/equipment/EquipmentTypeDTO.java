@@ -1,5 +1,6 @@
-package va.rit.teho.dto;
+package va.rit.teho.dto.equipment;
 
+import va.rit.teho.dto.AbstractNamedDTO;
 import va.rit.teho.entity.EquipmentType;
 
 public class EquipmentTypeDTO extends AbstractNamedDTO {

@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.exception.EquipmentNotFoundException;
+import va.rit.teho.exception.NotFoundException;
+import va.rit.teho.model.Pair;
 import va.rit.teho.repository.EquipmentRepository;
 import va.rit.teho.repository.EquipmentSubTypeRepository;
 import va.rit.teho.repository.EquipmentTypeRepository;
@@ -37,6 +40,11 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
+    public Equipment getEquipment(Long equipmentId) {
+        return equipmentRepository.findById(equipmentId).orElseThrow(() -> new EquipmentNotFoundException(equipmentId));
+    }
+
+    @Override
     public Long add(String name, Long subTypeId) {
         LOGGER.debug(String.format("Добавление ВВСТ \"%s\", subTypeId = %d", name, subTypeId));
         Optional<EquipmentSubType> equipmentSubType = equipmentSubTypeRepository.findById(subTypeId);
@@ -65,8 +73,20 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Map<EquipmentType, List<EquipmentSubType>> listSubTypesPerTypes() {
+    public Map<EquipmentType, List<EquipmentSubType>> listTypesWithSubTypes() {
         return equipmentSubTypeRepository.findAllGroupedByType();
+    }
+
+    @Override
+    public Pair<EquipmentType, List<EquipmentSubType>> getTypeWithSubTypes(Long typeId) {
+        return Pair.of(getEquipmentTypeById(typeId),
+                       equipmentSubTypeRepository.findByEquipmentTypeId(typeId));
+    }
+
+    private EquipmentType getEquipmentTypeById(Long typeId) {
+        return equipmentTypeRepository
+                .findById(typeId)
+                .orElseThrow(() -> new NotFoundException("Тип ВВСТ не найден!"));
     }
 
     @Override
@@ -75,6 +95,13 @@ public class EquipmentServiceImpl implements EquipmentService {
         EquipmentType equipmentType = new EquipmentType(shortName, longName);
         EquipmentType type = equipmentTypeRepository.save(equipmentType);
         return type.getId();
+    }
+
+    @Override
+    public Long addSubType(Long typeId, String shortName, String fullName) {
+        return equipmentSubTypeRepository
+                .save(new EquipmentSubType(shortName, fullName, getEquipmentTypeById(typeId)))
+                .getId();
     }
 
 

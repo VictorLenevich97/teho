@@ -1,15 +1,16 @@
 package va.rit.teho.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.BaseDTO;
+import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
 import va.rit.teho.service.BaseService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
-@RequestMapping("/base")
+@RequestMapping("base")
 public class BaseController {
 
     private final BaseService baseService;
@@ -18,13 +19,30 @@ public class BaseController {
         this.baseService = baseService;
     }
 
-    @PostMapping("/base")
+    @PostMapping
     public void addBase(@RequestBody BaseDTO baseModel) {
         baseService.add(baseModel.getShortName(), baseModel.getFullName());
     }
 
-    @PostMapping("/base/{baseId}/equipment/{equipmentId}/{amount}")
-    public void addEquipmentPerBase(@PathVariable Long equipmentId, @PathVariable Long baseId, @PathVariable int intensity, @PathVariable int amount) {
-        baseService.addEquipmentToBase(baseId, equipmentId, intensity, amount);
+    @GetMapping
+    @ResponseBody
+    public List<BaseDTO> listBases() {
+        return baseService.list().stream().map(BaseDTO::from).collect(Collectors.toList());
+    }
+
+    @GetMapping("/{baseId}")
+    @ResponseBody
+    public BaseDTO getBase(@PathVariable Long baseId) {
+        return BaseDTO.from(baseService.get(baseId));
+    }
+
+    @PostMapping("/{baseId}/equipment/{equipmentId}")
+    public void addEquipmentPerBase(@PathVariable Long baseId,
+                                    @PathVariable Long equipmentId,
+                                    @RequestBody IntensityAndAmountDTO intensityAndAmount) {
+        baseService.addEquipmentToBase(baseId,
+                                       equipmentId,
+                                       intensityAndAmount.getIntensity(),
+                                       intensityAndAmount.getAmount());
     }
 }

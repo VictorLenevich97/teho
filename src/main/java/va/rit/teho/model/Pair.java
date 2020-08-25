@@ -3,8 +3,17 @@ package va.rit.teho.model;
 import java.util.Objects;
 
 public class Pair<L, R> {
-    private L left;
-    private R right;
+    private final L left;
+    private final R right;
+
+    public Pair(L left, R right) {
+        this.left = left;
+        this.right = right;
+    }
+
+    public static <Left, Right> Pair<Left, Right> of(Left left, Right right) {
+        return new Pair<>(left, right);
+    }
 
     public L getLeft() {
         return left;
@@ -12,11 +21,6 @@ public class Pair<L, R> {
 
     public R getRight() {
         return right;
-    }
-
-    public Pair(L left, R right) {
-        this.left = left;
-        this.right = right;
     }
 
     @Override
@@ -35,9 +39,5 @@ public class Pair<L, R> {
     @Override
     public int hashCode() {
         return Objects.hash(left, right);
-    }
-
-    public static <Left, Right> Pair<Left, Right> of(Left left, Right right) {
-        return new Pair<>(left, right);
     }
 }

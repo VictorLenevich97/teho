@@ -19,4 +19,6 @@ public interface EquipmentSubTypeRepository extends CrudRepository<EquipmentSubT
                 .collect(Collectors.groupingBy(EquipmentSubType::getEquipmentType));
     }
 
+    List<EquipmentSubType> findByEquipmentTypeId(Long typeId);
+
 }

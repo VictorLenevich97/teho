@@ -6,18 +6,12 @@ public class EquipmentLaborInputDistribution {
 
     private final String baseName;
     private final EquipmentType equipmentType;
-
-    public EquipmentSubType getEquipmentSubType() {
-        return equipmentSubType;
-    }
-
     private final EquipmentSubType equipmentSubType;
     private final String equipmentName;
     private final double avgDailyFailure;
     private final int standardLaborInput;
     private final Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap;
     private final double totalRepairComplexity;
-
     public EquipmentLaborInputDistribution(
             String baseName,
             EquipmentType equipmentType,
@@ -39,6 +33,10 @@ public class EquipmentLaborInputDistribution {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public EquipmentSubType getEquipmentSubType() {
+        return equipmentSubType;
     }
 
     public double getTotalRepairComplexity() {

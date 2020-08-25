@@ -79,7 +79,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                         .reduce(Pair.of(new EquipmentInRepairData(), new HashMap<>()),
                                 (pair, eir) -> {
                                     pair.getRight()
-                                     .put(eir.getIntervalId(), Pair.of(eir.getCount(), eir.getAvgLaborInput()));
+                                        .put(eir.getIntervalId(), Pair.of(eir.getCount(), eir.getAvgLaborInput()));
                                     return Pair.of(eir, pair.getRight());
                                 },
                                 (l, r) -> l);

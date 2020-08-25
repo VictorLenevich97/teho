@@ -1,4 +1,4 @@
-package va.rit.teho.dto;
+package va.rit.teho.dto.equipment;
 
 import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.EquipmentSubType;
@@ -9,16 +9,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EquipmentSubTypeWithEquipmentPerTypeDTO {
-    private EquipmentTypeDTO type;
-    private List<EquipmentSubTypeDTOWithEquipment> subTypes;
-
-    public EquipmentTypeDTO getType() {
-        return type;
-    }
-
-    public List<EquipmentSubTypeDTOWithEquipment> getSubTypes() {
-        return subTypes;
-    }
+    private final EquipmentTypeDTO type;
+    private final List<EquipmentSubTypeDTOWithEquipment> subTypes;
 
     public EquipmentSubTypeWithEquipmentPerTypeDTO(EquipmentTypeDTO type,
                                                    List<EquipmentSubTypeDTOWithEquipment> subTypes) {
@@ -37,5 +29,13 @@ public class EquipmentSubTypeWithEquipmentPerTypeDTO {
                                                                                         subTypeListEntry.getKey(),
                                                                                         subTypeListEntry.getValue()))
                                                                    .collect(Collectors.toList()));
+    }
+
+    public EquipmentTypeDTO getType() {
+        return type;
+    }
+
+    public List<EquipmentSubTypeDTOWithEquipment> getSubTypes() {
+        return subTypes;
     }
 }
