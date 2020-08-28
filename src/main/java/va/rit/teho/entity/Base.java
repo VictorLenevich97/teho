@@ -1,6 +1,7 @@
 package va.rit.teho.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -48,5 +49,21 @@ public class Base {
 
     public Set<EquipmentPerBase> getEquipmentPerBases() {
         return equipmentPerBases;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Base base = (Base) o;
+        return Objects.equals(id, base.id) &&
+                Objects.equals(shortName, base.shortName) &&
+                Objects.equals(fullName, base.fullName) &&
+                Objects.equals(equipmentPerBases, base.equipmentPerBases);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, shortName, fullName, equipmentPerBases);
     }
 }
