@@ -46,7 +46,8 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public Long add(String name, Long subTypeId) {
-        LOGGER.debug(String.format("Добавление ВВСТ \"%s\", subTypeId = %d", name, subTypeId));
+        String logLine = String.format("Добавление ВВСТ \"%s\", subTypeId = %d", name, subTypeId);
+        LOGGER.debug(logLine);
         Optional<EquipmentSubType> equipmentSubType = equipmentSubTypeRepository.findById(subTypeId);
         if (!equipmentSubType.isPresent()) {
             LOGGER.error("Неверный тип");
@@ -91,7 +92,8 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public Long addType(String shortName, String longName) {
-        LOGGER.debug(String.format("Добавление типа ВВСТ: \"%s\" (\"%s\")", shortName, longName));
+        String logLine = String.format("Добавление типа ВВСТ: \"%s\" (\"%s\")", shortName, longName);
+        LOGGER.debug(logLine);
         EquipmentType equipmentType = new EquipmentType(shortName, longName);
         EquipmentType type = equipmentTypeRepository.save(equipmentType);
         return type.getId();

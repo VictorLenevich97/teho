@@ -11,7 +11,7 @@ public class Pair<L, R> {
         this.right = right;
     }
 
-    public static <Left, Right> Pair<Left, Right> of(Left left, Right right) {
+    public static <Q, E> Pair<Q, E> of(Q left, E right) {
         return new Pair<>(left, right);
     }
 

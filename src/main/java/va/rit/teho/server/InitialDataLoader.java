@@ -11,7 +11,6 @@ import va.rit.teho.enums.RepairTypeEnum;
 import va.rit.teho.enums.RestorationTypeEnum;
 import va.rit.teho.repository.RepairTypeRepository;
 import va.rit.teho.repository.RestorationTypeRepository;
-import va.rit.teho.repository.WorkhoursDistributionIntervalRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,8 +25,7 @@ public class InitialDataLoader implements ApplicationRunner {
     private final RestorationTypeRepository restorationTypeRepository;
 
     public InitialDataLoader(RepairTypeRepository repairTypeRepository,
-                             RestorationTypeRepository restorationTypeRepository,
-                             WorkhoursDistributionIntervalRepository workhoursDistributionIntervalRepository) {
+                             RestorationTypeRepository restorationTypeRepository) {
         this.repairTypeRepository = repairTypeRepository;
         this.restorationTypeRepository = restorationTypeRepository;
     }
@@ -54,13 +52,12 @@ public class InitialDataLoader implements ApplicationRunner {
                 .stream()
                 .map(RestorationType::getName)
                 .collect(Collectors.toList());
-        Iterable<RestorationType> types =
-                this.restorationTypeRepository.saveAll(Arrays
-                                                               .stream(RestorationTypeEnum.values())
-                                                               .map(restorationTypeEnum -> new RestorationType(
-                                                                       restorationTypeEnum.getName()))
-                                                               .filter(rt -> !restorationTypes.contains(rt.getName()))
-                                                               .collect(Collectors.toList()));
+        this.restorationTypeRepository.saveAll(Arrays
+                                                       .stream(RestorationTypeEnum.values())
+                                                       .map(restorationTypeEnum -> new RestorationType(
+                                                               restorationTypeEnum.getName()))
+                                                       .filter(rt -> !restorationTypes.contains(rt.getName()))
+                                                       .collect(Collectors.toList()));
         LOGGER.info("Типы восстановления загружены!");
     }
 
