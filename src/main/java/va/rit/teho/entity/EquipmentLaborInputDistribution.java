@@ -1,6 +1,7 @@
 package va.rit.teho.entity;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class EquipmentLaborInputDistribution {
 
@@ -12,6 +13,7 @@ public class EquipmentLaborInputDistribution {
     private final int standardLaborInput;
     private final Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap;
     private final double totalRepairComplexity;
+
     public EquipmentLaborInputDistribution(
             String baseName,
             EquipmentType equipmentType,
@@ -65,6 +67,33 @@ public class EquipmentLaborInputDistribution {
 
     public Map<Long, CountAndLaborInput> getIntervalCountAndLaborInputMap() {
         return intervalCountAndLaborInputMap;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquipmentLaborInputDistribution that = (EquipmentLaborInputDistribution) o;
+        return Double.compare(that.avgDailyFailure, avgDailyFailure) == 0 &&
+                standardLaborInput == that.standardLaborInput &&
+                Double.compare(that.totalRepairComplexity, totalRepairComplexity) == 0 &&
+                Objects.equals(baseName, that.baseName) &&
+                Objects.equals(equipmentType, that.equipmentType) &&
+                Objects.equals(equipmentSubType, that.equipmentSubType) &&
+                Objects.equals(equipmentName, that.equipmentName) &&
+                Objects.equals(intervalCountAndLaborInputMap, that.intervalCountAndLaborInputMap);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(baseName,
+                            equipmentType,
+                            equipmentSubType,
+                            equipmentName,
+                            avgDailyFailure,
+                            standardLaborInput,
+                            intervalCountAndLaborInputMap,
+                            totalRepairComplexity);
     }
 
     public static class Builder {

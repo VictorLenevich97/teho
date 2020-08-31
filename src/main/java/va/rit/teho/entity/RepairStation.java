@@ -1,6 +1,7 @@
 package va.rit.teho.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class RepairStation {
@@ -67,5 +68,22 @@ public class RepairStation {
 
     public void setStationAmount(int stationAmount) {
         this.stationAmount = stationAmount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RepairStation that = (RepairStation) o;
+        return stationAmount == that.stationAmount &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(repairStationType, that.repairStationType) &&
+                Objects.equals(base, that.base);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, repairStationType, base, stationAmount);
     }
 }

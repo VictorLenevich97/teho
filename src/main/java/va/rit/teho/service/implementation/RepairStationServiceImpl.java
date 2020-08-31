@@ -10,7 +10,6 @@ import va.rit.teho.repository.RepairStationTypeRepository;
 import va.rit.teho.service.BaseService;
 import va.rit.teho.service.RepairStationService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,15 +33,15 @@ public class RepairStationServiceImpl implements RepairStationService {
 
     @Override
     public List<RepairStation> list() {
-        return (ArrayList<RepairStation>) this.repairStationRepository.findAll();
+        return (List<RepairStation>) this.repairStationRepository.findAll();
     }
 
     @Override
     public Pair<RepairStation, List<RepairStationEquipmentStaff>> get(Long repairStationId) {
         return Pair.of(repairStationRepository
-                               .findById(repairStationId)
-                               .orElseThrow(() -> new NotFoundException("РВО с id = " + repairStationId + " не найден!")),
-                       repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId));
+                        .findById(repairStationId)
+                        .orElseThrow(() -> new NotFoundException("РВО с id = " + repairStationId + " не найден!")),
+                repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId));
     }
 
     @Override
@@ -53,7 +52,7 @@ public class RepairStationServiceImpl implements RepairStationService {
                         .findById(typeId)
                         .orElseThrow(() -> new NotFoundException("Тип РВО с id = " + typeId + " не найден"));
         RepairStation repairStation = new RepairStation(name, repairStationType, base, amount);
-        return repairStation.getId();
+        return repairStationRepository.save(repairStation).getId();
     }
 
     @Override
@@ -72,6 +71,6 @@ public class RepairStationServiceImpl implements RepairStationService {
 
     @Override
     public List<RepairStationType> listTypes() {
-        return (ArrayList<RepairStationType>) this.repairStationTypeRepository.findAll();
+        return (List<RepairStationType>) this.repairStationTypeRepository.findAll();
     }
 }

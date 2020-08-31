@@ -3,6 +3,7 @@ package va.rit.teho.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -70,5 +71,22 @@ public class Equipment {
 
     public void setEquipmentSubType(EquipmentSubType equipmentSubType) {
         this.equipmentSubType = equipmentSubType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Equipment equipment = (Equipment) o;
+        return Objects.equals(id, equipment.id) &&
+                Objects.equals(name, equipment.name) &&
+                Objects.equals(equipmentSubType, equipment.equipmentSubType) &&
+                Objects.equals(equipmentPerBases, equipment.equipmentPerBases) &&
+                Objects.equals(laborInputPerTypes, equipment.laborInputPerTypes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, equipmentSubType, equipmentPerBases, laborInputPerTypes);
     }
 }

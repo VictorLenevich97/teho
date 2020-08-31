@@ -1,6 +1,7 @@
 package va.rit.teho.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class EquipmentPerBase {
@@ -31,6 +32,23 @@ public class EquipmentPerBase {
         this.equipment = equipment;
         this.intensity = intensity;
         this.amount = amount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquipmentPerBase that = (EquipmentPerBase) o;
+        return intensity == that.intensity &&
+                amount == that.amount &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(base, that.base) &&
+                Objects.equals(equipment, that.equipment);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, base, equipment, intensity, amount);
     }
 
     public int getIntensity() {

@@ -3,6 +3,7 @@ package va.rit.teho.entity;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
+import java.util.Objects;
 
 @Embeddable
 public class EquipmentPerBaseAmount implements Serializable {
@@ -36,4 +37,17 @@ public class EquipmentPerBaseAmount implements Serializable {
         this.equipmentId = equipmentId;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquipmentPerBaseAmount that = (EquipmentPerBaseAmount) o;
+        return Objects.equals(baseId, that.baseId) &&
+                Objects.equals(equipmentId, that.equipmentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(baseId, equipmentId);
+    }
 }
