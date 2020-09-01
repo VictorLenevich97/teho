@@ -7,4 +7,6 @@ public interface ReportService {
     byte[] generateLaborIntensityRepairNormReport() throws TehoException;
 
     byte[] generateAverageDailyOutputReport() throws TehoException;
+
+    byte[] generateRepairFundDistributionReport() throws TehoException;
 }

@@ -17,15 +17,21 @@ public class ReportController {
         this.reportService = reportService;
     }
 
-    @GetMapping(value = "/generateLaborIntensityRepairNormReport", produces = "application/vnd.ms-excel")
+    @GetMapping(value = "/labor-intensity-repair-norm-report", produces = "application/vnd.ms-excel")
     @ResponseBody
     public byte[] generateLaborIntensityRepairNormReport() throws TehoException {
         return reportService.generateLaborIntensityRepairNormReport();
     }
 
-    @GetMapping(value = "/generateAverageDailyOutputReport", produces = "application/vnd.ms-excel")
+    @GetMapping(value = "/average-daily-output-report", produces = "application/vnd.ms-excel")
     @ResponseBody
     public byte[] generateAverageDailyOutputReport() throws TehoException {
         return reportService.generateAverageDailyOutputReport();
+    }
+
+    @GetMapping(value = "/repair-fund-distribution-report", produces = "application/vnd.ms-excel")
+    @ResponseBody
+    byte[] generateRepairFundDistributionReport() throws TehoException {
+        return reportService.generateRepairFundDistributionReport();
     }
 }
