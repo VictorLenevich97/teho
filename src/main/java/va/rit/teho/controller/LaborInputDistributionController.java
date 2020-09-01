@@ -38,15 +38,16 @@ public class LaborInputDistributionController {
 
     @GetMapping
     @ResponseBody
-    public List<LaborInputDistributionDTO> getDistributionData(@RequestParam(required = false) List<Long> typeIds) {
+    public ResponseEntity<List<LaborInputDistributionDTO>> getDistributionData(@RequestParam(required = false) List<Long> typeIds) {
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
                 laborInputDistributionService.getLaborInputDistribution(typeIds);
 
-        return laborInputDistribution
+        List<LaborInputDistributionDTO> laborInputDistributionDTOList = laborInputDistribution
                 .entrySet()
                 .stream()
                 .map(this::mapLaborInputDistributionDTO)
                 .collect(Collectors.toList());
+        return ResponseEntity.ok(laborInputDistributionDTOList);
     }
 
     private LaborInputDistributionDTO mapLaborInputDistributionDTO(

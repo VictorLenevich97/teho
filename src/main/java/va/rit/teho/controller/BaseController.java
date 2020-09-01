@@ -1,5 +1,7 @@
 package va.rit.teho.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.BaseDTO;
@@ -20,29 +22,31 @@ public class BaseController {
     }
 
     @PostMapping
-    public void addBase(@RequestBody BaseDTO baseModel) {
+    public ResponseEntity<Object> addBase(@RequestBody BaseDTO baseModel) {
         baseService.add(baseModel.getShortName(), baseModel.getFullName());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping
     @ResponseBody
-    public List<BaseDTO> listBases() {
-        return baseService.list().stream().map(BaseDTO::from).collect(Collectors.toList());
+    public ResponseEntity<List<BaseDTO>> listBases() {
+        return ResponseEntity.ok(baseService.list().stream().map(BaseDTO::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/{baseId}")
     @ResponseBody
-    public BaseDTO getBase(@PathVariable Long baseId) {
-        return BaseDTO.from(baseService.get(baseId));
+    public ResponseEntity<BaseDTO> getBase(@PathVariable Long baseId) {
+        return ResponseEntity.ok(BaseDTO.from(baseService.get(baseId)));
     }
 
     @PostMapping("/{baseId}/equipment/{equipmentId}")
-    public void addEquipmentPerBase(@PathVariable Long baseId,
-                                    @PathVariable Long equipmentId,
-                                    @RequestBody IntensityAndAmountDTO intensityAndAmount) {
+    public ResponseEntity<Object> addEquipmentPerBase(@PathVariable Long baseId,
+                                                      @PathVariable Long equipmentId,
+                                                      @RequestBody IntensityAndAmountDTO intensityAndAmount) {
         baseService.addEquipmentToBase(baseId,
                                        equipmentId,
                                        intensityAndAmount.getIntensity(),
                                        intensityAndAmount.getAmount());
+        return ResponseEntity.accepted().build();
     }
 }

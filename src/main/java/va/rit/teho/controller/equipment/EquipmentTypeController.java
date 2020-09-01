@@ -1,5 +1,7 @@
 package va.rit.teho.controller.equipment;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
@@ -25,29 +27,34 @@ public class EquipmentTypeController {
 
     @GetMapping
     @ResponseBody
-    public List<EquipmentSubTypePerTypeDTO> getEquipmentTypes() {
-        return equipmentService
+    public ResponseEntity<List<EquipmentSubTypePerTypeDTO>> getEquipmentTypes() {
+        List<EquipmentSubTypePerTypeDTO> equipmentTypes = equipmentService
                 .listTypesWithSubTypes()
                 .entrySet()
                 .stream()
                 .map(typeEntry -> EquipmentSubTypePerTypeDTO.from(typeEntry.getKey(), typeEntry.getValue()))
                 .collect(Collectors.toList());
+        return ResponseEntity.ok(equipmentTypes);
     }
 
     @GetMapping("/{typeId}")
     @ResponseBody
-    public EquipmentSubTypePerTypeDTO getEquipmentTypeById(@PathVariable Long typeId) {
+    public ResponseEntity<EquipmentSubTypePerTypeDTO> getEquipmentTypeById(@PathVariable Long typeId) {
         Pair<EquipmentType, List<EquipmentSubType>> typeWithSubTypes = equipmentService.getTypeWithSubTypes(typeId);
-        return EquipmentSubTypePerTypeDTO.from(typeWithSubTypes.getLeft(), typeWithSubTypes.getRight());
+        return ResponseEntity.ok(EquipmentSubTypePerTypeDTO.from(typeWithSubTypes.getLeft(),
+                                                                 typeWithSubTypes.getRight()));
     }
 
     @PostMapping
-    public void addEquipmentType(@RequestBody EquipmentTypeDTO equipmentTypeDTO) {
+    public ResponseEntity<Object> addEquipmentType(@RequestBody EquipmentTypeDTO equipmentTypeDTO) {
         equipmentService.addType(equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/{typeId}/subtype")
-    public void addEquipmentSubType(@PathVariable Long typeId, @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
+    public ResponseEntity<Object> addEquipmentSubType(@PathVariable Long typeId,
+                                                      @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
         equipmentService.addSubType(typeId, equipmentSubTypeDTO.getShortName(), equipmentSubTypeDTO.getFullName());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

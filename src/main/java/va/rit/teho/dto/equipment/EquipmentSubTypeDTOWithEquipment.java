@@ -15,7 +15,7 @@ public class EquipmentSubTypeDTOWithEquipment extends EquipmentSubTypeDTO {
     }
 
     public static EquipmentSubTypeDTOWithEquipment from(EquipmentSubType st, List<Equipment> equipment) {
-        List<EquipmentDTO> equipmentDTOList = equipment.stream().map(EquipmentDTO::from).collect(Collectors.toList());
+        List<EquipmentDTO> equipmentDTOList = equipment.stream().map(EquipmentDTO::idAndNameFrom).collect(Collectors.toList());
         return new EquipmentSubTypeDTOWithEquipment(st.getShortName(), st.getFullName(), equipmentDTOList);
     }
 
