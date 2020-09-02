@@ -5,24 +5,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import va.rit.teho.entity.*;
-import va.rit.teho.model.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Repository
 public interface EquipmentInRepairRepository extends CrudRepository<EquipmentInRepair, EquipmentInRepairId>, JpaSpecificationExecutor<EquipmentInRepair> {
-    List<EquipmentInRepair> findByBaseId(Long baseId);
-
-    default Map<Pair<Long, Long>, List<EquipmentInRepair>> findAllGroupedByBaseAndEquipment() {
-        return StreamSupport
-                .stream(findAll().spliterator(), false)
-                .collect(Collectors.groupingBy(eir -> Pair.of(eir.getBase().getId(), eir.getEquipment().getId())));
-    }
 
     @Query("SELECT new va.rit.teho.entity.EquipmentInRepairData(eir.equipment.equipmentSubType, " +
             "eir.base.fullName, " +

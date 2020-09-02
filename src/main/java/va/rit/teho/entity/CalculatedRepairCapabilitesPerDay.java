@@ -1,6 +1,7 @@
 package va.rit.teho.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class CalculatedRepairCapabilitesPerDay {
@@ -16,10 +17,8 @@ public class CalculatedRepairCapabilitesPerDay {
     @JoinColumn(name = "equipment_id")
     Equipment equipment;
     double capability;
-
     public CalculatedRepairCapabilitesPerDay() {
     }
-
     public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStation equipmentPerRepairStation,
                                              RepairStation repairStation,
                                              Equipment equipment,
@@ -28,6 +27,22 @@ public class CalculatedRepairCapabilitesPerDay {
         this.repairStation = repairStation;
         this.equipment = equipment;
         this.capability = capability;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CalculatedRepairCapabilitesPerDay that = (CalculatedRepairCapabilitesPerDay) o;
+        return Double.compare(that.capability, capability) == 0 &&
+                Objects.equals(equipmentPerRepairStation, that.equipmentPerRepairStation) &&
+                Objects.equals(repairStation, that.repairStation) &&
+                Objects.equals(equipment, that.equipment);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(equipmentPerRepairStation, repairStation, equipment, capability);
     }
 
     public EquipmentPerRepairStation getEquipmentPerRepairStation() {

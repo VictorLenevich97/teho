@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Objects;
 
 @Entity
 public class RepairStationType {
@@ -59,4 +60,19 @@ public class RepairStationType {
         this.workingHoursMax = workingHoursMax;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RepairStationType that = (RepairStationType) o;
+        return workingHoursMin == that.workingHoursMin &&
+                workingHoursMax == that.workingHoursMax &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, workingHoursMin, workingHoursMax);
+    }
 }

@@ -11,6 +11,20 @@ public class CountAndLaborInput {
         this.laborInput = laborInput;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CountAndLaborInput that = (CountAndLaborInput) o;
+        return Double.compare(that.count, count) == 0 &&
+                Double.compare(that.laborInput, laborInput) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(count, laborInput);
+    }
+
     public double getCount() {
         return count;
     }
@@ -19,21 +33,4 @@ public class CountAndLaborInput {
         return laborInput;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        CountAndLaborInput that = (CountAndLaborInput) o;
-        return count == that.count &&
-                laborInput == that.laborInput;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(count, laborInput);
-    }
 }

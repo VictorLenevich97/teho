@@ -20,6 +20,11 @@ public class EquipmentLaborInputPerType {
         //Пустой конструктор для автоматической инициализации
     }
 
+    public EquipmentLaborInputPerType(RepairType repairType, int amount) {
+        this.repairType = repairType;
+        this.amount = amount;
+    }
+
     public EquipmentLaborInputPerTypeAmount getEquipmentLaborInputPerTypeAmount() {
         return equipmentLaborInputPerTypeAmount;
     }

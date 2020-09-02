@@ -1,6 +1,7 @@
 package va.rit.teho.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "equipment_sub_type")
@@ -53,5 +54,25 @@ public class EquipmentSubType {
 
     public void setEquipmentType(EquipmentType equipmentType) {
         this.equipmentType = equipmentType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        EquipmentSubType that = (EquipmentSubType) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(shortName, that.shortName) &&
+                Objects.equals(fullName, that.fullName) &&
+                Objects.equals(equipmentType, that.equipmentType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, shortName, fullName, equipmentType);
     }
 }

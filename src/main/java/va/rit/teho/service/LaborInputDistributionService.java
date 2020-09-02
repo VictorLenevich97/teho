@@ -3,6 +3,7 @@ package va.rit.teho.service;
 import va.rit.teho.entity.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.entity.WorkhoursDistributionInterval;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,12 @@ public interface LaborInputDistributionService {
      *
      * @param baseId id Base
      */
-    void updateLaborInputDistribution(Long baseId);
+    void updateLaborInputDistributionPerBase(Long baseId);
+
+    void updateLaborInputDistributionPerEquipmentSubType(Long equipmentSubTypeId);
+
+    void updateLaborInputDistributionPerEquipmentType(Long equipmentType);
+
+    List<WorkhoursDistributionInterval> getDistributionIntervals();
 
 }

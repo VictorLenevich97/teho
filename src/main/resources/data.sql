@@ -49,3 +49,13 @@ INSERT INTO workhours_distribution_interval VALUES (4, 50, 100, 2);
 INSERT INTO workhours_distribution_interval VALUES (5, 100, 200, 2);
 INSERT INTO workhours_distribution_interval VALUES (6, 200, 400, 3);
 INSERT INTO workhours_distribution_interval VALUES (7, 400, 1000, 3);
+
+alter sequence base_id_seq restart with 3;
+alter sequence repair_station_type_id_seq restart with 3;
+alter sequence repair_station_id_seq restart with 3;
+alter sequence equipment_type_id_seq restart with 3;
+alter sequence equipment_sub_type_id_seq restart with 4;
+alter sequence equipment_id_seq restart with 5;
+alter sequence repair_type_id_seq restart with 5;
+alter sequence restoration_type_id_seq restart with 4;
+alter sequence workhours_distribution_interval_id_seq restart with 8;

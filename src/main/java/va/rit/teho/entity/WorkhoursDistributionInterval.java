@@ -1,6 +1,7 @@
 package va.rit.teho.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class WorkhoursDistributionInterval {
@@ -57,5 +58,21 @@ public class WorkhoursDistributionInterval {
 
     public void setUpperBound(int upperBound) {
         this.upperBound = upperBound;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WorkhoursDistributionInterval that = (WorkhoursDistributionInterval) o;
+        return Objects.equals(restorationType, that.restorationType) &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(lowerBound, that.lowerBound) &&
+                Objects.equals(upperBound, that.upperBound);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(restorationType, id, lowerBound, upperBound);
     }
 }

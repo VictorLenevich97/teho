@@ -1,15 +1,18 @@
 package va.rit.teho.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.BaseDTO;
+import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
 import va.rit.teho.service.BaseService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
-@RequestMapping("/base")
+@RequestMapping("base")
 public class BaseController {
 
     private final BaseService baseService;
@@ -18,13 +21,32 @@ public class BaseController {
         this.baseService = baseService;
     }
 
-    @PostMapping("/base")
-    public void addBase(@RequestBody BaseDTO baseModel) {
+    @PostMapping
+    public ResponseEntity<Object> addBase(@RequestBody BaseDTO baseModel) {
         baseService.add(baseModel.getShortName(), baseModel.getFullName());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/base/{baseId}/equipment/{equipmentId}/{amount}")
-    public void addEquipmentPerBase(@PathVariable Long equipmentId, @PathVariable Long baseId, @PathVariable int intensity, @PathVariable int amount) {
-        baseService.addEquipmentToBase(baseId, equipmentId, intensity, amount);
+    @GetMapping
+    @ResponseBody
+    public ResponseEntity<List<BaseDTO>> listBases() {
+        return ResponseEntity.ok(baseService.list().stream().map(BaseDTO::from).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/{baseId}")
+    @ResponseBody
+    public ResponseEntity<BaseDTO> getBase(@PathVariable Long baseId) {
+        return ResponseEntity.ok(BaseDTO.from(baseService.get(baseId)));
+    }
+
+    @PostMapping("/{baseId}/equipment/{equipmentId}")
+    public ResponseEntity<Object> addEquipmentPerBase(@PathVariable Long baseId,
+                                                      @PathVariable Long equipmentId,
+                                                      @RequestBody IntensityAndAmountDTO intensityAndAmount) {
+        baseService.addEquipmentToBase(baseId,
+                                       equipmentId,
+                                       intensityAndAmount.getIntensity(),
+                                       intensityAndAmount.getAmount());
+        return ResponseEntity.accepted().build();
     }
 }

@@ -1,6 +1,7 @@
 package va.rit.teho.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class RepairStation {
@@ -15,17 +16,17 @@ public class RepairStation {
     private RepairStationType repairStationType;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "base_id", referencedColumnName = "id")
-    private Base baseId;
+    private Base base;
     private int stationAmount;
 
     public RepairStation() {
         //Пустой конструктор для автоматической инициализации
     }
 
-    public RepairStation(String name, RepairStationType repairStationType, Base baseId, int stationAmount) {
+    public RepairStation(String name, RepairStationType repairStationType, Base base, int stationAmount) {
         this.name = name;
         this.repairStationType = repairStationType;
-        this.baseId = baseId;
+        this.base = base;
         this.stationAmount = stationAmount;
     }
 
@@ -53,12 +54,12 @@ public class RepairStation {
         this.repairStationType = repairStationType;
     }
 
-    public Base getBaseId() {
-        return baseId;
+    public Base getBase() {
+        return base;
     }
 
-    public void setBaseId(Base baseId) {
-        this.baseId = baseId;
+    public void setBase(Base base) {
+        this.base = base;
     }
 
     public int getStationAmount() {
@@ -67,5 +68,22 @@ public class RepairStation {
 
     public void setStationAmount(int stationAmount) {
         this.stationAmount = stationAmount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RepairStation that = (RepairStation) o;
+        return stationAmount == that.stationAmount &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(repairStationType, that.repairStationType) &&
+                Objects.equals(base, that.base);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, repairStationType, base, stationAmount);
     }
 }

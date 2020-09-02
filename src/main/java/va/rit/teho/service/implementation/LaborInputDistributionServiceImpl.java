@@ -77,10 +77,10 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 equipmentInRepairDataList
                         .stream()
                         .reduce(Pair.of(new EquipmentInRepairData(), new HashMap<>()),
-                                (p, eir) -> {
-                                    p.getRight()
-                                     .put(eir.getIntervalId(), Pair.of(eir.getCount(), eir.getAvgLaborInput()));
-                                    return Pair.of(eir, p.getRight());
+                                (pair, eir) -> {
+                                    pair.getRight()
+                                        .put(eir.getIntervalId(), Pair.of(eir.getCount(), eir.getAvgLaborInput()));
+                                    return Pair.of(eir, pair.getRight());
                                 },
                                 (l, r) -> l);
         result.computeIfAbsent(equipmentType, k -> new HashMap<>())
@@ -92,7 +92,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     public Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> getLaborInputDistribution(
             List<Long> equipmentTypeIds) {
         List<Long> equipmentTypeIdsFinal;
-        if (equipmentTypeIds.isEmpty()) {
+        if (equipmentTypeIds == null || equipmentTypeIds.isEmpty()) {
             equipmentTypeIdsFinal = StreamSupport
                     .stream(equipmentTypeRepository.findAll().spliterator(), false)
                     .map(EquipmentType::getId)
@@ -169,24 +169,37 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         return epbs.stream().flatMap(this::calculateEquipmentLaborInputDistribution).collect(Collectors.toList());
     }
 
-    @Override
-    @Transactional
-    public void updateLaborInputDistribution() {
-        List<Pair<EquipmentPerBase, Integer>> equipmentPerBases =
-                equipmentPerBaseRepository.findAllWithLaborInput(getDefaultRepairTypeId());
+    private void calculateAndSave(List<Pair<EquipmentPerBase, Integer>> equipmentPerBases) {
         List<EquipmentInRepair> calculated = calculateAndBuildEquipmentInRepair(equipmentPerBases);
-        equipmentInRepairRepository.deleteAll();
         equipmentInRepairRepository.saveAll(calculated);
     }
 
     @Override
     @Transactional
-    public void updateLaborInputDistribution(Long baseId) {
-        List<Pair<EquipmentPerBase, Integer>> equipmentPerBases =
-                equipmentPerBaseRepository.findAllWithLaborInput(getDefaultRepairTypeId());
-        List<EquipmentInRepair> calculated = calculateAndBuildEquipmentInRepair(equipmentPerBases);
-        Iterable<EquipmentInRepair> existing = equipmentInRepairRepository.findByBaseId(baseId);
-        equipmentInRepairRepository.deleteAll(existing);
-        equipmentInRepairRepository.saveAll(calculated);
+    public void updateLaborInputDistribution() {
+        calculateAndSave(equipmentPerBaseRepository.findAllWithLaborInput(getDefaultRepairTypeId()));
+    }
+
+    @Override
+    @Transactional
+    public void updateLaborInputDistributionPerBase(Long baseId) {
+        calculateAndSave(equipmentPerBaseRepository.findAllWithLaborInputAndBase(getDefaultRepairTypeId(), baseId));
+    }
+
+    @Override
+    public void updateLaborInputDistributionPerEquipmentSubType(Long equipmentSubTypeId) {
+        calculateAndSave(equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentSubType(getDefaultRepairTypeId(),
+                                                                                             equipmentSubTypeId));
+    }
+
+    @Override
+    public void updateLaborInputDistributionPerEquipmentType(Long equipmentType) {
+        calculateAndSave(equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentType(getDefaultRepairTypeId(),
+                                                                                          equipmentType));
+    }
+
+    @Override
+    public List<WorkhoursDistributionInterval> getDistributionIntervals() {
+        return (List<WorkhoursDistributionInterval>) workhoursDistributionIntervalRepository.findAll();
     }
 }
