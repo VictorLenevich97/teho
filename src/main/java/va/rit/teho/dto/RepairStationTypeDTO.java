@@ -8,7 +8,25 @@ public class RepairStationTypeDTO {
     private Integer workingHoursMin;
     private Integer workingHoursMax;
 
+    public RepairStationTypeDTO(Long key) {
+        this.key = key;
+    }
+
     public RepairStationTypeDTO() {
+    }
+
+    public RepairStationTypeDTO(Long key, String name, Integer workingHoursMin, Integer workingHoursMax) {
+        this.key = key;
+        this.name = name;
+        this.workingHoursMin = workingHoursMin;
+        this.workingHoursMax = workingHoursMax;
+    }
+
+    public static RepairStationTypeDTO from(RepairStationType repairStationType) {
+        return new RepairStationTypeDTO(repairStationType.getId(),
+                                        repairStationType.getName(),
+                                        repairStationType.getWorkingHoursMin(),
+                                        repairStationType.getWorkingHoursMax());
     }
 
     public Long getKey() {
@@ -41,19 +59,5 @@ public class RepairStationTypeDTO {
 
     public void setWorkingHoursMax(Integer workingHoursMax) {
         this.workingHoursMax = workingHoursMax;
-    }
-
-    public RepairStationTypeDTO(Long key, String name, Integer workingHoursMin, Integer workingHoursMax) {
-        this.key = key;
-        this.name = name;
-        this.workingHoursMin = workingHoursMin;
-        this.workingHoursMax = workingHoursMax;
-    }
-
-    public static RepairStationTypeDTO from(RepairStationType repairStationType) {
-        return new RepairStationTypeDTO(repairStationType.getId(),
-                                        repairStationType.getName(),
-                                        repairStationType.getWorkingHoursMin(),
-                                        repairStationType.getWorkingHoursMax());
     }
 }

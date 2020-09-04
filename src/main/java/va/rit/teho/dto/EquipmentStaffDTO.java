@@ -7,6 +7,27 @@ import va.rit.teho.entity.RepairStationEquipmentStaff;
 public class EquipmentStaffDTO {
 
     Long equipmentKey;
+    Integer totalStaff;
+    Integer availableStaff;
+
+    public EquipmentStaffDTO(Integer totalStaff, Integer availableStaff) {
+        this.totalStaff = totalStaff;
+        this.availableStaff = availableStaff;
+    }
+    public EquipmentStaffDTO() {
+    }
+
+    public EquipmentStaffDTO(Long equipmentKey, Integer totalStaff, Integer availableStaff) {
+        this.equipmentKey = equipmentKey;
+        this.totalStaff = totalStaff;
+        this.availableStaff = availableStaff;
+    }
+
+    public static EquipmentStaffDTO from(RepairStationEquipmentStaff repairStationEquipmentStaff) {
+        return new EquipmentStaffDTO(repairStationEquipmentStaff.getEquipment().getId(),
+                                     repairStationEquipmentStaff.getTotalStaff(),
+                                     repairStationEquipmentStaff.getAvailableStaff());
+    }
 
     public Long getEquipmentKey() {
         return equipmentKey;
@@ -15,9 +36,6 @@ public class EquipmentStaffDTO {
     public void setEquipmentKey(Long equipmentKey) {
         this.equipmentKey = equipmentKey;
     }
-
-    Integer totalStaff;
-    Integer availableStaff;
 
     public Integer getTotalStaff() {
         return totalStaff;
@@ -33,22 +51,5 @@ public class EquipmentStaffDTO {
 
     public void setAvailableStaff(Integer availableStaff) {
         this.availableStaff = availableStaff;
-    }
-
-    public EquipmentStaffDTO(Integer totalStaff, Integer availableStaff) {
-        this.totalStaff = totalStaff;
-        this.availableStaff = availableStaff;
-    }
-
-    public EquipmentStaffDTO(Long equipmentKey, Integer totalStaff, Integer availableStaff) {
-        this.equipmentKey = equipmentKey;
-        this.totalStaff = totalStaff;
-        this.availableStaff = availableStaff;
-    }
-
-    public static EquipmentStaffDTO from(RepairStationEquipmentStaff repairStationEquipmentStaff) {
-        return new EquipmentStaffDTO(repairStationEquipmentStaff.getEquipment().getId(),
-                                     repairStationEquipmentStaff.getTotalStaff(),
-                                     repairStationEquipmentStaff.getAvailableStaff());
     }
 }

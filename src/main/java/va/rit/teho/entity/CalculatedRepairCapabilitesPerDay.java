@@ -17,8 +17,10 @@ public class CalculatedRepairCapabilitesPerDay {
     @JoinColumn(name = "equipment_id")
     Equipment equipment;
     double capability;
+
     public CalculatedRepairCapabilitesPerDay() {
     }
+
     public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStation equipmentPerRepairStation,
                                              RepairStation repairStation,
                                              Equipment equipment,

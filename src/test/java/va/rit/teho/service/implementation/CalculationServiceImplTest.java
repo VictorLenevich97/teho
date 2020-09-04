@@ -3,7 +3,6 @@ package va.rit.teho.service.implementation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import va.rit.teho.service.CalculationService;
-import va.rit.teho.service.implementation.CalculationServiceImpl;
 
 public class CalculationServiceImplTest {
 

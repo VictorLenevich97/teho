@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.RepairCapabilitiesDTO;
 import va.rit.teho.dto.RepairStationDTO;
+import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.service.RepairCapabilitiesService;
@@ -49,7 +50,7 @@ public class RepairCapabilitiesController {
     }
 
     private RepairCapabilitiesDTO buildRepairCapabilitiesDTO(
-            Map.Entry<va.rit.teho.entity.RepairStation, Map<va.rit.teho.entity.Equipment, Double>> repairStationCapabilitiesEntry) {
+            Map.Entry<RepairStation, Map<Equipment, Double>> repairStationCapabilitiesEntry) {
         RepairStation repairStation = repairStationCapabilitiesEntry.getKey();
         return new RepairCapabilitiesDTO(
                 new RepairStationDTO(repairStation.getId(), repairStation.getName()),

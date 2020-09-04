@@ -71,25 +71,25 @@ public class LaborInputDistributionController {
     @PostMapping
     public ResponseEntity<Object> updateDistributionData() {
         laborInputDistributionService.updateLaborInputDistribution();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.accepted().build();
     }
 
     @PostMapping("/type/{typeId}")
     public ResponseEntity<Object> updateDistributionDataPerEquipmentType(@PathVariable Long typeId) {
         laborInputDistributionService.updateLaborInputDistributionPerEquipmentType(typeId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.accepted().build();
     }
 
     @PostMapping("/subtype/{subTypeId}")
     public ResponseEntity<Object> updateDistributionDataPerEquipmentSubType(@PathVariable Long subTypeId) {
         laborInputDistributionService.updateLaborInputDistributionPerEquipmentSubType(subTypeId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.accepted().build();
     }
 
     @PostMapping("/base/{baseId}")
     public ResponseEntity<Object> updateDistributionDataPerBase(@PathVariable Long baseId) {
         laborInputDistributionService.updateLaborInputDistributionPerBase(baseId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.accepted().build();
     }
 
 }

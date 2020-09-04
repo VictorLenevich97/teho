@@ -8,6 +8,7 @@ import va.rit.teho.entity.RepairStationEquipmentStaff;
 import java.util.List;
 
 @Repository
-public interface RepairStationEquipmentCapabilitiesRepository extends CrudRepository<RepairStationEquipmentStaff, EquipmentPerRepairStation> {
+public interface RepairStationEquipmentCapabilitiesRepository
+        extends CrudRepository<RepairStationEquipmentStaff, EquipmentPerRepairStation> {
     List<RepairStationEquipmentStaff> findAllByRepairStationId(Long repairStationId);
 }

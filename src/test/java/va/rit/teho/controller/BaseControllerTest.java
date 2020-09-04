@@ -1,20 +1,14 @@
 package va.rit.teho.controller;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import va.rit.teho.TestRunner;
 import va.rit.teho.dto.BaseDTO;
 import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
 import va.rit.teho.entity.Base;
 import va.rit.teho.exception.BaseNotFoundException;
-import va.rit.teho.repository.WorkhoursDistributionIntervalRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,16 +21,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = BaseController.class)
 @ContextConfiguration(classes = TestRunner.class)
 public class BaseControllerTest extends ControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private WorkhoursDistributionIntervalRepository workhoursDistributionIntervalRepository;
 
     @Test
     public void testListBases() throws Exception {

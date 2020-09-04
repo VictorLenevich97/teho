@@ -13,6 +13,7 @@ public class EquipmentDTO {
 
     public EquipmentDTO() {
     }
+
     public EquipmentDTO(Long key, String name) {
         this.key = key;
         this.name = name;
@@ -24,6 +25,15 @@ public class EquipmentDTO {
 
     public static EquipmentDTO idAndNameFrom(Equipment equipment) {
         return new EquipmentDTO(equipment.getId(), equipment.getName());
+    }
+
+    public static EquipmentDTO from(Equipment equipment) {
+        EquipmentDTO equipmentDTO = new EquipmentDTO();
+        equipmentDTO.setKey(equipment.getId());
+        equipmentDTO.setName(equipment.getName());
+        equipmentDTO.setSubType(EquipmentSubTypeDTO.from(equipment.getEquipmentSubType()));
+        equipmentDTO.setType(EquipmentTypeDTO.from(equipment.getEquipmentSubType().getEquipmentType()));
+        return equipmentDTO;
     }
 
     public Long getSubTypeKey() {
@@ -64,14 +74,5 @@ public class EquipmentDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public static EquipmentDTO from(Equipment equipment) {
-        EquipmentDTO equipmentDTO = new EquipmentDTO();
-        equipmentDTO.setKey(equipment.getId());
-        equipmentDTO.setName(equipment.getName());
-        equipmentDTO.setSubType(EquipmentSubTypeDTO.from(equipment.getEquipmentSubType()));
-        equipmentDTO.setType(EquipmentTypeDTO.from(equipment.getEquipmentSubType().getEquipmentType()));
-        return equipmentDTO;
     }
 }

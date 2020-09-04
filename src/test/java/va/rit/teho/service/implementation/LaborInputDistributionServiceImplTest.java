@@ -10,12 +10,8 @@ import va.rit.teho.model.Pair;
 import va.rit.teho.repository.*;
 import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.LaborInputDistributionService;
-import va.rit.teho.service.implementation.LaborInputDistributionServiceImpl;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,6 +51,15 @@ public class LaborInputDistributionServiceImplTest {
 
     @Test
     public void testGetLaborInputDistribution() {
+        testInternalGetLaborInputDistribution(Collections.emptyList());
+    }
+
+    @Test
+    public void testGetLaborInputDistributionFiltered() {
+        testInternalGetLaborInputDistribution(Arrays.asList(1L, 2L));
+    }
+
+    private void testInternalGetLaborInputDistribution(List<Long> equipmentTypeIds) {
         RepairType repairType = new RepairType(1L);
         when(repairTypeRepository.findByName(RepairTypeEnum.CURRENT_REPAIR.getName()))
                 .thenReturn(Optional.of(repairType));
@@ -63,7 +68,9 @@ public class LaborInputDistributionServiceImplTest {
         EquipmentSubType equipmentSubType = new EquipmentSubType("short", "full", equipmentType);
         Equipment e = new Equipment("eq", equipmentSubType);
         e.setId(3L);
-        when(equipmentTypeRepository.findAll()).thenReturn(Collections.singletonList(equipmentType));
+        if (equipmentTypeIds.isEmpty()) {
+            when(equipmentTypeRepository.findAll()).thenReturn(Collections.singletonList(equipmentType));
+        }
         EquipmentInRepairData equipmentInRepairData = new EquipmentInRepairData(equipmentSubType,
                                                                                 "basename",
                                                                                 e.getId(),
@@ -81,7 +88,8 @@ public class LaborInputDistributionServiceImplTest {
                                                                                            Collections.singletonList(
                                                                                                    equipmentInRepairData))));
         when(equipmentInRepairRepository.findAllGrouped(repairType.getId(),
-                                                        Collections.singletonList(equipmentType.getId()))).thenReturn(
+                                                        equipmentTypeIds.isEmpty() ? Collections.singletonList(
+                                                                equipmentType.getId()) : equipmentTypeIds)).thenReturn(
                 grouped);
         EquipmentLaborInputDistribution elid =
                 EquipmentLaborInputDistribution.builder()
@@ -101,7 +109,7 @@ public class LaborInputDistributionServiceImplTest {
                 equipmentType,
                 Collections.singletonMap(equipmentSubType, Collections.singletonList(elid)));
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution = laborInputDistributionService
-                .getLaborInputDistribution(Collections.emptyList());
+                .getLaborInputDistribution(equipmentTypeIds);
         Assertions.assertEquals(result, laborInputDistribution);
     }
 

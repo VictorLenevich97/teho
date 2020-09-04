@@ -39,9 +39,9 @@ public class RepairStationServiceImpl implements RepairStationService {
     @Override
     public Pair<RepairStation, List<RepairStationEquipmentStaff>> get(Long repairStationId) {
         return Pair.of(repairStationRepository
-                        .findById(repairStationId)
-                        .orElseThrow(() -> new NotFoundException("РВО с id = " + repairStationId + " не найден!")),
-                repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId));
+                               .findById(repairStationId)
+                               .orElseThrow(() -> new NotFoundException("РВО с id = " + repairStationId + " не найден!")),
+                       repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId));
     }
 
     @Override
