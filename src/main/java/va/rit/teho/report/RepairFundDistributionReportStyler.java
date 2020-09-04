@@ -15,8 +15,8 @@ import static org.apache.poi.ss.usermodel.CellType.BLANK;
 
 public class RepairFundDistributionReportStyler implements ReportRowStyler {
 
-    private Sheet sheet;
     private static final int DATA_BEGINNING_ROW_INDEX = 5;
+    private Sheet sheet;
 
     @Override
     public byte[] styleRows(byte[] file) {

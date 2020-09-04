@@ -40,9 +40,9 @@ public class BaseController {
     }
 
     @PostMapping("/{baseId}/equipment/{equipmentId}")
-    public ResponseEntity<Object> addEquipmentPerBase(@PathVariable Long baseId,
-                                                      @PathVariable Long equipmentId,
-                                                      @RequestBody IntensityAndAmountDTO intensityAndAmount) {
+    public ResponseEntity<Object> addEquipmentToBase(@PathVariable Long baseId,
+                                                     @PathVariable Long equipmentId,
+                                                     @RequestBody IntensityAndAmountDTO intensityAndAmount) {
         baseService.addEquipmentToBase(baseId,
                                        equipmentId,
                                        intensityAndAmount.getIntensity(),

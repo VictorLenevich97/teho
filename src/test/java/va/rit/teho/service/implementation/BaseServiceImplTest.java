@@ -11,7 +11,6 @@ import va.rit.teho.repository.BaseRepository;
 import va.rit.teho.repository.EquipmentPerBaseRepository;
 import va.rit.teho.repository.EquipmentRepository;
 import va.rit.teho.service.BaseService;
-import va.rit.teho.service.implementation.BaseServiceImpl;
 
 import java.util.Collections;
 import java.util.Optional;

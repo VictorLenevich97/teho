@@ -14,15 +14,6 @@ public class RepairStationDTO {
     private Integer amount;
     private List<EquipmentStaffDTO> equipmentStaff;
 
-    public List<EquipmentStaffDTO> getEquipmentStaff() {
-        return equipmentStaff;
-    }
-
-    public RepairStationDTO setEquipmentStaff(List<EquipmentStaffDTO> equipmentStaff) {
-        this.equipmentStaff = equipmentStaff;
-        return this;
-    }
-
     public RepairStationDTO() {
     }
 
@@ -37,6 +28,23 @@ public class RepairStationDTO {
         this.type = type;
         this.baseKey = baseKey;
         this.amount = amount;
+    }
+
+    public static RepairStationDTO from(RepairStation repairStation) {
+        return new RepairStationDTO(repairStation.getId(),
+                                    repairStation.getName(),
+                                    RepairStationTypeDTO.from(repairStation.getRepairStationType()),
+                                    repairStation.getBase().getId(),
+                                    repairStation.getStationAmount());
+    }
+
+    public List<EquipmentStaffDTO> getEquipmentStaff() {
+        return equipmentStaff;
+    }
+
+    public RepairStationDTO setEquipmentStaff(List<EquipmentStaffDTO> equipmentStaff) {
+        this.equipmentStaff = equipmentStaff;
+        return this;
     }
 
     public Long getKey() {
@@ -77,13 +85,5 @@ public class RepairStationDTO {
 
     public void setAmount(Integer amount) {
         this.amount = amount;
-    }
-
-    public static RepairStationDTO from(RepairStation repairStation) {
-        return new RepairStationDTO(repairStation.getId(),
-                                    repairStation.getName(),
-                                    RepairStationTypeDTO.from(repairStation.getRepairStationType()),
-                                    repairStation.getBase().getId(),
-                                    repairStation.getStationAmount());
     }
 }

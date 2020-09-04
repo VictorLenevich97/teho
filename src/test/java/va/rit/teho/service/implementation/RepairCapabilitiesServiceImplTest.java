@@ -9,7 +9,6 @@ import va.rit.teho.repository.CalculatedRepairCapabilitiesPerDayRepository;
 import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.RepairCapabilitiesService;
-import va.rit.teho.service.implementation.RepairCapabilitiesServiceImpl;
 
 import java.util.Collections;
 import java.util.List;

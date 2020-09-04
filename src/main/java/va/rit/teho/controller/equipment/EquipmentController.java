@@ -36,6 +36,7 @@ public class EquipmentController {
     }
 
 
+    @PostMapping
     @ResponseBody
     public ResponseEntity<Object> addNewEquipment(@RequestBody EquipmentDTO equipmentDTO) {
         equipmentService.add(equipmentDTO.getName(), equipmentDTO.getSubTypeKey());

@@ -11,7 +11,6 @@ import va.rit.teho.repository.EquipmentRepository;
 import va.rit.teho.repository.EquipmentSubTypeRepository;
 import va.rit.teho.repository.EquipmentTypeRepository;
 import va.rit.teho.service.EquipmentService;
-import va.rit.teho.service.implementation.EquipmentServiceImpl;
 
 import java.util.Collections;
 import java.util.List;

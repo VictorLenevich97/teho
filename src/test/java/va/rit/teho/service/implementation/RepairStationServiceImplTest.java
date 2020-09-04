@@ -10,7 +10,6 @@ import va.rit.teho.repository.RepairStationRepository;
 import va.rit.teho.repository.RepairStationTypeRepository;
 import va.rit.teho.service.BaseService;
 import va.rit.teho.service.RepairStationService;
-import va.rit.teho.service.implementation.RepairStationServiceImpl;
 
 import java.util.Collections;
 import java.util.List;

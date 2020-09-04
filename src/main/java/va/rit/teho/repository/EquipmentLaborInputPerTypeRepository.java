@@ -6,5 +6,6 @@ import va.rit.teho.entity.EquipmentLaborInputPerType;
 import va.rit.teho.entity.EquipmentLaborInputPerTypeAmount;
 
 @Repository
-public interface EquipmentLaborInputPerTypeRepository extends CrudRepository<EquipmentLaborInputPerType, EquipmentLaborInputPerTypeAmount> {
+public interface EquipmentLaborInputPerTypeRepository
+        extends CrudRepository<EquipmentLaborInputPerType, EquipmentLaborInputPerTypeAmount> {
 }

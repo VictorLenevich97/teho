@@ -4,6 +4,14 @@ public class IntensityAndAmountDTO {
     private int intensity;
     private int amount;
 
+    public IntensityAndAmountDTO(int intensity, int amount) {
+        this.intensity = intensity;
+        this.amount = amount;
+    }
+
+    public IntensityAndAmountDTO() {
+    }
+
     public int getIntensity() {
         return intensity;
     }
