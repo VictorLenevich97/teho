@@ -3,6 +3,7 @@ package va.rit.teho.service.implementation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
 import va.rit.teho.entity.*;
 import va.rit.teho.enums.RepairTypeEnum;
 import va.rit.teho.enums.RestorationTypeEnum;
@@ -12,6 +13,7 @@ import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.LaborInputDistributionService;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -115,17 +117,83 @@ public class LaborInputDistributionServiceImplTest {
 
     @Test
     public void testUpdateLaborInputDistribution() {
-        RepairType repairType = new RepairType(1L);
+        testInternalUpdateLaborInputDistribution(3L,
+                                                 1L,
+                                                 0L,
+                                                 0L,
+                                                 l -> when(equipmentPerBaseRepository.findAllWithLaborInput(l)),
+                                                 laborInputDistributionService::updateLaborInputDistribution);
+    }
+
+    @Test
+    public void testUpdateLaborInputDistributionPerBase() {
+        long repairTypeId = 2L;
+        long baseId = 3L;
+        testInternalUpdateLaborInputDistribution(baseId,
+                                                 repairTypeId,
+                                                 0L,
+                                                 0L,
+                                                 l -> when(equipmentPerBaseRepository.findAllWithLaborInputAndBase(
+                                                         repairTypeId,
+                                                         baseId)),
+                                                 () -> laborInputDistributionService.updateLaborInputDistributionPerBase(
+                                                         baseId));
+    }
+
+    @Test
+    public void testUpdateLaborInputDistributionPerEquipmentSubType() {
+        long repairTypeId = 2L;
+        long baseId = 3L;
+        long subTypeId = 5L;
+        testInternalUpdateLaborInputDistribution(baseId,
+                                                 repairTypeId,
+                                                 subTypeId,
+                                                 0L,
+                                                 l -> when(equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentSubType(
+                                                         repairTypeId,
+                                                         subTypeId)),
+                                                 () -> laborInputDistributionService.updateLaborInputDistributionPerEquipmentSubType(
+                                                         subTypeId));
+    }
+
+    @Test
+    public void testUpdateLaborInputDistributionPerEquipmentType() {
+        long repairTypeId = 2L;
+        long baseId = 3L;
+        long subTypeId = 5L;
+        long typeId = 7L;
+        testInternalUpdateLaborInputDistribution(baseId,
+                                                 repairTypeId,
+                                                 subTypeId,
+                                                 typeId,
+                                                 l -> when(equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentType(
+                                                         repairTypeId,
+                                                         typeId)),
+                                                 () -> laborInputDistributionService.updateLaborInputDistributionPerEquipmentType(
+                                                         typeId));
+    }
+
+    private void testInternalUpdateLaborInputDistribution(Long baseId,
+                                                          Long repairTypeId,
+                                                          Long subTypeId,
+                                                          Long typeId,
+                                                          Function<Long, OngoingStubbing<List<Pair<EquipmentPerBase, Integer>>>> repositoryFunctionStub,
+                                                          Runnable updateDistribution) {
+        RepairType repairType = new RepairType(repairTypeId);
         when(repairTypeRepository.findByName(RepairTypeEnum.CURRENT_REPAIR.getName()))
                 .thenReturn(Optional.of(repairType));
         Base base = new Base("s", "f");
-        base.setId(3L);
-        Equipment e = new Equipment("eqName", new EquipmentSubType("s", "f", new EquipmentType("s", "f")));
+        base.setId(baseId);
+        EquipmentType equipmentType = new EquipmentType("s", "f");
+        equipmentType.setId(typeId);
+        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
+        equipmentSubType.setId(subTypeId);
+        Equipment e = new Equipment("eqName", equipmentSubType);
         e.setId(5L);
         EquipmentPerBase equipmentPerBase = new EquipmentPerBase(base, e, 50, 20);
         Pair<EquipmentPerBase, Integer> equipmentPerBaseWithLaborInput = Pair.of(equipmentPerBase, 120);
-        when(equipmentPerBaseRepository.findAllWithLaborInput(repairType.getId()))
-                .thenReturn(Collections.singletonList(equipmentPerBaseWithLaborInput));
+        repositoryFunctionStub.apply(repairType.getId())
+                              .thenReturn(Collections.singletonList(equipmentPerBaseWithLaborInput));
         double avgDailyFailure = 123.12;
         when(calculationService.calculateEquipmentFailureAmount(equipmentPerBase.getAmount(),
                                                                 equipmentPerBase.getIntensity(),
@@ -162,7 +230,7 @@ public class LaborInputDistributionServiceImplTest {
                 count,
                 laborInput);
 
-        laborInputDistributionService.updateLaborInputDistribution();
+        updateDistribution.run();
 
         verify(equipmentInRepairRepository).saveAll(Collections.singletonList(equipmentInRepair));
     }
