@@ -47,10 +47,6 @@ public class Base {
         this.fullName = fullName;
     }
 
-    public Set<EquipmentPerBase> getEquipmentPerBases() {
-        return equipmentPerBases;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -51,10 +51,28 @@ public class EquipmentTypeController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PutMapping("/{typeId}")
+    public ResponseEntity<Object> updateEquipmentType(@PathVariable Long typeId,
+                                                   @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
+        equipmentService.updateType(typeId, equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
     @PostMapping("/{typeId}/subtype")
     public ResponseEntity<Object> addEquipmentSubType(@PathVariable Long typeId,
                                                       @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
         equipmentService.addSubType(typeId, equipmentSubTypeDTO.getShortName(), equipmentSubTypeDTO.getFullName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("/{typeId}/subtype/{subTypeId}")
+    public ResponseEntity<Object> updateEquipmentSubType(@PathVariable Long typeId,
+                                                      @PathVariable Long subTypeId,
+                                                      @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
+        equipmentService.updateSubType(subTypeId,
+                                       typeId,
+                                       equipmentSubTypeDTO.getShortName(),
+                                       equipmentSubTypeDTO.getFullName());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 }

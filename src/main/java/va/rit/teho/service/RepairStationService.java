@@ -15,9 +15,15 @@ public interface RepairStationService {
 
     Long add(String name, Long baseId, Long typeId, int amount);
 
+    void update(Long id, String name, Long baseId, Long typeId, int amount);
+
     void setEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
 
+    void updateEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
+
     Long addType(String name, int workingHoursMin, int workingHoursMax);
+
+    void updateType(Long id, String name, int workingHoursMin, int workingHoursMax);
 
     List<RepairStationType> listTypes();
 }

@@ -52,7 +52,7 @@ public class BaseControllerTest extends ControllerTest {
         when(baseService.get(baseId)).thenThrow(new BaseNotFoundException(baseId));
 
         mockMvc
-                .perform(get("/base/{id}", baseId))
+                .perform(get("/base/{baseId}", baseId))
                 .andExpect(status().isNotFound());
     }
 

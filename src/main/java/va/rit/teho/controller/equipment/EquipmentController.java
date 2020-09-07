@@ -37,9 +37,15 @@ public class EquipmentController {
 
 
     @PostMapping
-    @ResponseBody
     public ResponseEntity<Object> addNewEquipment(@RequestBody EquipmentDTO equipmentDTO) {
         equipmentService.add(equipmentDTO.getName(), equipmentDTO.getSubTypeKey());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @PutMapping("/{equipmentId}")
+    public ResponseEntity<Object> updateEquipment(@PathVariable Long equipmentId, @RequestBody EquipmentDTO equipmentDTO) {
+        equipmentService.update(equipmentId, equipmentDTO.getName(), equipmentDTO.getSubTypeKey());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
 }

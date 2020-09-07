@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.EquipmentNotFoundException;
+import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.model.Pair;
 import va.rit.teho.repository.EquipmentRepository;
@@ -16,7 +18,6 @@ import va.rit.teho.service.EquipmentService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
@@ -48,19 +49,28 @@ public class EquipmentServiceImpl implements EquipmentService {
     public Long add(String name, Long subTypeId) {
         String logLine = String.format("Добавление ВВСТ \"%s\", subTypeId = %d", name, subTypeId);
         LOGGER.debug(logLine);
-        Optional<EquipmentSubType> equipmentSubType = equipmentSubTypeRepository.findById(subTypeId);
-        if (!equipmentSubType.isPresent()) {
-            LOGGER.error("Неверный тип");
-            return -1L;
-        }
-
+        EquipmentSubType equipmentSubType = equipmentSubTypeRepository
+                .findById(subTypeId).orElseThrow(() -> new IncorrectParamException("subTypeId", subTypeId));
         if (equipmentRepository.findByName(name).isPresent()) {
-            LOGGER.error("Уже существует");
-            return -1L;
+            throw new AlreadyExistsException("ВВСТ", "имя", name);
         }
-        Equipment s = new Equipment(name, equipmentSubType.get());
+        Equipment s = new Equipment(name, equipmentSubType);
         Equipment saved = equipmentRepository.save(s);
         return saved.getId();
+    }
+
+    @Override
+    public void update(Long id, String name, Long subTypeId) {
+        String logLine = String.format("Обновление ВВСТ (id = %d) \"%s\", subTypeId = %d", id, name, subTypeId);
+        LOGGER.debug(logLine);
+        EquipmentSubType equipmentSubType =
+                equipmentSubTypeRepository.findById(subTypeId)
+                                          .orElseThrow(() -> new IncorrectParamException("subTypeId", subTypeId));
+        Equipment equipment = getEquipment(id);
+        equipment.setName(name);
+        equipment.setEquipmentSubType(equipmentSubType);
+
+        equipmentRepository.save(equipment);
     }
 
     @Override
@@ -91,19 +101,55 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Long addType(String shortName, String longName) {
-        String logLine = String.format("Добавление типа ВВСТ: \"%s\" (\"%s\")", shortName, longName);
+    public Long addType(String shortName, String fullName) {
+        String logLine = String.format("Добавление типа ВВСТ: \"%s\" (\"%s\")", shortName, fullName);
         LOGGER.debug(logLine);
-        EquipmentType equipmentType = new EquipmentType(shortName, longName);
+        equipmentTypeRepository.findByFullName(fullName).ifPresent((et) -> {
+            throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
+        });
+        EquipmentType equipmentType = new EquipmentType(shortName, fullName);
         EquipmentType type = equipmentTypeRepository.save(equipmentType);
         return type.getId();
     }
 
     @Override
+    public void updateType(Long id, String shortName, String fullName) {
+        String logLine = String.format("Обновление типа ВВСТ (id = %d): \"%s\" (\"%s\")", id, shortName, fullName);
+        LOGGER.debug(logLine);
+        EquipmentType equipmentType = equipmentTypeRepository.findById(id)
+                                                             .orElseThrow(() -> new NotFoundException(
+                                                                     "Тип ВВСТ с id = " + id + " не найден!"));
+        equipmentType.setShortName(shortName);
+        equipmentType.setFullName(fullName);
+        equipmentTypeRepository.save(equipmentType);
+    }
+
+    @Override
     public Long addSubType(Long typeId, String shortName, String fullName) {
+        if (!equipmentTypeRepository.findById(typeId).isPresent()) {
+            throw new IncorrectParamException("typeId", typeId);
+        }
+        equipmentSubTypeRepository.findByFullName(fullName).ifPresent((et) -> {
+            throw new AlreadyExistsException("Вид ВВСТ", "название", fullName);
+        });
         return equipmentSubTypeRepository
                 .save(new EquipmentSubType(shortName, fullName, getEquipmentTypeById(typeId)))
                 .getId();
+    }
+
+    @Override
+    public void updateSubType(Long id, Long typeId, String shortName, String fullName) {
+        EquipmentType equipmentType = equipmentTypeRepository.findById(typeId)
+                                                             .orElseThrow(() -> new IncorrectParamException("typeId",
+                                                                                                            typeId));
+        EquipmentSubType equipmentSubType = equipmentSubTypeRepository.findById(id)
+                                                                      .orElseThrow(() -> new NotFoundException(
+                                                                              "Подтип ВВСТ с id = " + id + "  найден!"));
+
+        equipmentSubType.setEquipmentType(equipmentType);
+        equipmentSubType.setShortName(shortName);
+        equipmentSubType.setFullName(fullName);
+        equipmentSubTypeRepository.save(equipmentSubType);
     }
 
 

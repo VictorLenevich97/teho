@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.EquipmentStaffDTO;
 import va.rit.teho.dto.RepairStationDTO;
+import va.rit.teho.dto.RepairStationTypeDTO;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
 import va.rit.teho.model.Pair;
@@ -59,6 +60,17 @@ public class RepairStationController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PutMapping("/{repairStationId}")
+    public ResponseEntity<Object> updateRepairStation(@PathVariable Long repairStationId,
+                                                      @RequestBody RepairStationDTO repairStationDTO) {
+        repairStationService.update(repairStationId,
+                                    repairStationDTO.getName(),
+                                    repairStationDTO.getBaseKey(),
+                                    repairStationDTO.getType().getKey(),
+                                    repairStationDTO.getAmount());
+        return ResponseEntity.accepted().build();
+    }
+
     @PostMapping("/{repairStationId}/equipment/{equipmentId}")
     public ResponseEntity<Object> setRepairStationEquipmentStaff(@PathVariable Long repairStationId,
                                                                  @PathVariable Long equipmentId,
@@ -67,6 +79,35 @@ public class RepairStationController {
                                                equipmentId,
                                                equipmentStaffDTO.getAvailableStaff(),
                                                equipmentStaffDTO.getTotalStaff());
+        return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping("/{repairStationId}/equipment/{equipmentId}")
+    public ResponseEntity<Object> updateRepairStationEquipmentStaff(@PathVariable Long repairStationId,
+                                                                    @PathVariable Long equipmentId,
+                                                                    @RequestBody EquipmentStaffDTO equipmentStaffDTO) {
+        repairStationService.updateEquipmentStaff(repairStationId,
+                                                  equipmentId,
+                                                  equipmentStaffDTO.getAvailableStaff(),
+                                                  equipmentStaffDTO.getTotalStaff());
+        return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/type")
+    public ResponseEntity<Object> addRepairStationType(@RequestBody RepairStationTypeDTO repairStationTypeDTO) {
+        repairStationService.addType(repairStationTypeDTO.getName(),
+                                     repairStationTypeDTO.getWorkingHoursMin(),
+                                     repairStationTypeDTO.getWorkingHoursMax());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("/type/{typeId}")
+    public ResponseEntity<Object> updateRepairStationType(@PathVariable Long typeId,
+                                                          @RequestBody RepairStationTypeDTO repairStationTypeDTO) {
+        repairStationService.updateType(typeId,
+                                        repairStationTypeDTO.getName(),
+                                        repairStationTypeDTO.getWorkingHoursMin(),
+                                        repairStationTypeDTO.getWorkingHoursMax());
         return ResponseEntity.accepted().build();
     }
 }

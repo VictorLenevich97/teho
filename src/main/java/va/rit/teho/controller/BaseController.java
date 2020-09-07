@@ -27,6 +27,12 @@ public class BaseController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PutMapping("/{baseId}")
+    public ResponseEntity<Object> updateBase(@PathVariable Long baseId, @RequestBody BaseDTO baseModel) {
+        baseService.update(baseId, baseModel.getShortName(), baseModel.getFullName());
+        return ResponseEntity.accepted().build();
+    }
+
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<BaseDTO>> listBases() {
@@ -47,6 +53,17 @@ public class BaseController {
                                        equipmentId,
                                        intensityAndAmount.getIntensity(),
                                        intensityAndAmount.getAmount());
+        return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping("/{baseId}/equipment/{equipmentId}")
+    public ResponseEntity<Object> updateEquipmentInBase(@PathVariable Long baseId,
+                                                        @PathVariable Long equipmentId,
+                                                        @RequestBody IntensityAndAmountDTO intensityAndAmount) {
+        baseService.updateEquipmentInBase(baseId,
+                                          equipmentId,
+                                          intensityAndAmount.getIntensity(),
+                                          intensityAndAmount.getAmount());
         return ResponseEntity.accepted().build();
     }
 }

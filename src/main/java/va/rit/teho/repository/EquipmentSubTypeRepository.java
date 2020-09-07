@@ -7,6 +7,7 @@ import va.rit.teho.entity.EquipmentType;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -20,5 +21,7 @@ public interface EquipmentSubTypeRepository extends CrudRepository<EquipmentSubT
     }
 
     List<EquipmentSubType> findByEquipmentTypeId(Long typeId);
+
+    Optional<EquipmentSubType> findByFullName(String fullName);
 
 }

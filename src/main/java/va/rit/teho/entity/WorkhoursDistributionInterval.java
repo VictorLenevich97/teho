@@ -28,14 +28,6 @@ public class WorkhoursDistributionInterval {
         //Пустой конструктор для автоматической инициализации
     }
 
-    public RestorationType getRestorationType() {
-        return restorationType;
-    }
-
-    public void setRestorationType(RestorationType restorationType) {
-        this.restorationType = restorationType;
-    }
-
     public Long getId() {
         return id;
     }
@@ -48,16 +40,8 @@ public class WorkhoursDistributionInterval {
         return lowerBound;
     }
 
-    public void setLowerBound(int lowerBound) {
-        this.lowerBound = lowerBound;
-    }
-
     public Integer getUpperBound() {
         return upperBound;
-    }
-
-    public void setUpperBound(int upperBound) {
-        this.upperBound = upperBound;
     }
 
     @Override

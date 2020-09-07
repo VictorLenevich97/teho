@@ -9,6 +9,7 @@ import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.repository.RepairStationRepository;
 import va.rit.teho.repository.RepairStationTypeRepository;
 import va.rit.teho.service.BaseService;
+import va.rit.teho.service.EquipmentService;
 import va.rit.teho.service.RepairStationService;
 
 import java.util.Collections;
@@ -25,13 +26,15 @@ public class RepairStationServiceImplTest {
     private final RepairStationRepository repairStationRepository = Mockito.mock(RepairStationRepository.class);
     private final RepairStationTypeRepository repairStationTypeRepository = Mockito.mock(RepairStationTypeRepository.class);
     private final BaseService baseService = Mockito.mock(BaseService.class);
+    private final EquipmentService equipmentService = Mockito.mock(EquipmentService.class);
 
     private final RepairStationService repairStationService =
             new RepairStationServiceImpl(
                     repairStationEquipmentCapabilitiesRepository,
                     repairStationRepository,
                     repairStationTypeRepository,
-                    baseService);
+                    baseService,
+                    equipmentService);
 
     @Test
     public void testList() {
@@ -115,7 +118,11 @@ public class RepairStationServiceImplTest {
         RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentPerRepairStation(
                 1L,
                 2L), 2, 1);
-
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(new RepairStation("name",
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         0)));
+        when(equipmentService.getEquipment(equipmentId)).thenReturn(new Equipment("", null));
         repairStationService.setEquipmentStaff(repairStationId,
                                                equipmentId,
                                                repairStationEquipmentStaff.getAvailableStaff(),

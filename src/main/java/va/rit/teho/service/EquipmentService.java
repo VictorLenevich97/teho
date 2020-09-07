@@ -16,6 +16,8 @@ public interface EquipmentService {
 
     Long add(String name, Long subTypeId);
 
+    void update(Long id, String name, Long subTypeId);
+
     List<EquipmentType> listTypes();
 
     Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes();
@@ -24,8 +26,12 @@ public interface EquipmentService {
 
     Pair<EquipmentType, List<EquipmentSubType>> getTypeWithSubTypes(Long typeId);
 
-    Long addType(String shortName, String longName);
+    Long addType(String shortName, String fullName);
+
+    void updateType(Long id, String shortName, String fullName);
 
     Long addSubType(Long typeId, String shortName, String fullName);
+
+    void updateSubType(Long id, Long typeId, String shortName, String fullName);
 
 }

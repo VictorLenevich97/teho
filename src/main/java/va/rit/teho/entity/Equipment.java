@@ -33,14 +33,6 @@ public class Equipment {
         this.equipmentSubType = equipmentSubType;
     }
 
-    public Set<EquipmentPerBase> getEquipmentPerBases() {
-        return equipmentPerBases;
-    }
-
-    public void setEquipmentPerBases(Set<EquipmentPerBase> equipmentPerBases) {
-        this.equipmentPerBases = equipmentPerBases;
-    }
-
     public Set<EquipmentLaborInputPerType> getLaborInputPerTypes() {
         return laborInputPerTypes;
     }
