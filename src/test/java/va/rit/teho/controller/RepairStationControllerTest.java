@@ -37,7 +37,7 @@ public class RepairStationControllerTest extends ControllerTest {
                 new RepairStation("first", repairStationType1, firstBase, 3),
                 new RepairStation("second", repairStationType2, secondBase, 5));
 
-        when(repairStationService.list()).thenReturn(repairStationDTOList);
+        when(repairStationService.list(Collections.emptyList())).thenReturn(repairStationDTOList);
 
         mockMvc.perform(get("/repair-station"))
                .andExpect(status().isOk())

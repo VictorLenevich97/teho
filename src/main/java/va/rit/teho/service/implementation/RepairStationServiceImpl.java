@@ -38,8 +38,9 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
-    public List<RepairStation> list() {
-        return (List<RepairStation>) this.repairStationRepository.findAll();
+    public List<RepairStation> list(List<Long> filterIds) {
+        return (List<RepairStation>) (
+                filterIds.isEmpty() ? repairStationRepository.findAll() : repairStationRepository.findAllById(filterIds));
     }
 
     @Override

@@ -74,15 +74,21 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                 repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId));
     }
 
+    private List<Long> nullIfEmpty(List<Long> collection) {
+        return collection == null || collection.isEmpty() ? null : collection;
+    }
+
     @Override
-    public Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(List<Long> repairStationIds) {
-        Iterable<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDays;
-        if (repairStationIds == null || repairStationIds.isEmpty()) {
-            calculatedRepairCapabilitesPerDays = calculatedRepairCapabilitiesPerDayRepository.findAll();
-        } else {
-            calculatedRepairCapabilitesPerDays =
-                    calculatedRepairCapabilitiesPerDayRepository.findByRepairStationIdIn(repairStationIds);
-        }
+    public Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(
+            List<Long> repairStationIds,
+            List<Long> equipmentIds,
+            List<Long> equipmentSubTypeIds,
+            List<Long> equipmentTypeIds) {
+        Iterable<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDays =
+                calculatedRepairCapabilitiesPerDayRepository.findFiltered(nullIfEmpty(repairStationIds),
+                                                                          nullIfEmpty(equipmentIds),
+                                                                          nullIfEmpty(equipmentSubTypeIds),
+                                                                          nullIfEmpty(equipmentTypeIds));
         Map<RepairStation, Map<Equipment, Double>> result = new HashMap<>();
         for (CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay : calculatedRepairCapabilitesPerDays) {
             RepairStation repairStation = calculatedRepairCapabilitesPerDay.getRepairStation();

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface RepairStationService {
 
-    List<RepairStation> list();
+    List<RepairStation> list(List<Long> filterIds);
 
     Pair<RepairStation, List<RepairStationEquipmentStaff>> get(Long repairStationId);
 

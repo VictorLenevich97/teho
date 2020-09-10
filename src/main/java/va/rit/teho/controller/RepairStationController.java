@@ -12,7 +12,9 @@ import va.rit.teho.entity.RepairStationEquipmentStaff;
 import va.rit.teho.model.Pair;
 import va.rit.teho.service.RepairStationService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -27,11 +29,13 @@ public class RepairStationController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<RepairStationDTO>> listRepairStations() {
-        List<RepairStationDTO> repairStationDTOList = repairStationService.list()
-                                                                          .stream()
-                                                                          .map(RepairStationDTO::from)
-                                                                          .collect(Collectors.toList());
+    public ResponseEntity<List<RepairStationDTO>> listRepairStations(
+            @RequestParam(value = "id", required = false) List<Long> ids) {
+        List<RepairStationDTO> repairStationDTOList =
+                repairStationService.list(Optional.ofNullable(ids).orElse(Collections.emptyList()))
+                                    .stream()
+                                    .map(RepairStationDTO::from)
+                                    .collect(Collectors.toList());
         return ResponseEntity.ok(repairStationDTOList);
     }
 

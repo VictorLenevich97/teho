@@ -15,5 +15,9 @@ public interface RepairCapabilitiesService {
 
     void calculateAndUpdateRepairCapabilitiesPerStation(Long repairStationId);
 
-    Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(List<Long> repairStationIds);
+    Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(
+            List<Long> repairStationIds,
+            List<Long> equipmentIds,
+            List<Long> equipmentSubTypeIds,
+            List<Long> equipmentTypeIds);
 }

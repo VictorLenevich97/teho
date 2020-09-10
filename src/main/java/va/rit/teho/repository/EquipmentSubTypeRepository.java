@@ -16,8 +16,6 @@ public interface EquipmentSubTypeRepository extends CrudRepository<EquipmentSubT
 
     List<EquipmentSubType> findByEquipmentTypeIdIn(List<Long> typeIds);
 
-    List<EquipmentSubType> findByIdIn(List<Long> id);
-
     List<EquipmentSubType> findByIdInAndEquipmentTypeIdIn(List<Long> ids, List<Long> typeIds);
 
 }

@@ -87,13 +87,13 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public List<EquipmentType> listTypes(List<Long> typeIds) {
-        List<EquipmentType> result;
+        Iterable<EquipmentType> result;
         if (typeIds.isEmpty()) {
-            result = (List<EquipmentType>) equipmentTypeRepository.findAll();
+            result = equipmentTypeRepository.findAll();
         } else {
-            result = equipmentTypeRepository.findByIdIn(typeIds);
+            result = equipmentTypeRepository.findAllById(typeIds);
         }
-        return result;
+        return (List<EquipmentType>) result;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         if (typeIds.isEmpty() && subTypeIds.isEmpty()) {
             equipmentSubTypes = equipmentSubTypeRepository.findAll();
         } else if (typeIds.isEmpty()) {
-            equipmentSubTypes = equipmentSubTypeRepository.findByIdIn(subTypeIds);
+            equipmentSubTypes = equipmentSubTypeRepository.findAllById(subTypeIds);
         } else if (subTypeIds.isEmpty()) {
             equipmentSubTypes = equipmentSubTypeRepository.findByEquipmentTypeIdIn(typeIds);
         } else {

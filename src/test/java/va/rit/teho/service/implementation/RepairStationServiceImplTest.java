@@ -45,7 +45,7 @@ public class RepairStationServiceImplTest {
                         .singletonList(new RepairStation("station", repairStationType, b, 2));
         when(repairStationRepository.findAll()).thenReturn(repairStations);
 
-        Assertions.assertEquals(repairStations, repairStationService.list());
+        Assertions.assertEquals(repairStations, repairStationService.list(Collections.emptyList()));
     }
 
     @Test

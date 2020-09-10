@@ -61,7 +61,7 @@ public class RepairCapabilitiesServiceImplTest {
                                                                                                                       .get(0)
                                                                                                                       .getCapability()));
 
-        Assertions.assertEquals(result, repairCapabilitiesService.getCalculatedRepairCapabilities(repairStationIds));
+        Assertions.assertEquals(result, repairCapabilitiesService.getCalculatedRepairCapabilities(repairStationIds, null, null, null));
     }
 
     @Test
