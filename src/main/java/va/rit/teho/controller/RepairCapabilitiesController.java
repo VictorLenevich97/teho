@@ -73,12 +73,12 @@ public class RepairCapabilitiesController {
     @GetMapping
     @ResponseBody
     public ResponseEntity<List<RepairCapabilitiesDTO>> getCalculatedRepairCapabilities(
-            @RequestParam(required = false) List<Long> repairStationIds,
-            @RequestParam(required = false) List<Long> equipmentIds,
-            @RequestParam(required = false) List<Long> equipmentTypeIds,
-            @RequestParam(required = false) List<Long> equipmentSubTypeIds) {
+            @RequestParam(required = false) List<Long> repairStationId,
+            @RequestParam(required = false) List<Long> equipmentId,
+            @RequestParam(required = false) List<Long> equipmentTypeId,
+            @RequestParam(required = false) List<Long> equipmentSubTypeId) {
         List<RepairCapabilitiesDTO> repairCapabilitiesDTOList = repairCapabilitiesService
-                .getCalculatedRepairCapabilities(repairStationIds, equipmentIds, equipmentSubTypeIds, equipmentTypeIds)
+                .getCalculatedRepairCapabilities(repairStationId, equipmentId, equipmentSubTypeId, equipmentTypeId)
                 .entrySet()
                 .stream()
                 .map(this::buildRepairCapabilitiesDTO)

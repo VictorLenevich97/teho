@@ -34,13 +34,14 @@ public class GroupedEquipmentController {
         List<Long> equipmentIdFilter = Optional.ofNullable(equipmentIds).orElse(Collections.emptyList());
         List<Long> subTypeIdFilter = Optional.ofNullable(subTypeIds).orElse(Collections.emptyList());
         List<Long> typeIdFilter = Optional.ofNullable(typeIds).orElse(Collections.emptyList());
-        List<EquipmentSubTypeWithEquipmentPerTypeDTO> equipmentPerTypeDTOList = equipmentService
-                .listGroupedByTypes(equipmentIdFilter, subTypeIdFilter, typeIdFilter)
-                .entrySet()
-                .stream()
-                .map(equipmentTypeEntry -> EquipmentSubTypeWithEquipmentPerTypeDTO.from(equipmentTypeEntry.getKey(),
-                                                                                        equipmentTypeEntry.getValue()))
-                .collect(Collectors.toList());
+        List<EquipmentSubTypeWithEquipmentPerTypeDTO> equipmentPerTypeDTOList =
+                equipmentService.listGroupedByTypes(equipmentIdFilter, subTypeIdFilter, typeIdFilter)
+                                .entrySet()
+                                .stream()
+                                .map(equipmentTypeEntry -> EquipmentSubTypeWithEquipmentPerTypeDTO.from(
+                                        equipmentTypeEntry.getKey(),
+                                        equipmentTypeEntry.getValue()))
+                                .collect(Collectors.toList());
         return ResponseEntity.ok(equipmentPerTypeDTOList);
     }
 
