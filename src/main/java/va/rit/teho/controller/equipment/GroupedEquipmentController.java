@@ -5,11 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import va.rit.teho.dto.equipment.EquipmentSubTypeWithEquipmentPerTypeDTO;
 import va.rit.teho.service.EquipmentService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -24,9 +27,15 @@ public class GroupedEquipmentController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<EquipmentSubTypeWithEquipmentPerTypeDTO>> getEquipmentPerType() {
+    public ResponseEntity<List<EquipmentSubTypeWithEquipmentPerTypeDTO>> getEquipmentPerType(
+            @RequestParam(value = "equipmentId", required = false) List<Long> equipmentIds,
+            @RequestParam(value = "subTypeId", required = false) List<Long> subTypeIds,
+            @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
+        List<Long> equipmentIdFilter = Optional.ofNullable(equipmentIds).orElse(Collections.emptyList());
+        List<Long> subTypeIdFilter = Optional.ofNullable(subTypeIds).orElse(Collections.emptyList());
+        List<Long> typeIdFilter = Optional.ofNullable(typeIds).orElse(Collections.emptyList());
         List<EquipmentSubTypeWithEquipmentPerTypeDTO> equipmentPerTypeDTOList = equipmentService
-                .listGroupedByTypes()
+                .listGroupedByTypes(equipmentIdFilter, subTypeIdFilter, typeIdFilter)
                 .entrySet()
                 .stream()
                 .map(equipmentTypeEntry -> EquipmentSubTypeWithEquipmentPerTypeDTO.from(equipmentTypeEntry.getKey(),

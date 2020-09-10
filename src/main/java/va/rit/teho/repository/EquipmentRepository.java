@@ -13,11 +13,33 @@ import java.util.stream.StreamSupport;
 @Repository
 public interface EquipmentRepository extends CrudRepository<Equipment, Long> {
 
-    default Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> getEquipmentGroupedByType() {
+    default Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> getEquipmentGroupedByType(List<Long> ids,
+                                                                                                 List<Long> subTypeIds,
+                                                                                                 List<Long> typeIds) {
+        Iterable<Equipment> totalEquipmentList;
+        if (ids.isEmpty() && subTypeIds.isEmpty() && typeIds.isEmpty()) {
+            totalEquipmentList = findAll();
+        } else if (ids.isEmpty() && subTypeIds.isEmpty()) {
+            totalEquipmentList = findByEquipmentSubTypeEquipmentTypeIdIn(typeIds);
+        } else if (ids.isEmpty() && typeIds.isEmpty()) {
+            totalEquipmentList = findByEquipmentSubTypeIdIn(subTypeIds);
+        } else if (subTypeIds.isEmpty() && typeIds.isEmpty()) {
+            totalEquipmentList = findByIdIn(ids);
+        } else if (ids.isEmpty()) {
+            totalEquipmentList = findByEquipmentSubTypeIdInAndEquipmentSubTypeEquipmentTypeIdIn(subTypeIds, typeIds);
+        } else if (subTypeIds.isEmpty()) {
+            totalEquipmentList = findByIdInAndEquipmentSubTypeEquipmentTypeIdIn(ids, typeIds);
+        } else if (typeIds.isEmpty()) {
+            totalEquipmentList = findByIdInAndEquipmentSubTypeIdIn(ids, subTypeIds);
+        } else {
+            totalEquipmentList = findByIdInAndEquipmentSubTypeIdInAndEquipmentSubTypeEquipmentTypeIdIn(ids,
+                                                                                                       subTypeIds,
+                                                                                                       typeIds);
+        }
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> resultMap = new HashMap<>();
         for (Map.Entry<EquipmentSubType, List<Equipment>> entry :
                 StreamSupport
-                        .stream(findAll().spliterator(), false)
+                        .stream(totalEquipmentList.spliterator(), false)
                         .collect(Collectors.groupingBy(Equipment::getEquipmentSubType))
                         .entrySet()) {
             EquipmentSubType subType = entry.getKey();
@@ -31,6 +53,23 @@ public interface EquipmentRepository extends CrudRepository<Equipment, Long> {
         }
         return resultMap;
     }
+
+    List<Equipment> findByIdIn(List<Long> ids);
+
+    List<Equipment> findByEquipmentSubTypeIdIn(List<Long> ids);
+
+    List<Equipment> findByIdInAndEquipmentSubTypeIdIn(List<Long> ids, List<Long> subTypeIds);
+
+    List<Equipment> findByEquipmentSubTypeEquipmentTypeIdIn(List<Long> typeIds);
+
+    List<Equipment> findByEquipmentSubTypeIdInAndEquipmentSubTypeEquipmentTypeIdIn(List<Long> subTypeIds,
+                                                                                   List<Long> typeIds);
+
+    List<Equipment> findByIdInAndEquipmentSubTypeEquipmentTypeIdIn(List<Long> ids, List<Long> typeIds);
+
+    List<Equipment> findByIdInAndEquipmentSubTypeIdInAndEquipmentSubTypeEquipmentTypeIdIn(List<Long> ids,
+                                                                                          List<Long> subTypeIds,
+                                                                                          List<Long> typeIds);
 
     Optional<Equipment> findByName(String name);
 }

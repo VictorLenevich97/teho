@@ -8,6 +8,7 @@ import va.rit.teho.entity.*;
 import va.rit.teho.exception.BaseNotFoundException;
 import va.rit.teho.exception.EquipmentNotFoundException;
 import va.rit.teho.repository.BaseRepository;
+import va.rit.teho.repository.EquipmentInRepairRepository;
 import va.rit.teho.repository.EquipmentPerBaseRepository;
 import va.rit.teho.repository.EquipmentRepository;
 import va.rit.teho.service.BaseService;
@@ -29,8 +30,11 @@ public class BaseServiceImplTest {
 
     private final EquipmentPerBaseRepository equipmentPerBaseRepository = Mockito.mock(EquipmentPerBaseRepository.class);
 
+    private final EquipmentInRepairRepository equipmentInRepairRepository = Mockito.mock(EquipmentInRepairRepository.class);
+
     private final BaseService service =
-            new BaseServiceImpl(baseRepository, equipmentRepository, equipmentPerBaseRepository);
+            new BaseServiceImpl(baseRepository, equipmentRepository, equipmentPerBaseRepository,
+                                equipmentInRepairRepository);
 
     @Test
     public void testAdd() {

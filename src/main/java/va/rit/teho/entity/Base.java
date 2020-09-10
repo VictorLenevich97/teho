@@ -12,8 +12,13 @@ public class Base {
     private Long id;
     private String shortName;
     private String fullName;
+
     @OneToMany(mappedBy = "base")
-    private Set<EquipmentPerBase> equipmentPerBases;
+    Set<RepairStation> repairStations;
+
+    public Set<RepairStation> getRepairStations() {
+        return repairStations;
+    }
 
     public Base() {
     }
@@ -54,12 +59,11 @@ public class Base {
         Base base = (Base) o;
         return Objects.equals(id, base.id) &&
                 Objects.equals(shortName, base.shortName) &&
-                Objects.equals(fullName, base.fullName) &&
-                Objects.equals(equipmentPerBases, base.equipmentPerBases);
+                Objects.equals(fullName, base.fullName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, shortName, fullName, equipmentPerBases);
+        return Objects.hash(id, shortName, fullName);
     }
 }

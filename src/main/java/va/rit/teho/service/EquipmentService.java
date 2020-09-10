@@ -18,11 +18,13 @@ public interface EquipmentService {
 
     void update(Long id, String name, Long subTypeId);
 
-    List<EquipmentType> listTypes();
+    List<EquipmentType> listTypes(List<Long> typeIds);
 
-    Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes();
+    Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
+                                                                                  List<Long> subTypeIds,
+                                                                                  List<Long> typeIds);
 
-    Map<EquipmentType, List<EquipmentSubType>> listTypesWithSubTypes();
+    Map<EquipmentType, List<EquipmentSubType>> listTypesWithSubTypes(List<Long> typeIds, List<Long> subTypeIds);
 
     Pair<EquipmentType, List<EquipmentSubType>> getTypeWithSubTypes(Long typeId);
 

@@ -32,7 +32,8 @@ public class EquipmentServiceImplTest {
     private final EquipmentSubTypeRepository equipmentSubTypeRepository = Mockito.mock(EquipmentSubTypeRepository.class);
 
     private final EquipmentService equipmentService =
-            new EquipmentServiceImpl(equipmentRepository, equipmentTypeRepository, equipmentSubTypeRepository);
+            new EquipmentServiceImpl(equipmentRepository, equipmentTypeRepository, equipmentSubTypeRepository,
+                                     null, null, null, null);
 
     @Test
     public void testList() {
@@ -70,7 +71,7 @@ public class EquipmentServiceImplTest {
         List<EquipmentType> equipmentTypes = Collections.singletonList(new EquipmentType("s", "f"));
         when(equipmentTypeRepository.findAll()).thenReturn(equipmentTypes);
 
-        Assertions.assertEquals(equipmentTypes, equipmentService.listTypes());
+        Assertions.assertEquals(equipmentTypes, equipmentService.listTypes(Collections.emptyList()));
     }
 
     @Test
@@ -116,9 +117,9 @@ public class EquipmentServiceImplTest {
                                                                                                                      .singletonList(
                                                                                                                              EQUIPMENT)));
 
-        when(equipmentRepository.getEquipmentGroupedByType()).thenReturn(result);
+        when(equipmentRepository.getEquipmentGroupedByType(null, null, null)).thenReturn(result);
 
-        Assertions.assertEquals(result, equipmentService.listGroupedByTypes());
+        Assertions.assertEquals(result, equipmentService.listGroupedByTypes(null, null, null));
     }
 
     @Test
@@ -129,9 +130,12 @@ public class EquipmentServiceImplTest {
                                                                                      Collections.singletonList(
                                                                                              equipmentSubType));
 
-        when(equipmentSubTypeRepository.findAllGroupedByType()).thenReturn(result);
+//        when(equipmentSubTypeRepository.findAllGroupedByType(Collections.emptyList(),
+//                                                             Collections.emptyList())).thenReturn(result);
 
-        Assertions.assertEquals(result, equipmentService.listTypesWithSubTypes());
+        Assertions.assertEquals(result,
+                                equipmentService.listTypesWithSubTypes(Collections.emptyList(),
+                                                                       Collections.emptyList()));
     }
 
     @Test

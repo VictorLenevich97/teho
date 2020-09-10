@@ -12,7 +12,9 @@ import va.rit.teho.entity.EquipmentType;
 import va.rit.teho.model.Pair;
 import va.rit.teho.service.EquipmentService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -27,14 +29,28 @@ public class EquipmentTypeController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<EquipmentSubTypePerTypeDTO>> getEquipmentTypes() {
-        List<EquipmentSubTypePerTypeDTO> equipmentTypes = equipmentService
-                .listTypesWithSubTypes()
+    public ResponseEntity<List<EquipmentTypeDTO>> getEquipmentTypes(@RequestParam(value = "id", required = false) List<Long> typeIds) {
+        List<Long> typeIdsFilter = typeIds == null ? Collections.emptyList() : typeIds;
+        List<EquipmentTypeDTO> equipmentTypeDTOList = equipmentService.listTypes(typeIdsFilter)
+                                                                      .stream()
+                                                                      .map(EquipmentTypeDTO::from)
+                                                                      .collect(Collectors.toList());
+        return ResponseEntity.ok(equipmentTypeDTOList);
+    }
+
+    @GetMapping("/subtype")
+    @ResponseBody
+    public ResponseEntity<List<EquipmentSubTypePerTypeDTO>> getEquipmentSubTypes(@RequestParam(value = "id", required = false) List<Long> subTypeIds,
+                                                                                 @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
+        List<Long> subTypeIdList = Optional.ofNullable(subTypeIds).orElse(Collections.emptyList());
+        List<Long> typeIdList = Optional.ofNullable(typeIds).orElse(Collections.emptyList());
+        List<EquipmentSubTypePerTypeDTO> equipmentSubTypePerTypeDTOList = equipmentService
+                .listTypesWithSubTypes(typeIdList, subTypeIdList)
                 .entrySet()
                 .stream()
                 .map(typeEntry -> EquipmentSubTypePerTypeDTO.from(typeEntry.getKey(), typeEntry.getValue()))
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(equipmentTypes);
+        return ResponseEntity.ok(equipmentSubTypePerTypeDTOList);
     }
 
     @GetMapping("/{typeId}")
@@ -53,7 +69,7 @@ public class EquipmentTypeController {
 
     @PutMapping("/{typeId}")
     public ResponseEntity<Object> updateEquipmentType(@PathVariable Long typeId,
-                                                   @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
+                                                      @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
         equipmentService.updateType(typeId, equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
@@ -67,8 +83,8 @@ public class EquipmentTypeController {
 
     @PutMapping("/{typeId}/subtype/{subTypeId}")
     public ResponseEntity<Object> updateEquipmentSubType(@PathVariable Long typeId,
-                                                      @PathVariable Long subTypeId,
-                                                      @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
+                                                         @PathVariable Long subTypeId,
+                                                         @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
         equipmentService.updateSubType(subTypeId,
                                        typeId,
                                        equipmentSubTypeDTO.getShortName(),

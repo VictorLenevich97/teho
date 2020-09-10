@@ -11,13 +11,13 @@ import va.rit.teho.exception.EquipmentNotFoundException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.model.Pair;
-import va.rit.teho.repository.EquipmentRepository;
-import va.rit.teho.repository.EquipmentSubTypeRepository;
-import va.rit.teho.repository.EquipmentTypeRepository;
+import va.rit.teho.repository.*;
 import va.rit.teho.service.EquipmentService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
@@ -27,13 +27,25 @@ public class EquipmentServiceImpl implements EquipmentService {
     private final EquipmentRepository equipmentRepository;
     private final EquipmentTypeRepository equipmentTypeRepository;
     private final EquipmentSubTypeRepository equipmentSubTypeRepository;
+    private final EquipmentPerBaseRepository equipmentPerBaseRepository;
+    private final EquipmentInRepairRepository equipmentInRepairRepository;
+    private final CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository;
+    private final RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository;
 
     public EquipmentServiceImpl(EquipmentRepository equipmentRepository,
                                 EquipmentTypeRepository equipmentTypeRepository,
-                                EquipmentSubTypeRepository equipmentSubTypeRepository) {
+                                EquipmentSubTypeRepository equipmentSubTypeRepository,
+                                EquipmentPerBaseRepository equipmentPerBaseRepository,
+                                EquipmentInRepairRepository equipmentInRepairRepository,
+                                CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository,
+                                RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository) {
         this.equipmentRepository = equipmentRepository;
         this.equipmentTypeRepository = equipmentTypeRepository;
         this.equipmentSubTypeRepository = equipmentSubTypeRepository;
+        this.equipmentPerBaseRepository = equipmentPerBaseRepository;
+        this.equipmentInRepairRepository = equipmentInRepairRepository;
+        this.calculatedRepairCapabilitiesPerDayRepository = calculatedRepairCapabilitiesPerDayRepository;
+        this.repairStationEquipmentCapabilitiesRepository = repairStationEquipmentCapabilitiesRepository;
     }
 
     public List<Equipment> list() {
@@ -74,18 +86,38 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public List<EquipmentType> listTypes() {
-        return (List<EquipmentType>) equipmentTypeRepository.findAll();
+    public List<EquipmentType> listTypes(List<Long> typeIds) {
+        List<EquipmentType> result;
+        if (typeIds.isEmpty()) {
+            result = (List<EquipmentType>) equipmentTypeRepository.findAll();
+        } else {
+            result = equipmentTypeRepository.findByIdIn(typeIds);
+        }
+        return result;
     }
 
     @Override
-    public Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes() {
-        return equipmentRepository.getEquipmentGroupedByType();
+    public Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
+                                                                                         List<Long> subTypeIds,
+                                                                                         List<Long> typeIds) {
+        return equipmentRepository.getEquipmentGroupedByType(ids, subTypeIds, typeIds);
     }
 
     @Override
-    public Map<EquipmentType, List<EquipmentSubType>> listTypesWithSubTypes() {
-        return equipmentSubTypeRepository.findAllGroupedByType();
+    public Map<EquipmentType, List<EquipmentSubType>> listTypesWithSubTypes(List<Long> typeIds, List<Long> subTypeIds) {
+        Iterable<EquipmentSubType> equipmentSubTypes;
+        if (typeIds.isEmpty() && subTypeIds.isEmpty()) {
+            equipmentSubTypes = equipmentSubTypeRepository.findAll();
+        } else if (typeIds.isEmpty()) {
+            equipmentSubTypes = equipmentSubTypeRepository.findByIdIn(subTypeIds);
+        } else if (subTypeIds.isEmpty()) {
+            equipmentSubTypes = equipmentSubTypeRepository.findByEquipmentTypeIdIn(typeIds);
+        } else {
+            equipmentSubTypes = equipmentSubTypeRepository.findByIdInAndEquipmentTypeIdIn(subTypeIds, typeIds);
+        }
+        return StreamSupport
+                .stream(equipmentSubTypes.spliterator(), false)
+                .collect(Collectors.groupingBy(EquipmentSubType::getEquipmentType));
     }
 
     @Override

@@ -11,4 +11,6 @@ import java.util.List;
 public interface CalculatedRepairCapabilitiesPerDayRepository
         extends CrudRepository<CalculatedRepairCapabilitesPerDay, EquipmentPerRepairStation> {
     List<CalculatedRepairCapabilitesPerDay> findByRepairStationIdIn(List<Long> repairStationIds);
+
+    List<CalculatedRepairCapabilitesPerDay> findAllByEquipmentId(Long equipmentId);
 }

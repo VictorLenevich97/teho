@@ -84,7 +84,7 @@ public class RepairCapabilitiesServiceImplTest {
         Equipment equipment = new Equipment("", null);
         int laborInput = 200;
         equipment.setLaborInputPerTypes(Collections.singleton(new EquipmentLaborInputPerType(new RepairType(
-                RepairTypeEnum.AVG_REPAIR.getName()), laborInput)));
+                RepairTypeEnum.AVG_REPAIR.getName(), true), laborInput)));
         RepairStation repairStation = new RepairStation("rs", new RepairStationType("rst", 2, 5), null, 0);
         repairStationEquipmentStaff.setRepairStation(repairStation);
         repairStationEquipmentStaff.setEquipment(equipment);
