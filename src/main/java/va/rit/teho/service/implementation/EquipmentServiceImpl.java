@@ -9,15 +9,12 @@ import va.rit.teho.entity.EquipmentType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.EquipmentNotFoundException;
 import va.rit.teho.exception.IncorrectParamException;
-import va.rit.teho.exception.NotFoundException;
-import va.rit.teho.model.Pair;
-import va.rit.teho.repository.*;
+import va.rit.teho.repository.EquipmentRepository;
+import va.rit.teho.repository.EquipmentSubTypeRepository;
 import va.rit.teho.service.EquipmentService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
@@ -25,27 +22,12 @@ public class EquipmentServiceImpl implements EquipmentService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentServiceImpl.class);
 
     private final EquipmentRepository equipmentRepository;
-    private final EquipmentTypeRepository equipmentTypeRepository;
     private final EquipmentSubTypeRepository equipmentSubTypeRepository;
-    private final EquipmentPerBaseRepository equipmentPerBaseRepository;
-    private final EquipmentInRepairRepository equipmentInRepairRepository;
-    private final CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository;
-    private final RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository;
 
     public EquipmentServiceImpl(EquipmentRepository equipmentRepository,
-                                EquipmentTypeRepository equipmentTypeRepository,
-                                EquipmentSubTypeRepository equipmentSubTypeRepository,
-                                EquipmentPerBaseRepository equipmentPerBaseRepository,
-                                EquipmentInRepairRepository equipmentInRepairRepository,
-                                CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository,
-                                RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository) {
+                                EquipmentSubTypeRepository equipmentSubTypeRepository) {
         this.equipmentRepository = equipmentRepository;
-        this.equipmentTypeRepository = equipmentTypeRepository;
         this.equipmentSubTypeRepository = equipmentSubTypeRepository;
-        this.equipmentPerBaseRepository = equipmentPerBaseRepository;
-        this.equipmentInRepairRepository = equipmentInRepairRepository;
-        this.calculatedRepairCapabilitiesPerDayRepository = calculatedRepairCapabilitiesPerDayRepository;
-        this.repairStationEquipmentCapabilitiesRepository = repairStationEquipmentCapabilitiesRepository;
     }
 
     public List<Equipment> list() {
@@ -85,16 +67,6 @@ public class EquipmentServiceImpl implements EquipmentService {
         equipmentRepository.save(equipment);
     }
 
-    @Override
-    public List<EquipmentType> listTypes(List<Long> typeIds) {
-        Iterable<EquipmentType> result;
-        if (typeIds.isEmpty()) {
-            result = equipmentTypeRepository.findAll();
-        } else {
-            result = equipmentTypeRepository.findAllById(typeIds);
-        }
-        return (List<EquipmentType>) result;
-    }
 
     @Override
     public Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
@@ -103,86 +75,6 @@ public class EquipmentServiceImpl implements EquipmentService {
         return equipmentRepository.getEquipmentGroupedByType(ids, subTypeIds, typeIds);
     }
 
-    @Override
-    public Map<EquipmentType, List<EquipmentSubType>> listTypesWithSubTypes(List<Long> typeIds, List<Long> subTypeIds) {
-        Iterable<EquipmentSubType> equipmentSubTypes;
-        if (typeIds.isEmpty() && subTypeIds.isEmpty()) {
-            equipmentSubTypes = equipmentSubTypeRepository.findAll();
-        } else if (typeIds.isEmpty()) {
-            equipmentSubTypes = equipmentSubTypeRepository.findAllById(subTypeIds);
-        } else if (subTypeIds.isEmpty()) {
-            equipmentSubTypes = equipmentSubTypeRepository.findByEquipmentTypeIdIn(typeIds);
-        } else {
-            equipmentSubTypes = equipmentSubTypeRepository.findByIdInAndEquipmentTypeIdIn(subTypeIds, typeIds);
-        }
-        return StreamSupport
-                .stream(equipmentSubTypes.spliterator(), false)
-                .collect(Collectors.groupingBy(EquipmentSubType::getEquipmentType));
-    }
-
-    @Override
-    public Pair<EquipmentType, List<EquipmentSubType>> getTypeWithSubTypes(Long typeId) {
-        return Pair.of(getEquipmentTypeById(typeId),
-                       equipmentSubTypeRepository.findByEquipmentTypeId(typeId));
-    }
-
-    private EquipmentType getEquipmentTypeById(Long typeId) {
-        return equipmentTypeRepository
-                .findById(typeId)
-                .orElseThrow(() -> new NotFoundException("Тип ВВСТ не найден!"));
-    }
-
-    @Override
-    public Long addType(String shortName, String fullName) {
-        String logLine = String.format("Добавление типа ВВСТ: \"%s\" (\"%s\")", shortName, fullName);
-        LOGGER.debug(logLine);
-        equipmentTypeRepository.findByFullName(fullName).ifPresent((et) -> {
-            throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
-        });
-        EquipmentType equipmentType = new EquipmentType(shortName, fullName);
-        EquipmentType type = equipmentTypeRepository.save(equipmentType);
-        return type.getId();
-    }
-
-    @Override
-    public void updateType(Long id, String shortName, String fullName) {
-        String logLine = String.format("Обновление типа ВВСТ (id = %d): \"%s\" (\"%s\")", id, shortName, fullName);
-        LOGGER.debug(logLine);
-        EquipmentType equipmentType = equipmentTypeRepository.findById(id)
-                                                             .orElseThrow(() -> new NotFoundException(
-                                                                     "Тип ВВСТ с id = " + id + " не найден!"));
-        equipmentType.setShortName(shortName);
-        equipmentType.setFullName(fullName);
-        equipmentTypeRepository.save(equipmentType);
-    }
-
-    @Override
-    public Long addSubType(Long typeId, String shortName, String fullName) {
-        if (!equipmentTypeRepository.findById(typeId).isPresent()) {
-            throw new IncorrectParamException("typeId", typeId);
-        }
-        equipmentSubTypeRepository.findByFullName(fullName).ifPresent((et) -> {
-            throw new AlreadyExistsException("Вид ВВСТ", "название", fullName);
-        });
-        return equipmentSubTypeRepository
-                .save(new EquipmentSubType(shortName, fullName, getEquipmentTypeById(typeId)))
-                .getId();
-    }
-
-    @Override
-    public void updateSubType(Long id, Long typeId, String shortName, String fullName) {
-        EquipmentType equipmentType = equipmentTypeRepository.findById(typeId)
-                                                             .orElseThrow(() -> new IncorrectParamException("typeId",
-                                                                                                            typeId));
-        EquipmentSubType equipmentSubType = equipmentSubTypeRepository.findById(id)
-                                                                      .orElseThrow(() -> new NotFoundException(
-                                                                              "Подтип ВВСТ с id = " + id + "  найден!"));
-
-        equipmentSubType.setEquipmentType(equipmentType);
-        equipmentSubType.setShortName(shortName);
-        equipmentSubType.setFullName(fullName);
-        equipmentSubTypeRepository.save(equipmentSubType);
-    }
 
 
 }

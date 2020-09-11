@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.TestRunner;
+import va.rit.teho.dto.BaseDTO;
 import va.rit.teho.dto.EquipmentStaffDTO;
 import va.rit.teho.dto.RepairStationDTO;
 import va.rit.teho.dto.RepairStationTypeDTO;
@@ -82,11 +83,11 @@ public class RepairStationControllerTest extends ControllerTest {
         RepairStationDTO repairStationDTO = new RepairStationDTO(null,
                                                                  "repair-station-name",
                                                                  new RepairStationTypeDTO(2L),
-                                                                 3L,
+                                                                 BaseDTO.from(base(3L, "")),
                                                                  15);
         when(repairStationService.add(repairStationDTO.getName(),
-                                      repairStationDTO.getBaseKey(),
-                                      repairStationDTO.getType().getKey(),
+                                      repairStationDTO.getBase().getId(),
+                                      repairStationDTO.getType().getId(),
                                       repairStationDTO.getAmount())).thenReturn(1L);
 
 

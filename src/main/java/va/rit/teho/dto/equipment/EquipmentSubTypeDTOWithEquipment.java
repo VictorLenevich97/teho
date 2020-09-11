@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class EquipmentSubTypeDTOWithEquipment extends EquipmentSubTypeDTO {
-    private final Long key;
+    private final Long id;
     private final List<EquipmentDTO> equipment;
 
-    public EquipmentSubTypeDTOWithEquipment(Long key, String shortName, String fullName, List<EquipmentDTO> equipment) {
+    public EquipmentSubTypeDTOWithEquipment(Long id, String shortName, String fullName, List<EquipmentDTO> equipment) {
         super(shortName, fullName);
-        this.key = key;
+        this.id = id;
         this.equipment = equipment;
     }
 
@@ -24,8 +24,8 @@ public class EquipmentSubTypeDTOWithEquipment extends EquipmentSubTypeDTO {
     }
 
     @Override
-    public Long getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 
     public List<EquipmentDTO> getEquipment() {

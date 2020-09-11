@@ -3,22 +3,22 @@ package va.rit.teho.dto;
 import va.rit.teho.entity.Base;
 
 public class BaseDTO extends AbstractNamedDTO {
-    private Long key;
+    private Long id;
 
-    public BaseDTO(Long key, String shortName, String fullName) {
+    public BaseDTO(Long id, String shortName, String fullName) {
         super(shortName, fullName);
-        this.key = key;
+        this.id = id;
     }
 
     public static BaseDTO from(Base base) {
         return new BaseDTO(base.getId(), base.getShortName(), base.getFullName());
     }
 
-    public Long getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 
-    public void setKey(Long key) {
-        this.key = key;
+    public void setId(Long id) {
+        this.id = id;
     }
 }

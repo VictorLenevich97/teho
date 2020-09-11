@@ -7,7 +7,6 @@ import va.rit.teho.entity.EquipmentPerBase;
 import va.rit.teho.entity.EquipmentPerBaseAmount;
 import va.rit.teho.exception.*;
 import va.rit.teho.repository.BaseRepository;
-import va.rit.teho.repository.EquipmentInRepairRepository;
 import va.rit.teho.repository.EquipmentPerBaseRepository;
 import va.rit.teho.repository.EquipmentRepository;
 import va.rit.teho.service.BaseService;
@@ -21,17 +20,14 @@ public class BaseServiceImpl implements BaseService {
     private final BaseRepository baseRepository;
     private final EquipmentRepository equipmentRepository;
     private final EquipmentPerBaseRepository equipmentPerBaseRepository;
-    private final EquipmentInRepairRepository equipmentInRepairRepository;
 
     public BaseServiceImpl(
             BaseRepository baseRepository,
             EquipmentRepository equipmentRepository,
-            EquipmentPerBaseRepository equipmentPerBaseRepository,
-            EquipmentInRepairRepository equipmentInRepairRepository) {
+            EquipmentPerBaseRepository equipmentPerBaseRepository) {
         this.baseRepository = baseRepository;
         this.equipmentRepository = equipmentRepository;
         this.equipmentPerBaseRepository = equipmentPerBaseRepository;
-        this.equipmentInRepairRepository = equipmentInRepairRepository;
     }
 
     private void checkIfEmptyField(String field) {

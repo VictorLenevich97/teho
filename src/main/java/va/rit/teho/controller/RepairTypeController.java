@@ -35,7 +35,7 @@ public class RepairTypeController {
         return ResponseEntity.ok(types
                                          .stream()
                                          .map(RepairTypeDTO::from)
-                                         .sorted(Comparator.comparing(RepairTypeDTO::getKey))
+                                         .sorted(Comparator.comparing(RepairTypeDTO::getId))
                                          .collect(Collectors.toList()));
     }
 }

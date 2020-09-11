@@ -17,13 +17,11 @@ public interface CalculatedRepairCapabilitiesPerDayRepository
             "(coalesce(:equipmentIds, null) is null or c.equipment.id in (:equipmentIds)) AND " +
             "(coalesce(:equipmentSubTypeIds, null) is null or c.equipment.equipmentSubType.id in (:equipmentSubTypeIds)) AND " +
             "(coalesce(:equipmentTypeIds, null) is null or c.equipment.equipmentSubType.equipmentType.id in (:equipmentTypeIds))")
-    List<CalculatedRepairCapabilitesPerDay> findFiltered(
-            List<Long> repairStationIds,
-            List<Long> equipmentIds,
-            List<Long> equipmentSubTypeIds,
-            List<Long> equipmentTypeIds);
+    List<CalculatedRepairCapabilitesPerDay> findByIds(List<Long> repairStationIds,
+                                                      List<Long> equipmentIds,
+                                                      List<Long> equipmentSubTypeIds,
+                                                      List<Long> equipmentTypeIds);
 
     List<CalculatedRepairCapabilitesPerDay> findByRepairStationIdIn(List<Long> repairStationIds);
 
-    List<CalculatedRepairCapabilitesPerDay> findAllByEquipmentId(Long equipmentId);
 }

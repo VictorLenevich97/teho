@@ -2,7 +2,6 @@ package va.rit.teho.service;
 
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
-import va.rit.teho.entity.RepairStationType;
 import va.rit.teho.model.Pair;
 
 import java.util.List;
@@ -21,9 +20,4 @@ public interface RepairStationService {
 
     void updateEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
 
-    Long addType(String name, int workingHoursMin, int workingHoursMax);
-
-    void updateType(Long id, String name, int workingHoursMin, int workingHoursMax);
-
-    List<RepairStationType> listTypes();
 }

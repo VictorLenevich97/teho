@@ -31,7 +31,7 @@ public class EquipmentTypeControllerTest extends ControllerTest {
     @Test
     public void testGetEquipmentTypes() throws Exception {
         EquipmentType eqType = new EquipmentType("s", "f");
-        when(equipmentService.listTypesWithSubTypes(Collections.emptyList(), Collections.emptyList())).thenReturn(
+        when(equipmentTypeService.listTypesWithSubTypes(Collections.emptyList(), Collections.emptyList())).thenReturn(
                 Collections.singletonMap(eqType, Collections.singletonList(new EquipmentSubType("s", "f", eqType))));
 
         mockMvc.perform(get("/equipment-type")).andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(1)));
@@ -45,7 +45,7 @@ public class EquipmentTypeControllerTest extends ControllerTest {
         EquipmentSubType secondEquipmentSubType = new EquipmentSubType("secondStShort", "secondStFull", equipmentType);
         List<EquipmentSubType> equipmentSubTypes = Arrays.asList(firstEquipmentSubType, secondEquipmentSubType);
 
-        when(equipmentService.getTypeWithSubTypes(equipmentType.getId())).thenReturn(Pair.of(equipmentType,
+        when(equipmentTypeService.getTypeWithSubTypes(equipmentType.getId())).thenReturn(Pair.of(equipmentType,
                                                                                              equipmentSubTypes));
 
         mockMvc.perform(get("/equipment-type/{id}", equipmentType.getId())).andExpect(status().isOk())
@@ -62,7 +62,7 @@ public class EquipmentTypeControllerTest extends ControllerTest {
                                                .content(objectMapper.writeValueAsString(equipmentTypeDTO)))
                .andExpect(status().isCreated());
 
-        verify(equipmentService).addType(equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
+        verify(equipmentTypeService).addType(equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class EquipmentTypeControllerTest extends ControllerTest {
                                                                                      equipmentSubTypeDTO)))
                .andExpect(status().isCreated());
 
-        verify(equipmentService).addSubType(equipmentTypeId,
+        verify(equipmentTypeService).addSubType(equipmentTypeId,
                                             equipmentSubTypeDTO.getShortName(),
                                             equipmentSubTypeDTO.getFullName());
     }

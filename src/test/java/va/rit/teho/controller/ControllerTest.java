@@ -29,6 +29,9 @@ public abstract class ControllerTest {
     @MockBean
     protected EquipmentService equipmentService;
 
+    @MockBean
+    protected EquipmentTypeService equipmentTypeService;
+
     protected Base base(Long id, String name) {
         Base b = new Base("short" + name, "full" + name);
         b.setId(id);

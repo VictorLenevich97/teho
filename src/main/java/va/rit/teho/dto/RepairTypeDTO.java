@@ -3,14 +3,14 @@ package va.rit.teho.dto;
 import va.rit.teho.entity.RepairType;
 
 public class RepairTypeDTO {
-    private Long key;
+    private Long id;
     private String name;
 
     public RepairTypeDTO() {
     }
 
-    public RepairTypeDTO(Long key, String name) {
-        this.key = key;
+    public RepairTypeDTO(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
@@ -18,8 +18,8 @@ public class RepairTypeDTO {
         return new RepairTypeDTO(repairType.getId(), repairType.getName());
     }
 
-    public Long getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 
     public String getName() {

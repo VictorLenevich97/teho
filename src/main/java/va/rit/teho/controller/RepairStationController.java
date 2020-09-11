@@ -6,11 +6,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.EquipmentStaffDTO;
 import va.rit.teho.dto.RepairStationDTO;
-import va.rit.teho.dto.RepairStationTypeDTO;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
 import va.rit.teho.model.Pair;
 import va.rit.teho.service.RepairStationService;
+import va.rit.teho.service.RepairStationTypeService;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +23,8 @@ public class RepairStationController {
 
     private final RepairStationService repairStationService;
 
-    public RepairStationController(RepairStationService repairStationService) {
+    public RepairStationController(RepairStationService repairStationService,
+                                   RepairStationTypeService repairStationTypeService) {
         this.repairStationService = repairStationService;
     }
 
@@ -58,8 +59,8 @@ public class RepairStationController {
     @PostMapping
     public ResponseEntity<Object> addRepairStation(@RequestBody RepairStationDTO repairStationDTO) {
         repairStationService.add(repairStationDTO.getName(),
-                                 repairStationDTO.getBaseKey(),
-                                 repairStationDTO.getType().getKey(),
+                                 repairStationDTO.getBase().getId(),
+                                 repairStationDTO.getType().getId(),
                                  repairStationDTO.getAmount());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -69,8 +70,8 @@ public class RepairStationController {
                                                       @RequestBody RepairStationDTO repairStationDTO) {
         repairStationService.update(repairStationId,
                                     repairStationDTO.getName(),
-                                    repairStationDTO.getBaseKey(),
-                                    repairStationDTO.getType().getKey(),
+                                    repairStationDTO.getBase().getId(),
+                                    repairStationDTO.getType().getId(),
                                     repairStationDTO.getAmount());
         return ResponseEntity.accepted().build();
     }
@@ -97,21 +98,4 @@ public class RepairStationController {
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping("/type")
-    public ResponseEntity<Object> addRepairStationType(@RequestBody RepairStationTypeDTO repairStationTypeDTO) {
-        repairStationService.addType(repairStationTypeDTO.getName(),
-                                     repairStationTypeDTO.getWorkingHoursMin(),
-                                     repairStationTypeDTO.getWorkingHoursMax());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @PutMapping("/type/{typeId}")
-    public ResponseEntity<Object> updateRepairStationType(@PathVariable Long typeId,
-                                                          @RequestBody RepairStationTypeDTO repairStationTypeDTO) {
-        repairStationService.updateType(typeId,
-                                        repairStationTypeDTO.getName(),
-                                        repairStationTypeDTO.getWorkingHoursMin(),
-                                        repairStationTypeDTO.getWorkingHoursMax());
-        return ResponseEntity.accepted().build();
-    }
 }

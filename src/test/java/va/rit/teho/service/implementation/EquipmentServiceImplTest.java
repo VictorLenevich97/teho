@@ -32,8 +32,7 @@ public class EquipmentServiceImplTest {
     private final EquipmentSubTypeRepository equipmentSubTypeRepository = Mockito.mock(EquipmentSubTypeRepository.class);
 
     private final EquipmentService equipmentService =
-            new EquipmentServiceImpl(equipmentRepository, equipmentTypeRepository, equipmentSubTypeRepository,
-                                     null, null, null, null);
+            new EquipmentServiceImpl(equipmentRepository, equipmentSubTypeRepository);
 
     @Test
     public void testList() {
@@ -66,45 +65,45 @@ public class EquipmentServiceImplTest {
         verify(equipmentRepository).save(equipmentToAdd);
     }
 
-    @Test
-    public void testListTypes() {
-        List<EquipmentType> equipmentTypes = Collections.singletonList(new EquipmentType("s", "f"));
-        when(equipmentTypeRepository.findAll()).thenReturn(equipmentTypes);
-
-        Assertions.assertEquals(equipmentTypes, equipmentService.listTypes(Collections.emptyList()));
-    }
-
-    @Test
-    public void testAddType() {
-        EquipmentType equipmentType = new EquipmentType("short", "full");
-        EquipmentType addedEquipmentType = new EquipmentType(equipmentType.getShortName(), equipmentType.getFullName());
-        addedEquipmentType.setId(15L);
-        when(equipmentTypeRepository.save(equipmentType)).thenReturn(addedEquipmentType);
-
-        Assertions.assertEquals(
-                addedEquipmentType.getId(),
-                equipmentService.addType(equipmentType.getShortName(), equipmentType.getFullName()));
-    }
-
-    @Test
-    public void testAddSubType() {
-        EquipmentType equipmentType = new EquipmentType("short", "full");
-        equipmentType.setId(5L);
-        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
-        EquipmentSubType addedEquipmentSubType = new EquipmentSubType(equipmentSubType.getShortName(),
-                                                                      equipmentSubType.getFullName(),
-                                                                      equipmentType);
-        addedEquipmentSubType.setId(10L);
-
-        when(equipmentTypeRepository.findById(equipmentType.getId())).thenReturn(Optional.of(equipmentType));
-        when(equipmentSubTypeRepository.save(equipmentSubType)).thenReturn(addedEquipmentSubType);
-
-        Assertions.assertEquals(
-                addedEquipmentSubType.getId(),
-                equipmentService.addSubType(equipmentType.getId(),
-                                            equipmentSubType.getShortName(),
-                                            equipmentSubType.getFullName()));
-    }
+//    @Test
+//    public void testListTypes() {
+//        List<EquipmentType> equipmentTypes = Collections.singletonList(new EquipmentType("s", "f"));
+//        when(equipmentTypeRepository.findAll()).thenReturn(equipmentTypes);
+//
+//        Assertions.assertEquals(equipmentTypes, equipmentService.listTypes(Collections.emptyList()));
+//    }
+//
+//    @Test
+//    public void testAddType() {
+//        EquipmentType equipmentType = new EquipmentType("short", "full");
+//        EquipmentType addedEquipmentType = new EquipmentType(equipmentType.getShortName(), equipmentType.getFullName());
+//        addedEquipmentType.setId(15L);
+//        when(equipmentTypeRepository.save(equipmentType)).thenReturn(addedEquipmentType);
+//
+//        Assertions.assertEquals(
+//                addedEquipmentType.getId(),
+//                equipmentService.addType(equipmentType.getShortName(), equipmentType.getFullName()));
+//    }
+//
+//    @Test
+//    public void testAddSubType() {
+//        EquipmentType equipmentType = new EquipmentType("short", "full");
+//        equipmentType.setId(5L);
+//        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
+//        EquipmentSubType addedEquipmentSubType = new EquipmentSubType(equipmentSubType.getShortName(),
+//                                                                      equipmentSubType.getFullName(),
+//                                                                      equipmentType);
+//        addedEquipmentSubType.setId(10L);
+//
+//        when(equipmentTypeRepository.findById(equipmentType.getId())).thenReturn(Optional.of(equipmentType));
+//        when(equipmentSubTypeRepository.save(equipmentSubType)).thenReturn(addedEquipmentSubType);
+//
+//        Assertions.assertEquals(
+//                addedEquipmentSubType.getId(),
+//                equipmentService.addSubType(equipmentType.getId(),
+//                                            equipmentSubType.getShortName(),
+//                                            equipmentSubType.getFullName()));
+//    }
 
     @Test
     public void testListGroupedByTypes() {
@@ -121,34 +120,34 @@ public class EquipmentServiceImplTest {
 
         Assertions.assertEquals(result, equipmentService.listGroupedByTypes(null, null, null));
     }
-
-    @Test
-    public void testListTypesWithSubTypes() {
-        EquipmentType equipmentType = new EquipmentType("short", "full");
-        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
-        Map<EquipmentType, List<EquipmentSubType>> result = Collections.singletonMap(equipmentType,
-                                                                                     Collections.singletonList(
-                                                                                             equipmentSubType));
-
-//        when(equipmentSubTypeRepository.findAllGroupedByType(Collections.emptyList(),
-//                                                             Collections.emptyList())).thenReturn(result);
-
-        Assertions.assertEquals(result,
-                                equipmentService.listTypesWithSubTypes(Collections.emptyList(),
-                                                                       Collections.emptyList()));
-    }
-
-    @Test
-    public void testGetTypeWithSubTypes() {
-        Long equipmentTypeId = 11L;
-        EquipmentType equipmentType = new EquipmentType("short", "full");
-        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
-        Pair<EquipmentType, List<EquipmentSubType>> result = Pair.of(equipmentType,
-                                                                     Collections.singletonList(equipmentSubType));
-
-        when(equipmentTypeRepository.findById(equipmentTypeId)).thenReturn(Optional.of(equipmentType));
-        when(equipmentSubTypeRepository.findByEquipmentTypeId(equipmentTypeId)).thenReturn(result.getRight());
-
-        Assertions.assertEquals(result, equipmentService.getTypeWithSubTypes(equipmentTypeId));
-    }
+//
+//    @Test
+//    public void testListTypesWithSubTypes() {
+//        EquipmentType equipmentType = new EquipmentType("short", "full");
+//        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
+//        Map<EquipmentType, List<EquipmentSubType>> result = Collections.singletonMap(equipmentType,
+//                                                                                     Collections.singletonList(
+//                                                                                             equipmentSubType));
+//
+////        when(equipmentSubTypeRepository.findAllGroupedByType(Collections.emptyList(),
+////                                                             Collections.emptyList())).thenReturn(result);
+//
+//        Assertions.assertEquals(result,
+//                                equipmentService.listTypesWithSubTypes(Collections.emptyList(),
+//                                                                       Collections.emptyList()));
+//    }
+//
+//    @Test
+//    public void testGetTypeWithSubTypes() {
+//        Long equipmentTypeId = 11L;
+//        EquipmentType equipmentType = new EquipmentType("short", "full");
+//        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
+//        Pair<EquipmentType, List<EquipmentSubType>> result = Pair.of(equipmentType,
+//                                                                     Collections.singletonList(equipmentSubType));
+//
+//        when(equipmentTypeRepository.findById(equipmentTypeId)).thenReturn(Optional.of(equipmentType));
+//        when(equipmentSubTypeRepository.findByEquipmentTypeId(equipmentTypeId)).thenReturn(result.getRight());
+//
+//        Assertions.assertEquals(result, equipmentService.getTypeWithSubTypes(equipmentTypeId));
+//    }
 }

@@ -21,16 +21,16 @@ public class RepairCapabilitiesDTO {
     }
 
     public static class EquipmentRepairCapabilityDTO {
-        private final Long key;
+        private final Long id;
         private final double capability;
 
-        public EquipmentRepairCapabilityDTO(Long key, double capability) {
-            this.key = key;
+        public EquipmentRepairCapabilityDTO(Long id, double capability) {
+            this.id = id;
             this.capability = capability;
         }
 
-        public Long getKey() {
-            return key;
+        public Long getId() {
+            return id;
         }
 
         public double getCapability() {

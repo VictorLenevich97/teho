@@ -85,10 +85,10 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
             List<Long> equipmentSubTypeIds,
             List<Long> equipmentTypeIds) {
         Iterable<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDays =
-                calculatedRepairCapabilitiesPerDayRepository.findFiltered(nullIfEmpty(repairStationIds),
-                                                                          nullIfEmpty(equipmentIds),
-                                                                          nullIfEmpty(equipmentSubTypeIds),
-                                                                          nullIfEmpty(equipmentTypeIds));
+                calculatedRepairCapabilitiesPerDayRepository.findByIds(nullIfEmpty(repairStationIds),
+                                                                       nullIfEmpty(equipmentIds),
+                                                                       nullIfEmpty(equipmentSubTypeIds),
+                                                                       nullIfEmpty(equipmentTypeIds));
         Map<RepairStation, Map<Equipment, Double>> result = new HashMap<>();
         for (CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay : calculatedRepairCapabilitesPerDays) {
             RepairStation repairStation = calculatedRepairCapabilitesPerDay.getRepairStation();

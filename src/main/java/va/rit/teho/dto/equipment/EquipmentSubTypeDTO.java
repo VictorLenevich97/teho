@@ -5,15 +5,15 @@ import va.rit.teho.entity.EquipmentSubType;
 
 public class EquipmentSubTypeDTO extends AbstractNamedDTO {
 
-    private Long key;
+    private Long id;
 
     public EquipmentSubTypeDTO(String shortName, String fullName) {
         super(shortName, fullName);
     }
 
-    public EquipmentSubTypeDTO(Long key, String shortName, String fullName) {
+    public EquipmentSubTypeDTO(Long id, String shortName, String fullName) {
         super(shortName, fullName);
-        this.key = key;
+        this.id = id;
     }
 
     public static EquipmentSubTypeDTO from(EquipmentSubType equipmentSubType) {
@@ -22,7 +22,7 @@ public class EquipmentSubTypeDTO extends AbstractNamedDTO {
                                        equipmentSubType.getFullName());
     }
 
-    public Long getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 }

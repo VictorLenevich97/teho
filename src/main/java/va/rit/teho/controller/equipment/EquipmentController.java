@@ -38,13 +38,13 @@ public class EquipmentController {
 
     @PostMapping
     public ResponseEntity<Object> addNewEquipment(@RequestBody EquipmentDTO equipmentDTO) {
-        equipmentService.add(equipmentDTO.getName(), equipmentDTO.getSubTypeKey());
+        equipmentService.add(equipmentDTO.getName(), equipmentDTO.getSubType().getId());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{equipmentId}")
     public ResponseEntity<Object> updateEquipment(@PathVariable Long equipmentId, @RequestBody EquipmentDTO equipmentDTO) {
-        equipmentService.update(equipmentId, equipmentDTO.getName(), equipmentDTO.getSubTypeKey());
+        equipmentService.update(equipmentId, equipmentDTO.getName(), equipmentDTO.getSubType().getId());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
