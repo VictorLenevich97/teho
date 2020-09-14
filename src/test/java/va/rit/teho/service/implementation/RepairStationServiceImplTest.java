@@ -87,6 +87,28 @@ public class RepairStationServiceImplTest {
                                 repairStationService.add(repairStation.getName(), baseId, repairStationTypeId, 2));
     }
 
+    @Test
+    public void testUpdate() {
+        Long baseId = 1L;
+        Long repairStationTypeId = 2L;
+        Long repairStationId = 3L;
+        Base b = new Base("s", "f");
+        RepairStationType repairStationType = new RepairStationType("type", 1, 2);
+        RepairStation repairStation = new RepairStation("repair-station", repairStationType, b, 2);
+        RepairStation addedRepairStation = new RepairStation(repairStation.getName(),
+                                                             repairStationType,
+                                                             b,
+                                                             repairStation.getStationAmount());
+        when(baseService.get(baseId)).thenReturn(b);
+        when(repairStationTypeService.get(repairStationTypeId)).thenReturn(repairStationType);
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(repairStation));
+        addedRepairStation.setId(3L);
+        when(repairStationRepository.save(repairStation)).thenReturn(addedRepairStation);
+        repairStationService.update(repairStationId, repairStation.getName(), baseId, repairStationTypeId, 2);
+
+        verify(repairStationRepository).findById(repairStationId);
+    }
+
 
     @Test
     public void testSetEquipmentStaff() {
@@ -104,6 +126,32 @@ public class RepairStationServiceImplTest {
                                                equipmentId,
                                                repairStationEquipmentStaff.getAvailableStaff(),
                                                repairStationEquipmentStaff.getTotalStaff());
+
+        verify(repairStationEquipmentCapabilitiesRepository).save(repairStationEquipmentStaff);
+    }
+
+
+    @Test
+    public void testUpdateEquipmentStaff() {
+        Long repairStationId = 1L;
+        Long equipmentId = 2L;
+        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentPerRepairStation(
+                1L,
+                2L), 2, 1);
+        RepairStation repairStation = new RepairStation("repair-station", null, null, 2);
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(repairStation));
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(new RepairStation("name",
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         0)));
+        when(equipmentService.getEquipment(equipmentId)).thenReturn(new Equipment("", null));
+        when(repairStationEquipmentCapabilitiesRepository.findById(new EquipmentPerRepairStation(repairStationId,
+                                                                                                 equipmentId))).thenReturn(
+                Optional.of(repairStationEquipmentStaff));
+        repairStationService.updateEquipmentStaff(repairStationId,
+                                                  equipmentId,
+                                                  repairStationEquipmentStaff.getAvailableStaff(),
+                                                  repairStationEquipmentStaff.getTotalStaff());
 
         verify(repairStationEquipmentCapabilitiesRepository).save(repairStationEquipmentStaff);
     }

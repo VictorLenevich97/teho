@@ -19,8 +19,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -98,6 +97,27 @@ public class RepairStationControllerTest extends ControllerTest {
     }
 
     @Test
+    public void testUpdateRepairStation() throws Exception {
+        Long repairStationId = 3L;
+        RepairStationDTO repairStationDTO = new RepairStationDTO(repairStationId,
+                                                                 "repair-station-name",
+                                                                 new RepairStationTypeDTO(2L),
+                                                                 BaseDTO.from(base(3L, "")),
+                                                                 15);
+
+        mockMvc.perform(
+                put("/repair-station/{id}", repairStationId).contentType(MediaType.APPLICATION_JSON)
+                                                            .content(objectMapper.writeValueAsString(repairStationDTO)))
+               .andExpect(status().isAccepted());
+
+        verify(repairStationService).update(repairStationId,
+                                            repairStationDTO.getName(),
+                                            repairStationDTO.getBase().getId(),
+                                            repairStationDTO.getType().getId(),
+                                            repairStationDTO.getAmount());
+    }
+
+    @Test
     public void testSetRepairStationEquipmentStaff() throws Exception {
         EquipmentStaffDTO equipmentStaffDTO = new EquipmentStaffDTO(10, 5);
         Long repairStationId = 2L;
@@ -113,6 +133,24 @@ public class RepairStationControllerTest extends ControllerTest {
                                                        equipmentId,
                                                        equipmentStaffDTO.getAvailableStaff(),
                                                        equipmentStaffDTO.getTotalStaff());
+    }
+
+    @Test
+    public void testUpdateRepairStationEquipmentStaff() throws Exception {
+        EquipmentStaffDTO equipmentStaffDTO = new EquipmentStaffDTO(10, 5);
+        Long repairStationId = 2L;
+        Long equipmentId = 4L;
+
+        mockMvc
+                .perform(put("/repair-station/{repairStationId}/equipment/{equipmentId}", repairStationId, equipmentId)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(objectMapper.writeValueAsString(equipmentStaffDTO)))
+                .andExpect(status().isAccepted());
+
+        verify(repairStationService).updateEquipmentStaff(repairStationId,
+                                                          equipmentId,
+                                                          equipmentStaffDTO.getAvailableStaff(),
+                                                          equipmentStaffDTO.getTotalStaff());
     }
 
 }

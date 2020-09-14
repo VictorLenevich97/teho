@@ -15,8 +15,7 @@ import java.util.Collections;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -66,5 +65,21 @@ public class EquipmentControllerTest extends ControllerTest {
                .andExpect(status().isCreated());
 
         verify(equipmentService).add(equipmentDTO.getName(), equipmentDTO.getSubType().getId());
+    }
+
+    @Test
+    public void testUpdateEquipment() throws Exception {
+        EquipmentDTO equipmentDTO = new EquipmentDTO("equipmentName");
+        equipmentDTO.setId(3L);
+        equipmentDTO.setSubType(new EquipmentSubTypeDTO(2L, "", ""));
+
+        mockMvc.perform(put("/equipment/{id}", equipmentDTO.getId()).contentType(MediaType.APPLICATION_JSON)
+                                                                    .content(objectMapper.writeValueAsString(
+                                                                            equipmentDTO)))
+               .andExpect(status().isAccepted());
+
+        verify(equipmentService).update(equipmentDTO.getId(),
+                                        equipmentDTO.getName(),
+                                        equipmentDTO.getSubType().getId());
     }
 }

@@ -5,13 +5,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import va.rit.teho.entity.RepairStationType;
+import va.rit.teho.exception.AlreadyExistsException;
+import va.rit.teho.exception.IncorrectParamException;
+import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.RepairStationTypeRepository;
 import va.rit.teho.service.RepairStationTypeService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class RepairStationTypeServiceImplTest {
 
@@ -43,5 +47,101 @@ public class RepairStationTypeServiceImplTest {
                         repairStationType.getName(),
                         repairStationType.getWorkingHoursMin(),
                         repairStationType.getWorkingHoursMax()));
+    }
+
+    @Test
+    public void testAddTypeAlreadyExists() {
+        RepairStationType repairStationType = new RepairStationType("type", 1, 2);
+        when(repairStationTypeRepository.findByName(repairStationType.getName())).thenReturn(Optional.of(
+                repairStationType));
+
+        Assertions.assertThrows(AlreadyExistsException.class, () ->
+                repairStationTypeService.addType(
+                        repairStationType.getName(),
+                        repairStationType.getWorkingHoursMin(),
+                        repairStationType.getWorkingHoursMax()));
+    }
+
+
+    @Test
+    public void testAddIncorrectParams() {
+        RepairStationType repairStationType = new RepairStationType("type", 3, 2);
+        when(repairStationTypeRepository.findByName(repairStationType.getName())).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(IncorrectParamException.class, () ->
+                repairStationTypeService.addType(
+                        repairStationType.getName(),
+                        repairStationType.getWorkingHoursMin(),
+                        repairStationType.getWorkingHoursMax()));
+    }
+
+
+    @Test
+    public void testUpdateType() {
+        Long repairStationTypeId = 3L;
+        RepairStationType repairStationType = new RepairStationType("type", 1, 2);
+        RepairStationType addedRepairStationType = new RepairStationType(repairStationType.getName(),
+                                                                         repairStationType.getWorkingHoursMin(),
+                                                                         repairStationType.getWorkingHoursMax());
+        when(repairStationTypeRepository.findById(repairStationTypeId)).thenReturn(Optional.of(repairStationType));
+        when(repairStationTypeRepository.save(repairStationType)).thenReturn(addedRepairStationType);
+
+        repairStationTypeService.updateType(
+                repairStationTypeId,
+                repairStationType.getName(),
+                repairStationType.getWorkingHoursMin(),
+                repairStationType.getWorkingHoursMax());
+
+        verify(repairStationTypeRepository).findById(repairStationTypeId);
+        verify(repairStationTypeRepository).save(repairStationType);
+    }
+
+    @Test
+    public void testUpdateTypeNotFound() {
+        Long repairStationTypeId = 3L;
+        RepairStationType repairStationType = new RepairStationType("type", 1, 2);
+        when(repairStationTypeRepository.findById(repairStationTypeId)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(NotFoundException.class, () -> repairStationTypeService.updateType(
+                repairStationTypeId,
+                repairStationType.getName(),
+                repairStationType.getWorkingHoursMin(),
+                repairStationType.getWorkingHoursMax()));
+
+        verify(repairStationTypeRepository).findById(repairStationTypeId);
+        verifyNoMoreInteractions(repairStationTypeRepository);
+    }
+
+    @Test
+    public void testUpdateIncorrectParams() {
+        Long repairStationTypeId = 3L;
+        RepairStationType repairStationType = new RepairStationType("type", 5, 2);
+        when(repairStationTypeRepository.findById(repairStationTypeId)).thenReturn(Optional.of(repairStationType));
+
+        Assertions.assertThrows(IncorrectParamException.class, () -> repairStationTypeService.updateType(
+                repairStationTypeId,
+                repairStationType.getName(),
+                repairStationType.getWorkingHoursMin(),
+                repairStationType.getWorkingHoursMax()));
+
+        verify(repairStationTypeRepository).findById(repairStationTypeId);
+        verifyNoMoreInteractions(repairStationTypeRepository);
+    }
+
+    @Test
+    public void testGetById() {
+        Long repairStationTypeId = 2L;
+        RepairStationType repairStationType = new RepairStationType("type", 1, 5);
+        when(repairStationTypeRepository.findById(repairStationTypeId)).thenReturn(Optional.of(repairStationType));
+
+        Assertions.assertEquals(repairStationType, repairStationTypeService.get(repairStationTypeId));
+    }
+
+    @Test
+    public void testGetByIdNotFound() {
+        Long repairStationTypeId = 2L;
+        when(repairStationTypeRepository.findById(repairStationTypeId)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(NotFoundException.class, () -> repairStationTypeService.get(repairStationTypeId));
     }
 }

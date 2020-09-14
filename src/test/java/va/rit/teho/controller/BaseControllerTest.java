@@ -16,8 +16,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,6 +69,20 @@ public class BaseControllerTest extends ControllerTest {
     }
 
     @Test
+    public void testUpdateBase() throws Exception {
+        Long baseId = 1L;
+        BaseDTO base = new BaseDTO(baseId, "short", "full");
+        when(baseService.add(base.getShortName(), base.getFullName())).thenReturn(baseId);
+
+        mockMvc.perform(
+                put("/base/{id}", baseId).contentType(MediaType.APPLICATION_JSON)
+                                         .content(objectMapper.writeValueAsString(base)))
+               .andExpect(status().isAccepted());
+
+        verify(baseService).update(baseId, base.getShortName(), base.getFullName());
+    }
+
+    @Test
     public void testAddEquipmentToBase() throws Exception {
         Long baseId = 1L;
         Long equipmentId = 2L;
@@ -85,6 +98,24 @@ public class BaseControllerTest extends ControllerTest {
                                                equipmentId,
                                                intensityAndAmountDTO.getIntensity(),
                                                intensityAndAmountDTO.getAmount());
+    }
+
+    @Test
+    public void testUpdateEquipmentToBase() throws Exception {
+        Long baseId = 1L;
+        Long equipmentId = 2L;
+        IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(12, 10);
+
+        mockMvc
+                .perform(put("/base/{baseId}/equipment/{equipmentId}", baseId, equipmentId)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
+                .andExpect(status().isAccepted());
+
+        verify(baseService).updateEquipmentInBase(baseId,
+                                                  equipmentId,
+                                                  intensityAndAmountDTO.getIntensity(),
+                                                  intensityAndAmountDTO.getAmount());
     }
 
 

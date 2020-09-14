@@ -28,7 +28,7 @@ public abstract class ControllerTest {
     protected RepairStationService repairStationService;
 
     @MockBean
-    protected RepairStationTypeService repairStationtypeService;
+    protected RepairStationTypeService repairStationTypeService;
 
     @MockBean
     protected RepairTypeServiceImpl repairTypeService;
