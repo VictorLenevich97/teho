@@ -41,7 +41,7 @@ public class BaseControllerTest extends ControllerTest {
         when(baseService.get(baseId)).thenReturn(base);
 
         mockMvc.perform(get("/base/{id}", baseId))
-               .andExpect(status().isOk()).andExpect(jsonPath("$.key", is(baseId.intValue())))
+               .andExpect(status().isOk()).andExpect(jsonPath("$.id", is(baseId.intValue())))
                .andExpect(jsonPath("$.shortName", is(base.getShortName())))
                .andExpect(jsonPath("$.fullName", is(base.getFullName())));
     }

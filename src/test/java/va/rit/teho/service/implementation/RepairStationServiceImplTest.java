@@ -66,50 +66,27 @@ public class RepairStationServiceImplTest {
 
         Assertions.assertEquals(result, repairStationService.get(repairStationId));
     }
-//
-//    @Test
-//    public void testAdd() {
-//        Long baseId = 1L;
-//        Long repairStationTypeId = 2L;
-//        Base b = new Base("s", "f");
-//        RepairStationType repairStationType = new RepairStationType("type", 1, 2);
-//        when(baseService.get(baseId)).thenReturn(b);
-//        when(repairStationTypeService.findById(repairStationTypeId)).thenReturn(Optional.of(repairStationType));
-//        RepairStation repairStation = new RepairStation("repair-station", repairStationType, b, 2);
-//        RepairStation addedRepairStation = new RepairStation(repairStation.getName(),
-//                                                             repairStationType,
-//                                                             b,
-//                                                             repairStation.getStationAmount());
-//        addedRepairStation.setId(3L);
-//        when(repairStationRepository.save(repairStation)).thenReturn(addedRepairStation);
-//        Assertions.assertEquals(addedRepairStation.getId(),
-//                                repairStationService.add(repairStation.getName(), baseId, repairStationTypeId, 2));
-//    }
-//
-//    @Test
-//    public void testListTypes() {
-//        RepairStationType repairStationType = new RepairStationType("type", 1, 2);
-//        List<RepairStationType> repairStationTypeList = Collections.singletonList(repairStationType);
-//        when(repairStationTypeService.findAll()).thenReturn(repairStationTypeList);
-//
-//        Assertions.assertEquals(repairStationTypeList, repairStationService.listTypes());
-//    }
-//
-//    @Test
-//    public void testAddType() {
-//        RepairStationType repairStationType = new RepairStationType("type", 1, 2);
-//        RepairStationType addedRepairStationType = new RepairStationType(repairStationType.getName(),
-//                                                                         repairStationType.getWorkingHoursMin(),
-//                                                                         repairStationType.getWorkingHoursMax());
-//        when(repairStationTypeService.save(repairStationType)).thenReturn(addedRepairStationType);
-//
-//        Assertions.assertEquals(
-//                addedRepairStationType.getId(),
-//                repairStationService.addType(
-//                        repairStationType.getName(),
-//                        repairStationType.getWorkingHoursMin(),
-//                        repairStationType.getWorkingHoursMax()));
-//    }
+
+
+    @Test
+    public void testAdd() {
+        Long baseId = 1L;
+        Long repairStationTypeId = 2L;
+        Base b = new Base("s", "f");
+        RepairStationType repairStationType = new RepairStationType("type", 1, 2);
+        when(baseService.get(baseId)).thenReturn(b);
+        when(repairStationTypeService.get(repairStationTypeId)).thenReturn(repairStationType);
+        RepairStation repairStation = new RepairStation("repair-station", repairStationType, b, 2);
+        RepairStation addedRepairStation = new RepairStation(repairStation.getName(),
+                                                             repairStationType,
+                                                             b,
+                                                             repairStation.getStationAmount());
+        addedRepairStation.setId(3L);
+        when(repairStationRepository.save(repairStation)).thenReturn(addedRepairStation);
+        Assertions.assertEquals(addedRepairStation.getId(),
+                                repairStationService.add(repairStation.getName(), baseId, repairStationTypeId, 2));
+    }
+
 
     @Test
     public void testSetEquipmentStaff() {

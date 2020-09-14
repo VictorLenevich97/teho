@@ -7,6 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.TestRunner;
 import va.rit.teho.controller.ControllerTest;
 import va.rit.teho.dto.equipment.EquipmentDTO;
+import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
 import va.rit.teho.entity.Equipment;
 
 import java.util.Collections;
@@ -32,7 +33,7 @@ public class EquipmentControllerTest extends ControllerTest {
         mockMvc.perform(get("/equipment"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.size()", is(1)))
-               .andExpect(jsonPath("$[0].key", is(equipment.getId().intValue())))
+               .andExpect(jsonPath("$[0].id", is(equipment.getId().intValue())))
                .andExpect(jsonPath("$[0].name", is(equipment.getName())));
     }
 
@@ -44,7 +45,7 @@ public class EquipmentControllerTest extends ControllerTest {
 
         mockMvc.perform(get("/equipment/{id}", equipment.getId()))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.key", is(equipment.getId().intValue())))
+               .andExpect(jsonPath("$.id", is(equipment.getId().intValue())))
                .andExpect(jsonPath("$.name", is(equipment.getName())))
                .andExpect(jsonPath("$.type.shortName",
                                    is(equipment.getEquipmentSubType().getEquipmentType().getShortName())))
@@ -54,15 +55,16 @@ public class EquipmentControllerTest extends ControllerTest {
                .andExpect(jsonPath("$.subType.fullName", is(equipment.getEquipmentSubType().getFullName())));
     }
 
-//    @Test
-//    public void testAddNewEquipment() throws Exception {
-//        EquipmentDTO equipmentDTO = new EquipmentDTO("equipmentName");
-//        equipmentDTO.set(3L);
-//
-//        mockMvc.perform(post("/equipment").contentType(MediaType.APPLICATION_JSON)
-//                                          .content(objectMapper.writeValueAsString(equipmentDTO)))
-//               .andExpect(status().isCreated());
-//
-//        verify(equipmentService).add(equipmentDTO.getName(), equipmentDTO.getSubTypeKey());
-//    }
+    @Test
+    public void testAddNewEquipment() throws Exception {
+        EquipmentDTO equipmentDTO = new EquipmentDTO("equipmentName");
+        equipmentDTO.setId(3L);
+        equipmentDTO.setSubType(new EquipmentSubTypeDTO(2L, "", ""));
+
+        mockMvc.perform(post("/equipment").contentType(MediaType.APPLICATION_JSON)
+                                          .content(objectMapper.writeValueAsString(equipmentDTO)))
+               .andExpect(status().isCreated());
+
+        verify(equipmentService).add(equipmentDTO.getName(), equipmentDTO.getSubType().getId());
+    }
 }

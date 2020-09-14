@@ -7,6 +7,9 @@ public class EquipmentSubTypeDTO extends AbstractNamedDTO {
 
     private Long id;
 
+    public EquipmentSubTypeDTO() {
+    }
+
     public EquipmentSubTypeDTO(String shortName, String fullName) {
         super(shortName, fullName);
     }

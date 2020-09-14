@@ -31,11 +31,8 @@ public class GroupedEquipmentController {
             @RequestParam(value = "equipmentId", required = false) List<Long> equipmentIds,
             @RequestParam(value = "subTypeId", required = false) List<Long> subTypeIds,
             @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
-        List<Long> equipmentIdFilter = Optional.ofNullable(equipmentIds).orElse(Collections.emptyList());
-        List<Long> subTypeIdFilter = Optional.ofNullable(subTypeIds).orElse(Collections.emptyList());
-        List<Long> typeIdFilter = Optional.ofNullable(typeIds).orElse(Collections.emptyList());
         List<EquipmentSubTypeWithEquipmentPerTypeDTO> equipmentPerTypeDTOList =
-                equipmentService.listGroupedByTypes(equipmentIdFilter, subTypeIdFilter, typeIdFilter)
+                equipmentService.listGroupedByTypes(equipmentIds, subTypeIds, typeIds)
                                 .entrySet()
                                 .stream()
                                 .map(equipmentTypeEntry -> EquipmentSubTypeWithEquipmentPerTypeDTO.from(

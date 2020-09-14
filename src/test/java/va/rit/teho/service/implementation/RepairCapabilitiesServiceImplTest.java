@@ -37,7 +37,10 @@ public class RepairCapabilitiesServiceImplTest {
     public void testGetAllCalculatedRepairCapabilities() {
         testGetCalculatedRepairCapabilities(
                 (List<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDayList) ->
-                        when(calculatedRepairCapabilitiesPerDayRepository.findAll()).thenReturn(
+                        when(calculatedRepairCapabilitiesPerDayRepository.findByIds(null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null)).thenReturn(
                                 calculatedRepairCapabilitesPerDayList),
                 Collections.emptyList());
     }
@@ -65,12 +68,13 @@ public class RepairCapabilitiesServiceImplTest {
     }
 
     @Test
-    public void testGetCalculatedRepaircapabilitiesByIds() {
+    public void testGetCalculatedRepairCapabilitiesByIds() {
         List<Long> repairStationIds = Collections.singletonList(3L);
         testGetCalculatedRepairCapabilities(
                 (List<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDayList) ->
-                        when(calculatedRepairCapabilitiesPerDayRepository.findByRepairStationIdIn(repairStationIds)).thenReturn(
-                                calculatedRepairCapabilitesPerDayList),
+                        when(calculatedRepairCapabilitiesPerDayRepository
+                                     .findByIds(repairStationIds, null, null, null))
+                                .thenReturn(calculatedRepairCapabilitesPerDayList),
                 repairStationIds);
     }
 

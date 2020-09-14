@@ -62,16 +62,16 @@ public class RepairStationControllerTest extends ControllerTest {
         mockMvc.perform(get("/repair-station/{id}", repairStationId))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.name", is(repairStation.getName())))
-               .andExpect(jsonPath("$.type.key", is(repairStation.getRepairStationType().getId().intValue())))
+               .andExpect(jsonPath("$.type.id", is(repairStation.getRepairStationType().getId().intValue())))
                .andExpect(jsonPath("$.type.name", is(repairStation.getRepairStationType().getName())))
                .andExpect(jsonPath("$.type.workingHoursMin",
                                    is(repairStation.getRepairStationType().getWorkingHoursMin())))
                .andExpect(jsonPath("$.type.workingHoursMax",
                                    is(repairStation.getRepairStationType().getWorkingHoursMax())))
-               .andExpect(jsonPath("$.baseKey", is(b.getId().intValue())))
+               .andExpect(jsonPath("$.base.id", is(b.getId().intValue())))
                .andExpect(jsonPath("$.amount", is(repairStation.getStationAmount())))
                .andExpect(jsonPath("$.equipmentStaff.size()", is(staff.size())))
-               .andExpect(jsonPath("$.equipmentStaff[0].equipmentKey", is(equipment.getId().intValue())))
+               .andExpect(jsonPath("$.equipmentStaff[0].equipmentId", is(equipment.getId().intValue())))
                .andExpect(jsonPath("$.equipmentStaff[0].totalStaff", is(repairStationEquipmentStaff.getTotalStaff())))
                .andExpect(jsonPath("$.equipmentStaff[0].availableStaff",
                                    is(repairStationEquipmentStaff.getAvailableStaff())));

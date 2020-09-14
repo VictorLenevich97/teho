@@ -35,7 +35,7 @@ public class LaborInputDistributionControllerTest extends ControllerTest {
         mockMvc.perform(get("/labor-distribution/intervals"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.size()", is(intervals.size())))
-               .andExpect(jsonPath("$[0].key", is(interval.getId().intValue())))
+               .andExpect(jsonPath("$[0].id", is(interval.getId().intValue())))
                .andExpect(jsonPath("$[0].from", is(interval.getLowerBound())))
                .andExpect(jsonPath("$[0].to", is(interval.getUpperBound())));
     }
@@ -78,7 +78,7 @@ public class LaborInputDistributionControllerTest extends ControllerTest {
                                    is(elid.getTotalRepairComplexity())))
                .andExpect(jsonPath("$[0].subTypeDistribution[0].equipmentDistribution[0].countAndLaborInputs.size()",
                                    is(elid.getIntervalCountAndLaborInputMap().size())))
-               .andExpect(jsonPath("$[0].subTypeDistribution[0].equipmentDistribution[0].countAndLaborInputs[0].key",
+               .andExpect(jsonPath("$[0].subTypeDistribution[0].equipmentDistribution[0].countAndLaborInputs[0].id",
                                    is(intervalKey.intValue())))
                .andExpect(jsonPath("$[0].subTypeDistribution[0].equipmentDistribution[0].countAndLaborInputs[0].count",
                                    is(elid.getIntervalCountAndLaborInputMap().get(intervalKey).getCount())))

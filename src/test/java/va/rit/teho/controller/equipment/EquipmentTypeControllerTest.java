@@ -31,8 +31,7 @@ public class EquipmentTypeControllerTest extends ControllerTest {
     @Test
     public void testGetEquipmentTypes() throws Exception {
         EquipmentType eqType = new EquipmentType("s", "f");
-        when(equipmentTypeService.listTypesWithSubTypes(Collections.emptyList(), Collections.emptyList())).thenReturn(
-                Collections.singletonMap(eqType, Collections.singletonList(new EquipmentSubType("s", "f", eqType))));
+        when(equipmentTypeService.listTypes(Collections.emptyList())).thenReturn(Collections.singletonList(eqType));
 
         mockMvc.perform(get("/equipment-type")).andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(1)));
     }

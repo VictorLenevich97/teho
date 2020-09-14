@@ -37,10 +37,9 @@ public class RepairCapabilitiesControllerTest extends ControllerTest {
         mockMvc.perform(get("/repair-capabilities"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.size()", is(1)))
-               .andExpect(jsonPath("$[0].repairStation.key", is(rs.getId().intValue())))
-               .andExpect(jsonPath("$[0].repairStation.name", is(rs.getName())))
+               .andExpect(jsonPath("$[0].repairStationId", is(rs.getId().intValue())))
                .andExpect(jsonPath("$[0].capabilities.size()", is(1)))
-               .andExpect(jsonPath("$[0].capabilities[0].key", is(e.getId().intValue())))
+               .andExpect(jsonPath("$[0].capabilities[0].id", is(e.getId().intValue())))
                .andExpect(jsonPath("$[0].capabilities[0].capability", is(amount)));
         verify(repairCapabilitiesService).getCalculatedRepairCapabilities(null, null, null, null);
         verifyNoMoreInteractions(repairCapabilitiesService);
@@ -57,13 +56,12 @@ public class RepairCapabilitiesControllerTest extends ControllerTest {
                         rs,
                         Collections.singletonMap(e, amount)));
 
-        mockMvc.perform(get("/repair-capabilities?repairStationIds=1,2"))
+        mockMvc.perform(get("/repair-capabilities?repairStationId=1,2"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.size()", is(1)))
-               .andExpect(jsonPath("$[0].repairStation.key", is(rs.getId().intValue())))
-               .andExpect(jsonPath("$[0].repairStation.name", is(rs.getName())))
+               .andExpect(jsonPath("$[0].repairStationId", is(rs.getId().intValue())))
                .andExpect(jsonPath("$[0].capabilities.size()", is(1)))
-               .andExpect(jsonPath("$[0].capabilities[0].key", is(e.getId().intValue())))
+               .andExpect(jsonPath("$[0].capabilities[0].id", is(e.getId().intValue())))
                .andExpect(jsonPath("$[0].capabilities[0].capability", is(amount)));
         verify(repairCapabilitiesService).getCalculatedRepairCapabilities(repairStationIds, null, null, null);
         verifyNoMoreInteractions(repairCapabilitiesService);
@@ -75,19 +73,18 @@ public class RepairCapabilitiesControllerTest extends ControllerTest {
         Equipment e = equipment(3L, "eq-name");
         Double amount = 12.34;
         when(repairCapabilitiesService.getCalculatedRepairCapabilities(Collections.emptyList(),
-                                                                       null,
-                                                                       null,
-                                                                       null)).thenReturn(Collections.singletonMap(
+                                                                       Collections.emptyList(),
+                                                                       Collections.emptyList(),
+                                                                       Collections.emptyList())).thenReturn(Collections.singletonMap(
                 rs,
                 Collections.singletonMap(e, amount)));
 
         mockMvc.perform(post("/repair-capabilities"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.size()", is(1)))
-               .andExpect(jsonPath("$[0].repairStation.key", is(rs.getId().intValue())))
-               .andExpect(jsonPath("$[0].repairStation.name", is(rs.getName())))
+               .andExpect(jsonPath("$[0].repairStationId", is(rs.getId().intValue())))
                .andExpect(jsonPath("$[0].capabilities.size()", is(1)))
-               .andExpect(jsonPath("$[0].capabilities[0].key", is(e.getId().intValue())))
+               .andExpect(jsonPath("$[0].capabilities[0].id", is(e.getId().intValue())))
                .andExpect(jsonPath("$[0].capabilities[0].capability", is(amount)));
 
         verify(repairCapabilitiesService).calculateAndUpdateRepairCapabilities();
@@ -99,19 +96,18 @@ public class RepairCapabilitiesControllerTest extends ControllerTest {
         Equipment e = equipment(3L, "eq-name");
         Double amount = 12.34;
         when(repairCapabilitiesService.getCalculatedRepairCapabilities(Collections.singletonList(rs.getId()),
-                                                                       null,
-                                                                       null,
-                                                                       null)).thenReturn(
+                                                                       Collections.emptyList(),
+                                                                       Collections.emptyList(),
+                                                                       Collections.emptyList())).thenReturn(
                 Collections.singletonMap(
                         rs,
                         Collections.singletonMap(e, amount)));
 
         mockMvc.perform(post("/repair-capabilities/repair-station/{id}", rs.getId()))
                .andExpect(status().isAccepted())
-               .andExpect(jsonPath("$.repairStation.key", is(rs.getId().intValue())))
-               .andExpect(jsonPath("$.repairStation.name", is(rs.getName())))
+               .andExpect(jsonPath("$.repairStationId", is(rs.getId().intValue())))
                .andExpect(jsonPath("$.capabilities.size()", is(1)))
-               .andExpect(jsonPath("$.capabilities[0].key", is(e.getId().intValue())))
+               .andExpect(jsonPath("$.capabilities[0].id", is(e.getId().intValue())))
                .andExpect(jsonPath("$.capabilities[0].capability", is(amount)));
 
         verify(repairCapabilitiesService).calculateAndUpdateRepairCapabilitiesPerStation(rs.getId());

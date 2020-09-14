@@ -7,6 +7,9 @@ public class EquipmentTypeDTO extends AbstractNamedDTO {
 
     private Long id;
 
+    public EquipmentTypeDTO() {
+    }
+
     public EquipmentTypeDTO(String shortName, String fullName) {
         super(shortName, fullName);
     }
@@ -22,5 +25,9 @@ public class EquipmentTypeDTO extends AbstractNamedDTO {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
