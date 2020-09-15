@@ -26,10 +26,10 @@ INSERT INTO equipment_per_base values (2, 4, 12, 22);
 INSERT INTO repair_station_equipment_staff VALUES (1, 1, 5, 10);
 INSERT INTO repair_station_equipment_staff VALUES (2, 1, 3, 5);
 
-INSERT INTO repair_type VALUES (1, 'Текущий');
-INSERT INTO repair_type VALUES (2, 'Средний');
-INSERT INTO repair_type VALUES (3, 'Капитальный');
-INSERT INTO repair_type VALUES (4, 'Безвозвратные потери');
+INSERT INTO repair_type VALUES (1, 'Текущий', true);
+INSERT INTO repair_type VALUES (2, 'Средний', true);
+INSERT INTO repair_type VALUES (3, 'Капитальный', true);
+INSERT INTO repair_type VALUES (4, 'Безвозвратные потери', false);
 
 INSERT INTO restoration_type VALUES (1, 'Тактический');
 INSERT INTO restoration_type VALUES (2, 'Оперативный');

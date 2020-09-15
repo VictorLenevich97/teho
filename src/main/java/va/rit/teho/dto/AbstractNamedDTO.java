@@ -7,6 +7,9 @@ public abstract class AbstractNamedDTO {
     private String shortName;
     private String fullName;
 
+    public AbstractNamedDTO() {
+    }
+
     public AbstractNamedDTO(String shortName, String fullName) {
         this.shortName = shortName;
         this.fullName = fullName;

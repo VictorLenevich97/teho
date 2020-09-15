@@ -6,6 +6,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import va.rit.teho.entity.*;
 import va.rit.teho.service.*;
+import va.rit.teho.service.implementation.RepairTypeServiceImpl;
 
 public abstract class ControllerTest {
 
@@ -27,7 +28,16 @@ public abstract class ControllerTest {
     protected RepairStationService repairStationService;
 
     @MockBean
+    protected RepairStationTypeService repairStationTypeService;
+
+    @MockBean
+    protected RepairTypeServiceImpl repairTypeService;
+
+    @MockBean
     protected EquipmentService equipmentService;
+
+    @MockBean
+    protected EquipmentTypeService equipmentTypeService;
 
     protected Base base(Long id, String name) {
         Base b = new Base("short" + name, "full" + name);

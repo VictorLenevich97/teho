@@ -8,7 +8,11 @@ public interface BaseService {
 
     Long add(String shortName, String fullName);
 
+    void update(Long baseId, String shortName, String fullName);
+
     void addEquipmentToBase(Long baseId, Long equipmentId, int intensity, int amount);
+
+    void updateEquipmentInBase(Long baseId, Long equipmentId, int intensity, int amount);
 
     Base get(Long baseId);
 

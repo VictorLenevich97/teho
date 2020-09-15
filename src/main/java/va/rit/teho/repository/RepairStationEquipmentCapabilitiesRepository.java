@@ -11,4 +11,6 @@ import java.util.List;
 public interface RepairStationEquipmentCapabilitiesRepository
         extends CrudRepository<RepairStationEquipmentStaff, EquipmentPerRepairStation> {
     List<RepairStationEquipmentStaff> findAllByRepairStationId(Long repairStationId);
+
+    List<RepairStationEquipmentStaff> findAllByEquipmentId(Long equipmentId);
 }

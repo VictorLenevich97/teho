@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import va.rit.teho.entity.*;
 import va.rit.teho.exception.BaseNotFoundException;
+import va.rit.teho.exception.EmptyFieldException;
 import va.rit.teho.exception.EquipmentNotFoundException;
 import va.rit.teho.repository.BaseRepository;
 import va.rit.teho.repository.EquipmentPerBaseRepository;
@@ -16,8 +17,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class BaseServiceImplTest {
 
@@ -41,6 +41,27 @@ public class BaseServiceImplTest {
         Assertions.assertEquals(service.add(BASE.getShortName(), BASE.getFullName()), BASE.getId());
 
         verify(baseRepository).save(new Base(BASE.getShortName(), BASE.getFullName()));
+    }
+
+    @Test
+    public void testAddEmptyField() {
+        BASE.setId(1L);
+
+        Assertions.assertThrows(EmptyFieldException.class, () -> service.add(null, BASE.getFullName()));
+
+        verifyNoInteractions(baseRepository);
+    }
+
+    @Test
+    public void testUpdate() {
+        BASE.setId(1L);
+
+        when(baseRepository.findById(BASE.getId())).thenReturn(Optional.of(BASE));
+        when(baseRepository.save(any())).thenReturn(BASE);
+
+        service.update(BASE.getId(), BASE.getShortName(), BASE.getFullName());
+
+        verify(baseRepository).save(BASE);
     }
 
     @Test
@@ -73,6 +94,24 @@ public class BaseServiceImplTest {
         when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
         when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.empty());
         Assertions.assertThrows(EquipmentNotFoundException.class, () -> service.addEquipmentToBase(1L, 1L, 0, 0));
+    }
+
+    @Test
+    public void testUpdateEquipmentInBase() {
+        Long baseId = 1L;
+        Long equipmentId = 1L;
+        int intensity = 10;
+        int amount = 15;
+        Equipment e = new Equipment("n", new EquipmentSubType("", "", new EquipmentType("", "")));
+        when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
+        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(e));
+        EquipmentPerBase epb = new EquipmentPerBase(BASE, e, intensity, amount);
+        when(equipmentPerBaseRepository.findById(new EquipmentPerBaseAmount(baseId,
+                                                                            equipmentId))).thenReturn(Optional.of(epb));
+
+        service.updateEquipmentInBase(baseId, equipmentId, intensity, amount);
+
+        verify(equipmentPerBaseRepository).save(epb);
     }
 
     @Test

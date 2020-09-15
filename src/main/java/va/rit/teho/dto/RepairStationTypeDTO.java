@@ -3,20 +3,20 @@ package va.rit.teho.dto;
 import va.rit.teho.entity.RepairStationType;
 
 public class RepairStationTypeDTO {
-    private Long key;
+    private Long id;
     private String name;
     private Integer workingHoursMin;
     private Integer workingHoursMax;
 
     public RepairStationTypeDTO(Long key) {
-        this.key = key;
+        this.id = key;
     }
 
     public RepairStationTypeDTO() {
     }
 
-    public RepairStationTypeDTO(Long key, String name, Integer workingHoursMin, Integer workingHoursMax) {
-        this.key = key;
+    public RepairStationTypeDTO(Long id, String name, Integer workingHoursMin, Integer workingHoursMax) {
+        this.id = id;
         this.name = name;
         this.workingHoursMin = workingHoursMin;
         this.workingHoursMax = workingHoursMax;
@@ -29,12 +29,12 @@ public class RepairStationTypeDTO {
                                         repairStationType.getWorkingHoursMax());
     }
 
-    public Long getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 
-    public void setKey(Long key) {
-        this.key = key;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

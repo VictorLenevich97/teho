@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import va.rit.teho.entity.*;
+import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.model.Pair;
 import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.repository.RepairStationRepository;
-import va.rit.teho.repository.RepairStationTypeRepository;
 import va.rit.teho.service.BaseService;
+import va.rit.teho.service.EquipmentService;
 import va.rit.teho.service.RepairStationService;
+import va.rit.teho.service.RepairStationTypeService;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,15 +25,17 @@ public class RepairStationServiceImplTest {
     private final RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository =
             Mockito.mock(RepairStationEquipmentCapabilitiesRepository.class);
     private final RepairStationRepository repairStationRepository = Mockito.mock(RepairStationRepository.class);
-    private final RepairStationTypeRepository repairStationTypeRepository = Mockito.mock(RepairStationTypeRepository.class);
+    private final RepairStationTypeService repairStationTypeService = Mockito.mock(RepairStationTypeService.class);
     private final BaseService baseService = Mockito.mock(BaseService.class);
+    private final EquipmentService equipmentService = Mockito.mock(EquipmentService.class);
 
     private final RepairStationService repairStationService =
             new RepairStationServiceImpl(
                     repairStationEquipmentCapabilitiesRepository,
                     repairStationRepository,
-                    repairStationTypeRepository,
-                    baseService);
+                    repairStationTypeService,
+                    baseService,
+                    equipmentService);
 
     @Test
     public void testList() {
@@ -42,7 +46,7 @@ public class RepairStationServiceImplTest {
                         .singletonList(new RepairStation("station", repairStationType, b, 2));
         when(repairStationRepository.findAll()).thenReturn(repairStations);
 
-        Assertions.assertEquals(repairStations, repairStationService.list());
+        Assertions.assertEquals(repairStations, repairStationService.list(Collections.emptyList()));
     }
 
     @Test
@@ -64,6 +68,7 @@ public class RepairStationServiceImplTest {
         Assertions.assertEquals(result, repairStationService.get(repairStationId));
     }
 
+
     @Test
     public void testAdd() {
         Long baseId = 1L;
@@ -71,7 +76,7 @@ public class RepairStationServiceImplTest {
         Base b = new Base("s", "f");
         RepairStationType repairStationType = new RepairStationType("type", 1, 2);
         when(baseService.get(baseId)).thenReturn(b);
-        when(repairStationTypeRepository.findById(repairStationTypeId)).thenReturn(Optional.of(repairStationType));
+        when(repairStationTypeService.get(repairStationTypeId)).thenReturn(repairStationType);
         RepairStation repairStation = new RepairStation("repair-station", repairStationType, b, 2);
         RepairStation addedRepairStation = new RepairStation(repairStation.getName(),
                                                              repairStationType,
@@ -84,29 +89,27 @@ public class RepairStationServiceImplTest {
     }
 
     @Test
-    public void testListTypes() {
+    public void testUpdate() {
+        Long baseId = 1L;
+        Long repairStationTypeId = 2L;
+        Long repairStationId = 3L;
+        Base b = new Base("s", "f");
         RepairStationType repairStationType = new RepairStationType("type", 1, 2);
-        List<RepairStationType> repairStationTypeList = Collections.singletonList(repairStationType);
-        when(repairStationTypeRepository.findAll()).thenReturn(repairStationTypeList);
+        RepairStation repairStation = new RepairStation("repair-station", repairStationType, b, 2);
+        RepairStation addedRepairStation = new RepairStation(repairStation.getName(),
+                                                             repairStationType,
+                                                             b,
+                                                             repairStation.getStationAmount());
+        when(baseService.get(baseId)).thenReturn(b);
+        when(repairStationTypeService.get(repairStationTypeId)).thenReturn(repairStationType);
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(repairStation));
+        addedRepairStation.setId(3L);
+        when(repairStationRepository.save(repairStation)).thenReturn(addedRepairStation);
+        repairStationService.update(repairStationId, repairStation.getName(), baseId, repairStationTypeId, 2);
 
-        Assertions.assertEquals(repairStationTypeList, repairStationService.listTypes());
+        verify(repairStationRepository).findById(repairStationId);
     }
 
-    @Test
-    public void testAddType() {
-        RepairStationType repairStationType = new RepairStationType("type", 1, 2);
-        RepairStationType addedRepairStationType = new RepairStationType(repairStationType.getName(),
-                                                                         repairStationType.getWorkingHoursMin(),
-                                                                         repairStationType.getWorkingHoursMax());
-        when(repairStationTypeRepository.save(repairStationType)).thenReturn(addedRepairStationType);
-
-        Assertions.assertEquals(
-                addedRepairStationType.getId(),
-                repairStationService.addType(
-                        repairStationType.getName(),
-                        repairStationType.getWorkingHoursMin(),
-                        repairStationType.getWorkingHoursMax()));
-    }
 
     @Test
     public void testSetEquipmentStaff() {
@@ -115,7 +118,11 @@ public class RepairStationServiceImplTest {
         RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentPerRepairStation(
                 1L,
                 2L), 2, 1);
-
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(new RepairStation("name",
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         0)));
+        when(equipmentService.getEquipment(equipmentId)).thenReturn(new Equipment("", null));
         repairStationService.setEquipmentStaff(repairStationId,
                                                equipmentId,
                                                repairStationEquipmentStaff.getAvailableStaff(),
@@ -124,4 +131,55 @@ public class RepairStationServiceImplTest {
         verify(repairStationEquipmentCapabilitiesRepository).save(repairStationEquipmentStaff);
     }
 
+    @Test
+    public void testSetEquipmentStaffIncorrectParams() {
+        Long repairStationId = 1L;
+        Long equipmentId = 2L;
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(new RepairStation("name",
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         0)));
+        when(equipmentService.getEquipment(equipmentId)).thenReturn(new Equipment("", null));
+        Assertions.assertThrows(IncorrectParamException.class,
+                                () -> repairStationService.setEquipmentStaff(repairStationId, equipmentId, 20, 5));
+    }
+
+
+    @Test
+    public void testUpdateEquipmentStaff() {
+        Long repairStationId = 1L;
+        Long equipmentId = 2L;
+        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentPerRepairStation(
+                1L,
+                2L), 2, 1);
+        RepairStation repairStation = new RepairStation("repair-station", null, null, 2);
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(repairStation));
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(new RepairStation("name",
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         0)));
+        when(equipmentService.getEquipment(equipmentId)).thenReturn(new Equipment("", null));
+        when(repairStationEquipmentCapabilitiesRepository.findById(new EquipmentPerRepairStation(repairStationId,
+                                                                                                 equipmentId))).thenReturn(
+                Optional.of(repairStationEquipmentStaff));
+        repairStationService.updateEquipmentStaff(repairStationId,
+                                                  equipmentId,
+                                                  repairStationEquipmentStaff.getAvailableStaff(),
+                                                  repairStationEquipmentStaff.getTotalStaff());
+
+        verify(repairStationEquipmentCapabilitiesRepository).save(repairStationEquipmentStaff);
+    }
+
+    @Test
+    public void testUpdateEquipmentStaffIncorrectParams() {
+        Long repairStationId = 1L;
+        Long equipmentId = 2L;
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(new RepairStation("name",
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         0)));
+        when(equipmentService.getEquipment(equipmentId)).thenReturn(new Equipment("", null));
+        Assertions.assertThrows(IncorrectParamException.class,
+                                () -> repairStationService.updateEquipmentStaff(repairStationId, equipmentId, 20, 5));
+    }
 }

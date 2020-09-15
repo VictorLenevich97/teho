@@ -38,9 +38,9 @@ public class LaborInputDistributionController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<LaborInputDistributionDTO>> getDistributionData(@RequestParam(required = false) List<Long> typeIds) {
+    public ResponseEntity<List<LaborInputDistributionDTO>> getDistributionData(@RequestParam(required = false) List<Long> typeId) {
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
-                laborInputDistributionService.getLaborInputDistribution(typeIds);
+                laborInputDistributionService.getLaborInputDistribution(typeId);
 
         List<LaborInputDistributionDTO> laborInputDistributionDTOList = laborInputDistribution
                 .entrySet()

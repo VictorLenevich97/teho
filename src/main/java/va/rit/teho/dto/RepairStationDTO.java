@@ -7,26 +7,26 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepairStationDTO {
-    private Long key;
+    private Long id;
     private String name;
     private RepairStationTypeDTO type;
-    private Long baseKey;
+    private BaseDTO base;
     private Integer amount;
     private List<EquipmentStaffDTO> equipmentStaff;
 
     public RepairStationDTO() {
     }
 
-    public RepairStationDTO(Long key, String name) {
-        this.key = key;
+    public RepairStationDTO(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
-    public RepairStationDTO(Long key, String name, RepairStationTypeDTO type, Long baseKey, Integer amount) {
-        this.key = key;
+    public RepairStationDTO(Long id, String name, RepairStationTypeDTO type, BaseDTO base, Integer amount) {
+        this.id = id;
         this.name = name;
         this.type = type;
-        this.baseKey = baseKey;
+        this.base = base;
         this.amount = amount;
     }
 
@@ -34,8 +34,16 @@ public class RepairStationDTO {
         return new RepairStationDTO(repairStation.getId(),
                                     repairStation.getName(),
                                     RepairStationTypeDTO.from(repairStation.getRepairStationType()),
-                                    repairStation.getBase().getId(),
+                                    BaseDTO.from(repairStation.getBase()),
                                     repairStation.getStationAmount());
+    }
+
+    public BaseDTO getBase() {
+        return base;
+    }
+
+    public void setBase(BaseDTO base) {
+        this.base = base;
     }
 
     public List<EquipmentStaffDTO> getEquipmentStaff() {
@@ -47,12 +55,12 @@ public class RepairStationDTO {
         return this;
     }
 
-    public Long getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 
-    public void setKey(Long key) {
-        this.key = key;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -71,13 +79,6 @@ public class RepairStationDTO {
         this.type = type;
     }
 
-    public Long getBaseKey() {
-        return baseKey;
-    }
-
-    public void setBaseKey(Long baseKey) {
-        this.baseKey = baseKey;
-    }
 
     public Integer getAmount() {
         return amount;

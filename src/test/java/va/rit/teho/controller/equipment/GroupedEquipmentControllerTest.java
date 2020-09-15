@@ -35,7 +35,7 @@ public class GroupedEquipmentControllerTest extends ControllerTest {
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> equipmentTypeMap =
                 Collections.singletonMap(equipmentType, equipmentSubTypeListMap);
 
-        when(equipmentService.listGroupedByTypes()).thenReturn(equipmentTypeMap);
+        when(equipmentService.listGroupedByTypes(null, null, null)).thenReturn(equipmentTypeMap);
 
         mockMvc.perform(get("/grouped-equipment")).andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(1)))
                .andExpect(jsonPath("$[0].subTypes.size()", is(equipmentSubTypeListMap.size())))

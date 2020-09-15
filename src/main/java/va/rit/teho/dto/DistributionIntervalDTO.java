@@ -3,12 +3,12 @@ package va.rit.teho.dto;
 import va.rit.teho.entity.WorkhoursDistributionInterval;
 
 public class DistributionIntervalDTO {
-    private final Long key;
+    private final Long id;
     private final int from;
     private final int to;
 
-    public DistributionIntervalDTO(Long key, int from, int to) {
-        this.key = key;
+    public DistributionIntervalDTO(Long id, int from, int to) {
+        this.id = id;
         this.from = from;
         this.to = to;
     }
@@ -17,8 +17,8 @@ public class DistributionIntervalDTO {
         return new DistributionIntervalDTO(interval.getId(), interval.getLowerBound(), interval.getUpperBound());
     }
 
-    public Long getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 
     public int getFrom() {

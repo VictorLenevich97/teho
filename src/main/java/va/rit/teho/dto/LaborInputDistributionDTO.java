@@ -114,18 +114,18 @@ public class LaborInputDistributionDTO {
     }
 
     public static class IntervalWithCountAndLaborInputDTO {
-        private final Long key;
+        private final Long id;
         private final Double count;
         private final Double laborInput;
 
         public IntervalWithCountAndLaborInputDTO(Long key, Double count, Double laborInput) {
-            this.key = key;
+            this.id = key;
             this.count = count;
             this.laborInput = laborInput;
         }
 
-        public Long getKey() {
-            return key;
+        public Long getId() {
+            return id;
         }
 
         public Double getCount() {

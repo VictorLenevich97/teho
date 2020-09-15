@@ -12,6 +12,10 @@ import java.util.List;
 @Repository
 public interface EquipmentPerBaseRepository extends CrudRepository<EquipmentPerBase, EquipmentPerBaseAmount> {
 
+    List<EquipmentPerBase> findByBaseId(Long baseId);
+
+    List<EquipmentPerBase> findByEquipmentId(Long equipmentId);
+
     @Query("SELECT new va.rit.teho.model.Pair(epb, elipt.amount) FROM EquipmentPerBase epb " +
             "INNER JOIN EquipmentLaborInputPerType elipt ON epb.equipment.id = elipt.equipment.id " +
             "WHERE elipt.repairType.id = ?1")

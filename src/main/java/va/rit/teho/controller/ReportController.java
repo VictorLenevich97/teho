@@ -31,7 +31,7 @@ public class ReportController {
 
     @GetMapping(value = "/repair-fund-distribution-report", produces = "application/vnd.ms-excel")
     @ResponseBody
-    byte[] generateRepairFundDistributionReport() throws TehoException {
+    public byte[] generateRepairFundDistributionReport() throws TehoException {
         return reportService.generateRepairFundDistributionReport();
     }
 }

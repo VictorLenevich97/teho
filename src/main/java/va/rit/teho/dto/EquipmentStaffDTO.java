@@ -6,7 +6,7 @@ import va.rit.teho.entity.RepairStationEquipmentStaff;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentStaffDTO {
 
-    Long equipmentKey;
+    Long equipmentId;
     Integer totalStaff;
     Integer availableStaff;
 
@@ -18,7 +18,7 @@ public class EquipmentStaffDTO {
     }
 
     public EquipmentStaffDTO(Long equipmentKey, Integer totalStaff, Integer availableStaff) {
-        this.equipmentKey = equipmentKey;
+        this.equipmentId = equipmentKey;
         this.totalStaff = totalStaff;
         this.availableStaff = availableStaff;
     }
@@ -29,12 +29,12 @@ public class EquipmentStaffDTO {
                                      repairStationEquipmentStaff.getAvailableStaff());
     }
 
-    public Long getEquipmentKey() {
-        return equipmentKey;
+    public Long getEquipmentId() {
+        return equipmentId;
     }
 
-    public void setEquipmentKey(Long equipmentKey) {
-        this.equipmentKey = equipmentKey;
+    public void setEquipmentId(Long equipmentId) {
+        this.equipmentId = equipmentId;
     }
 
     public Integer getTotalStaff() {

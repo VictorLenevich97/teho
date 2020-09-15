@@ -6,7 +6,7 @@ import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
 import va.rit.teho.enums.RepairTypeEnum;
-import va.rit.teho.exception.RepairTypeLaborInputNotFoundException;
+import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.CalculatedRepairCapabilitiesPerDayRepository;
 import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.service.CalculationService;
@@ -41,8 +41,10 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                 .stream()
                 .filter(lipt -> lipt.getRepairType().getName().equals(RepairTypeEnum.AVG_REPAIR.getName()))
                 .findFirst()
-                .orElseThrow(() -> new RepairTypeLaborInputNotFoundException(RepairTypeEnum.AVG_REPAIR,
-                                                                             rsec.getEquipment()))
+                .orElseThrow(() -> new NotFoundException("Отсутствует значение нормативной трудоемкости " +
+                                                                 RepairTypeEnum.AVG_REPAIR.getName() +
+                                                                 " ремонта для ВВСТ с id = " + rsec.getEquipment()
+                                                                                                   .getId()))
                 .getAmount();
         double calculatedCapabilities = calculationService.calculateRepairCapabilities(
                 rsec.getTotalStaff(),
@@ -74,15 +76,21 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                 repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId));
     }
 
+    private List<Long> nullIfEmpty(List<Long> collection) {
+        return collection == null || collection.isEmpty() ? null : collection;
+    }
+
     @Override
-    public Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(List<Long> repairStationIds) {
-        Iterable<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDays;
-        if (repairStationIds == null || repairStationIds.isEmpty()) {
-            calculatedRepairCapabilitesPerDays = calculatedRepairCapabilitiesPerDayRepository.findAll();
-        } else {
-            calculatedRepairCapabilitesPerDays =
-                    calculatedRepairCapabilitiesPerDayRepository.findByRepairStationIdIn(repairStationIds);
-        }
+    public Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(
+            List<Long> repairStationIds,
+            List<Long> equipmentIds,
+            List<Long> equipmentSubTypeIds,
+            List<Long> equipmentTypeIds) {
+        Iterable<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDays =
+                calculatedRepairCapabilitiesPerDayRepository.findByIds(nullIfEmpty(repairStationIds),
+                                                                       nullIfEmpty(equipmentIds),
+                                                                       nullIfEmpty(equipmentSubTypeIds),
+                                                                       nullIfEmpty(equipmentTypeIds));
         Map<RepairStation, Map<Equipment, Double>> result = new HashMap<>();
         for (CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay : calculatedRepairCapabilitesPerDays) {
             RepairStation repairStation = calculatedRepairCapabilitesPerDay.getRepairStation();

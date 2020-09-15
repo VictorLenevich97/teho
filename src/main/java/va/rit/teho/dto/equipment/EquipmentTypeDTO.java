@@ -5,11 +5,29 @@ import va.rit.teho.entity.EquipmentType;
 
 public class EquipmentTypeDTO extends AbstractNamedDTO {
 
+    private Long id;
+
+    public EquipmentTypeDTO() {
+    }
+
     public EquipmentTypeDTO(String shortName, String fullName) {
         super(shortName, fullName);
     }
 
+    public EquipmentTypeDTO(Long id, String shortName, String fullName) {
+        super(shortName, fullName);
+        this.id = id;
+    }
+
     public static EquipmentTypeDTO from(EquipmentType equipmentType) {
-        return new EquipmentTypeDTO(equipmentType.getShortName(), equipmentType.getFullName());
+        return new EquipmentTypeDTO(equipmentType.getId(), equipmentType.getShortName(), equipmentType.getFullName());
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

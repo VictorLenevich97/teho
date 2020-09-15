@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.RepairCapabilitiesDTO;
-import va.rit.teho.dto.RepairStationDTO;
 import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.exception.NotFoundException;
@@ -34,7 +33,10 @@ public class RepairCapabilitiesController {
     @ResponseBody
     public ResponseEntity<List<RepairCapabilitiesDTO>> calculateAndGet() {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilities();
-        return getCalculatedRepairCapabilities(Collections.emptyList());
+        return getCalculatedRepairCapabilities(Collections.emptyList(),
+                                               Collections.emptyList(),
+                                               Collections.emptyList(),
+                                               Collections.emptyList());
     }
 
     @PostMapping("/repair-station/{repairStationId}")
@@ -43,7 +45,10 @@ public class RepairCapabilitiesController {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilitiesPerStation(repairStationId);
         RepairCapabilitiesDTO repairCapabilitiesDTO =
                 Optional.ofNullable(
-                        getCalculatedRepairCapabilities(Collections.singletonList(repairStationId)).getBody())
+                        getCalculatedRepairCapabilities(Collections.singletonList(repairStationId),
+                                                        Collections.emptyList(),
+                                                        Collections.emptyList(),
+                                                        Collections.emptyList()).getBody())
                         .flatMap(v -> v.stream().findFirst())
                         .orElseThrow(() -> new NotFoundException("Производственные возможности РВО с id = " + repairStationId + " не найдены!"));
         return ResponseEntity.accepted().body(repairCapabilitiesDTO);
@@ -53,7 +58,7 @@ public class RepairCapabilitiesController {
             Map.Entry<RepairStation, Map<Equipment, Double>> repairStationCapabilitiesEntry) {
         RepairStation repairStation = repairStationCapabilitiesEntry.getKey();
         return new RepairCapabilitiesDTO(
-                new RepairStationDTO(repairStation.getId(), repairStation.getName()),
+                repairStation.getId(),
                 repairStationCapabilitiesEntry
                         .getValue()
                         .entrySet()
@@ -67,9 +72,13 @@ public class RepairCapabilitiesController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<RepairCapabilitiesDTO>> getCalculatedRepairCapabilities(@RequestParam(required = false) List<Long> repairStationIds) {
+    public ResponseEntity<List<RepairCapabilitiesDTO>> getCalculatedRepairCapabilities(
+            @RequestParam(required = false) List<Long> repairStationId,
+            @RequestParam(required = false) List<Long> equipmentId,
+            @RequestParam(required = false) List<Long> equipmentTypeId,
+            @RequestParam(required = false) List<Long> equipmentSubTypeId) {
         List<RepairCapabilitiesDTO> repairCapabilitiesDTOList = repairCapabilitiesService
-                .getCalculatedRepairCapabilities(repairStationIds)
+                .getCalculatedRepairCapabilities(repairStationId, equipmentId, equipmentSubTypeId, equipmentTypeId)
                 .entrySet()
                 .stream()
                 .map(this::buildRepairCapabilitiesDTO)

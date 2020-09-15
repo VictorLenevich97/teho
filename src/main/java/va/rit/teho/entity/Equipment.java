@@ -20,9 +20,6 @@ public class Equipment {
 
     @JsonIgnore
     @OneToMany(mappedBy = "equipment")
-    private Set<EquipmentPerBase> equipmentPerBases;
-    @JsonIgnore
-    @OneToMany(mappedBy = "equipment")
     private Set<EquipmentLaborInputPerType> laborInputPerTypes;
 
     public Equipment() {
@@ -31,14 +28,6 @@ public class Equipment {
     public Equipment(String name, EquipmentSubType equipmentSubType) {
         this.name = name;
         this.equipmentSubType = equipmentSubType;
-    }
-
-    public Set<EquipmentPerBase> getEquipmentPerBases() {
-        return equipmentPerBases;
-    }
-
-    public void setEquipmentPerBases(Set<EquipmentPerBase> equipmentPerBases) {
-        this.equipmentPerBases = equipmentPerBases;
     }
 
     public Set<EquipmentLaborInputPerType> getLaborInputPerTypes() {
@@ -81,12 +70,11 @@ public class Equipment {
         return Objects.equals(id, equipment.id) &&
                 Objects.equals(name, equipment.name) &&
                 Objects.equals(equipmentSubType, equipment.equipmentSubType) &&
-                Objects.equals(equipmentPerBases, equipment.equipmentPerBases) &&
                 Objects.equals(laborInputPerTypes, equipment.laborInputPerTypes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, equipmentSubType, equipmentPerBases, laborInputPerTypes);
+        return Objects.hash(id, name, equipmentSubType, laborInputPerTypes);
     }
 }

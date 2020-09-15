@@ -10,14 +10,26 @@ public class RepairType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    private boolean repairable;
+
+    public RepairType(String name, boolean repairable) {
+        this.name = name;
+        this.repairable = repairable;
+    }
+
+    public boolean isRepairable() {
+        return repairable;
+    }
+
     @OneToMany(mappedBy = "repairType")
     private Set<EquipmentLaborInputPerType> laborInputPerTypes;
 
     public RepairType() {
     }
 
-    public RepairType(String name) {
-        this.name = name;
+    public void setRepairable(boolean repairable) {
+        this.repairable = repairable;
     }
 
     public RepairType(Long id) {

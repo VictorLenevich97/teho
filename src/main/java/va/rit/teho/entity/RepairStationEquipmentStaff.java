@@ -52,10 +52,6 @@ public class RepairStationEquipmentStaff {
         return equipmentPerRepairStation;
     }
 
-    public void setEquipmentPerRepairStation(EquipmentPerRepairStation equipmentPerRepairStation) {
-        this.equipmentPerRepairStation = equipmentPerRepairStation;
-    }
-
     public RepairStation getRepairStation() {
         return repairStation;
     }
@@ -76,12 +72,12 @@ public class RepairStationEquipmentStaff {
         return totalStaff;
     }
 
-    public void setTotalStaff(int totalStaff) {
-        this.totalStaff = totalStaff;
-    }
-
     public int getAvailableStaff() {
         return availableStaff;
+    }
+
+    public void setTotalStaff(int totalStaff) {
+        this.totalStaff = totalStaff;
     }
 
     public void setAvailableStaff(int availableStaff) {

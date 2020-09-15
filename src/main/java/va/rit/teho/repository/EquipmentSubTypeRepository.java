@@ -1,24 +1,23 @@
 package va.rit.teho.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import va.rit.teho.entity.EquipmentSubType;
-import va.rit.teho.entity.EquipmentType;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.Optional;
 
 @Repository
 public interface EquipmentSubTypeRepository extends CrudRepository<EquipmentSubType, Long> {
 
-    default Map<EquipmentType, List<EquipmentSubType>> findAllGroupedByType() {
-        return StreamSupport
-                .stream(findAll().spliterator(), false)
-                .collect(Collectors.groupingBy(EquipmentSubType::getEquipmentType));
-    }
-
     List<EquipmentSubType> findByEquipmentTypeId(Long typeId);
+
+    Optional<EquipmentSubType> findByFullName(String fullName);
+
+    @Query("SELECT est FROM EquipmentSubType est WHERE " +
+            "(coalesce(:ids, null) is null or est.id in (:ids)) AND " +
+            "(coalesce(:typeIds, null) is null or est.equipmentType.id in (:typeIds))")
+    List<EquipmentSubType> findByIds(List<Long> ids, List<Long> typeIds);
 
 }

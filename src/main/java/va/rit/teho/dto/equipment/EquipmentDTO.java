@@ -5,17 +5,16 @@ import va.rit.teho.entity.Equipment;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentDTO {
-    private Long key;
+    private Long id;
     private String name;
-    private Long subTypeKey;
     private EquipmentTypeDTO type;
     private EquipmentSubTypeDTO subType;
 
     public EquipmentDTO() {
     }
 
-    public EquipmentDTO(Long key, String name) {
-        this.key = key;
+    public EquipmentDTO(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
@@ -29,19 +28,11 @@ public class EquipmentDTO {
 
     public static EquipmentDTO from(Equipment equipment) {
         EquipmentDTO equipmentDTO = new EquipmentDTO();
-        equipmentDTO.setKey(equipment.getId());
+        equipmentDTO.setId(equipment.getId());
         equipmentDTO.setName(equipment.getName());
         equipmentDTO.setSubType(EquipmentSubTypeDTO.from(equipment.getEquipmentSubType()));
         equipmentDTO.setType(EquipmentTypeDTO.from(equipment.getEquipmentSubType().getEquipmentType()));
         return equipmentDTO;
-    }
-
-    public Long getSubTypeKey() {
-        return subTypeKey;
-    }
-
-    public void setSubTypeKey(Long subTypeKey) {
-        this.subTypeKey = subTypeKey;
     }
 
     public EquipmentTypeDTO getType() {
@@ -60,12 +51,12 @@ public class EquipmentDTO {
         this.subType = subType;
     }
 
-    public Long getKey() {
-        return key;
+    public Long getId() {
+        return id;
     }
 
-    public void setKey(Long key) {
-        this.key = key;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {

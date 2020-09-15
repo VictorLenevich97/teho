@@ -3,17 +3,17 @@ package va.rit.teho.dto;
 import java.util.List;
 
 public class RepairCapabilitiesDTO {
-    private final RepairStationDTO repairStation;
+    private final Long repairStationId;
     private final List<EquipmentRepairCapabilityDTO> capabilities;
 
-    public RepairCapabilitiesDTO(RepairStationDTO repairStation,
+    public RepairCapabilitiesDTO(Long repairStationId,
                                  List<EquipmentRepairCapabilityDTO> capabilities) {
-        this.repairStation = repairStation;
+        this.repairStationId = repairStationId;
         this.capabilities = capabilities;
     }
 
-    public RepairStationDTO getRepairStation() {
-        return repairStation;
+    public Long getRepairStationId() {
+        return repairStationId;
     }
 
     public List<EquipmentRepairCapabilityDTO> getCapabilities() {
@@ -21,16 +21,16 @@ public class RepairCapabilitiesDTO {
     }
 
     public static class EquipmentRepairCapabilityDTO {
-        private final Long key;
+        private final Long id;
         private final double capability;
 
-        public EquipmentRepairCapabilityDTO(Long key, double capability) {
-            this.key = key;
+        public EquipmentRepairCapabilityDTO(Long id, double capability) {
+            this.id = id;
             this.capability = capability;
         }
 
-        public Long getKey() {
-            return key;
+        public Long getId() {
+            return id;
         }
 
         public double getCapability() {

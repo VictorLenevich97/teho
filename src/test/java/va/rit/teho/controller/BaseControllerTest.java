@@ -16,8 +16,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,7 +40,7 @@ public class BaseControllerTest extends ControllerTest {
         when(baseService.get(baseId)).thenReturn(base);
 
         mockMvc.perform(get("/base/{id}", baseId))
-               .andExpect(status().isOk()).andExpect(jsonPath("$.key", is(baseId.intValue())))
+               .andExpect(status().isOk()).andExpect(jsonPath("$.id", is(baseId.intValue())))
                .andExpect(jsonPath("$.shortName", is(base.getShortName())))
                .andExpect(jsonPath("$.fullName", is(base.getFullName())));
     }
@@ -52,7 +51,7 @@ public class BaseControllerTest extends ControllerTest {
         when(baseService.get(baseId)).thenThrow(new BaseNotFoundException(baseId));
 
         mockMvc
-                .perform(get("/base/{id}", baseId))
+                .perform(get("/base/{baseId}", baseId))
                 .andExpect(status().isNotFound());
     }
 
@@ -67,6 +66,20 @@ public class BaseControllerTest extends ControllerTest {
                .andExpect(status().isCreated());
 
         verify(baseService).add(base.getShortName(), base.getFullName());
+    }
+
+    @Test
+    public void testUpdateBase() throws Exception {
+        Long baseId = 1L;
+        BaseDTO base = new BaseDTO(baseId, "short", "full");
+        when(baseService.add(base.getShortName(), base.getFullName())).thenReturn(baseId);
+
+        mockMvc.perform(
+                put("/base/{id}", baseId).contentType(MediaType.APPLICATION_JSON)
+                                         .content(objectMapper.writeValueAsString(base)))
+               .andExpect(status().isAccepted());
+
+        verify(baseService).update(baseId, base.getShortName(), base.getFullName());
     }
 
     @Test
@@ -85,6 +98,24 @@ public class BaseControllerTest extends ControllerTest {
                                                equipmentId,
                                                intensityAndAmountDTO.getIntensity(),
                                                intensityAndAmountDTO.getAmount());
+    }
+
+    @Test
+    public void testUpdateEquipmentToBase() throws Exception {
+        Long baseId = 1L;
+        Long equipmentId = 2L;
+        IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(12, 10);
+
+        mockMvc
+                .perform(put("/base/{baseId}/equipment/{equipmentId}", baseId, equipmentId)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
+                .andExpect(status().isAccepted());
+
+        verify(baseService).updateEquipmentInBase(baseId,
+                                                  equipmentId,
+                                                  intensityAndAmountDTO.getIntensity(),
+                                                  intensityAndAmountDTO.getAmount());
     }
 
 

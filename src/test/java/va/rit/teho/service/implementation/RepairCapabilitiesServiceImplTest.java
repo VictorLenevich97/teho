@@ -37,7 +37,10 @@ public class RepairCapabilitiesServiceImplTest {
     public void testGetAllCalculatedRepairCapabilities() {
         testGetCalculatedRepairCapabilities(
                 (List<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDayList) ->
-                        when(calculatedRepairCapabilitiesPerDayRepository.findAll()).thenReturn(
+                        when(calculatedRepairCapabilitiesPerDayRepository.findByIds(null,
+                                                                                    null,
+                                                                                    null,
+                                                                                    null)).thenReturn(
                                 calculatedRepairCapabilitesPerDayList),
                 Collections.emptyList());
     }
@@ -61,16 +64,17 @@ public class RepairCapabilitiesServiceImplTest {
                                                                                                                       .get(0)
                                                                                                                       .getCapability()));
 
-        Assertions.assertEquals(result, repairCapabilitiesService.getCalculatedRepairCapabilities(repairStationIds));
+        Assertions.assertEquals(result, repairCapabilitiesService.getCalculatedRepairCapabilities(repairStationIds, null, null, null));
     }
 
     @Test
-    public void testGetCalculatedRepaircapabilitiesByIds() {
+    public void testGetCalculatedRepairCapabilitiesByIds() {
         List<Long> repairStationIds = Collections.singletonList(3L);
         testGetCalculatedRepairCapabilities(
                 (List<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDayList) ->
-                        when(calculatedRepairCapabilitiesPerDayRepository.findByRepairStationIdIn(repairStationIds)).thenReturn(
-                                calculatedRepairCapabilitesPerDayList),
+                        when(calculatedRepairCapabilitiesPerDayRepository
+                                     .findByIds(repairStationIds, null, null, null))
+                                .thenReturn(calculatedRepairCapabilitesPerDayList),
                 repairStationIds);
     }
 
@@ -84,7 +88,7 @@ public class RepairCapabilitiesServiceImplTest {
         Equipment equipment = new Equipment("", null);
         int laborInput = 200;
         equipment.setLaborInputPerTypes(Collections.singleton(new EquipmentLaborInputPerType(new RepairType(
-                RepairTypeEnum.AVG_REPAIR.getName()), laborInput)));
+                RepairTypeEnum.AVG_REPAIR.getName(), true), laborInput)));
         RepairStation repairStation = new RepairStation("rs", new RepairStationType("rst", 2, 5), null, 0);
         repairStationEquipmentStaff.setRepairStation(repairStation);
         repairStationEquipmentStaff.setEquipment(equipment);
@@ -104,6 +108,41 @@ public class RepairCapabilitiesServiceImplTest {
                                                                                          calculationResult);
 
         repairCapabilitiesService.calculateAndUpdateRepairCapabilities();
+
+        verify(calculatedRepairCapabilitiesPerDayRepository).saveAll(Collections.singletonList(result));
+    }
+
+    @Test
+    public void testCalculateAndUpdateRepairCapabilitiesPerStation() {
+        Long repairStationId = 1L;
+        Long equipmentId = 2L;
+        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentPerRepairStation(
+                repairStationId,
+                equipmentId), 3, 2);
+        Equipment equipment = new Equipment("", null);
+        int laborInput = 200;
+        equipment.setLaborInputPerTypes(Collections.singleton(new EquipmentLaborInputPerType(new RepairType(
+                RepairTypeEnum.AVG_REPAIR.getName(), true), laborInput)));
+        RepairStation repairStation = new RepairStation("rs", new RepairStationType("rst", 2, 5), null, 0);
+        repairStationEquipmentStaff.setRepairStation(repairStation);
+        repairStationEquipmentStaff.setEquipment(equipment);
+
+        List<RepairStationEquipmentStaff> repairStationEquipmentStaffList = Collections.singletonList(
+                repairStationEquipmentStaff);
+
+        when(repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId)).thenReturn(
+                repairStationEquipmentStaffList);
+        double calculationResult = 15.4;
+        when(calculationService.calculateRepairCapabilities(repairStationEquipmentStaff.getTotalStaff(),
+                                                            repairStation.getRepairStationType().getWorkingHoursMax(),
+                                                            laborInput)).thenReturn(calculationResult);
+
+        CalculatedRepairCapabilitesPerDay result = new CalculatedRepairCapabilitesPerDay(repairStationEquipmentStaff.getEquipmentPerRepairStation(),
+                                                                                         repairStation,
+                                                                                         equipment,
+                                                                                         calculationResult);
+
+        repairCapabilitiesService.calculateAndUpdateRepairCapabilitiesPerStation(repairStationId);
 
         verify(calculatedRepairCapabilitiesPerDayRepository).saveAll(Collections.singletonList(result));
     }

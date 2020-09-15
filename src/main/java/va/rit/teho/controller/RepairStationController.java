@@ -10,8 +10,11 @@ import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
 import va.rit.teho.model.Pair;
 import va.rit.teho.service.RepairStationService;
+import va.rit.teho.service.RepairStationTypeService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -26,11 +29,13 @@ public class RepairStationController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<RepairStationDTO>> listRepairStations() {
-        List<RepairStationDTO> repairStationDTOList = repairStationService.list()
-                                                                          .stream()
-                                                                          .map(RepairStationDTO::from)
-                                                                          .collect(Collectors.toList());
+    public ResponseEntity<List<RepairStationDTO>> listRepairStations(
+            @RequestParam(value = "id", required = false) List<Long> ids) {
+        List<RepairStationDTO> repairStationDTOList =
+                repairStationService.list(Optional.ofNullable(ids).orElse(Collections.emptyList()))
+                                    .stream()
+                                    .map(RepairStationDTO::from)
+                                    .collect(Collectors.toList());
         return ResponseEntity.ok(repairStationDTOList);
     }
 
@@ -53,10 +58,21 @@ public class RepairStationController {
     @PostMapping
     public ResponseEntity<Object> addRepairStation(@RequestBody RepairStationDTO repairStationDTO) {
         repairStationService.add(repairStationDTO.getName(),
-                                 repairStationDTO.getBaseKey(),
-                                 repairStationDTO.getType().getKey(),
+                                 repairStationDTO.getBase().getId(),
+                                 repairStationDTO.getType().getId(),
                                  repairStationDTO.getAmount());
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("/{repairStationId}")
+    public ResponseEntity<Object> updateRepairStation(@PathVariable Long repairStationId,
+                                                      @RequestBody RepairStationDTO repairStationDTO) {
+        repairStationService.update(repairStationId,
+                                    repairStationDTO.getName(),
+                                    repairStationDTO.getBase().getId(),
+                                    repairStationDTO.getType().getId(),
+                                    repairStationDTO.getAmount());
+        return ResponseEntity.accepted().build();
     }
 
     @PostMapping("/{repairStationId}/equipment/{equipmentId}")
@@ -69,4 +85,16 @@ public class RepairStationController {
                                                equipmentStaffDTO.getTotalStaff());
         return ResponseEntity.accepted().build();
     }
+
+    @PutMapping("/{repairStationId}/equipment/{equipmentId}")
+    public ResponseEntity<Object> updateRepairStationEquipmentStaff(@PathVariable Long repairStationId,
+                                                                    @PathVariable Long equipmentId,
+                                                                    @RequestBody EquipmentStaffDTO equipmentStaffDTO) {
+        repairStationService.updateEquipmentStaff(repairStationId,
+                                                  equipmentId,
+                                                  equipmentStaffDTO.getAvailableStaff(),
+                                                  equipmentStaffDTO.getTotalStaff());
+        return ResponseEntity.accepted().build();
+    }
+
 }

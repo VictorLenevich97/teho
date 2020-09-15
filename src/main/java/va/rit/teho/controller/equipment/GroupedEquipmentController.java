@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import va.rit.teho.dto.equipment.EquipmentSubTypeWithEquipmentPerTypeDTO;
 import va.rit.teho.service.EquipmentService;
@@ -24,14 +25,18 @@ public class GroupedEquipmentController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<EquipmentSubTypeWithEquipmentPerTypeDTO>> getEquipmentPerType() {
-        List<EquipmentSubTypeWithEquipmentPerTypeDTO> equipmentPerTypeDTOList = equipmentService
-                .listGroupedByTypes()
-                .entrySet()
-                .stream()
-                .map(equipmentTypeEntry -> EquipmentSubTypeWithEquipmentPerTypeDTO.from(equipmentTypeEntry.getKey(),
-                                                                                        equipmentTypeEntry.getValue()))
-                .collect(Collectors.toList());
+    public ResponseEntity<List<EquipmentSubTypeWithEquipmentPerTypeDTO>> getEquipmentPerType(
+            @RequestParam(value = "equipmentId", required = false) List<Long> equipmentIds,
+            @RequestParam(value = "subTypeId", required = false) List<Long> subTypeIds,
+            @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
+        List<EquipmentSubTypeWithEquipmentPerTypeDTO> equipmentPerTypeDTOList =
+                equipmentService.listGroupedByTypes(equipmentIds, subTypeIds, typeIds)
+                                .entrySet()
+                                .stream()
+                                .map(equipmentTypeEntry -> EquipmentSubTypeWithEquipmentPerTypeDTO.from(
+                                        equipmentTypeEntry.getKey(),
+                                        equipmentTypeEntry.getValue()))
+                                .collect(Collectors.toList());
         return ResponseEntity.ok(equipmentPerTypeDTOList);
     }
 

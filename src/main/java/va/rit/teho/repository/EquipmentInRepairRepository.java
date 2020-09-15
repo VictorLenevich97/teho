@@ -15,6 +15,10 @@ import java.util.Map;
 public interface EquipmentInRepairRepository
         extends CrudRepository<EquipmentInRepair, EquipmentInRepairId>, JpaSpecificationExecutor<EquipmentInRepair> {
 
+    List<EquipmentInRepair> findAllByBaseId(Long baseId);
+
+    List<EquipmentInRepair> findAllByEquipmentId(Long equipmentId);
+
     @Query("SELECT new va.rit.teho.entity.EquipmentInRepairData(eir.equipment.equipmentSubType, " +
             "eir.base.fullName, " +
             "eir.equipment.id, " +

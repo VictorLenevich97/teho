@@ -40,7 +40,7 @@ public class InitialDataLoader implements ApplicationRunner {
         this.repairTypeRepository.saveAll(
                 Arrays
                         .stream(RepairTypeEnum.values())
-                        .map(repairTypeEnum -> new RepairType(repairTypeEnum.getName()))
+                        .map(repairTypeEnum -> new RepairType(repairTypeEnum.getName(), repairTypeEnum.isRepairable()))
                         .filter(rt -> !repairTypes.contains(rt.getName()))
                         .collect(Collectors.toList()));
         LOGGER.info("Типы ремонта загружены!");

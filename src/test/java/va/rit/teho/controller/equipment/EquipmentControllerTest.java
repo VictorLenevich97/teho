@@ -7,6 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.TestRunner;
 import va.rit.teho.controller.ControllerTest;
 import va.rit.teho.dto.equipment.EquipmentDTO;
+import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
 import va.rit.teho.entity.Equipment;
 
 import java.util.Collections;
@@ -14,8 +15,7 @@ import java.util.Collections;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,7 +32,7 @@ public class EquipmentControllerTest extends ControllerTest {
         mockMvc.perform(get("/equipment"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.size()", is(1)))
-               .andExpect(jsonPath("$[0].key", is(equipment.getId().intValue())))
+               .andExpect(jsonPath("$[0].id", is(equipment.getId().intValue())))
                .andExpect(jsonPath("$[0].name", is(equipment.getName())));
     }
 
@@ -44,7 +44,7 @@ public class EquipmentControllerTest extends ControllerTest {
 
         mockMvc.perform(get("/equipment/{id}", equipment.getId()))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.key", is(equipment.getId().intValue())))
+               .andExpect(jsonPath("$.id", is(equipment.getId().intValue())))
                .andExpect(jsonPath("$.name", is(equipment.getName())))
                .andExpect(jsonPath("$.type.shortName",
                                    is(equipment.getEquipmentSubType().getEquipmentType().getShortName())))
@@ -57,12 +57,29 @@ public class EquipmentControllerTest extends ControllerTest {
     @Test
     public void testAddNewEquipment() throws Exception {
         EquipmentDTO equipmentDTO = new EquipmentDTO("equipmentName");
-        equipmentDTO.setSubTypeKey(3L);
+        equipmentDTO.setId(3L);
+        equipmentDTO.setSubType(new EquipmentSubTypeDTO(2L, "", ""));
 
         mockMvc.perform(post("/equipment").contentType(MediaType.APPLICATION_JSON)
                                           .content(objectMapper.writeValueAsString(equipmentDTO)))
                .andExpect(status().isCreated());
 
-        verify(equipmentService).add(equipmentDTO.getName(), equipmentDTO.getSubTypeKey());
+        verify(equipmentService).add(equipmentDTO.getName(), equipmentDTO.getSubType().getId());
+    }
+
+    @Test
+    public void testUpdateEquipment() throws Exception {
+        EquipmentDTO equipmentDTO = new EquipmentDTO("equipmentName");
+        equipmentDTO.setId(3L);
+        equipmentDTO.setSubType(new EquipmentSubTypeDTO(2L, "", ""));
+
+        mockMvc.perform(put("/equipment/{id}", equipmentDTO.getId()).contentType(MediaType.APPLICATION_JSON)
+                                                                    .content(objectMapper.writeValueAsString(
+                                                                            equipmentDTO)))
+               .andExpect(status().isAccepted());
+
+        verify(equipmentService).update(equipmentDTO.getId(),
+                                        equipmentDTO.getName(),
+                                        equipmentDTO.getSubType().getId());
     }
 }
