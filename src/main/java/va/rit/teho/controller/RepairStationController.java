@@ -23,8 +23,7 @@ public class RepairStationController {
 
     private final RepairStationService repairStationService;
 
-    public RepairStationController(RepairStationService repairStationService,
-                                   RepairStationTypeService repairStationTypeService) {
+    public RepairStationController(RepairStationService repairStationService) {
         this.repairStationService = repairStationService;
     }
 

@@ -40,7 +40,7 @@ public class BaseServiceImpl implements BaseService {
     public Long add(String shortName, String fullName) {
         checkIfEmptyField(shortName);
         checkIfEmptyField(fullName);
-        baseRepository.findByFullName(fullName).ifPresent((b) -> {
+        baseRepository.findByFullName(fullName).ifPresent(b -> {
             throw new AlreadyExistsException("ВЧ", "название", fullName);
         });
         Base base = baseRepository.save(new Base(shortName, fullName));
@@ -59,7 +59,7 @@ public class BaseServiceImpl implements BaseService {
     public void addEquipmentToBase(Long baseId, Long equipmentId, int intensity, int amount) {
         Base base = getBaseOrThrow(baseId);
         Equipment equipment = getEquipmentOrThrow(equipmentId);
-        equipmentPerBaseRepository.findById(new EquipmentPerBaseAmount(baseId, equipmentId)).ifPresent((epb) -> {
+        equipmentPerBaseRepository.findById(new EquipmentPerBaseAmount(baseId, equipmentId)).ifPresent(epb -> {
             throw new AlreadyExistsException("ВВСТ в ВЧ", "(id ВЧ, id ВВСТ)", "(" + baseId + ", " + equipmentId + ")");
         });
 

@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.exception.AlreadyExistsException;
+import va.rit.teho.exception.IncorrectParamException;
+import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.model.Pair;
 import va.rit.teho.repository.EquipmentSubTypeRepository;
 import va.rit.teho.repository.EquipmentTypeRepository;
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class EquipmentTypeServiceImplTest {
 
@@ -34,6 +37,15 @@ public class EquipmentTypeServiceImplTest {
     }
 
     @Test
+    public void testListTypesWithFilter() {
+        List<EquipmentType> equipmentTypes = Collections.singletonList(new EquipmentType("s", "f"));
+        Long equipmentId = 10L;
+        when(equipmentTypeRepository.findAllById(Collections.singletonList(equipmentId))).thenReturn(equipmentTypes);
+
+        Assertions.assertEquals(equipmentTypes, equipmentTypeService.listTypes(Collections.singletonList(equipmentId)));
+    }
+
+    @Test
     public void testAddType() {
         EquipmentType equipmentType = new EquipmentType("short", "full");
         EquipmentType addedEquipmentType = new EquipmentType(equipmentType.getShortName(), equipmentType.getFullName());
@@ -43,6 +55,46 @@ public class EquipmentTypeServiceImplTest {
         Assertions.assertEquals(
                 addedEquipmentType.getId(),
                 equipmentTypeService.addType(equipmentType.getShortName(), equipmentType.getFullName()));
+    }
+
+    @Test
+    public void testAddTypeAlreadyExists() {
+        EquipmentType equipmentType = new EquipmentType("short", "full");
+        when(equipmentTypeRepository.findByFullName(equipmentType.getFullName())).thenReturn(Optional.of(equipmentType));
+
+        Assertions.assertThrows(
+                AlreadyExistsException.class,
+                () -> equipmentTypeService.addType(equipmentType.getShortName(), equipmentType.getFullName()));
+    }
+
+    @Test
+    public void testUpdateType() {
+        EquipmentType equipmentType = new EquipmentType("short", "full");
+        equipmentType.setId(15L);
+
+        when(equipmentTypeRepository.findById(equipmentType.getId())).thenReturn(Optional.of(equipmentType));
+
+        equipmentTypeService.updateType(equipmentType.getId(),
+                                        equipmentType.getShortName(),
+                                        equipmentType.getFullName());
+
+        verify(equipmentTypeRepository).save(equipmentType);
+    }
+
+
+    @Test
+    public void testUpdateTypeNotFound() {
+        EquipmentType equipmentType = new EquipmentType("short", "full");
+        equipmentType.setId(15L);
+
+        when(equipmentTypeRepository.findById(equipmentType.getId())).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(NotFoundException.class, () -> equipmentTypeService.updateType(equipmentType.getId(),
+                                                                                               equipmentType.getShortName(),
+                                                                                               equipmentType.getFullName()));
+
+        verify(equipmentTypeRepository).findById(equipmentType.getId());
+        verifyNoMoreInteractions(equipmentTypeRepository);
     }
 
     @Test
@@ -63,6 +115,65 @@ public class EquipmentTypeServiceImplTest {
                 equipmentTypeService.addSubType(equipmentType.getId(),
                                                 equipmentSubType.getShortName(),
                                                 equipmentSubType.getFullName()));
+    }
+
+    @Test
+    public void testAddSubTypeIncorrectType() {
+        EquipmentType equipmentType = new EquipmentType("short", "full");
+        equipmentType.setId(5L);
+        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
+        EquipmentSubType addedEquipmentSubType = new EquipmentSubType(equipmentSubType.getShortName(),
+                                                                      equipmentSubType.getFullName(),
+                                                                      equipmentType);
+        addedEquipmentSubType.setId(10L);
+
+        when(equipmentTypeRepository.findById(equipmentType.getId())).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(IncorrectParamException.class, () ->
+                equipmentTypeService.addSubType(equipmentType.getId(),
+                                                equipmentSubType.getShortName(),
+                                                equipmentSubType.getFullName()));
+    }
+
+    @Test
+    public void testAddSubTypeAlreadyExists() {
+        EquipmentType equipmentType = new EquipmentType("short", "full");
+        equipmentType.setId(5L);
+        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
+        EquipmentSubType addedEquipmentSubType = new EquipmentSubType(equipmentSubType.getShortName(),
+                                                                      equipmentSubType.getFullName(),
+                                                                      equipmentType);
+        addedEquipmentSubType.setId(10L);
+
+        when(equipmentTypeRepository.findById(equipmentType.getId())).thenReturn(Optional.of(equipmentType));
+        when(equipmentSubTypeRepository.findByFullName(equipmentSubType.getFullName())).thenReturn(Optional.of(
+                equipmentSubType));
+
+        Assertions.assertThrows(AlreadyExistsException.class, () ->
+                equipmentTypeService.addSubType(equipmentType.getId(),
+                                                equipmentSubType.getShortName(),
+                                                equipmentSubType.getFullName()));
+    }
+
+    @Test
+    public void testUpdateSubType() {
+        EquipmentType equipmentType = new EquipmentType("short", "full");
+        equipmentType.setId(5L);
+        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
+        EquipmentSubType addedEquipmentSubType = new EquipmentSubType(equipmentSubType.getShortName(),
+                                                                      equipmentSubType.getFullName(),
+                                                                      equipmentType);
+        addedEquipmentSubType.setId(10L);
+
+        when(equipmentTypeRepository.findById(equipmentType.getId())).thenReturn(Optional.of(equipmentType));
+        when(equipmentSubTypeRepository.findById(addedEquipmentSubType.getId())).thenReturn(Optional.of(
+                addedEquipmentSubType));
+        when(equipmentSubTypeRepository.save(equipmentSubType)).thenReturn(addedEquipmentSubType);
+
+        equipmentTypeService.updateSubType(addedEquipmentSubType.getId(),
+                                           equipmentType.getId(),
+                                           equipmentSubType.getShortName(),
+                                           equipmentSubType.getFullName());
     }
 
     @Test

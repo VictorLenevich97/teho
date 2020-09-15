@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import va.rit.teho.dto.equipment.EquipmentSubTypeWithEquipmentPerTypeDTO;
 import va.rit.teho.service.EquipmentService;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller

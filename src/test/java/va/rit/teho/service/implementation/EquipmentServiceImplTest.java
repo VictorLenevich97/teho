@@ -62,6 +62,19 @@ public class EquipmentServiceImplTest {
         verify(equipmentRepository).save(equipmentToAdd);
     }
 
+    @Test
+    public void testUpdate() {
+        Long equipmentSubTypeId = 2L;
+        EquipmentSubType equipmentSubType = new EquipmentSubType("short", "full", new EquipmentType("", ""));
+        Equipment equipmentToAdd = new Equipment("eqName", equipmentSubType);
+        Equipment addedEquipment = new Equipment(equipmentToAdd.getName(), equipmentToAdd.getEquipmentSubType());
+        addedEquipment.setId(15L);
+        when(equipmentSubTypeRepository.findById(equipmentSubTypeId)).thenReturn(Optional.of(equipmentSubType));
+        when(equipmentRepository.findById(addedEquipment.getId())).thenReturn(Optional.of(addedEquipment));
+        when(equipmentRepository.save(equipmentToAdd)).thenReturn(addedEquipment);
+
+        equipmentService.update(addedEquipment.getId(), equipmentToAdd.getName(), equipmentSubTypeId);
+    }
 
     @Test
     public void testListGroupedByTypes() {

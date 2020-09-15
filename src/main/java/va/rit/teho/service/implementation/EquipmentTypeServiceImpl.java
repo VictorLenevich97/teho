@@ -63,7 +63,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     public Long addType(String shortName, String fullName) {
         String logLine = String.format("Добавление типа ВВСТ: \"%s\" (\"%s\")", shortName, fullName);
         LOGGER.debug(logLine);
-        equipmentTypeRepository.findByFullName(fullName).ifPresent((et) -> {
+        equipmentTypeRepository.findByFullName(fullName).ifPresent(et -> {
             throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
         });
         EquipmentType equipmentType = new EquipmentType(shortName, fullName);
@@ -88,7 +88,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
         if (!equipmentTypeRepository.findById(typeId).isPresent()) {
             throw new IncorrectParamException("typeId", typeId);
         }
-        equipmentSubTypeRepository.findByFullName(fullName).ifPresent((et) -> {
+        equipmentSubTypeRepository.findByFullName(fullName).ifPresent(et -> {
             throw new AlreadyExistsException("Вид ВВСТ", "название", fullName);
         });
         return equipmentSubTypeRepository

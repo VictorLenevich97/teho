@@ -27,7 +27,7 @@ public class RepairStationTypeServiceImpl implements RepairStationTypeService {
 
     @Override
     public Long addType(String name, int workingHoursMin, int workingHoursMax) {
-        repairStationTypeRepository.findByName(name).ifPresent((rst) -> {
+        repairStationTypeRepository.findByName(name).ifPresent(rst -> {
             throw new AlreadyExistsException("Тип РВО", "название", name);
         });
         if (workingHoursMax < workingHoursMin) {

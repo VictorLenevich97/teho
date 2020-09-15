@@ -6,7 +6,7 @@ import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
 import va.rit.teho.enums.RepairTypeEnum;
-import va.rit.teho.exception.RepairTypeLaborInputNotFoundException;
+import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.CalculatedRepairCapabilitiesPerDayRepository;
 import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.service.CalculationService;
@@ -41,8 +41,10 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                 .stream()
                 .filter(lipt -> lipt.getRepairType().getName().equals(RepairTypeEnum.AVG_REPAIR.getName()))
                 .findFirst()
-                .orElseThrow(() -> new RepairTypeLaborInputNotFoundException(RepairTypeEnum.AVG_REPAIR,
-                                                                             rsec.getEquipment()))
+                .orElseThrow(() -> new NotFoundException("Отсутствует значение нормативной трудоемкости " +
+                                                                 RepairTypeEnum.AVG_REPAIR.getName() +
+                                                                 " ремонта для ВВСТ с id = " + rsec.getEquipment()
+                                                                                                   .getId()))
                 .getAmount();
         double calculatedCapabilities = calculationService.calculateRepairCapabilities(
                 rsec.getTotalStaff(),
