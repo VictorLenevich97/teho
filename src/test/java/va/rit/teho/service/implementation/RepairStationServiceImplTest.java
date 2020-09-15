@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import va.rit.teho.entity.*;
+import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.model.Pair;
 import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.repository.RepairStationRepository;
@@ -130,6 +131,19 @@ public class RepairStationServiceImplTest {
         verify(repairStationEquipmentCapabilitiesRepository).save(repairStationEquipmentStaff);
     }
 
+    @Test
+    public void testSetEquipmentStaffIncorrectParams() {
+        Long repairStationId = 1L;
+        Long equipmentId = 2L;
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(new RepairStation("name",
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         0)));
+        when(equipmentService.getEquipment(equipmentId)).thenReturn(new Equipment("", null));
+        Assertions.assertThrows(IncorrectParamException.class,
+                                () -> repairStationService.setEquipmentStaff(repairStationId, equipmentId, 20, 5));
+    }
+
 
     @Test
     public void testUpdateEquipmentStaff() {
@@ -156,4 +170,16 @@ public class RepairStationServiceImplTest {
         verify(repairStationEquipmentCapabilitiesRepository).save(repairStationEquipmentStaff);
     }
 
+    @Test
+    public void testUpdateEquipmentStaffIncorrectParams() {
+        Long repairStationId = 1L;
+        Long equipmentId = 2L;
+        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(new RepairStation("name",
+                                                                                                         null,
+                                                                                                         null,
+                                                                                                         0)));
+        when(equipmentService.getEquipment(equipmentId)).thenReturn(new Equipment("", null));
+        Assertions.assertThrows(IncorrectParamException.class,
+                                () -> repairStationService.updateEquipmentStaff(repairStationId, equipmentId, 20, 5));
+    }
 }

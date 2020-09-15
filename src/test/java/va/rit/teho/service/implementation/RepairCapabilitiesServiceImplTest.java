@@ -111,4 +111,39 @@ public class RepairCapabilitiesServiceImplTest {
 
         verify(calculatedRepairCapabilitiesPerDayRepository).saveAll(Collections.singletonList(result));
     }
+
+    @Test
+    public void testCalculateAndUpdateRepairCapabilitiesPerStation() {
+        Long repairStationId = 1L;
+        Long equipmentId = 2L;
+        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentPerRepairStation(
+                repairStationId,
+                equipmentId), 3, 2);
+        Equipment equipment = new Equipment("", null);
+        int laborInput = 200;
+        equipment.setLaborInputPerTypes(Collections.singleton(new EquipmentLaborInputPerType(new RepairType(
+                RepairTypeEnum.AVG_REPAIR.getName(), true), laborInput)));
+        RepairStation repairStation = new RepairStation("rs", new RepairStationType("rst", 2, 5), null, 0);
+        repairStationEquipmentStaff.setRepairStation(repairStation);
+        repairStationEquipmentStaff.setEquipment(equipment);
+
+        List<RepairStationEquipmentStaff> repairStationEquipmentStaffList = Collections.singletonList(
+                repairStationEquipmentStaff);
+
+        when(repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId)).thenReturn(
+                repairStationEquipmentStaffList);
+        double calculationResult = 15.4;
+        when(calculationService.calculateRepairCapabilities(repairStationEquipmentStaff.getTotalStaff(),
+                                                            repairStation.getRepairStationType().getWorkingHoursMax(),
+                                                            laborInput)).thenReturn(calculationResult);
+
+        CalculatedRepairCapabilitesPerDay result = new CalculatedRepairCapabilitesPerDay(repairStationEquipmentStaff.getEquipmentPerRepairStation(),
+                                                                                         repairStation,
+                                                                                         equipment,
+                                                                                         calculationResult);
+
+        repairCapabilitiesService.calculateAndUpdateRepairCapabilitiesPerStation(repairStationId);
+
+        verify(calculatedRepairCapabilitiesPerDayRepository).saveAll(Collections.singletonList(result));
+    }
 }
