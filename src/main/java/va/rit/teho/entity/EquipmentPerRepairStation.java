@@ -34,4 +34,12 @@ public class EquipmentPerRepairStation implements Serializable {
     public int hashCode() {
         return Objects.hash(repairStationId, equipmentId);
     }
+
+    public Long getRepairStationId() {
+        return repairStationId;
+    }
+
+    public Long getEquipmentId() {
+        return equipmentId;
+    }
 }

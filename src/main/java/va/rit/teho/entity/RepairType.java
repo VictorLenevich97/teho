@@ -1,11 +1,11 @@
 package va.rit.teho.entity;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 @Table(name = "repair_type")
 public class RepairType {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,9 +21,6 @@ public class RepairType {
     public boolean isRepairable() {
         return repairable;
     }
-
-    @OneToMany(mappedBy = "repairType")
-    private Set<EquipmentLaborInputPerType> laborInputPerTypes;
 
     public RepairType() {
     }
@@ -52,11 +49,4 @@ public class RepairType {
         this.name = name;
     }
 
-    public Set<EquipmentLaborInputPerType> getLaborInputPerTypes() {
-        return laborInputPerTypes;
-    }
-
-    public void setLaborInputPerTypes(Set<EquipmentLaborInputPerType> laborInputPerTypes) {
-        this.laborInputPerTypes = laborInputPerTypes;
-    }
 }

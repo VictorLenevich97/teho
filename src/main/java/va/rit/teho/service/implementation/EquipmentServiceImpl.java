@@ -9,12 +9,12 @@ import va.rit.teho.entity.EquipmentType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.EquipmentNotFoundException;
 import va.rit.teho.exception.IncorrectParamException;
+import va.rit.teho.model.Pair;
 import va.rit.teho.repository.EquipmentRepository;
 import va.rit.teho.repository.EquipmentSubTypeRepository;
 import va.rit.teho.service.EquipmentService;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
@@ -75,6 +75,20 @@ public class EquipmentServiceImpl implements EquipmentService {
         return equipmentRepository.getEquipmentGroupedByType(ids, subTypeIds, typeIds);
     }
 
+    @Override
+    public Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypesSorted(List<Long> ids,
+                                                                                               List<Long> subTypeIds,
+                                                                                               List<Long> typeIds) {
+        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, subTypeIds, typeIds);
+        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> map = new TreeMap<>(Comparator.comparing(EquipmentType::getId));
+        for (Equipment equipment : equipmentList) {
+            map
+                    .computeIfAbsent(equipment.getEquipmentSubType().getEquipmentType(), (k) -> new TreeMap<>(Comparator.comparing(EquipmentSubType::getId)))
+                    .computeIfAbsent(equipment.getEquipmentSubType(), (k) -> new ArrayList<>())
+                    .add(equipment);
+        }
+        return map;
+    }
 
 
 }

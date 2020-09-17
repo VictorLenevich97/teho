@@ -11,11 +11,18 @@ import java.util.Map;
  */
 public interface RepairCapabilitiesService {
 
-    void calculateAndUpdateRepairCapabilities();
+    void calculateAndUpdateRepairCapabilities(Long repairTypeId);
 
-    void calculateAndUpdateRepairCapabilitiesPerStation(Long repairStationId);
+    void calculateAndUpdateRepairCapabilitiesPerStation(Long repairStationId, Long repairTypeId);
 
     Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(
+            List<Long> repairStationIds,
+            List<Long> equipmentIds,
+            List<Long> equipmentSubTypeIds,
+            List<Long> equipmentTypeIds);
+
+    Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(
+            Long repairTypeId,
             List<Long> repairStationIds,
             List<Long> equipmentIds,
             List<Long> equipmentSubTypeIds,

@@ -54,8 +54,8 @@ public class InitialDataLoader implements ApplicationRunner {
                 .collect(Collectors.toList());
         this.restorationTypeRepository.saveAll(Arrays
                                                        .stream(RestorationTypeEnum.values())
-                                                       .map(restorationTypeEnum -> new RestorationType(
-                                                               restorationTypeEnum.getName()))
+                                                       .map(restorationTypeEnum ->
+                                                                    new RestorationType(restorationTypeEnum.getName()))
                                                        .filter(rt -> !restorationTypes.contains(rt.getName()))
                                                        .collect(Collectors.toList()));
         LOGGER.info("Типы восстановления загружены!");

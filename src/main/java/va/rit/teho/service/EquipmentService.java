@@ -22,4 +22,9 @@ public interface EquipmentService {
                                                                                   List<Long> typeIds);
 
 
+    Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypesSorted(List<Long> ids,
+                                                                                        List<Long> subTypeIds,
+                                                                                        List<Long> typeIds);
+
+
 }

@@ -7,28 +7,46 @@ import java.util.Objects;
 public class CalculatedRepairCapabilitesPerDay {
 
     @EmbeddedId
-    EquipmentPerRepairStation equipmentPerRepairStation;
+    EquipmentPerRepairStationWithRepairType equipmentPerRepairStationWithRepairType;
+
     @ManyToOne
     @MapsId("repair_station_id")
     @JoinColumn(name = "repair_station_id")
     RepairStation repairStation;
+
     @ManyToOne
     @MapsId("equipment_id")
     @JoinColumn(name = "equipment_id")
     Equipment equipment;
+
     double capability;
+
+    @ManyToOne
+    @MapsId("repair_type_id")
+    @JoinColumn(name = "repair_type_id")
+    RepairType repairType;
 
     public CalculatedRepairCapabilitesPerDay() {
     }
 
-    public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStation equipmentPerRepairStation,
+    public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStationWithRepairType equipmentPerRepairStationWithRepairType,
                                              RepairStation repairStation,
                                              Equipment equipment,
-                                             double capability) {
-        this.equipmentPerRepairStation = equipmentPerRepairStation;
+                                             double capability,
+                                             RepairType repairType) {
+        this.equipmentPerRepairStationWithRepairType = equipmentPerRepairStationWithRepairType;
         this.repairStation = repairStation;
         this.equipment = equipment;
+        this.repairType = repairType;
         this.capability = capability;
+    }
+
+    public RepairType getRepairType() {
+        return repairType;
+    }
+
+    public void setRepairType(RepairType repairType) {
+        this.repairType = repairType;
     }
 
     @Override
@@ -37,22 +55,23 @@ public class CalculatedRepairCapabilitesPerDay {
         if (o == null || getClass() != o.getClass()) return false;
         CalculatedRepairCapabilitesPerDay that = (CalculatedRepairCapabilitesPerDay) o;
         return Double.compare(that.capability, capability) == 0 &&
-                Objects.equals(equipmentPerRepairStation, that.equipmentPerRepairStation) &&
+                Objects.equals(equipmentPerRepairStationWithRepairType, that.equipmentPerRepairStationWithRepairType) &&
                 Objects.equals(repairStation, that.repairStation) &&
-                Objects.equals(equipment, that.equipment);
+                Objects.equals(equipment, that.equipment) &&
+                Objects.equals(repairType, that.repairType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(equipmentPerRepairStation, repairStation, equipment, capability);
+        return Objects.hash(equipmentPerRepairStationWithRepairType, repairStation, equipment, repairType, capability);
     }
 
-    public EquipmentPerRepairStation getEquipmentPerRepairStation() {
-        return equipmentPerRepairStation;
+    public EquipmentPerRepairStationWithRepairType getEquipmentPerRepairStation() {
+        return equipmentPerRepairStationWithRepairType;
     }
 
-    public void setEquipmentPerRepairStation(EquipmentPerRepairStation equipmentPerRepairStation) {
-        this.equipmentPerRepairStation = equipmentPerRepairStation;
+    public void setEquipmentPerRepairStation(EquipmentPerRepairStationWithRepairType equipmentPerRepairStation) {
+        this.equipmentPerRepairStationWithRepairType = equipmentPerRepairStation;
     }
 
     public RepairStation getRepairStation() {
