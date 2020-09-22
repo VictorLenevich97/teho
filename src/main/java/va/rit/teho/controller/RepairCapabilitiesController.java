@@ -5,10 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.NestedColumnsDTO;
 import va.rit.teho.dto.TableDataDTO;
-import va.rit.teho.entity.Equipment;
-import va.rit.teho.entity.EquipmentSubType;
-import va.rit.teho.entity.EquipmentType;
-import va.rit.teho.entity.RepairStation;
+import va.rit.teho.entity.*;
 import va.rit.teho.service.EquipmentService;
 import va.rit.teho.service.EquipmentTypeService;
 import va.rit.teho.service.RepairCapabilitiesService;
@@ -45,7 +42,7 @@ public class RepairCapabilitiesController {
      */
     @PostMapping("/repair-type/{id}")
     @ResponseBody
-    public ResponseEntity<TableDataDTO> calculateAndGet(@PathVariable("id") Long repairTypeId) {
+    public ResponseEntity<TableDataDTO<Double>> calculateAndGet(@PathVariable("id") Long repairTypeId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilities(repairTypeId);
         return getCalculatedRepairCapabilities(repairTypeId,
                                                Collections.emptyList(),
@@ -56,10 +53,10 @@ public class RepairCapabilitiesController {
 
     @PostMapping("/repair-type/{id}/repair-station/{repairStationId}")
     @ResponseBody
-    public ResponseEntity<TableDataDTO> calculateAndGetPerStation(@PathVariable("id") Long repairTypeId,
-                                                                  @PathVariable Long repairStationId) {
+    public ResponseEntity<TableDataDTO<Double>> calculateAndGetPerStation(@PathVariable("id") Long repairTypeId,
+                                                                          @PathVariable Long repairStationId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilitiesPerStation(repairStationId, repairTypeId);
-        TableDataDTO repairCapabilitiesDTO =
+        TableDataDTO<Double> repairCapabilitiesDTO =
                 getCalculatedRepairCapabilities(repairTypeId,
                                                 Collections.singletonList(repairStationId),
                                                 Collections.emptyList(),
@@ -68,9 +65,30 @@ public class RepairCapabilitiesController {
         return ResponseEntity.accepted().body(repairCapabilitiesDTO);
     }
 
+    @GetMapping
+    @ResponseBody
+    public ResponseEntity<TableDataDTO<Double>> getCalculatedRepairCapabilities(
+            @RequestParam(required = false) List<Long> repairStationId,
+            @RequestParam(required = false) List<Long> equipmentId,
+            @RequestParam(required = false) List<Long> equipmentTypeId,
+            @RequestParam(required = false) List<Long> equipmentSubTypeId) {
+        List<RepairStation> repairStationList = repairStationService.list(repairStationId);
+        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped =
+                equipmentService.listGroupedByTypes(equipmentId, equipmentSubTypeId, equipmentTypeId);
+        Map<RepairStation, Map<Equipment, Double>> calculatedRepairCapabilities =
+                repairCapabilitiesService.getCalculatedRepairCapabilities(repairStationId,
+                                                                          equipmentId,
+                                                                          equipmentSubTypeId,
+                                                                          equipmentTypeId);
+        TableDataDTO<Double> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(repairStationList,
+                                                                                    grouped,
+                                                                                    calculatedRepairCapabilities);
+        return ResponseEntity.ok(repairCapabilitiesFullDTO);
+    }
+
     @GetMapping("/repair-type/{id}")
     @ResponseBody
-    public ResponseEntity<TableDataDTO> getCalculatedRepairCapabilities(
+    public ResponseEntity<TableDataDTO<Double>> getCalculatedRepairCapabilities(
             @PathVariable("id") Long repairTypeId,
             @RequestParam(required = false) List<Long> repairStationId,
             @RequestParam(required = false) List<Long> equipmentId,
@@ -85,32 +103,51 @@ public class RepairCapabilitiesController {
                                                                           equipmentId,
                                                                           equipmentSubTypeId,
                                                                           equipmentTypeId);
-        TableDataDTO repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(repairStationList,
-                                                                            grouped,
-                                                                            calculatedRepairCapabilities);
+        TableDataDTO<Double> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(repairStationList,
+                                                                                    grouped,
+                                                                                    calculatedRepairCapabilities);
         return ResponseEntity.ok(repairCapabilitiesFullDTO);
     }
 
-    private TableDataDTO buildRepairCapabilitiesDTO(List<RepairStation> repairStationList,
-                                                    Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped,
-                                                    Map<RepairStation, Map<Equipment, Double>> calculatedRepairCapabilities) {
+    private TableDataDTO<Double> buildRepairCapabilitiesDTO(List<RepairStation> repairStationList,
+                                                            Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped,
+                                                            Map<RepairStation, Map<Equipment, Double>> calculatedRepairCapabilities) {
         List<Equipment> flattenedColumns =
                 grouped.values()
                        .stream()
                        .flatMap(e -> e.values().stream())
                        .flatMap(List::stream)
                        .collect(Collectors.toList());
-        Double[][] data = mapTableData(repairStationList, calculatedRepairCapabilities, flattenedColumns);
+        Double[][] data = mapRepairCapabilitiesTableData(repairStationList,
+                                                         calculatedRepairCapabilities,
+                                                         flattenedColumns);
         List<NestedColumnsDTO> equipmentPerTypeDTOList =
                 grouped.entrySet()
                        .stream()
-                       .map(this::getNestedColumnsDTO)
+                       .map(this::getRepairCapabilitiesNestedColumnsDTO)
                        .collect(Collectors.toList());
         List<String> rsNames = repairStationList.stream().map(RepairStation::getName).collect(Collectors.toList());
-        return new TableDataDTO(rsNames, equipmentPerTypeDTOList, data);
+        return new TableDataDTO<>(rsNames, equipmentPerTypeDTOList, data);
     }
 
-    private NestedColumnsDTO getNestedColumnsDTO(Map.Entry<EquipmentType, Map<EquipmentSubType, List<Equipment>>> equipmentTypeEntry) {
+    private TableDataDTO<Integer> buildEquipmentStaffDTO(List<RepairStation> repairStationList,
+                                                         Map<EquipmentType, List<EquipmentSubType>> equipmentTypeListMap,
+                                                         Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap) {
+        List<EquipmentSubType> flattenedColumns = equipmentTypeListMap.values()
+                                                                      .stream()
+                                                                      .flatMap(List::stream)
+                                                                      .collect(Collectors.toList());
+        Integer[][] data = mapRepairStationStaffTableData(repairStationList, repairStationMap, flattenedColumns);
+        List<NestedColumnsDTO> equipmentPerTypeDTOList =
+                equipmentTypeListMap.entrySet()
+                                    .stream()
+                                    .map(this::getEquipmentStaffNestedColumnsDTO)
+                                    .collect(Collectors.toList());
+        List<String> rsNames = repairStationList.stream().map(RepairStation::getName).collect(Collectors.toList());
+        return new TableDataDTO<>(rsNames, equipmentPerTypeDTOList, data);
+    }
+
+    private NestedColumnsDTO getRepairCapabilitiesNestedColumnsDTO(Map.Entry<EquipmentType, Map<EquipmentSubType, List<Equipment>>> equipmentTypeEntry) {
         return new NestedColumnsDTO(
                 equipmentTypeEntry.getKey().getShortName(),
                 equipmentTypeEntry.getValue()
@@ -126,9 +163,19 @@ public class RepairCapabilitiesController {
                                   .collect(Collectors.toList()));
     }
 
-    private Double[][] mapTableData(List<RepairStation> repairStationList,
-                                    Map<RepairStation, Map<Equipment, Double>> calculatedRepairCapabilities,
-                                    List<Equipment> equipmentList) {
+    private NestedColumnsDTO getEquipmentStaffNestedColumnsDTO(Map.Entry<EquipmentType, List<EquipmentSubType>> equipmentTypeEntry) {
+        return new NestedColumnsDTO(
+                equipmentTypeEntry.getKey().getShortName(),
+                equipmentTypeEntry.getValue()
+                                  .stream()
+                                  .map(est -> new NestedColumnsDTO(est.getShortName(),
+                                                                   null))
+                                  .collect(Collectors.toList()));
+    }
+
+    private Double[][] mapRepairCapabilitiesTableData(List<RepairStation> repairStationList,
+                                                      Map<RepairStation, Map<Equipment, Double>> calculatedRepairCapabilities,
+                                                      List<Equipment> equipmentList) {
         Double[][] data = new Double[repairStationList.size()][equipmentList.size()];
         Arrays.stream(data).forEach(dataRow -> Arrays.fill(dataRow, 0.0));
         for (int i = 0; i < data.length; i++) {
@@ -141,15 +188,40 @@ public class RepairCapabilitiesController {
         return data;
     }
 
-    public ResponseEntity<TableDataDTO> getEquipmentStaffData(
-            @RequestParam(required = false) List<Long> repairStationId) {
-        List<RepairStation> repairStationList = repairStationService.list(repairStationId);
-        Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes = this.equipmentTypeService.listTypesWithSubTypes(
-                null,
-                null);
-        //repairStationList.get(0)
+    private Integer[][] mapRepairStationStaffTableData(List<RepairStation> repairStationList,
+                                                       Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap,
+                                                       List<EquipmentSubType> equipmentSubTypeList) {
+        int subTypeListSize = equipmentSubTypeList.size();
+        Integer[][] data = new Integer[repairStationList.size() * 2][subTypeListSize];
+        Arrays.stream(data).forEach(dataRow -> Arrays.fill(dataRow, 0));
+        for (int i = 0; i < repairStationList.size(); i ++) {
+            for (int j = 0; j < data[i].length; j++) {
+                RepairStationEquipmentStaff repairStationEquipmentStaff = repairStationMap.get(repairStationList.get(i))
+                                                                                          .get(equipmentSubTypeList.get(
+                                                                                                  j));
+                data[i * 2][j] = repairStationEquipmentStaff.getAvailableStaff();
+                data[i * 2 + 1][j] = repairStationEquipmentStaff.getTotalStaff();
+            }
+        }
+        return data;
+    }
 
-        return null;
+    @GetMapping("/staff")
+    public ResponseEntity<TableDataDTO<Integer>> getEquipmentStaffData(
+            @RequestParam(required = false) List<Long> repairStationId,
+            @RequestParam(required = false) List<Long> equipmentTypeId,
+            @RequestParam(required = false) List<Long> equipmentSubTypeId) {
+        List<RepairStation> repairStationList = repairStationService.list(repairStationId);
+        Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes =
+                equipmentTypeService.listTypesWithSubTypes(equipmentTypeId, equipmentSubTypeId);
+        Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationEquipmentStaff =
+                repairCapabilitiesService.getRepairStationEquipmentStaff(repairStationId,
+                                                                         equipmentTypeId,
+                                                                         equipmentSubTypeId);
+        TableDataDTO<Integer> equipmentStaffDTO = buildEquipmentStaffDTO(repairStationList,
+                                                                         typesWithSubTypes,
+                                                                         repairStationEquipmentStaff);
+        return ResponseEntity.ok(equipmentStaffDTO);
     }
 
 }

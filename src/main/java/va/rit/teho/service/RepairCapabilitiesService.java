@@ -1,7 +1,9 @@
 package va.rit.teho.service;
 
 import va.rit.teho.entity.Equipment;
+import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.RepairStation;
+import va.rit.teho.entity.RepairStationEquipmentStaff;
 
 import java.util.List;
 import java.util.Map;
@@ -27,4 +29,6 @@ public interface RepairCapabilitiesService {
             List<Long> equipmentIds,
             List<Long> equipmentSubTypeIds,
             List<Long> equipmentTypeIds);
+
+    Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> getRepairStationEquipmentStaff(List<Long> repairStationIds, List<Long> equipmentTypeIds, List<Long> equipmentSubTypeIds);
 }

@@ -2,13 +2,14 @@ package va.rit.teho.dto;
 
 import java.util.List;
 
-public class TableDataDTO {
+public class TableDataDTO<T> {
     private final List<String> rows;
     private final List<NestedColumnsDTO> columns;
-    private final Double[][] data;
+    private final T[][] data;
 
     public TableDataDTO(List<String> rows,
-                        List<NestedColumnsDTO> columns, Double[][] data) {
+                        List<NestedColumnsDTO> columns,
+                        T[][] data) {
         this.rows = rows;
         this.columns = columns;
         this.data = data;
@@ -22,7 +23,7 @@ public class TableDataDTO {
         return columns;
     }
 
-    public Double[][] getData() {
+    public T[][] getData() {
         return data;
     }
 

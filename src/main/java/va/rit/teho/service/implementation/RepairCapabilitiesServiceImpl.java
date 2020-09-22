@@ -124,6 +124,26 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                                        equipmentTypeIds);
     }
 
+    @Override
+    public Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> getRepairStationEquipmentStaff(List<Long> repairStationIds,
+                                                                                                                 List<Long> equipmentTypeIds,
+                                                                                                                 List<Long> equipmentSubTypeIds) {
+        List<RepairStationEquipmentStaff> equipmentStaffList =
+                repairStationEquipmentCapabilitiesRepository.findFiltered(repairStationIds,
+                                                                          equipmentTypeIds,
+                                                                          equipmentSubTypeIds);
+
+        Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> result = new TreeMap<>(Comparator.comparing(
+                RepairStation::getId));
+        for (RepairStationEquipmentStaff repairStationEquipmentStaff : equipmentStaffList) {
+            RepairStation repairStation = repairStationEquipmentStaff.getRepairStation();
+            result.computeIfAbsent(repairStation, rs -> new TreeMap<>(Comparator.comparing(EquipmentSubType::getId)));
+            result.get(repairStation)
+                  .put(repairStationEquipmentStaff.getEquipmentSubType(), repairStationEquipmentStaff);
+        }
+        return result;
+    }
+
     private Map<RepairStation, Map<Equipment, Double>> internalGetCalculatedRepairCapabilities(Long repairTypeId,
                                                                                                List<Long> repairStationIds,
                                                                                                List<Long> equipmentIds,
