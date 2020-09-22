@@ -17,12 +17,8 @@ public interface EquipmentService {
 
     void update(Long id, String name, Long subTypeId);
 
+
     Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
-                                                                                  List<Long> subTypeIds,
-                                                                                  List<Long> typeIds);
-
-
-    Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypesSorted(List<Long> ids,
                                                                                         List<Long> subTypeIds,
                                                                                         List<Long> typeIds);
 

@@ -115,7 +115,7 @@ public class RepairStationServiceImplTest {
     public void testSetEquipmentStaff() {
         Long repairStationId = 1L;
         Long equipmentId = 2L;
-        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentPerRepairStation(
+        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentSubTypePerRepairStation(
                 1L,
                 2L), 2, 1);
         when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(new RepairStation("name",
@@ -149,7 +149,7 @@ public class RepairStationServiceImplTest {
     public void testUpdateEquipmentStaff() {
         Long repairStationId = 1L;
         Long equipmentId = 2L;
-        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentPerRepairStation(
+        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(new EquipmentSubTypePerRepairStation(
                 1L,
                 2L), 2, 1);
         RepairStation repairStation = new RepairStation("repair-station", null, null, 2);
@@ -159,8 +159,8 @@ public class RepairStationServiceImplTest {
                                                                                                          null,
                                                                                                          0)));
         when(equipmentService.getEquipment(equipmentId)).thenReturn(new Equipment("", null));
-        when(repairStationEquipmentCapabilitiesRepository.findById(new EquipmentPerRepairStation(repairStationId,
-                                                                                                 equipmentId))).thenReturn(
+        when(repairStationEquipmentCapabilitiesRepository.findById(new EquipmentSubTypePerRepairStation(repairStationId,
+                                                                                                        equipmentId))).thenReturn(
                 Optional.of(repairStationEquipmentStaff));
         repairStationService.updateEquipmentStaff(repairStationId,
                                                   equipmentId,

@@ -2,6 +2,7 @@ package va.rit.teho.entity;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "equipment_sub_type")
@@ -14,6 +15,9 @@ public class EquipmentSubType {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "equipment_type_id", referencedColumnName = "id")
     private EquipmentType equipmentType;
+
+    @OneToMany(mappedBy = "equipmentSubType")
+    private Set<Equipment> equipmentSet;
 
     public EquipmentSubType() {
     }
@@ -54,6 +58,10 @@ public class EquipmentSubType {
 
     public void setEquipmentType(EquipmentType equipmentType) {
         this.equipmentType = equipmentType;
+    }
+
+    public Set<Equipment> getEquipmentSet() {
+        return equipmentSet;
     }
 
     @Override

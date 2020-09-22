@@ -20,4 +20,8 @@ public interface RepairStationService {
 
     void updateEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
 
+    List<RepairStationEquipmentStaff> listEquipmentStaff(List<Long> repairStationIds,
+                                                         List<Long> equipmentTypeIds,
+                                                         List<Long> equipmentSubTypeIds);
+
 }

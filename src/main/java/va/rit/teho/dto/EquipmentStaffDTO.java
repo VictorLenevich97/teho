@@ -24,7 +24,7 @@ public class EquipmentStaffDTO {
     }
 
     public static EquipmentStaffDTO from(RepairStationEquipmentStaff repairStationEquipmentStaff) {
-        return new EquipmentStaffDTO(repairStationEquipmentStaff.getEquipment().getId(),
+        return new EquipmentStaffDTO(repairStationEquipmentStaff.getEquipmentSubType().getId(),
                                      repairStationEquipmentStaff.getTotalStaff(),
                                      repairStationEquipmentStaff.getAvailableStaff());
     }

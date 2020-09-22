@@ -87,7 +87,7 @@ public class RepairStationServiceImpl implements RepairStationService {
                     "Всего производственников < доступно производственников (" + totalStaff + " < " + availableStaff + ")");
         }
         RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(
-                new EquipmentPerRepairStation(repairStationId, equipmentId), totalStaff, availableStaff);
+                new EquipmentSubTypePerRepairStation(repairStationId, equipmentId), totalStaff, availableStaff);
         repairStationEquipmentCapabilitiesRepository.save(repairStationEquipmentStaff);
     }
 
@@ -101,11 +101,18 @@ public class RepairStationServiceImpl implements RepairStationService {
         }
         RepairStationEquipmentStaff stationEquipmentStaff =
                 repairStationEquipmentCapabilitiesRepository
-                        .findById(new EquipmentPerRepairStation(repairStationId, equipmentId))
+                        .findById(new EquipmentSubTypePerRepairStation(repairStationId, equipmentId))
                         .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationId + " по ВВСТ с id = " + equipmentId + " не найдены!"));
         stationEquipmentStaff.setAvailableStaff(availableStaff);
         stationEquipmentStaff.setTotalStaff(totalStaff);
         repairStationEquipmentCapabilitiesRepository.save(stationEquipmentStaff);
+    }
+
+    @Override
+    public List<RepairStationEquipmentStaff> listEquipmentStaff(List<Long> repairStationIds,
+                                                                List<Long> equipmentTypeIds,
+                                                                List<Long> equipmentSubTypeIds) {
+        return null;
     }
 
 }

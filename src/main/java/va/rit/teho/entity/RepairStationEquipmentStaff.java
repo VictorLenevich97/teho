@@ -7,23 +7,23 @@ import java.util.Objects;
 public class RepairStationEquipmentStaff {
 
     @EmbeddedId
-    EquipmentPerRepairStation equipmentPerRepairStation;
+    EquipmentSubTypePerRepairStation equipmentPerRepairStation;
 
     @ManyToOne
     @MapsId("repair_station_id")
     @JoinColumn(name = "repair_station_id")
     RepairStation repairStation;
     @ManyToOne
-    @MapsId("equipment_id")
-    @JoinColumn(name = "equipment_id")
-    Equipment equipment;
+    @MapsId("equipment_sub_type_id")
+    @JoinColumn(name = "equipment_sub_type_id")
+    EquipmentSubType equipmentSubType;
     int totalStaff;
     int availableStaff;
 
     public RepairStationEquipmentStaff() {
     }
 
-    public RepairStationEquipmentStaff(EquipmentPerRepairStation equipmentPerRepairStation,
+    public RepairStationEquipmentStaff(EquipmentSubTypePerRepairStation equipmentPerRepairStation,
                                        int totalStaff,
                                        int availableStaff) {
         this.equipmentPerRepairStation = equipmentPerRepairStation;
@@ -40,15 +40,15 @@ public class RepairStationEquipmentStaff {
                 availableStaff == that.availableStaff &&
                 Objects.equals(equipmentPerRepairStation, that.equipmentPerRepairStation) &&
                 Objects.equals(repairStation, that.repairStation) &&
-                Objects.equals(equipment, that.equipment);
+                Objects.equals(equipmentSubType, that.equipmentSubType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(equipmentPerRepairStation, repairStation, equipment, totalStaff, availableStaff);
+        return Objects.hash(equipmentPerRepairStation, repairStation, equipmentSubType, totalStaff, availableStaff);
     }
 
-    public EquipmentPerRepairStation getEquipmentPerRepairStation() {
+    public EquipmentSubTypePerRepairStation getEquipmentPerRepairStation() {
         return equipmentPerRepairStation;
     }
 
@@ -60,12 +60,8 @@ public class RepairStationEquipmentStaff {
         this.repairStation = repairStation;
     }
 
-    public Equipment getEquipment() {
-        return equipment;
-    }
-
-    public void setEquipment(Equipment equipment) {
-        this.equipment = equipment;
+    public EquipmentSubType getEquipmentSubType() {
+        return equipmentSubType;
     }
 
     public int getTotalStaff() {

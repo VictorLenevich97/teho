@@ -6,40 +6,40 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class EquipmentPerRepairStation implements Serializable {
+public class EquipmentSubTypePerRepairStation implements Serializable {
 
     @Column(name = "repair_station_id")
     private Long repairStationId;
-    @Column(name = "equipment_id")
-    private Long equipmentId;
+    @Column(name = "equipment_sub_type_id")
+    private Long equipmentSubTypeId;
 
-    public EquipmentPerRepairStation() {
+    public EquipmentSubTypePerRepairStation() {
     }
 
-    public EquipmentPerRepairStation(Long repairStationId, Long equipmentId) {
+    public EquipmentSubTypePerRepairStation(Long repairStationId, Long equipmentSubTypeId) {
         this.repairStationId = repairStationId;
-        this.equipmentId = equipmentId;
+        this.equipmentSubTypeId = equipmentSubTypeId;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EquipmentPerRepairStation that = (EquipmentPerRepairStation) o;
+        EquipmentSubTypePerRepairStation that = (EquipmentSubTypePerRepairStation) o;
         return Objects.equals(repairStationId, that.repairStationId) &&
-                Objects.equals(equipmentId, that.equipmentId);
+                Objects.equals(equipmentSubTypeId, that.equipmentSubTypeId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(repairStationId, equipmentId);
+        return Objects.hash(repairStationId, equipmentSubTypeId);
     }
 
     public Long getRepairStationId() {
         return repairStationId;
     }
 
-    public Long getEquipmentId() {
-        return equipmentId;
+    public Long getEquipmentSubTypeId() {
+        return equipmentSubTypeId;
     }
 }

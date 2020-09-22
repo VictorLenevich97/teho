@@ -9,10 +9,11 @@ import va.rit.teho.repository.RepairTypeRepository;
 import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.RepairCapabilitiesService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -37,27 +38,26 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     }
 
     private CalculatedRepairCapabilitesPerDay getCalculatedRepairCapabilitesPerDay(Long repairTypeId,
+                                                                                   Equipment equipment,
                                                                                    RepairStationEquipmentStaff rsec) {
-        EquipmentLaborInputPerType laborInputPerType = rsec
-                .getEquipment()
+        EquipmentLaborInputPerType laborInputPerType = equipment
                 .getLaborInputPerTypes()
                 .stream()
                 .filter(lipt -> lipt.getRepairType().getId().equals(repairTypeId))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(
                         "Отсутствует значение нормативной трудоемкости по типу ремонта с id = " + repairTypeId +
-                                " для ВВСТ с id = " + rsec.getEquipment()
-                                                          .getId()));
+                                " для ВВСТ с id = " + equipment.getId()));
         double calculatedCapabilities = calculationService.calculateRepairCapabilities(
                 rsec.getTotalStaff(),
                 rsec.getRepairStation().getRepairStationType().getWorkingHoursMax(),
                 laborInputPerType.getAmount());
         return new CalculatedRepairCapabilitesPerDay(
                 new EquipmentPerRepairStationWithRepairType(rsec.getEquipmentPerRepairStation().getRepairStationId(),
-                                                            rsec.getEquipmentPerRepairStation().getEquipmentId(),
+                                                            equipment.getId(),
                                                             repairTypeId),
                 rsec.getRepairStation(),
-                rsec.getEquipment(),
+                equipment,
                 calculatedCapabilities,
                 laborInputPerType.getRepairType());
     }
@@ -71,10 +71,17 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
 
     private void calculateAndUpdateRepairCapabilities(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList,
                                                       Long repairTypeId) {
-        List<CalculatedRepairCapabilitesPerDay> capabilitesPerDayList = new ArrayList<>();
-        for (RepairStationEquipmentStaff repairStationEquipmentStaff : repairStationEquipmentStaffList) {
-            capabilitesPerDayList.add(getCalculatedRepairCapabilitesPerDay(repairTypeId, repairStationEquipmentStaff));
-        }
+        List<CalculatedRepairCapabilitesPerDay> capabilitesPerDayList =
+                repairStationEquipmentStaffList.stream().flatMap(
+                        repairStationEquipmentStaff ->
+                                repairStationEquipmentStaff
+                                        .getEquipmentSubType()
+                                        .getEquipmentSet()
+                                        .stream()
+                                        .map(e -> getCalculatedRepairCapabilitesPerDay(repairTypeId,
+                                                                                       e,
+                                                                                       repairStationEquipmentStaff)))
+                                               .collect(Collectors.toList());
         calculatedRepairCapabilitiesPerDayRepository.saveAll(capabilitesPerDayList);
     }
 
@@ -128,10 +135,10 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                                                        nullIfEmpty(equipmentIds),
                                                                        nullIfEmpty(equipmentSubTypeIds),
                                                                        nullIfEmpty(equipmentTypeIds));
-        Map<RepairStation, Map<Equipment, Double>> result = new HashMap<>();
+        Map<RepairStation, Map<Equipment, Double>> result = new TreeMap<>(Comparator.comparing(RepairStation::getId));
         for (CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay : calculatedRepairCapabilitesPerDays) {
             RepairStation repairStation = calculatedRepairCapabilitesPerDay.getRepairStation();
-            result.computeIfAbsent(repairStation, rs -> new HashMap<>());
+            result.computeIfAbsent(repairStation, rs -> new TreeMap<>(Comparator.comparing(Equipment::getId)));
             result
                     .get(repairStation)
                     .put(calculatedRepairCapabilitesPerDay.getEquipment(),
