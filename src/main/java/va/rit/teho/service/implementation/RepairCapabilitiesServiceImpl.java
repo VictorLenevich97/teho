@@ -54,8 +54,8 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                 laborInputPerType.getAmount());
         return new CalculatedRepairCapabilitesPerDay(
                 new EquipmentPerRepairStationWithRepairType(rsec.getEquipmentPerRepairStation().getRepairStationId(),
-                                                            equipment.getId(),
-                                                            repairTypeId),
+                        equipment.getId(),
+                        repairTypeId),
                 rsec.getRepairStation(),
                 equipment,
                 calculatedCapabilities,
@@ -79,9 +79,9 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                         .getEquipmentSet()
                                         .stream()
                                         .map(e -> getCalculatedRepairCapabilitesPerDay(repairTypeId,
-                                                                                       e,
-                                                                                       repairStationEquipmentStaff)))
-                                               .collect(Collectors.toList());
+                                                e,
+                                                repairStationEquipmentStaff)))
+                        .collect(Collectors.toList());
         calculatedRepairCapabilitiesPerDayRepository.saveAll(capabilitesPerDayList);
     }
 
@@ -97,13 +97,13 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                                                                       List<Long> equipmentSubTypeIds,
                                                                                       List<Long> equipmentTypeIds) {
         RepairType repairType = StreamSupport.stream(repairTypeRepository.findAll().spliterator(), false)
-                                             .findFirst()
-                                             .orElseThrow(() -> new NotFoundException("Типов ремонта не существует!"));
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Типов ремонта не существует!"));
         return internalGetCalculatedRepairCapabilities(repairType.getId(),
-                                                       repairStationIds,
-                                                       equipmentIds,
-                                                       equipmentSubTypeIds,
-                                                       equipmentTypeIds);
+                repairStationIds,
+                equipmentIds,
+                equipmentSubTypeIds,
+                equipmentTypeIds);
     }
 
     private List<Long> nullIfEmpty(List<Long> collection) {
@@ -117,11 +117,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
             List<Long> equipmentIds,
             List<Long> equipmentSubTypeIds,
             List<Long> equipmentTypeIds) {
-        return internalGetCalculatedRepairCapabilities(repairTypeId,
-                                                       repairStationIds,
-                                                       equipmentIds,
-                                                       equipmentSubTypeIds,
-                                                       equipmentTypeIds);
+        return internalGetCalculatedRepairCapabilities(repairTypeId, repairStationIds, equipmentIds, equipmentSubTypeIds, equipmentTypeIds);
     }
 
     @Override
@@ -130,16 +126,15 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                                                                                                  List<Long> equipmentSubTypeIds) {
         List<RepairStationEquipmentStaff> equipmentStaffList =
                 repairStationEquipmentCapabilitiesRepository.findFiltered(repairStationIds,
-                                                                          equipmentTypeIds,
-                                                                          equipmentSubTypeIds);
+                        equipmentTypeIds,
+                        equipmentSubTypeIds);
 
-        Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> result = new TreeMap<>(Comparator.comparing(
-                RepairStation::getId));
+        Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> result =
+                new TreeMap<>(Comparator.comparing(RepairStation::getId));
         for (RepairStationEquipmentStaff repairStationEquipmentStaff : equipmentStaffList) {
             RepairStation repairStation = repairStationEquipmentStaff.getRepairStation();
             result.computeIfAbsent(repairStation, rs -> new TreeMap<>(Comparator.comparing(EquipmentSubType::getId)));
-            result.get(repairStation)
-                  .put(repairStationEquipmentStaff.getEquipmentSubType(), repairStationEquipmentStaff);
+            result.get(repairStation).put(repairStationEquipmentStaff.getEquipmentSubType(), repairStationEquipmentStaff);
         }
         return result;
     }
@@ -150,19 +145,17 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                                                                                List<Long> equipmentSubTypeIds,
                                                                                                List<Long> equipmentTypeIds) {
         Iterable<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDays =
-                calculatedRepairCapabilitiesPerDayRepository.findByIds(repairTypeId,
-                                                                       nullIfEmpty(repairStationIds),
-                                                                       nullIfEmpty(equipmentIds),
-                                                                       nullIfEmpty(equipmentSubTypeIds),
-                                                                       nullIfEmpty(equipmentTypeIds));
+                calculatedRepairCapabilitiesPerDayRepository.findByIds(
+                        repairTypeId,
+                        nullIfEmpty(repairStationIds),
+                        nullIfEmpty(equipmentIds),
+                        nullIfEmpty(equipmentSubTypeIds),
+                        nullIfEmpty(equipmentTypeIds));
         Map<RepairStation, Map<Equipment, Double>> result = new TreeMap<>(Comparator.comparing(RepairStation::getId));
         for (CalculatedRepairCapabilitesPerDay calculatedRepairCapabilitesPerDay : calculatedRepairCapabilitesPerDays) {
             RepairStation repairStation = calculatedRepairCapabilitesPerDay.getRepairStation();
             result.computeIfAbsent(repairStation, rs -> new TreeMap<>(Comparator.comparing(Equipment::getId)));
-            result
-                    .get(repairStation)
-                    .put(calculatedRepairCapabilitesPerDay.getEquipment(),
-                         calculatedRepairCapabilitesPerDay.getCapability());
+            result.get(repairStation).put(calculatedRepairCapabilitesPerDay.getEquipment(), calculatedRepairCapabilitesPerDay.getCapability());
         }
         return result;
     }
