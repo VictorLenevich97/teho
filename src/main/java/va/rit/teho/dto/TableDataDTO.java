@@ -1,21 +1,19 @@
 package va.rit.teho.dto;
 
 import java.util.List;
+import java.util.Map;
 
 public class TableDataDTO<T> {
-    private final List<String> rows;
     private final List<NestedColumnsDTO> columns;
-    private final T[][] data;
+    private final List<RowData<T>> rows;
 
-    public TableDataDTO(List<String> rows,
-                        List<NestedColumnsDTO> columns,
-                        T[][] data) {
-        this.rows = rows;
+    public TableDataDTO(List<NestedColumnsDTO> columns,
+                        List<RowData<T>> rows) {
         this.columns = columns;
-        this.data = data;
+        this.rows = rows;
     }
 
-    public List<String> getRows() {
+    public List<RowData<T>> getRows() {
         return rows;
     }
 
@@ -23,8 +21,21 @@ public class TableDataDTO<T> {
         return columns;
     }
 
-    public T[][] getData() {
-        return data;
-    }
+    public static class RowData<T> {
+        private final String name;
+        private final Map<String, T> data;
 
+        public String getName() {
+            return name;
+        }
+
+        public Map<String, T> getData() {
+            return data;
+        }
+
+        public RowData(String name, Map<String, T> data) {
+            this.name = name;
+            this.data = data;
+        }
+    }
 }
