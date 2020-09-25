@@ -7,15 +7,15 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NestedColumnsDTO {
     private final String title;
-    private String key;
+    private Object key;
     private List<NestedColumnsDTO> columns;
 
-    public String getKey() {
+    public Object getKey() {
         return key;
     }
 
     public NestedColumnsDTO(Object key, String title) {
-        this.key = key.toString();
+        this.key = key;
         this.title = title;
     }
 

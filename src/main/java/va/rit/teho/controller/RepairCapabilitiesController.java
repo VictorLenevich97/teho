@@ -13,6 +13,7 @@ import va.rit.teho.service.RepairStationService;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("repair-capabilities")
@@ -93,7 +94,7 @@ public class RepairCapabilitiesController {
                                 new NestedColumnsDTO(subTypeListEntry.getKey().getShortName(),
                                         subTypeListEntry.getValue()
                                                 .stream()
-                                                .map(e -> new NestedColumnsDTO(e.getId(), e.getName()))
+                                                .map(e -> new NestedColumnsDTO(e.getId().toString(), e.getName()))
                                                 .collect(Collectors.toList())))
                         .collect(Collectors.toList()));
     }
@@ -166,13 +167,14 @@ public class RepairCapabilitiesController {
                 equipmentTypeEntry.getKey().getShortName(),
                 equipmentTypeEntry.getValue()
                         .stream()
-                        .map(est -> new NestedColumnsDTO(est.getId() + "." + postfix, est.getShortName()))
+                        .map(est -> new NestedColumnsDTO(Arrays.asList(est.getId().toString(), postfix), est.getShortName()))
                         .collect(Collectors.toList()));
     }
 
-    private TableDataDTO<Map<String, Integer>> buildEquipmentStaffDTO(List<RepairStation> repairStationList,
-                                                         Map<EquipmentType, List<EquipmentSubType>> equipmentTypeListMap,
-                                                         Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap) {
+    private TableDataDTO<Map<String, Integer>> buildEquipmentStaffDTO(
+            List<RepairStation> repairStationList,
+            Map<EquipmentType, List<EquipmentSubType>> equipmentTypeListMap,
+            Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap) {
         List<EquipmentSubType> columns =
                 equipmentTypeListMap
                         .values()
@@ -180,31 +182,33 @@ public class RepairCapabilitiesController {
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
         List<NestedColumnsDTO> nestedColumnsTotal =
-                equipmentTypeListMap.entrySet()
-                        .stream()
-                        .map(entry -> this.getEquipmentStaffNestedColumnsDTO(entry, "total"))
+                Stream.of("total", "available")
+                        .flatMap(postfix ->
+                                equipmentTypeListMap
+                                        .entrySet()
+                                        .stream()
+                                        .map(entry -> this.getEquipmentStaffNestedColumnsDTO(entry, postfix)))
                         .collect(Collectors.toList());
-        nestedColumnsTotal.addAll(
-                equipmentTypeListMap.entrySet()
+        List<TableDataDTO.RowData<Map<String, Integer>>> rows =
+                repairStationList
                         .stream()
-                        .map(entry -> this.getEquipmentStaffNestedColumnsDTO(entry, "available"))
-                        .collect(Collectors.toList()));
-        List<TableDataDTO.RowData<Map<String, Integer>>> rows = repairStationList
-                .stream()
-                .map(rs -> {
-                    Map<String, Map<String, Integer>> dataMap = new HashMap<>();
-                    columns.forEach(est -> {
-                        RepairStationEquipmentStaff repairStationEquipmentStaff =
-                                repairStationMap.getOrDefault(rs, Collections.emptyMap()).get(est);
-                        Map<String, Integer> innerMap = new HashMap<>();
-                        innerMap.put("total", repairStationEquipmentStaff == null ? 0 : repairStationEquipmentStaff.getTotalStaff());
-                        innerMap.put("available", repairStationEquipmentStaff == null ? 0 : repairStationEquipmentStaff.getAvailableStaff());
-                        dataMap.put(est.getId().toString(), innerMap);
-                    });
-                    return new TableDataDTO.RowData<>(rs.getName(), dataMap);
-                })
-                .collect(Collectors.toList());
+                        .map(rs -> getEquipmentStaffRow(repairStationMap, columns, rs))
+                        .collect(Collectors.toList());
         return new TableDataDTO<>(nestedColumnsTotal, rows);
+    }
+
+    private TableDataDTO.RowData<Map<String, Integer>> getEquipmentStaffRow(Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap, List<EquipmentSubType> columns, RepairStation rs) {
+        Map<String, Map<String, Integer>> dataMap = new HashMap<>();
+        for (EquipmentSubType est : columns) {
+            RepairStationEquipmentStaff repairStationEquipmentStaff =
+                    repairStationMap.getOrDefault(rs, Collections.emptyMap()).get(est);
+            Map<String, Integer> innerMap = new HashMap<>();
+            boolean emptyStaff = repairStationEquipmentStaff == null;
+            innerMap.put("total", emptyStaff ? 0 : repairStationEquipmentStaff.getTotalStaff());
+            innerMap.put("available", emptyStaff ? 0 : repairStationEquipmentStaff.getAvailableStaff());
+            dataMap.put(est.getId().toString(), innerMap);
+        }
+        return new TableDataDTO.RowData<>(rs.getName(), dataMap);
     }
 
     @GetMapping("/staff")
