@@ -10,8 +10,10 @@ import va.rit.teho.dto.equipment.EquipmentTypeDTO;
 import va.rit.teho.entity.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.server.TehoSessionData;
 import va.rit.teho.service.LaborInputDistributionService;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +27,9 @@ public class LaborInputDistributionController {
     public LaborInputDistributionController(LaborInputDistributionService laborInputDistributionService) {
         this.laborInputDistributionService = laborInputDistributionService;
     }
+
+    @Resource
+    private TehoSessionData tehoSession;
 
     @GetMapping("/intervals")
     public ResponseEntity<List<DistributionIntervalDTO>> getDistributionIntervals() {
@@ -40,7 +45,7 @@ public class LaborInputDistributionController {
     @ResponseBody
     public ResponseEntity<List<LaborInputDistributionDTO>> getDistributionData(@RequestParam(required = false) List<Long> typeId) {
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
-                laborInputDistributionService.getLaborInputDistribution(typeId);
+                laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(), typeId);
 
         List<LaborInputDistributionDTO> laborInputDistributionDTOList = laborInputDistribution
                 .entrySet()
@@ -70,25 +75,25 @@ public class LaborInputDistributionController {
 
     @PostMapping
     public ResponseEntity<Object> updateDistributionData() {
-        laborInputDistributionService.updateLaborInputDistribution();
+        laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId());
         return ResponseEntity.accepted().build();
     }
 
     @PostMapping("/type/{typeId}")
     public ResponseEntity<Object> updateDistributionDataPerEquipmentType(@PathVariable Long typeId) {
-        laborInputDistributionService.updateLaborInputDistributionPerEquipmentType(typeId);
+        laborInputDistributionService.updateLaborInputDistributionPerEquipmentType(tehoSession.getSessionId(), typeId);
         return ResponseEntity.accepted().build();
     }
 
     @PostMapping("/subtype/{subTypeId}")
     public ResponseEntity<Object> updateDistributionDataPerEquipmentSubType(@PathVariable Long subTypeId) {
-        laborInputDistributionService.updateLaborInputDistributionPerEquipmentSubType(subTypeId);
+        laborInputDistributionService.updateLaborInputDistributionPerEquipmentSubType(tehoSession.getSessionId(), subTypeId);
         return ResponseEntity.accepted().build();
     }
 
     @PostMapping("/base/{baseId}")
     public ResponseEntity<Object> updateDistributionDataPerBase(@PathVariable Long baseId) {
-        laborInputDistributionService.updateLaborInputDistributionPerBase(baseId);
+        laborInputDistributionService.updateLaborInputDistributionPerBase(tehoSession.getSessionId(), baseId);
         return ResponseEntity.accepted().build();
     }
 

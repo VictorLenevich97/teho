@@ -10,10 +10,7 @@ import va.rit.teho.repository.*;
 import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.LaborInputDistributionService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -62,10 +59,10 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 .standardLaborInput(eir.getLaborInput())
                 .intervalCountAndLaborInputMap(laborInputMap)
                 .totalRepairComplexity(laborInputMap
-                                               .values()
-                                               .stream()
-                                               .mapToDouble(CountAndLaborInput::getLaborInput)
-                                               .sum())
+                        .values()
+                        .stream()
+                        .mapToDouble(CountAndLaborInput::getLaborInput)
+                        .sum())
                 .build();
     }
 
@@ -79,17 +76,18 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                         .reduce(Pair.of(new EquipmentInRepairData(), new HashMap<>()),
                                 (pair, eir) -> {
                                     pair.getRight()
-                                        .put(eir.getIntervalId(), Pair.of(eir.getCount(), eir.getAvgLaborInput()));
+                                            .put(eir.getIntervalId(), Pair.of(eir.getCount(), eir.getAvgLaborInput()));
                                     return Pair.of(eir, pair.getRight());
                                 },
                                 (l, r) -> l);
         result.computeIfAbsent(equipmentType, k -> new HashMap<>())
-              .computeIfAbsent(subType, k -> new ArrayList<>())
-              .add(getEquipmentLaborInputDistribution(repairDataHashMapPair));
+                .computeIfAbsent(subType, k -> new ArrayList<>())
+                .add(getEquipmentLaborInputDistribution(repairDataHashMapPair));
     }
 
     @Override
     public Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> getLaborInputDistribution(
+            UUID sessionId,
             List<Long> equipmentTypeIds) {
         List<Long> equipmentTypeIdsFinal;
         if (equipmentTypeIds == null || equipmentTypeIds.isEmpty()) {
@@ -107,9 +105,9 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         grouped.forEach((equipmentType, subTypeMap) -> subTypeMap
                 .forEach((subType, compositeKeyMap) -> compositeKeyMap
                         .forEach((key, equipmentInRepairDataList) -> buildLaborDistributionMap(result,
-                                                                                               equipmentType,
-                                                                                               subType,
-                                                                                               equipmentInRepairDataList))));
+                                equipmentType,
+                                subType,
+                                equipmentInRepairDataList))));
         return result;
     }
 
@@ -120,14 +118,16 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 .getId();
     }
 
-    private EquipmentInRepair buildEquipmentInRepair(EquipmentPerBase equipmentPerBase,
+    private EquipmentInRepair buildEquipmentInRepair(UUID sessionId,
+                                                     EquipmentPerBase equipmentPerBase,
                                                      WorkhoursDistributionInterval interval,
                                                      double count,
                                                      double laborInput) {
         return new EquipmentInRepair(
                 new EquipmentInRepairId(equipmentPerBase.getBase().getId(),
-                                        equipmentPerBase.getEquipment().getId(),
-                                        interval.getId()),
+                        equipmentPerBase.getEquipment().getId(),
+                        interval.getId(),
+                        sessionId),
                 equipmentPerBase.getBase(),
                 equipmentPerBase.getEquipment(),
                 interval,
@@ -136,66 +136,70 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     }
 
 
-    private EquipmentInRepair calculateEquipmentInRepair(EquipmentPerBase equipmentPerBase,
+    private EquipmentInRepair calculateEquipmentInRepair(UUID sessionId,
+                                                         EquipmentPerBase equipmentPerBase,
                                                          double avgDailyFailure,
                                                          int standardLaborInput,
                                                          WorkhoursDistributionInterval interval) {
         double count = calculationService.calculateEquipmentRequiringRepair(interval.getUpperBound(),
-                                                                            interval.getLowerBound(),
-                                                                            avgDailyFailure,
-                                                                            standardLaborInput);
+                interval.getLowerBound(),
+                avgDailyFailure,
+                standardLaborInput);
         double laborInput = calculationService.calculateEquipmentRepairComplexity(count,
-                                                                                  interval.getUpperBound());
-        return buildEquipmentInRepair(equipmentPerBase, interval, count, laborInput);
+                interval.getUpperBound());
+        return buildEquipmentInRepair(sessionId, equipmentPerBase, interval, count, laborInput);
     }
 
     private Stream<EquipmentInRepair> calculateEquipmentLaborInputDistribution(
+            UUID sessionId,
             Pair<EquipmentPerBase, Integer> equipmentPerBaseAndLaborInput) {
         EquipmentPerBase equipmentPerBase = equipmentPerBaseAndLaborInput.getLeft();
         double avgDailyFailure =
                 calculationService.calculateEquipmentFailureAmount(equipmentPerBase.getAmount(),
-                                                                   equipmentPerBase.getIntensity(),
-                                                                   2.2);
+                        equipmentPerBase.getIntensity(),
+                        2.2);
         int standardLaborInput = equipmentPerBaseAndLaborInput.getRight();
         return StreamSupport.stream(workhoursDistributionIntervalRepository.findAll().spliterator(), false)
-                            .map(interval -> calculateEquipmentInRepair(equipmentPerBase,
-                                                                        avgDailyFailure,
-                                                                        standardLaborInput,
-                                                                        interval))
-                            .filter(eir -> eir.getCount() > 0 || eir.getAvgLaborInput() > 0);
+                .map(interval -> calculateEquipmentInRepair(
+                        sessionId,
+                        equipmentPerBase,
+                        avgDailyFailure,
+                        standardLaborInput,
+                        interval))
+                .filter(eir -> eir.getCount() > 0 || eir.getAvgLaborInput() > 0);
     }
 
-    private List<EquipmentInRepair> calculateAndBuildEquipmentInRepair(List<Pair<EquipmentPerBase, Integer>> epbs) {
-        return epbs.stream().flatMap(this::calculateEquipmentLaborInputDistribution).collect(Collectors.toList());
+    private List<EquipmentInRepair> calculateAndBuildEquipmentInRepair(UUID sessionId, List<Pair<EquipmentPerBase, Integer>> epbs) {
+        return epbs.stream().flatMap(epb -> this.calculateEquipmentLaborInputDistribution(sessionId, epb)).collect(Collectors.toList());
     }
 
-    private void calculateAndSave(List<Pair<EquipmentPerBase, Integer>> equipmentPerBases) {
-        List<EquipmentInRepair> calculated = calculateAndBuildEquipmentInRepair(equipmentPerBases);
+    private void calculateAndSave(UUID sessionId, List<Pair<EquipmentPerBase, Integer>> equipmentPerBases) {
+        List<EquipmentInRepair> calculated = calculateAndBuildEquipmentInRepair(sessionId, equipmentPerBases);
         equipmentInRepairRepository.saveAll(calculated);
     }
 
     @Override
     @Transactional
-    public void updateLaborInputDistribution() {
-        calculateAndSave(equipmentPerBaseRepository.findAllWithLaborInput(getDefaultRepairTypeId()));
+    public void updateLaborInputDistribution(UUID sessionId) {
+        calculateAndSave(sessionId, equipmentPerBaseRepository.findAllWithLaborInput(getDefaultRepairTypeId()));
     }
 
     @Override
     @Transactional
-    public void updateLaborInputDistributionPerBase(Long baseId) {
-        calculateAndSave(equipmentPerBaseRepository.findAllWithLaborInputAndBase(getDefaultRepairTypeId(), baseId));
+    public void updateLaborInputDistributionPerBase(UUID sessionId, Long baseId) {
+        calculateAndSave(sessionId, equipmentPerBaseRepository.findAllWithLaborInputAndBase(getDefaultRepairTypeId(), baseId));
     }
 
     @Override
-    public void updateLaborInputDistributionPerEquipmentSubType(Long equipmentSubTypeId) {
-        calculateAndSave(equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentSubType(getDefaultRepairTypeId(),
-                                                                                             equipmentSubTypeId));
+    public void updateLaborInputDistributionPerEquipmentSubType(UUID sessionId, Long equipmentSubTypeId) {
+        calculateAndSave(sessionId, equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentSubType(getDefaultRepairTypeId(),
+                equipmentSubTypeId));
     }
 
     @Override
-    public void updateLaborInputDistributionPerEquipmentType(Long equipmentType) {
-        calculateAndSave(equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentType(getDefaultRepairTypeId(),
-                                                                                          equipmentType));
+    public void updateLaborInputDistributionPerEquipmentType(UUID sessionId, Long equipmentType) {
+        calculateAndSave(sessionId, equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentType(getDefaultRepairTypeId(),
+                equipmentType));
     }
 
     @Override

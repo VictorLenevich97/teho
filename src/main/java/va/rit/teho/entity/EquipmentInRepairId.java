@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 
 @Embeddable
 public class EquipmentInRepairId implements Serializable {
@@ -13,11 +14,14 @@ public class EquipmentInRepairId implements Serializable {
     private Long equipmentId;
     @Column(name = "workhours_distribution_interval_id")
     private Long workhoursDistributionIntervalId;
+    @Column(name = "session_id")
+    private UUID sessionId;
 
-    public EquipmentInRepairId(Long baseId, Long equipmentId, Long workhoursDistributionIntervalId) {
+    public EquipmentInRepairId(Long baseId, Long equipmentId, Long workhoursDistributionIntervalId, UUID sessionId) {
         this.baseId = baseId;
         this.equipmentId = equipmentId;
         this.workhoursDistributionIntervalId = workhoursDistributionIntervalId;
+        this.sessionId = sessionId;
     }
 
     public EquipmentInRepairId() {
@@ -30,11 +34,12 @@ public class EquipmentInRepairId implements Serializable {
         EquipmentInRepairId that = (EquipmentInRepairId) o;
         return Objects.equals(baseId, that.baseId) &&
                 Objects.equals(equipmentId, that.equipmentId) &&
-                Objects.equals(workhoursDistributionIntervalId, that.workhoursDistributionIntervalId);
+                Objects.equals(workhoursDistributionIntervalId, that.workhoursDistributionIntervalId) &&
+                Objects.equals(sessionId, that.sessionId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(baseId, equipmentId, workhoursDistributionIntervalId);
+        return Objects.hash(baseId, equipmentId, workhoursDistributionIntervalId, sessionId);
     }
 }

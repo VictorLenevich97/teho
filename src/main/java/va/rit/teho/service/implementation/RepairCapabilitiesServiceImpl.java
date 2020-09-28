@@ -6,6 +6,7 @@ import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.CalculatedRepairCapabilitiesPerDayRepository;
 import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.repository.RepairTypeRepository;
+import va.rit.teho.repository.SessionRepository;
 import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.RepairCapabilitiesService;
 
@@ -22,6 +23,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     private final RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository;
     private final CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository;
     private final RepairTypeRepository repairTypeRepository;
+    private final SessionRepository sessionRepository;
 
 
     private final CalculationService calculationService;
@@ -30,10 +32,11 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
             RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository,
             CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository,
             RepairTypeRepository repairTypeRepository,
-            CalculationService calculationService) {
+            SessionRepository sessionRepository, CalculationService calculationService) {
         this.repairStationEquipmentCapabilitiesRepository = repairStationEquipmentCapabilitiesRepository;
         this.calculatedRepairCapabilitiesPerDayRepository = calculatedRepairCapabilitiesPerDayRepository;
         this.repairTypeRepository = repairTypeRepository;
+        this.sessionRepository = sessionRepository;
         this.calculationService = calculationService;
     }
 
