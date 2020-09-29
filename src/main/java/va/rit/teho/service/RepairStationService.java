@@ -17,11 +17,11 @@ public interface RepairStationService {
 
     void update(Long id, String name, Long baseId, Long typeId, int amount);
 
-    void setEquipmentStaff(UUID sessionId, Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
+    void setEquipmentStaff(UUID sessionId, Long repairStationId, Long equipmentSubTypeId, int availableStaff, int totalStaff);
 
     void updateEquipmentStaff(UUID sessionId,
                               Long repairStationId,
-                              Long equipmentId,
+                              Long equipmentSubTypeId,
                               int availableStaff,
                               int totalStaff);
 

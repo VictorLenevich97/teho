@@ -20,6 +20,11 @@ public class RepairStationEquipmentStaff {
     int totalStaff;
     int availableStaff;
 
+    @ManyToOne
+    @MapsId("session_id")
+    @JoinColumn(name = "session_id")
+    TehoSession tehoSession;
+
     public RepairStationEquipmentStaff() {
     }
 
@@ -40,12 +45,13 @@ public class RepairStationEquipmentStaff {
                 availableStaff == that.availableStaff &&
                 Objects.equals(equipmentPerRepairStation, that.equipmentPerRepairStation) &&
                 Objects.equals(repairStation, that.repairStation) &&
-                Objects.equals(equipmentSubType, that.equipmentSubType);
+                Objects.equals(equipmentSubType, that.equipmentSubType) &&
+                Objects.equals(tehoSession, that.tehoSession);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(equipmentPerRepairStation, repairStation, equipmentSubType, totalStaff, availableStaff);
+        return Objects.hash(equipmentPerRepairStation, repairStation, equipmentSubType, totalStaff, availableStaff, tehoSession);
     }
 
     public EquipmentSubTypePerRepairStation getEquipmentPerRepairStation() {
@@ -78,5 +84,9 @@ public class RepairStationEquipmentStaff {
 
     public void setAvailableStaff(int availableStaff) {
         this.availableStaff = availableStaff;
+    }
+
+    public TehoSession getTehoSession() {
+        return tehoSession;
     }
 }

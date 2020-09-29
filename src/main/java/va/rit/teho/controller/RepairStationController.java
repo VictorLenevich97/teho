@@ -79,27 +79,27 @@ public class RepairStationController {
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping("/{repairStationId}/equipment/{equipmentId}")
+    @PostMapping("/{repairStationId}/subtype/{subTypeId}")
     public ResponseEntity<Object> setRepairStationEquipmentStaff(@PathVariable Long repairStationId,
-                                                                 @PathVariable Long equipmentId,
+                                                                 @PathVariable Long subTypeId,
                                                                  @RequestBody EquipmentStaffDTO equipmentStaffDTO) {
         repairStationService.setEquipmentStaff(
                 tehoSession.getSessionId(),
                 repairStationId,
-                equipmentId,
+                subTypeId,
                 equipmentStaffDTO.getAvailableStaff(),
                 equipmentStaffDTO.getTotalStaff());
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping("/{repairStationId}/equipment/{equipmentId}")
+    @PutMapping("/{repairStationId}/subtype/{subTypeId}")
     public ResponseEntity<Object> updateRepairStationEquipmentStaff(@PathVariable Long repairStationId,
-                                                                    @PathVariable Long equipmentId,
+                                                                    @PathVariable Long subTypeId,
                                                                     @RequestBody EquipmentStaffDTO equipmentStaffDTO) {
         repairStationService.updateEquipmentStaff(
                 tehoSession.getSessionId(),
                 repairStationId,
-                equipmentId,
+                subTypeId,
                 equipmentStaffDTO.getAvailableStaff(),
                 equipmentStaffDTO.getTotalStaff());
         return ResponseEntity.accepted().build();

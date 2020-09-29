@@ -13,7 +13,10 @@ import va.rit.teho.repository.EquipmentRepository;
 import va.rit.teho.repository.EquipmentSubTypeRepository;
 import va.rit.teho.service.EquipmentService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class EquipmentServiceImpl implements EquipmentService {
@@ -42,8 +45,10 @@ public class EquipmentServiceImpl implements EquipmentService {
     public Long add(String name, Long subTypeId) {
         String logLine = String.format("Добавление ВВСТ \"%s\", subTypeId = %d", name, subTypeId);
         LOGGER.debug(logLine);
-        EquipmentSubType equipmentSubType = equipmentSubTypeRepository
-                .findById(subTypeId).orElseThrow(() -> new IncorrectParamException("subTypeId", subTypeId));
+        EquipmentSubType equipmentSubType =
+                equipmentSubTypeRepository
+                        .findById(subTypeId)
+                        .orElseThrow(() -> new IncorrectParamException("subTypeId", subTypeId));
         if (equipmentRepository.findByName(name).isPresent()) {
             throw new AlreadyExistsException("ВВСТ", "имя", name);
         }
@@ -72,12 +77,10 @@ public class EquipmentServiceImpl implements EquipmentService {
                                                                                          List<Long> subTypeIds,
                                                                                          List<Long> typeIds) {
         List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, subTypeIds, typeIds);
-        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> result =
-                new TreeMap<>(Comparator.comparing(EquipmentType::getId));
+        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> result = new HashMap<>();
         for (Equipment equipment : equipmentList) {
             result
-                    .computeIfAbsent(equipment.getEquipmentSubType().getEquipmentType(),
-                                     (k) -> new TreeMap<>(Comparator.comparing(EquipmentSubType::getId)))
+                    .computeIfAbsent(equipment.getEquipmentSubType().getEquipmentType(), (k) -> new HashMap<>())
                     .computeIfAbsent(equipment.getEquipmentSubType(), (k) -> new ArrayList<>())
                     .add(equipment);
         }

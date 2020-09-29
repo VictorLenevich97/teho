@@ -24,6 +24,11 @@ public class EquipmentInRepair {
     @JoinColumn(name = "workhours_distribution_interval_id")
     WorkhoursDistributionInterval workhoursDistributionInterval;
 
+    @ManyToOne
+    @MapsId("session_id")
+    @JoinColumn(name = "session_id")
+    TehoSession tehoSession;
+
     private double count;
     private double avgLaborInput;
 
@@ -32,15 +37,9 @@ public class EquipmentInRepair {
     }
 
     public EquipmentInRepair(EquipmentInRepairId equipmentInRepairId,
-                             Base base,
-                             Equipment equipment,
-                             WorkhoursDistributionInterval workhoursDistributionInterval,
                              double count,
                              double avgLaborInput) {
         this.equipmentInRepairId = equipmentInRepairId;
-        this.base = base;
-        this.equipment = equipment;
-        this.workhoursDistributionInterval = workhoursDistributionInterval;
         this.count = count;
         this.avgLaborInput = avgLaborInput;
     }
@@ -91,6 +90,10 @@ public class EquipmentInRepair {
 
     public void setWorkhoursDistributionInterval(WorkhoursDistributionInterval workhoursDistributionInterval) {
         this.workhoursDistributionInterval = workhoursDistributionInterval;
+    }
+
+    public TehoSession getTehoSession() {
+        return tehoSession;
     }
 
     @Override

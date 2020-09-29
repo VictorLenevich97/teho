@@ -139,13 +139,10 @@ public class RepairCapabilitiesController {
             RepairStation rs) {
         return new TableDataDTO.RowData<>(
                 rs.getName(),
-                columns
-                        .stream()
-                        .collect(Collectors.toMap(
-                                equipment -> equipment.getId().toString(),
-                                equipment -> calculatedRepairCapabilities
-                                        .getOrDefault(rs, Collections.emptyMap())
-                                        .getOrDefault(equipment, 0.0))));
+                columns.stream().collect(Collectors.toMap(equipment -> equipment.getId().toString(),
+                                                          equipment -> calculatedRepairCapabilities
+                                                                  .getOrDefault(rs, Collections.emptyMap())
+                                                                  .getOrDefault(equipment, 0.0))));
     }
 
     @GetMapping("/repair-type/{id}")
@@ -196,12 +193,12 @@ public class RepairCapabilitiesController {
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
         List<NestedColumnsDTO> nestedColumnsTotal =
-                Stream.of("total", "available")
-                        .flatMap(postfix ->
-                                equipmentTypeListMap
-                                        .entrySet()
-                                        .stream()
-                                        .map(entry -> this.getEquipmentStaffNestedColumnsDTO(entry, postfix)))
+                Stream
+                        .of("total", "available")
+                        .flatMap(postfix -> equipmentTypeListMap
+                                .entrySet()
+                                .stream()
+                                .map(entry -> this.getEquipmentStaffNestedColumnsDTO(entry, postfix)))
                         .collect(Collectors.toList());
         List<TableDataDTO.RowData<Map<String, Integer>>> rows =
                 repairStationList
@@ -211,7 +208,10 @@ public class RepairCapabilitiesController {
         return new TableDataDTO<>(nestedColumnsTotal, rows);
     }
 
-    private TableDataDTO.RowData<Map<String, Integer>> getEquipmentStaffRow(Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap, List<EquipmentSubType> columns, RepairStation rs) {
+    private TableDataDTO.RowData<Map<String, Integer>> getEquipmentStaffRow(
+            Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap,
+            List<EquipmentSubType> columns,
+            RepairStation rs) {
         Map<String, Map<String, Integer>> dataMap = new HashMap<>();
         for (EquipmentSubType est : columns) {
             RepairStationEquipmentStaff repairStationEquipmentStaff =

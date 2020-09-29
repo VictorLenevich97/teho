@@ -97,6 +97,12 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     @Override
+    public EquipmentSubType getSubType(Long subTypeId) {
+        return equipmentSubTypeRepository.findById(subTypeId).orElseThrow(() -> new IncorrectParamException("subTypeId",
+                                                                                                            subTypeId));
+    }
+
+    @Override
     public void updateSubType(Long id, Long typeId, String shortName, String fullName) {
         EquipmentType equipmentType = equipmentTypeRepository.findById(typeId)
                                                              .orElseThrow(() -> new IncorrectParamException("typeId",

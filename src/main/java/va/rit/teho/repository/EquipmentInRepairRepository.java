@@ -15,10 +15,6 @@ import java.util.Map;
 public interface EquipmentInRepairRepository
         extends CrudRepository<EquipmentInRepair, EquipmentInRepairId>, JpaSpecificationExecutor<EquipmentInRepair> {
 
-    List<EquipmentInRepair> findAllByBaseId(Long baseId);
-
-    List<EquipmentInRepair> findAllByEquipmentId(Long equipmentId);
-
     @Query("SELECT new va.rit.teho.entity.EquipmentInRepairData(eir.equipment.equipmentSubType, " +
             "eir.base.fullName, " +
             "eir.equipment.id, " +
@@ -28,7 +24,8 @@ public interface EquipmentInRepairRepository
             "eir.count, " +
             "eir.avgLaborInput) FROM EquipmentInRepair eir " +
             "INNER JOIN EquipmentLaborInputPerType ipt ON eir.equipment.id = ipt.equipment.id " +
-            "WHERE ipt.repairType.id = ?1 AND eir.equipment.equipmentSubType.equipmentType.id IN ?2 " +
+            "WHERE ipt.repairType.id = ?1 AND " +
+            "(coalesce(:equipmentTypeIds, null) is null or eir.equipment.equipmentSubType.equipmentType.id IN (:equipmentTypeIds)) " +
             "GROUP BY eir.equipment.equipmentSubType, " +
             "eir.base.fullName, " +
             "eir.equipment.id, " +

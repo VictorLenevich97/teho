@@ -21,6 +21,8 @@ public interface EquipmentTypeService {
 
     Long addSubType(Long typeId, String shortName, String fullName);
 
+    EquipmentSubType getSubType(Long subTypeId);
+
     void updateSubType(Long id, Long typeId, String shortName, String fullName);
 
 }

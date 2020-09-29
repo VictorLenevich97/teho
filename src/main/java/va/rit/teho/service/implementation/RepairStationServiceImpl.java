@@ -9,7 +9,7 @@ import va.rit.teho.model.Pair;
 import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.repository.RepairStationRepository;
 import va.rit.teho.service.BaseService;
-import va.rit.teho.service.EquipmentService;
+import va.rit.teho.service.EquipmentTypeService;
 import va.rit.teho.service.RepairStationService;
 import va.rit.teho.service.RepairStationTypeService;
 
@@ -24,19 +24,19 @@ public class RepairStationServiceImpl implements RepairStationService {
 
     private final RepairStationTypeService repairStationTypeService;
     private final BaseService baseService;
-    private final EquipmentService equipmentService;
+    private final EquipmentTypeService equipmentTypeService;
 
     public RepairStationServiceImpl(
             RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository,
             RepairStationRepository repairStationRepository,
             RepairStationTypeService repairStationTypeService,
             BaseService baseService,
-            EquipmentService equipmentService) {
+            EquipmentTypeService equipmentTypeService) {
         this.repairStationEquipmentCapabilitiesRepository = repairStationEquipmentCapabilitiesRepository;
         this.repairStationRepository = repairStationRepository;
         this.repairStationTypeService = repairStationTypeService;
         this.baseService = baseService;
-        this.equipmentService = equipmentService;
+        this.equipmentTypeService = equipmentTypeService;
     }
 
     @Override
@@ -66,10 +66,12 @@ public class RepairStationServiceImpl implements RepairStationService {
         RepairStation repairStation = getRepairStationOrThrow(id);
         Base base = baseService.get(baseId);
         RepairStationType repairStationType = repairStationTypeService.get(typeId);
+
         repairStation.setBase(base);
         repairStation.setRepairStationType(repairStationType);
         repairStation.setName(name);
         repairStation.setStationAmount(amount);
+
         repairStationRepository.save(repairStation);
     }
 
@@ -79,43 +81,50 @@ public class RepairStationServiceImpl implements RepairStationService {
                 .orElseThrow(() -> new NotFoundException("РВО с id = " + id + " не найден!"));
     }
 
-    @Override
-    public void setEquipmentStaff(UUID sessionId,
-                                  Long repairStationId,
-                                  Long equipmentId,
-                                  int availableStaff,
-                                  int totalStaff) {
+    private void checkEquipmentStaffPreconditions(Long repairStationId,
+                                                  Long equipmentSubTypeId,
+                                                  int availableStaff,
+                                                  int totalStaff) {
         getRepairStationOrThrow(repairStationId);
-        equipmentService.getEquipment(equipmentId); //Проверка на существование
+        equipmentTypeService.getSubType(equipmentSubTypeId); //Проверка на существование
         if (totalStaff < availableStaff) {
             throw new IncorrectParamException(
                     "Всего производственников < доступно производственников (" + totalStaff + " < " + availableStaff + ")");
         }
-        RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(
-                new EquipmentSubTypePerRepairStation(repairStationId, equipmentId, sessionId),
-                totalStaff,
-                availableStaff);
+    }
+
+    @Override
+    public void setEquipmentStaff(UUID sessionId,
+                                  Long repairStationId,
+                                  Long equipmentSubTypeId,
+                                  int availableStaff,
+                                  int totalStaff) {
+        checkEquipmentStaffPreconditions(repairStationId, equipmentSubTypeId, availableStaff, totalStaff);
+
+        EquipmentSubTypePerRepairStation id =
+                new EquipmentSubTypePerRepairStation(repairStationId, equipmentSubTypeId, sessionId);
+        RepairStationEquipmentStaff repairStationEquipmentStaff =
+                new RepairStationEquipmentStaff(id, totalStaff, availableStaff);
+
         repairStationEquipmentCapabilitiesRepository.save(repairStationEquipmentStaff);
     }
 
     @Override
     public void updateEquipmentStaff(UUID sessionId,
                                      Long repairStationId,
-                                     Long equipmentId,
+                                     Long equipmentSubTypeId,
                                      int availableStaff,
                                      int totalStaff) {
-        getRepairStationOrThrow(repairStationId);
-        equipmentService.getEquipment(equipmentId); //Проверка на существование
-        if (totalStaff < availableStaff) {
-            throw new IncorrectParamException(
-                    "Всего производственников < доступно производственников (" + totalStaff + " < " + availableStaff + ")");
-        }
+        checkEquipmentStaffPreconditions(repairStationId, equipmentSubTypeId, availableStaff, totalStaff);
+
         RepairStationEquipmentStaff stationEquipmentStaff =
                 repairStationEquipmentCapabilitiesRepository
-                        .findById(new EquipmentSubTypePerRepairStation(repairStationId, equipmentId, sessionId))
-                        .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationId + " по ВВСТ с id = " + equipmentId + " не найдены!"));
+                        .findById(new EquipmentSubTypePerRepairStation(repairStationId, equipmentSubTypeId, sessionId))
+                        .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationId + " по ВВСТ с id = " + equipmentSubTypeId + " не найдены!"));
+
         stationEquipmentStaff.setAvailableStaff(availableStaff);
         stationEquipmentStaff.setTotalStaff(totalStaff);
+
         repairStationEquipmentCapabilitiesRepository.save(stationEquipmentStaff);
     }
 
