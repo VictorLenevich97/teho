@@ -30,9 +30,9 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public UUID create(String name) {
+    public TehoSession create(String name) {
         TehoSession tehoSession = new TehoSession(name);
-        return sessionRepository.save(tehoSession).getId();
+        return sessionRepository.save(tehoSession);
     }
 
     @Override

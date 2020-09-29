@@ -26,6 +26,11 @@ public class CalculatedRepairCapabilitesPerDay {
     @JoinColumn(name = "repair_type_id")
     RepairType repairType;
 
+    @ManyToOne
+    @MapsId("session_id")
+    @JoinColumn(name = "session_id")
+    TehoSession tehoSession;
+
     public CalculatedRepairCapabilitesPerDay() {
     }
 
@@ -58,12 +63,22 @@ public class CalculatedRepairCapabilitesPerDay {
                 Objects.equals(equipmentPerRepairStationWithRepairType, that.equipmentPerRepairStationWithRepairType) &&
                 Objects.equals(repairStation, that.repairStation) &&
                 Objects.equals(equipment, that.equipment) &&
-                Objects.equals(repairType, that.repairType);
+                Objects.equals(repairType, that.repairType) &&
+                Objects.equals(tehoSession, that.tehoSession);
+    }
+
+    public TehoSession getTehoSession() {
+        return tehoSession;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(equipmentPerRepairStationWithRepairType, repairStation, equipment, repairType, capability);
+        return Objects.hash(equipmentPerRepairStationWithRepairType,
+                            repairStation,
+                            equipment,
+                            repairType,
+                            capability,
+                            tehoSession);
     }
 
     public EquipmentPerRepairStationWithRepairType getEquipmentPerRepairStation() {

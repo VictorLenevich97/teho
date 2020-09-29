@@ -11,7 +11,7 @@ public interface SessionService {
 
     UUID create();
 
-    UUID create(String name);
+    TehoSession create(String name);
 
     TehoSession get(UUID sessionId);
 

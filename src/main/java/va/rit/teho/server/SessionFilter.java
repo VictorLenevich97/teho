@@ -1,5 +1,6 @@
 package va.rit.teho.server;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import va.rit.teho.service.SessionService;
@@ -10,6 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -27,12 +30,22 @@ public class SessionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         final String sessionId = httpServletRequest.getHeader("Session-Id");
+        if (sessionId == null) {
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        } else {
+            UUID sessionUUID = UUID.fromString(sessionId);
+            sessionService.get(sessionUUID);
+            tehoSession.saveSessionId(sessionUUID);
 
-        UUID sessionUUID = UUID.fromString(sessionId);
-        sessionService.get(sessionUUID);
-        tehoSession.saveSessionId(sessionUUID);
-
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+        }
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        List<String> filterPaths = Arrays.asList("/repair-capabilities", "/labor-distribution");
+        String path = request.getServletPath();
+        return filterPaths.stream().noneMatch(path::contains) && !(path.contains("/repair-station") && path.contains(
+                "/equipment"));
+    }
 }

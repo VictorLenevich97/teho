@@ -14,6 +14,7 @@ import va.rit.teho.service.RepairStationService;
 import va.rit.teho.service.RepairStationTypeService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class RepairStationServiceImpl implements RepairStationService {
@@ -79,7 +80,11 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
-    public void setEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff) {
+    public void setEquipmentStaff(UUID sessionId,
+                                  Long repairStationId,
+                                  Long equipmentId,
+                                  int availableStaff,
+                                  int totalStaff) {
         getRepairStationOrThrow(repairStationId);
         equipmentService.getEquipment(equipmentId); //Проверка на существование
         if (totalStaff < availableStaff) {
@@ -87,12 +92,18 @@ public class RepairStationServiceImpl implements RepairStationService {
                     "Всего производственников < доступно производственников (" + totalStaff + " < " + availableStaff + ")");
         }
         RepairStationEquipmentStaff repairStationEquipmentStaff = new RepairStationEquipmentStaff(
-                new EquipmentSubTypePerRepairStation(repairStationId, equipmentId), totalStaff, availableStaff);
+                new EquipmentSubTypePerRepairStation(repairStationId, equipmentId, sessionId),
+                totalStaff,
+                availableStaff);
         repairStationEquipmentCapabilitiesRepository.save(repairStationEquipmentStaff);
     }
 
     @Override
-    public void updateEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff) {
+    public void updateEquipmentStaff(UUID sessionId,
+                                     Long repairStationId,
+                                     Long equipmentId,
+                                     int availableStaff,
+                                     int totalStaff) {
         getRepairStationOrThrow(repairStationId);
         equipmentService.getEquipment(equipmentId); //Проверка на существование
         if (totalStaff < availableStaff) {
@@ -101,7 +112,7 @@ public class RepairStationServiceImpl implements RepairStationService {
         }
         RepairStationEquipmentStaff stationEquipmentStaff =
                 repairStationEquipmentCapabilitiesRepository
-                        .findById(new EquipmentSubTypePerRepairStation(repairStationId, equipmentId))
+                        .findById(new EquipmentSubTypePerRepairStation(repairStationId, equipmentId, sessionId))
                         .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationId + " по ВВСТ с id = " + equipmentId + " не найдены!"));
         stationEquipmentStaff.setAvailableStaff(availableStaff);
         stationEquipmentStaff.setTotalStaff(totalStaff);
@@ -109,7 +120,8 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
-    public List<RepairStationEquipmentStaff> listEquipmentStaff(List<Long> repairStationIds,
+    public List<RepairStationEquipmentStaff> listEquipmentStaff(UUID sessionId,
+                                                                List<Long> repairStationIds,
                                                                 List<Long> equipmentTypeIds,
                                                                 List<Long> equipmentSubTypeIds) {
         return null;

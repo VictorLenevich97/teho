@@ -5,6 +5,7 @@ import va.rit.teho.entity.RepairStationEquipmentStaff;
 import va.rit.teho.model.Pair;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface RepairStationService {
 
@@ -16,11 +17,16 @@ public interface RepairStationService {
 
     void update(Long id, String name, Long baseId, Long typeId, int amount);
 
-    void setEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
+    void setEquipmentStaff(UUID sessionId, Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
 
-    void updateEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
+    void updateEquipmentStaff(UUID sessionId,
+                              Long repairStationId,
+                              Long equipmentId,
+                              int availableStaff,
+                              int totalStaff);
 
-    List<RepairStationEquipmentStaff> listEquipmentStaff(List<Long> repairStationIds,
+    List<RepairStationEquipmentStaff> listEquipmentStaff(UUID sessionId,
+                                                         List<Long> repairStationIds,
                                                          List<Long> equipmentTypeIds,
                                                          List<Long> equipmentSubTypeIds);
 

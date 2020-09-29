@@ -9,9 +9,10 @@ import va.rit.teho.dto.RepairStationDTO;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
 import va.rit.teho.model.Pair;
+import va.rit.teho.server.TehoSessionData;
 import va.rit.teho.service.RepairStationService;
-import va.rit.teho.service.RepairStationTypeService;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,9 @@ public class RepairStationController {
     public RepairStationController(RepairStationService repairStationService) {
         this.repairStationService = repairStationService;
     }
+
+    @Resource
+    private TehoSessionData tehoSession;
 
     @GetMapping
     @ResponseBody
@@ -79,10 +83,12 @@ public class RepairStationController {
     public ResponseEntity<Object> setRepairStationEquipmentStaff(@PathVariable Long repairStationId,
                                                                  @PathVariable Long equipmentId,
                                                                  @RequestBody EquipmentStaffDTO equipmentStaffDTO) {
-        repairStationService.setEquipmentStaff(repairStationId,
-                                               equipmentId,
-                                               equipmentStaffDTO.getAvailableStaff(),
-                                               equipmentStaffDTO.getTotalStaff());
+        repairStationService.setEquipmentStaff(
+                tehoSession.getSessionId(),
+                repairStationId,
+                equipmentId,
+                equipmentStaffDTO.getAvailableStaff(),
+                equipmentStaffDTO.getTotalStaff());
         return ResponseEntity.accepted().build();
     }
 
@@ -90,10 +96,12 @@ public class RepairStationController {
     public ResponseEntity<Object> updateRepairStationEquipmentStaff(@PathVariable Long repairStationId,
                                                                     @PathVariable Long equipmentId,
                                                                     @RequestBody EquipmentStaffDTO equipmentStaffDTO) {
-        repairStationService.updateEquipmentStaff(repairStationId,
-                                                  equipmentId,
-                                                  equipmentStaffDTO.getAvailableStaff(),
-                                                  equipmentStaffDTO.getTotalStaff());
+        repairStationService.updateEquipmentStaff(
+                tehoSession.getSessionId(),
+                repairStationId,
+                equipmentId,
+                equipmentStaffDTO.getAvailableStaff(),
+                equipmentStaffDTO.getTotalStaff());
         return ResponseEntity.accepted().build();
     }
 

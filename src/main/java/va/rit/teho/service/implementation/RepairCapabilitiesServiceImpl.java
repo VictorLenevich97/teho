@@ -6,14 +6,10 @@ import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.CalculatedRepairCapabilitiesPerDayRepository;
 import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 import va.rit.teho.repository.RepairTypeRepository;
-import va.rit.teho.repository.SessionRepository;
 import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.RepairCapabilitiesService;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -23,7 +19,6 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     private final RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository;
     private final CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository;
     private final RepairTypeRepository repairTypeRepository;
-    private final SessionRepository sessionRepository;
 
 
     private final CalculationService calculationService;
@@ -32,15 +27,15 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
             RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository,
             CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository,
             RepairTypeRepository repairTypeRepository,
-            SessionRepository sessionRepository, CalculationService calculationService) {
+            CalculationService calculationService) {
         this.repairStationEquipmentCapabilitiesRepository = repairStationEquipmentCapabilitiesRepository;
         this.calculatedRepairCapabilitiesPerDayRepository = calculatedRepairCapabilitiesPerDayRepository;
         this.repairTypeRepository = repairTypeRepository;
-        this.sessionRepository = sessionRepository;
         this.calculationService = calculationService;
     }
 
-    private CalculatedRepairCapabilitesPerDay getCalculatedRepairCapabilitesPerDay(Long repairTypeId,
+    private CalculatedRepairCapabilitesPerDay getCalculatedRepairCapabilitesPerDay(UUID sessionId,
+                                                                                   Long repairTypeId,
                                                                                    Equipment equipment,
                                                                                    RepairStationEquipmentStaff rsec) {
         EquipmentLaborInputPerType laborInputPerType = equipment
@@ -56,9 +51,11 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                 rsec.getRepairStation().getRepairStationType().getWorkingHoursMax(),
                 laborInputPerType.getAmount());
         return new CalculatedRepairCapabilitesPerDay(
-                new EquipmentPerRepairStationWithRepairType(rsec.getEquipmentPerRepairStation().getRepairStationId(),
+                new EquipmentPerRepairStationWithRepairType(
+                        rsec.getEquipmentPerRepairStation().getRepairStationId(),
                         equipment.getId(),
-                        repairTypeId),
+                        repairTypeId,
+                        sessionId),
                 rsec.getRepairStation(),
                 equipment,
                 calculatedCapabilities,
@@ -66,13 +63,15 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     }
 
     @Override
-    public void calculateAndUpdateRepairCapabilities(Long repairTypeId) {
+    public void calculateAndUpdateRepairCapabilities(UUID sessionId, Long repairTypeId) {
         calculateAndUpdateRepairCapabilities(
+                sessionId,
                 (List<RepairStationEquipmentStaff>) this.repairStationEquipmentCapabilitiesRepository.findAll(),
                 repairTypeId);
     }
 
-    private void calculateAndUpdateRepairCapabilities(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList,
+    private void calculateAndUpdateRepairCapabilities(UUID sessionId,
+                                                      List<RepairStationEquipmentStaff> repairStationEquipmentStaffList,
                                                       Long repairTypeId) {
         List<CalculatedRepairCapabilitesPerDay> capabilitesPerDayList =
                 repairStationEquipmentStaffList.stream().flatMap(
@@ -81,32 +80,39 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                         .getEquipmentSubType()
                                         .getEquipmentSet()
                                         .stream()
-                                        .map(e -> getCalculatedRepairCapabilitesPerDay(repairTypeId,
-                                                e,
-                                                repairStationEquipmentStaff)))
+                                        .map(e -> getCalculatedRepairCapabilitesPerDay(sessionId,
+                                                                                       repairTypeId,
+                                                                                       e,
+                                                                                       repairStationEquipmentStaff)))
                         .collect(Collectors.toList());
         calculatedRepairCapabilitiesPerDayRepository.saveAll(capabilitesPerDayList);
     }
 
     @Override
-    public void calculateAndUpdateRepairCapabilitiesPerStation(Long repairStationId, Long repairTypeId) {
+    public void calculateAndUpdateRepairCapabilitiesPerStation(UUID sessionId,
+                                                               Long repairStationId,
+                                                               Long repairTypeId) {
         calculateAndUpdateRepairCapabilities(
-                repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId), repairTypeId);
+                sessionId,
+                repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId),
+                repairTypeId);
     }
 
     @Override
-    public Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(List<Long> repairStationIds,
+    public Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(UUID sessionId,
+                                                                                      List<Long> repairStationIds,
                                                                                       List<Long> equipmentIds,
                                                                                       List<Long> equipmentSubTypeIds,
                                                                                       List<Long> equipmentTypeIds) {
         RepairType repairType = StreamSupport.stream(repairTypeRepository.findAll().spliterator(), false)
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Типов ремонта не существует!"));
-        return internalGetCalculatedRepairCapabilities(repairType.getId(),
-                repairStationIds,
-                equipmentIds,
-                equipmentSubTypeIds,
-                equipmentTypeIds);
+                                             .findFirst()
+                                             .orElseThrow(() -> new NotFoundException("Типов ремонта не существует!"));
+        return internalGetCalculatedRepairCapabilities(sessionId,
+                                                       repairType.getId(),
+                                                       repairStationIds,
+                                                       equipmentIds,
+                                                       equipmentSubTypeIds,
+                                                       equipmentTypeIds);
     }
 
     private List<Long> nullIfEmpty(List<Long> collection) {
@@ -115,40 +121,50 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
 
     @Override
     public Map<RepairStation, Map<Equipment, Double>> getCalculatedRepairCapabilities(
+            UUID sessionId,
             Long repairTypeId,
             List<Long> repairStationIds,
             List<Long> equipmentIds,
             List<Long> equipmentSubTypeIds,
             List<Long> equipmentTypeIds) {
-        return internalGetCalculatedRepairCapabilities(repairTypeId, repairStationIds, equipmentIds, equipmentSubTypeIds, equipmentTypeIds);
+        return internalGetCalculatedRepairCapabilities(sessionId,
+                                                       repairTypeId,
+                                                       repairStationIds,
+                                                       equipmentIds,
+                                                       equipmentSubTypeIds,
+                                                       equipmentTypeIds);
     }
 
     @Override
-    public Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> getRepairStationEquipmentStaff(List<Long> repairStationIds,
+    public Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> getRepairStationEquipmentStaff(UUID sessionId,
+                                                                                                                 List<Long> repairStationIds,
                                                                                                                  List<Long> equipmentTypeIds,
                                                                                                                  List<Long> equipmentSubTypeIds) {
         List<RepairStationEquipmentStaff> equipmentStaffList =
                 repairStationEquipmentCapabilitiesRepository.findFiltered(repairStationIds,
-                        equipmentTypeIds,
-                        equipmentSubTypeIds);
+                                                                          equipmentTypeIds,
+                                                                          equipmentSubTypeIds);
 
         Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> result =
                 new TreeMap<>(Comparator.comparing(RepairStation::getId));
         for (RepairStationEquipmentStaff repairStationEquipmentStaff : equipmentStaffList) {
             RepairStation repairStation = repairStationEquipmentStaff.getRepairStation();
             result.computeIfAbsent(repairStation, rs -> new TreeMap<>(Comparator.comparing(EquipmentSubType::getId)));
-            result.get(repairStation).put(repairStationEquipmentStaff.getEquipmentSubType(), repairStationEquipmentStaff);
+            result.get(repairStation).put(repairStationEquipmentStaff.getEquipmentSubType(),
+                                          repairStationEquipmentStaff);
         }
         return result;
     }
 
-    private Map<RepairStation, Map<Equipment, Double>> internalGetCalculatedRepairCapabilities(Long repairTypeId,
+    private Map<RepairStation, Map<Equipment, Double>> internalGetCalculatedRepairCapabilities(UUID sessionId,
+                                                                                               Long repairTypeId,
                                                                                                List<Long> repairStationIds,
                                                                                                List<Long> equipmentIds,
                                                                                                List<Long> equipmentSubTypeIds,
                                                                                                List<Long> equipmentTypeIds) {
         Iterable<CalculatedRepairCapabilitesPerDay> calculatedRepairCapabilitesPerDays =
                 calculatedRepairCapabilitiesPerDayRepository.findByIds(
+                        sessionId,
                         repairTypeId,
                         nullIfEmpty(repairStationIds),
                         nullIfEmpty(equipmentIds),

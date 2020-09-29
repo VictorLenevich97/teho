@@ -18,10 +18,13 @@ public class TehoSession {
     )
     private UUID id;
 
-    private final String name;
+    private String name;
 
     @Column(name = "creation_ts")
-    private final Instant creationTimestamp;
+    private Instant creationTimestamp;
+
+    public TehoSession() {
+    }
 
     public TehoSession(String name) {
         this.name = name;

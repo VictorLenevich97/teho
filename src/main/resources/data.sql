@@ -22,13 +22,13 @@ INSERT INTO equipment_per_base values (1, 1, 20, 3);
 INSERT INTO equipment_per_base values (2, 2, 3, 14);
 INSERT INTO equipment_per_base values (1, 3, 9, 7);
 INSERT INTO equipment_per_base values (2, 4, 12, 22);
-
-INSERT INTO repair_station_equipment_staff VALUES (1, 1, 5, 10);
-INSERT INTO repair_station_equipment_staff VALUES (2, 1, 3, 5);
-INSERT INTO repair_station_equipment_staff VALUES (3, 1, 12, 15);
-INSERT INTO repair_station_equipment_staff VALUES (1, 2, 7, 11);
-INSERT INTO repair_station_equipment_staff VALUES (2, 2, 8, 12);
-INSERT INTO repair_station_equipment_staff VALUES (3, 2, 9, 13);
+--
+-- INSERT INTO repair_station_equipment_staff VALUES (1, 1, 5, 10);
+-- INSERT INTO repair_station_equipment_staff VALUES (2, 1, 3, 5);
+-- INSERT INTO repair_station_equipment_staff VALUES (3, 1, 12, 15);
+-- INSERT INTO repair_station_equipment_staff VALUES (1, 2, 7, 11);
+-- INSERT INTO repair_station_equipment_staff VALUES (2, 2, 8, 12);
+-- INSERT INTO repair_station_equipment_staff VALUES (3, 2, 9, 13);
 
 INSERT INTO repair_type VALUES (1, 'Текущий', true);
 INSERT INTO repair_type VALUES (2, 'Средний', true);
