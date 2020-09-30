@@ -46,6 +46,6 @@ public class SessionFilter extends OncePerRequestFilter {
         List<String> filterPaths = Arrays.asList("/repair-capabilities", "/labor-distribution");
         String path = request.getServletPath();
         return filterPaths.stream().noneMatch(path::contains) && !(path.contains("/repair-station") && path.contains(
-                "/equipment"));
+                "/subtype"));
     }
 }

@@ -24,7 +24,7 @@ public interface EquipmentInRepairRepository
             "eir.count, " +
             "eir.avgLaborInput) FROM EquipmentInRepair eir " +
             "INNER JOIN EquipmentLaborInputPerType ipt ON eir.equipment.id = ipt.equipment.id " +
-            "WHERE ipt.repairType.id = ?1 AND " +
+            "WHERE ipt.repairType.id = :repairTypeId AND " +
             "(coalesce(:equipmentTypeIds, null) is null or eir.equipment.equipmentSubType.equipmentType.id IN (:equipmentTypeIds)) " +
             "GROUP BY eir.equipment.equipmentSubType, " +
             "eir.base.fullName, " +
