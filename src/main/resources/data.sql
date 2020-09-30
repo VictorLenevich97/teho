@@ -1,3 +1,15 @@
+DELETE FROM workhours_distribution_interval;
+DELETE FROM equipment_labor_input_per_type;
+DELETE FROM restoration_type;
+DELETE FROM repair_type;
+DELETE FROM equipment_per_base;
+DELETE FROM equipment;
+DELETE FROM equipment_sub_type;
+DELETE FROM equipment_type;
+DELETE FROM repair_station;
+DELETE FROM repair_station_type;
+DELETE FROM base;
+
 INSERT INTO base VALUES (1, 'б 1', 'б1');
 INSERT INTO base VALUES (2, 'б 2', 'б2');
 
