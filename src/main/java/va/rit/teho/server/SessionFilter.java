@@ -31,7 +31,11 @@ public class SessionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         final String sessionId = httpServletRequest.getHeader("Session-Id");
         if (sessionId == null) {
+            httpServletResponse.resetBuffer();
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+            httpServletResponse.setHeader("Content-Type", "application/json");
+            httpServletResponse.getOutputStream().print("{\"message\": \"Missing Session-Id header!\"}");
+            httpServletResponse.flushBuffer();
         } else {
             UUID sessionUUID = UUID.fromString(sessionId);
             sessionService.get(sessionUUID);

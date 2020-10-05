@@ -5,17 +5,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.NestedColumnsDTO;
 import va.rit.teho.dto.TableDataDTO;
-import va.rit.teho.entity.*;
+import va.rit.teho.entity.Equipment;
+import va.rit.teho.entity.EquipmentSubType;
+import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.entity.RepairStation;
 import va.rit.teho.server.TehoSessionData;
 import va.rit.teho.service.EquipmentService;
-import va.rit.teho.service.EquipmentTypeService;
 import va.rit.teho.service.RepairCapabilitiesService;
 import va.rit.teho.service.RepairStationService;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("repair-capabilities")
@@ -23,17 +26,14 @@ public class RepairCapabilitiesController {
 
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final EquipmentService equipmentService;
-    private final EquipmentTypeService equipmentTypeService;
     private final RepairStationService repairStationService;
 
     public RepairCapabilitiesController(
             RepairCapabilitiesService repairCapabilitiesService,
             EquipmentService equipmentService,
-            EquipmentTypeService equipmentTypeService,
             RepairStationService repairStationService) {
         this.repairCapabilitiesService = repairCapabilitiesService;
         this.equipmentService = equipmentService;
-        this.equipmentTypeService = equipmentTypeService;
         this.repairStationService = repairStationService;
     }
 
@@ -169,81 +169,6 @@ public class RepairCapabilitiesController {
                                                                                     grouped,
                                                                                     calculatedRepairCapabilities);
         return ResponseEntity.ok(repairCapabilitiesFullDTO);
-    }
-
-    private NestedColumnsDTO getEquipmentStaffNestedColumnsDTO(
-            Map.Entry<EquipmentType, List<EquipmentSubType>> equipmentTypeEntry,
-            String postfix) {
-        return new NestedColumnsDTO(
-                equipmentTypeEntry.getKey().getShortName(),
-                equipmentTypeEntry.getValue()
-                        .stream()
-                        .map(est -> new NestedColumnsDTO(Arrays.asList(est.getId().toString(), postfix), est.getShortName()))
-                        .collect(Collectors.toList()));
-    }
-
-    private TableDataDTO<Map<String, Integer>> buildEquipmentStaffDTO(
-            List<RepairStation> repairStationList,
-            Map<EquipmentType, List<EquipmentSubType>> equipmentTypeListMap,
-            Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap) {
-        List<EquipmentSubType> columns =
-                equipmentTypeListMap
-                        .values()
-                        .stream()
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList());
-        List<NestedColumnsDTO> nestedColumnsTotal =
-                Stream
-                        .of("total", "available")
-                        .flatMap(postfix -> equipmentTypeListMap
-                                .entrySet()
-                                .stream()
-                                .map(entry -> this.getEquipmentStaffNestedColumnsDTO(entry, postfix)))
-                        .collect(Collectors.toList());
-        List<TableDataDTO.RowData<Map<String, Integer>>> rows =
-                repairStationList
-                        .stream()
-                        .map(rs -> getEquipmentStaffRow(repairStationMap, columns, rs))
-                        .collect(Collectors.toList());
-        return new TableDataDTO<>(nestedColumnsTotal, rows);
-    }
-
-    private TableDataDTO.RowData<Map<String, Integer>> getEquipmentStaffRow(
-            Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap,
-            List<EquipmentSubType> columns,
-            RepairStation rs) {
-        Map<String, Map<String, Integer>> dataMap = new HashMap<>();
-        for (EquipmentSubType est : columns) {
-            RepairStationEquipmentStaff repairStationEquipmentStaff =
-                    repairStationMap.getOrDefault(rs, Collections.emptyMap()).get(est);
-            Map<String, Integer> innerMap = new HashMap<>();
-            boolean emptyStaff = repairStationEquipmentStaff == null;
-            innerMap.put("total", emptyStaff ? 0 : repairStationEquipmentStaff.getTotalStaff());
-            innerMap.put("available", emptyStaff ? 0 : repairStationEquipmentStaff.getAvailableStaff());
-            dataMap.put(est.getId().toString(), innerMap);
-        }
-        return new TableDataDTO.RowData<>(rs.getName(), dataMap);
-    }
-
-    @GetMapping("/staff")
-    public ResponseEntity<TableDataDTO<Map<String, Integer>>> getEquipmentStaffData(
-            @RequestParam(required = false) List<Long> repairStationId,
-            @RequestParam(required = false) List<Long> equipmentTypeId,
-            @RequestParam(required = false) List<Long> equipmentSubTypeId) {
-        List<RepairStation> repairStationList = repairStationService.list(repairStationId);
-        Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes =
-                equipmentTypeService.listTypesWithSubTypes(equipmentTypeId,
-                                                           equipmentSubTypeId);
-        Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationEquipmentStaff =
-                repairCapabilitiesService.getRepairStationEquipmentStaff(tehoSession.getSessionId(),
-                                                                         repairStationId,
-                                                                         equipmentTypeId,
-                                                                         equipmentSubTypeId);
-        TableDataDTO<Map<String, Integer>> equipmentStaffDTO =
-                buildEquipmentStaffDTO(repairStationList,
-                                       typesWithSubTypes,
-                                       repairStationEquipmentStaff);
-        return ResponseEntity.ok(equipmentStaffDTO);
     }
 
 }

@@ -130,25 +130,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                 sessionId, repairTypeId, repairStationIds, equipmentIds, equipmentSubTypeIds, equipmentTypeIds);
     }
 
-    @Override
-    public Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> getRepairStationEquipmentStaff(UUID sessionId,
-                                                                                                                 List<Long> repairStationIds,
-                                                                                                                 List<Long> equipmentTypeIds,
-                                                                                                                 List<Long> equipmentSubTypeIds) {
-        List<RepairStationEquipmentStaff> equipmentStaffList =
-                repairStationEquipmentCapabilitiesRepository.findFiltered(repairStationIds,
-                                                                          equipmentTypeIds,
-                                                                          equipmentSubTypeIds);
 
-        Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> result = new HashMap<>();
-        for (RepairStationEquipmentStaff repairStationEquipmentStaff : equipmentStaffList) {
-            RepairStation repairStation = repairStationEquipmentStaff.getRepairStation();
-            result.computeIfAbsent(repairStation, rs -> new HashMap<>());
-            result.get(repairStation).put(repairStationEquipmentStaff.getEquipmentSubType(),
-                                          repairStationEquipmentStaff);
-        }
-        return result;
-    }
 
     private Map<RepairStation, Map<Equipment, Double>> internalGetCalculatedRepairCapabilities(UUID sessionId,
                                                                                                Long repairTypeId,

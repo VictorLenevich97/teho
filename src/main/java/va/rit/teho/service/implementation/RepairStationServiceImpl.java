@@ -13,7 +13,9 @@ import va.rit.teho.service.EquipmentTypeService;
 import va.rit.teho.service.RepairStationService;
 import va.rit.teho.service.RepairStationTypeService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -129,11 +131,23 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
-    public List<RepairStationEquipmentStaff> listEquipmentStaff(UUID sessionId,
-                                                                List<Long> repairStationIds,
-                                                                List<Long> equipmentTypeIds,
-                                                                List<Long> equipmentSubTypeIds) {
-        return null;
+    public Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> getRepairStationEquipmentStaff(UUID sessionId,
+                                                                                                                 List<Long> repairStationIds,
+                                                                                                                 List<Long> equipmentTypeIds,
+                                                                                                                 List<Long> equipmentSubTypeIds) {
+        List<RepairStationEquipmentStaff> equipmentStaffList =
+                repairStationEquipmentCapabilitiesRepository.findFiltered(repairStationIds,
+                                                                          equipmentTypeIds,
+                                                                          equipmentSubTypeIds);
+
+        Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> result = new HashMap<>();
+        for (RepairStationEquipmentStaff repairStationEquipmentStaff : equipmentStaffList) {
+            RepairStation repairStation = repairStationEquipmentStaff.getRepairStation();
+            result.computeIfAbsent(repairStation, rs -> new HashMap<>());
+            result.get(repairStation).put(repairStationEquipmentStaff.getEquipmentSubType(),
+                                          repairStationEquipmentStaff);
+        }
+        return result;
     }
 
 }

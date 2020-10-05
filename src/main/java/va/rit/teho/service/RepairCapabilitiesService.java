@@ -33,8 +33,4 @@ public interface RepairCapabilitiesService {
             List<Long> equipmentSubTypeIds,
             List<Long> equipmentTypeIds);
 
-    Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> getRepairStationEquipmentStaff(UUID sessionId,
-                                                                                                          List<Long> repairStationIds,
-                                                                                                          List<Long> equipmentTypeIds,
-                                                                                                          List<Long> equipmentSubTypeIds);
 }
