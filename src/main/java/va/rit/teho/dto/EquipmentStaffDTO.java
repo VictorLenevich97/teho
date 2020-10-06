@@ -1,7 +1,10 @@
 package va.rit.teho.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import va.rit.teho.entity.EquipmentSubTypePerRepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
+
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentStaffDTO {
@@ -52,5 +55,13 @@ public class EquipmentStaffDTO {
 
     public void setAvailableStaff(Integer availableStaff) {
         this.availableStaff = availableStaff;
+    }
+
+    public RepairStationEquipmentStaff toEntity(UUID sessionId,
+                                                Long repairStationId) {
+        return new RepairStationEquipmentStaff(
+                new EquipmentSubTypePerRepairStation(repairStationId, equipmentSubTypeId, sessionId),
+                totalStaff,
+                availableStaff);
     }
 }

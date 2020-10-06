@@ -87,7 +87,7 @@ public class RepairStationController {
     }
 
     @GetMapping("/staff")
-    public ResponseEntity<TableDataDTO<Map<String, Integer>>> getEquipmentStaffData(
+    public ResponseEntity<TableDataDTO<Map<String, Integer>>> getEquipmentStaff(
             @RequestParam(required = false) List<Long> repairStationId,
             @RequestParam(required = false) List<Long> equipmentTypeId,
             @RequestParam(required = false) List<Long> equipmentSubTypeId) {
@@ -109,13 +109,25 @@ public class RepairStationController {
 
     @PostMapping("/{repairStationId}/staff")
     public ResponseEntity<Object> setRepairStationEquipmentStaff(@PathVariable Long repairStationId,
-                                                                 @RequestBody EquipmentStaffDTO equipmentStaffDTO) {
+                                                                 @RequestBody List<EquipmentStaffDTO> equipmentStaffDTOList) {
         repairStationService.setEquipmentStaff(
-                tehoSession.getSessionId(),
-                repairStationId,
-                equipmentStaffDTO.getEquipmentSubTypeId(),
-                equipmentStaffDTO.getAvailableStaff(),
-                equipmentStaffDTO.getTotalStaff());
+                equipmentStaffDTOList
+                        .stream()
+                        .map(equipmentStaffDTO -> equipmentStaffDTO.toEntity(tehoSession.getSessionId(),
+                                                                             repairStationId))
+                        .collect(Collectors.toList()));
+        return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping("/{repairStationId}/staff")
+    public ResponseEntity<Object> updateRepairStationEquipmentStaff(@PathVariable Long repairStationId,
+                                                                    @RequestBody List<EquipmentStaffDTO> equipmentStaffDTOList) {
+        repairStationService.updateEquipmentStaff(
+                equipmentStaffDTOList
+                        .stream()
+                        .map(equipmentStaffDTO -> equipmentStaffDTO.toEntity(tehoSession.getSessionId(),
+                                                                             repairStationId))
+                        .collect(Collectors.toList()));
         return ResponseEntity.accepted().build();
     }
 
@@ -174,16 +186,5 @@ public class RepairStationController {
         return new TableDataDTO.RowData<>(rs.getName(), dataMap);
     }
 
-    @PutMapping("/{repairStationId}/staff")
-    public ResponseEntity<Object> updateRepairStationEquipmentStaff(@PathVariable Long repairStationId,
-                                                                    @RequestBody EquipmentStaffDTO equipmentStaffDTO) {
-        repairStationService.updateEquipmentStaff(
-                tehoSession.getSessionId(),
-                repairStationId,
-                equipmentStaffDTO.getEquipmentSubTypeId(),
-                equipmentStaffDTO.getAvailableStaff(),
-                equipmentStaffDTO.getTotalStaff());
-        return ResponseEntity.accepted().build();
-    }
 
 }

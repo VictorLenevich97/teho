@@ -19,17 +19,9 @@ public interface RepairStationService {
 
     void update(Long id, String name, Long baseId, Long typeId, int amount);
 
-    void setEquipmentStaff(UUID sessionId,
-                           Long repairStationId,
-                           Long equipmentSubTypeId,
-                           int availableStaff,
-                           int totalStaff);
+    void setEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList);
 
-    void updateEquipmentStaff(UUID sessionId,
-                              Long repairStationId,
-                              Long equipmentSubTypeId,
-                              int availableStaff,
-                              int totalStaff);
+    void updateEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList);
 
     Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> getRepairStationEquipmentStaff(UUID sessionId,
                                                                                                           List<Long> repairStationIds,

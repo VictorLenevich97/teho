@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class RepairStationServiceImpl implements RepairStationService {
@@ -83,51 +84,44 @@ public class RepairStationServiceImpl implements RepairStationService {
                 .orElseThrow(() -> new NotFoundException("РВО с id = " + id + " не найден!"));
     }
 
-    private void checkEquipmentStaffPreconditions(Long repairStationId,
-                                                  Long equipmentSubTypeId,
-                                                  int availableStaff,
-                                                  int totalStaff) {
-        getRepairStationOrThrow(repairStationId);
-        equipmentTypeService.getSubType(equipmentSubTypeId); //Проверка на существование
-        if (totalStaff < availableStaff) {
+    private void checkEquipmentStaffPreconditions(RepairStationEquipmentStaff repairStationEquipmentStaff) {
+        getRepairStationOrThrow(repairStationEquipmentStaff.getEquipmentPerRepairStation().getRepairStationId());
+        equipmentTypeService.getSubType(repairStationEquipmentStaff
+                                                .getEquipmentPerRepairStation()
+                                                .getEquipmentSubTypeId()); //Проверка на существование
+        if (repairStationEquipmentStaff.getTotalStaff() < repairStationEquipmentStaff.getAvailableStaff()) {
             throw new IncorrectParamException(
-                    "Всего производственников < доступно производственников (" + totalStaff + " < " + availableStaff + ")");
+                    "Всего производственников < доступно производственников (" + repairStationEquipmentStaff.getTotalStaff() + " < " + repairStationEquipmentStaff
+                            .getAvailableStaff() + ")");
         }
     }
 
     @Override
-    public void setEquipmentStaff(UUID sessionId,
-                                  Long repairStationId,
-                                  Long equipmentSubTypeId,
-                                  int availableStaff,
-                                  int totalStaff) {
-        checkEquipmentStaffPreconditions(repairStationId, equipmentSubTypeId, availableStaff, totalStaff);
+    public void setEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList) {
+        repairStationEquipmentStaffList.forEach(this::checkEquipmentStaffPreconditions);
 
-        EquipmentSubTypePerRepairStation id =
-                new EquipmentSubTypePerRepairStation(repairStationId, equipmentSubTypeId, sessionId);
-        RepairStationEquipmentStaff repairStationEquipmentStaff =
-                new RepairStationEquipmentStaff(id, totalStaff, availableStaff);
-
-        repairStationEquipmentCapabilitiesRepository.save(repairStationEquipmentStaff);
+        repairStationEquipmentCapabilitiesRepository.saveAll(repairStationEquipmentStaffList);
     }
 
     @Override
-    public void updateEquipmentStaff(UUID sessionId,
-                                     Long repairStationId,
-                                     Long equipmentSubTypeId,
-                                     int availableStaff,
-                                     int totalStaff) {
-        checkEquipmentStaffPreconditions(repairStationId, equipmentSubTypeId, availableStaff, totalStaff);
+    public void updateEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList) {
+        List<RepairStationEquipmentStaff> stationEquipmentStaffList = repairStationEquipmentStaffList.stream().map(
+                repairStationEquipmentStaff -> {
+                    checkEquipmentStaffPreconditions(repairStationEquipmentStaff);
+                    RepairStationEquipmentStaff stationEquipmentStaff =
+                            repairStationEquipmentCapabilitiesRepository
+                                    .findById(repairStationEquipmentStaff.getEquipmentPerRepairStation())
+                                    .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationEquipmentStaff
+                                            .getEquipmentPerRepairStation()
+                                            .getRepairStationId() + " по ВВСТ с id = " + repairStationEquipmentStaff
+                                            .getEquipmentPerRepairStation()
+                                            .getEquipmentSubTypeId() + " не найдены!"));
 
-        RepairStationEquipmentStaff stationEquipmentStaff =
-                repairStationEquipmentCapabilitiesRepository
-                        .findById(new EquipmentSubTypePerRepairStation(repairStationId, equipmentSubTypeId, sessionId))
-                        .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationId + " по ВВСТ с id = " + equipmentSubTypeId + " не найдены!"));
-
-        stationEquipmentStaff.setAvailableStaff(availableStaff);
-        stationEquipmentStaff.setTotalStaff(totalStaff);
-
-        repairStationEquipmentCapabilitiesRepository.save(stationEquipmentStaff);
+                    stationEquipmentStaff.setAvailableStaff(repairStationEquipmentStaff.getAvailableStaff());
+                    stationEquipmentStaff.setTotalStaff(repairStationEquipmentStaff.getTotalStaff());
+                    return stationEquipmentStaff;
+                }).collect(Collectors.toList());
+        repairStationEquipmentCapabilitiesRepository.saveAll(stationEquipmentStaffList);
     }
 
     @Override
