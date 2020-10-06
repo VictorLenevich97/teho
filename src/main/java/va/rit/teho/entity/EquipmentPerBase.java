@@ -26,10 +26,8 @@ public class EquipmentPerBase {
     public EquipmentPerBase() {
     }
 
-    public EquipmentPerBase(Base base, Equipment equipment, int intensity, int amount) {
-        this.id = new EquipmentPerBaseAmount(base.getId(), equipment.getId());
-        this.base = base;
-        this.equipment = equipment;
+    public EquipmentPerBase(Long baseId, Long equipmentId, int intensity, int amount) {
+        this.id = new EquipmentPerBaseAmount(baseId, equipmentId);
         this.intensity = intensity;
         this.amount = amount;
     }

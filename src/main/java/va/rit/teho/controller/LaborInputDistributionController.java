@@ -73,27 +73,36 @@ public class LaborInputDistributionController {
         return new LaborInputDistributionDTO(EquipmentTypeDTO.from(typeEntry.getKey()), subTypeDistribution);
     }
 
-    @PostMapping
-    public ResponseEntity<Object> updateDistributionData() {
-        laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId());
+    @PostMapping("/{coefficient}")
+    public ResponseEntity<Object> updateDistributionData(@PathVariable Double coefficient) {
+        laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId(), coefficient);
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping("/type/{typeId}")
-    public ResponseEntity<Object> updateDistributionDataPerEquipmentType(@PathVariable Long typeId) {
-        laborInputDistributionService.updateLaborInputDistributionPerEquipmentType(tehoSession.getSessionId(), typeId);
+    @PostMapping("/type/{typeId}/{coefficient}")
+    public ResponseEntity<Object> updateDistributionDataPerEquipmentType(@PathVariable Long typeId,
+                                                                         @PathVariable Double coefficient) {
+        laborInputDistributionService.updateLaborInputDistributionPerEquipmentType(tehoSession.getSessionId(),
+                                                                                   coefficient,
+                                                                                   typeId);
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping("/subtype/{subTypeId}")
-    public ResponseEntity<Object> updateDistributionDataPerEquipmentSubType(@PathVariable Long subTypeId) {
-        laborInputDistributionService.updateLaborInputDistributionPerEquipmentSubType(tehoSession.getSessionId(), subTypeId);
+    @PostMapping("/subtype/{subTypeId}/{coefficient}")
+    public ResponseEntity<Object> updateDistributionDataPerEquipmentSubType(@PathVariable Long subTypeId,
+                                                                            @PathVariable Double coefficient) {
+        laborInputDistributionService.updateLaborInputDistributionPerEquipmentSubType(tehoSession.getSessionId(),
+                                                                                      coefficient,
+                                                                                      subTypeId);
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping("/base/{baseId}")
-    public ResponseEntity<Object> updateDistributionDataPerBase(@PathVariable Long baseId) {
-        laborInputDistributionService.updateLaborInputDistributionPerBase(tehoSession.getSessionId(), baseId);
+    @PostMapping("/base/{baseId}/{coefficient}")
+    public ResponseEntity<Object> updateDistributionDataPerBase(@PathVariable Long baseId,
+                                                                @PathVariable Double coefficient) {
+        laborInputDistributionService.updateLaborInputDistributionPerBase(tehoSession.getSessionId(),
+                                                                          coefficient,
+                                                                          baseId);
         return ResponseEntity.accepted().build();
     }
 

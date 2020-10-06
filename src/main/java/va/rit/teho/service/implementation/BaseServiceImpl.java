@@ -2,7 +2,6 @@ package va.rit.teho.service.implementation;
 
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.Base;
-import va.rit.teho.entity.Equipment;
 import va.rit.teho.entity.EquipmentPerBase;
 import va.rit.teho.entity.EquipmentPerBaseAmount;
 import va.rit.teho.exception.*;
@@ -57,17 +56,17 @@ public class BaseServiceImpl implements BaseService {
 
     @Override
     public void addEquipmentToBase(Long baseId, Long equipmentId, int intensity, int amount) {
-        Base base = getBaseOrThrow(baseId);
-        Equipment equipment = getEquipmentOrThrow(equipmentId);
+        getBaseOrThrow(baseId);
+        getEquipmentOrThrow(equipmentId);
         equipmentPerBaseRepository.findById(new EquipmentPerBaseAmount(baseId, equipmentId)).ifPresent(epb -> {
             throw new AlreadyExistsException("ВВСТ в ВЧ", "(id ВЧ, id ВВСТ)", "(" + baseId + ", " + equipmentId + ")");
         });
 
-        this.equipmentPerBaseRepository.save(new EquipmentPerBase(base, equipment, intensity, amount));
+        this.equipmentPerBaseRepository.save(new EquipmentPerBase(baseId, equipmentId, intensity, amount));
     }
 
-    private Equipment getEquipmentOrThrow(Long equipmentId) {
-        return equipmentRepository
+    private void getEquipmentOrThrow(Long equipmentId) {
+        equipmentRepository
                 .findById(equipmentId)
                 .orElseThrow(() -> new EquipmentNotFoundException(equipmentId));
     }

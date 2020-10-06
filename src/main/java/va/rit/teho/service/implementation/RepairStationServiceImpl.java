@@ -6,7 +6,7 @@ import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.model.Pair;
-import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
+import va.rit.teho.repository.RepairStationEquipmentStaffRepository;
 import va.rit.teho.repository.RepairStationRepository;
 import va.rit.teho.service.BaseService;
 import va.rit.teho.service.EquipmentTypeService;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class RepairStationServiceImpl implements RepairStationService {
 
-    private final RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository;
+    private final RepairStationEquipmentStaffRepository repairStationEquipmentStaffRepository;
     private final RepairStationRepository repairStationRepository;
 
     private final RepairStationTypeService repairStationTypeService;
@@ -30,12 +30,12 @@ public class RepairStationServiceImpl implements RepairStationService {
     private final EquipmentTypeService equipmentTypeService;
 
     public RepairStationServiceImpl(
-            RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository,
+            RepairStationEquipmentStaffRepository repairStationEquipmentStaffRepository,
             RepairStationRepository repairStationRepository,
             RepairStationTypeService repairStationTypeService,
             BaseService baseService,
             EquipmentTypeService equipmentTypeService) {
-        this.repairStationEquipmentCapabilitiesRepository = repairStationEquipmentCapabilitiesRepository;
+        this.repairStationEquipmentStaffRepository = repairStationEquipmentStaffRepository;
         this.repairStationRepository = repairStationRepository;
         this.repairStationTypeService = repairStationTypeService;
         this.baseService = baseService;
@@ -50,7 +50,7 @@ public class RepairStationServiceImpl implements RepairStationService {
     @Override
     public Pair<RepairStation, List<RepairStationEquipmentStaff>> get(Long repairStationId) {
         return Pair.of(getRepairStationOrThrow(repairStationId),
-                       repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId));
+                       repairStationEquipmentStaffRepository.findAllByRepairStationId(repairStationId));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class RepairStationServiceImpl implements RepairStationService {
     public void setEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList) {
         repairStationEquipmentStaffList.forEach(this::checkEquipmentStaffPreconditions);
 
-        repairStationEquipmentCapabilitiesRepository.saveAll(repairStationEquipmentStaffList);
+        repairStationEquipmentStaffRepository.saveAll(repairStationEquipmentStaffList);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class RepairStationServiceImpl implements RepairStationService {
                 repairStationEquipmentStaff -> {
                     checkEquipmentStaffPreconditions(repairStationEquipmentStaff);
                     RepairStationEquipmentStaff stationEquipmentStaff =
-                            repairStationEquipmentCapabilitiesRepository
+                            repairStationEquipmentStaffRepository
                                     .findById(repairStationEquipmentStaff.getEquipmentPerRepairStation())
                                     .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationEquipmentStaff
                                             .getEquipmentPerRepairStation()
@@ -121,7 +121,7 @@ public class RepairStationServiceImpl implements RepairStationService {
                     stationEquipmentStaff.setTotalStaff(repairStationEquipmentStaff.getTotalStaff());
                     return stationEquipmentStaff;
                 }).collect(Collectors.toList());
-        repairStationEquipmentCapabilitiesRepository.saveAll(stationEquipmentStaffList);
+        repairStationEquipmentStaffRepository.saveAll(stationEquipmentStaffList);
     }
 
     @Override
@@ -130,9 +130,9 @@ public class RepairStationServiceImpl implements RepairStationService {
                                                                                                                  List<Long> equipmentTypeIds,
                                                                                                                  List<Long> equipmentSubTypeIds) {
         List<RepairStationEquipmentStaff> equipmentStaffList =
-                repairStationEquipmentCapabilitiesRepository.findFiltered(repairStationIds,
-                                                                          equipmentTypeIds,
-                                                                          equipmentSubTypeIds);
+                repairStationEquipmentStaffRepository.findFiltered(repairStationIds,
+                                                                   equipmentTypeIds,
+                                                                   equipmentSubTypeIds);
 
         Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> result = new HashMap<>();
         for (RepairStationEquipmentStaff repairStationEquipmentStaff : equipmentStaffList) {

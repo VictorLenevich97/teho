@@ -24,18 +24,18 @@ public interface LaborInputDistributionService {
     /**
      * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ.
      */
-    void updateLaborInputDistribution(UUID sessionId);
+    void updateLaborInputDistribution(UUID sessionId, double coefficient);
 
     /**
      * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ, относящихся к Base с id = baseId.
      *
      * @param baseId id Base
      */
-    void updateLaborInputDistributionPerBase(UUID sessionId, Long baseId);
+    void updateLaborInputDistributionPerBase(UUID sessionId, double coefficient, Long baseId);
 
-    void updateLaborInputDistributionPerEquipmentSubType(UUID sessionId, Long equipmentSubTypeId);
+    void updateLaborInputDistributionPerEquipmentSubType(UUID sessionId, double coefficient, Long equipmentSubTypeId);
 
-    void updateLaborInputDistributionPerEquipmentType(UUID sessionId, Long equipmentType);
+    void updateLaborInputDistributionPerEquipmentType(UUID sessionId, double coefficient, Long equipmentType);
 
     List<WorkhoursDistributionInterval> getDistributionIntervals();
 

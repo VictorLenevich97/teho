@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import va.rit.teho.entity.*;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.CalculatedRepairCapabilitiesPerDayRepository;
-import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
+import va.rit.teho.repository.RepairStationEquipmentStaffRepository;
 import va.rit.teho.repository.RepairTypeRepository;
 import va.rit.teho.service.CalculationService;
 import va.rit.teho.service.RepairCapabilitiesService;
@@ -20,7 +20,7 @@ import java.util.stream.StreamSupport;
 @Service
 public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService {
 
-    private final RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository;
+    private final RepairStationEquipmentStaffRepository repairStationEquipmentStaffRepository;
     private final CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository;
     private final RepairTypeRepository repairTypeRepository;
 
@@ -28,11 +28,11 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     private final CalculationService calculationService;
 
     public RepairCapabilitiesServiceImpl(
-            RepairStationEquipmentCapabilitiesRepository repairStationEquipmentCapabilitiesRepository,
+            RepairStationEquipmentStaffRepository repairStationEquipmentStaffRepository,
             CalculatedRepairCapabilitiesPerDayRepository calculatedRepairCapabilitiesPerDayRepository,
             RepairTypeRepository repairTypeRepository,
             CalculationService calculationService) {
-        this.repairStationEquipmentCapabilitiesRepository = repairStationEquipmentCapabilitiesRepository;
+        this.repairStationEquipmentStaffRepository = repairStationEquipmentStaffRepository;
         this.calculatedRepairCapabilitiesPerDayRepository = calculatedRepairCapabilitiesPerDayRepository;
         this.repairTypeRepository = repairTypeRepository;
         this.calculationService = calculationService;
@@ -74,7 +74,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     @Override
     public void calculateAndUpdateRepairCapabilities(UUID sessionId, Long repairTypeId) {
         List<RepairStationEquipmentStaff> repairStationStaff =
-                (List<RepairStationEquipmentStaff>) this.repairStationEquipmentCapabilitiesRepository.findAll();
+                (List<RepairStationEquipmentStaff>) this.repairStationEquipmentStaffRepository.findAll();
         calculateAndUpdateRepairCapabilities(sessionId, repairStationStaff, repairTypeId);
     }
 
@@ -100,7 +100,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                                                Long repairStationId,
                                                                Long repairTypeId) {
         List<RepairStationEquipmentStaff> repairStationStaff =
-                repairStationEquipmentCapabilitiesRepository.findAllByRepairStationId(repairStationId);
+                repairStationEquipmentStaffRepository.findAllByRepairStationId(repairStationId);
 
         calculateAndUpdateRepairCapabilities(sessionId, repairStationStaff, repairTypeId);
     }
