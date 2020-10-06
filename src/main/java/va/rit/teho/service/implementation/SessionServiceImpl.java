@@ -37,7 +37,14 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public TehoSession get(UUID sessionId) {
-        return sessionRepository.findById(sessionId).orElseThrow(() -> new NotFoundException("Сессии с id = '" + sessionId.toString() + "' не существует!"));
+        return sessionRepository
+                .findById(sessionId)
+                .orElseThrow(() -> new NotFoundException("Сессии с id = '" + sessionId.toString() + "' не существует!"));
+    }
+
+    @Override
+    public void delete(UUID sessionId) {
+        sessionRepository.deleteById(sessionId);
     }
 
 

@@ -15,4 +15,6 @@ public interface SessionService {
 
     TehoSession get(UUID sessionId);
 
+    void delete(UUID sessionId);
+
 }

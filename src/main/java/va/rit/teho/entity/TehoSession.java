@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +20,12 @@ public class TehoSession {
     private UUID id;
 
     private String name;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tehoSession", orphanRemoval = true)
+    private Set<EquipmentInRepair> equipmentInRepairSet;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tehoSession", orphanRemoval = true)
+    private Set<RepairStationEquipmentStaff> repairStationEquipmentStaffSet;
 
     @Column(name = "creation_ts")
     private Instant creationTimestamp;
@@ -43,4 +50,11 @@ public class TehoSession {
         return creationTimestamp;
     }
 
+    public Set<EquipmentInRepair> getEquipmentInRepairSet() {
+        return equipmentInRepairSet;
+    }
+
+    public Set<RepairStationEquipmentStaff> getRepairStationEquipmentStaffSet() {
+        return repairStationEquipmentStaffSet;
+    }
 }
