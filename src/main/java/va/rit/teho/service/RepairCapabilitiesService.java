@@ -14,6 +14,8 @@ import java.util.UUID;
  */
 public interface RepairCapabilitiesService {
 
+    void copyRepairCapabilities(UUID originalSessionId, UUID newSessionId);
+
     void calculateAndUpdateRepairCapabilities(UUID sessionId, Long repairTypeId);
 
     void calculateAndUpdateRepairCapabilitiesPerStation(UUID sessionId, Long repairStationId, Long repairTypeId);

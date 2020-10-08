@@ -42,4 +42,24 @@ public class EquipmentInRepairId implements Serializable {
     public int hashCode() {
         return Objects.hash(baseId, equipmentId, workhoursDistributionIntervalId, sessionId);
     }
+
+    public EquipmentInRepairId copy(UUID sessionId) {
+        return new EquipmentInRepairId(baseId, equipmentId, workhoursDistributionIntervalId, sessionId);
+    }
+
+    public Long getBaseId() {
+        return baseId;
+    }
+
+    public Long getEquipmentId() {
+        return equipmentId;
+    }
+
+    public Long getWorkhoursDistributionIntervalId() {
+        return workhoursDistributionIntervalId;
+    }
+
+    public UUID getSessionId() {
+        return sessionId;
+    }
 }

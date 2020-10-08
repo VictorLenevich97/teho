@@ -2,6 +2,7 @@ package va.rit.teho.entity;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class CalculatedRepairCapabilitesPerDay {
@@ -35,14 +36,8 @@ public class CalculatedRepairCapabilitesPerDay {
     }
 
     public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStationWithRepairType equipmentPerRepairStationWithRepairType,
-                                             RepairStation repairStation,
-                                             Equipment equipment,
-                                             double capability,
-                                             RepairType repairType) {
+                                             double capability) {
         this.equipmentPerRepairStationWithRepairType = equipmentPerRepairStationWithRepairType;
-        this.repairStation = repairStation;
-        this.equipment = equipment;
-        this.repairType = repairType;
         this.capability = capability;
     }
 
@@ -111,5 +106,10 @@ public class CalculatedRepairCapabilitesPerDay {
 
     public void setCapability(double capability) {
         this.capability = capability;
+    }
+
+    public CalculatedRepairCapabilitesPerDay copy(UUID newSessionId) {
+        return new CalculatedRepairCapabilitesPerDay(getEquipmentPerRepairStation().copy(newSessionId),
+                                                     getCapability());
     }
 }

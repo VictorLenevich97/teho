@@ -2,6 +2,7 @@ package va.rit.teho.entity;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class RepairStationEquipmentStaff {
@@ -88,5 +89,12 @@ public class RepairStationEquipmentStaff {
 
     public TehoSession getTehoSession() {
         return tehoSession;
+    }
+
+    public RepairStationEquipmentStaff copy(UUID newSessionId) {
+        return new RepairStationEquipmentStaff(
+                getEquipmentPerRepairStation().copy(newSessionId),
+                getTotalStaff(),
+                getAvailableStaff());
     }
 }

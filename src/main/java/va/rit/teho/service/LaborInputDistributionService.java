@@ -37,6 +37,8 @@ public interface LaborInputDistributionService {
 
     void updateLaborInputDistributionPerEquipmentType(UUID sessionId, double coefficient, Long equipmentType);
 
+    void copyLaborInputDistributionData(UUID originalSessionId, UUID newSessionId);
+
     List<WorkhoursDistributionInterval> getDistributionIntervals();
 
 }

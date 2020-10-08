@@ -13,6 +13,8 @@ public interface SessionService {
 
     TehoSession create(String name);
 
+    TehoSession copy(UUID sessionId, String name);
+
     TehoSession get(UUID sessionId);
 
     void delete(UUID sessionId);

@@ -67,7 +67,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
             List<Long> equipmentTypeIds) {
         Long repairTypeId = getDefaultRepairTypeId();
         Map<EquipmentType, Map<EquipmentSubType, Map<EquipmentInRepairData.CompositeKey, List<EquipmentInRepairData>>>> grouped =
-                equipmentInRepairRepository.findAllGrouped(repairTypeId, equipmentTypeIds);
+                equipmentInRepairRepository.findAllGrouped(sessionId, repairTypeId, equipmentTypeIds);
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> result = new HashMap<>();
 
         grouped.forEach((equipmentType, subTypeMap) -> subTypeMap
@@ -165,6 +165,17 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                          coefficient,
                          equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentType(getDefaultRepairTypeId(),
                                                                                           equipmentType));
+    }
+
+    @Override
+    public void copyLaborInputDistributionData(UUID originalSessionId, UUID newSessionId) {
+        List<EquipmentInRepair> equipmentInRepairList =
+                equipmentInRepairRepository.findByTehoSessionId(originalSessionId);
+
+        List<EquipmentInRepair> updatedEquipmentInRepairList =
+                equipmentInRepairList.stream().map(eir -> eir.copy(newSessionId)).collect(Collectors.toList());
+
+        equipmentInRepairRepository.saveAll(updatedEquipmentInRepairList);
     }
 
     @Override

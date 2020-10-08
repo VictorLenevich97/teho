@@ -51,4 +51,8 @@ public class EquipmentSubTypePerRepairStation implements Serializable {
     public Long getEquipmentSubTypeId() {
         return equipmentSubTypeId;
     }
+
+    public EquipmentSubTypePerRepairStation copy(UUID sessionId) {
+        return new EquipmentSubTypePerRepairStation(getRepairStationId(), getEquipmentSubTypeId(), sessionId);
+    }
 }

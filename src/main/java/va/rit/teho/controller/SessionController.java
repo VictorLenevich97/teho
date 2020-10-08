@@ -33,6 +33,12 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
     }
 
+    @PutMapping("/{sessionId}")
+    public ResponseEntity<SessionDTO> copySession(@PathVariable UUID sessionId, @RequestBody SessionDTO sessionDTO) {
+        TehoSession tehoSession = sessionService.copy(sessionId, sessionDTO.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
+    }
+
     @DeleteMapping("/{sessionId}")
     public ResponseEntity<Object> deleteSession(@PathVariable UUID sessionId) {
         sessionService.delete(sessionId);

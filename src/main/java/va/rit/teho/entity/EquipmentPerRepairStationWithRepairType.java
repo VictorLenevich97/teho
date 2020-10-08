@@ -47,4 +47,31 @@ public class EquipmentPerRepairStationWithRepairType implements Serializable {
                 Objects.equals(repairTypeId, that.repairTypeId) &&
                 Objects.equals(sessionId, that.sessionId);
     }
+
+    public void setSessionId(UUID sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public Long getRepairStationId() {
+        return repairStationId;
+    }
+
+    public Long getEquipmentId() {
+        return equipmentId;
+    }
+
+    public UUID getSessionId() {
+        return sessionId;
+    }
+
+    public Long getRepairTypeId() {
+        return repairTypeId;
+    }
+
+    public EquipmentPerRepairStationWithRepairType copy(UUID sessionId) {
+        return new EquipmentPerRepairStationWithRepairType(getRepairStationId(),
+                                                           getEquipmentId(),
+                                                           getRepairTypeId(),
+                                                           sessionId);
+    }
 }

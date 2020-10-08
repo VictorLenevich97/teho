@@ -5,6 +5,7 @@ import va.rit.teho.dto.equipment.EquipmentTypeDTO;
 import va.rit.teho.entity.EquipmentLaborInputDistribution;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class LaborInputDistributionDTO {
@@ -50,14 +51,14 @@ public class LaborInputDistributionDTO {
         private final String equipmentName;
         private final double avgDailyFailure;
         private final int standardLaborInput;
-        private final List<IntervalWithCountAndLaborInputDTO> countAndLaborInputs;
+        private final Map<String, CountAndLaborInputDTO> countAndLaborInputs;
         private final double totalLaborInput;
 
         public EquipmentLaborInputDistributionDTO(String baseName,
                                                   String equipmentName,
                                                   double avgDailyFailure,
                                                   int standardLaborInput,
-                                                  List<IntervalWithCountAndLaborInputDTO> countAndLaborInputs,
+                                                  Map<String, CountAndLaborInputDTO> countAndLaborInputs,
                                                   double totalLaborInput) {
             this.baseName = baseName;
             this.equipmentName = equipmentName;
@@ -77,14 +78,10 @@ public class LaborInputDistributionDTO {
                             .getIntervalCountAndLaborInputMap()
                             .entrySet()
                             .stream()
-                            .map(laborInputEntry -> new IntervalWithCountAndLaborInputDTO(laborInputEntry.getKey(),
-                                                                                          laborInputEntry
-                                                                                                  .getValue()
-                                                                                                  .getCount(),
-                                                                                          laborInputEntry
-                                                                                                  .getValue()
-                                                                                                  .getLaborInput()))
-                            .collect(Collectors.toList()),
+                            .collect(Collectors.toMap(
+                                    e -> e.getKey().toString(),
+                                    e -> new CountAndLaborInputDTO(e.getValue().getCount(),
+                                                                   e.getValue().getLaborInput()))),
                     entity.getTotalRepairComplexity());
         }
 
@@ -104,7 +101,7 @@ public class LaborInputDistributionDTO {
             return standardLaborInput;
         }
 
-        public List<IntervalWithCountAndLaborInputDTO> getCountAndLaborInputs() {
+        public Map<String, CountAndLaborInputDTO> getCountAndLaborInputs() {
             return countAndLaborInputs;
         }
 
@@ -113,19 +110,13 @@ public class LaborInputDistributionDTO {
         }
     }
 
-    public static class IntervalWithCountAndLaborInputDTO {
-        private final Long id;
+    public static class CountAndLaborInputDTO {
         private final Double count;
         private final Double laborInput;
 
-        public IntervalWithCountAndLaborInputDTO(Long key, Double count, Double laborInput) {
-            this.id = key;
+        public CountAndLaborInputDTO(Double count, Double laborInput) {
             this.count = count;
             this.laborInput = laborInput;
-        }
-
-        public Long getId() {
-            return id;
         }
 
         public Double getCount() {

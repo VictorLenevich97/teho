@@ -28,4 +28,6 @@ public interface RepairStationService {
                                                                                                           List<Long> equipmentTypeIds,
                                                                                                           List<Long> equipmentSubTypeIds);
 
+    void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId);
+
 }

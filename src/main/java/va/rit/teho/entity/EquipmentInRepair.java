@@ -2,6 +2,7 @@ package va.rit.teho.entity;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class EquipmentInRepair {
@@ -112,5 +113,13 @@ public class EquipmentInRepair {
     @Override
     public int hashCode() {
         return Objects.hash(equipmentInRepairId, base, equipment, workhoursDistributionInterval, count, avgLaborInput);
+    }
+
+    public void setTehoSession(TehoSession tehoSession) {
+        this.tehoSession = tehoSession;
+    }
+
+    public EquipmentInRepair copy(UUID newSessionId) {
+        return new EquipmentInRepair(getEquipmentInRepairId().copy(newSessionId), getCount(), getAvgLaborInput());
     }
 }

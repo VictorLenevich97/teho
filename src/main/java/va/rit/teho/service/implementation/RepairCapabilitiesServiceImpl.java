@@ -62,13 +62,19 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                             equipment.getId(),
                             repairTypeId,
                             sessionId);
-            return new CalculatedRepairCapabilitesPerDay(
-                    stationWithRepairType,
-                    rsec.getRepairStation(),
-                    equipment,
-                    calculatedCapabilities,
-                    laborInputPerType.getRepairType());
+            return new CalculatedRepairCapabilitesPerDay(stationWithRepairType, calculatedCapabilities);
         };
+    }
+
+    @Override
+    public void copyRepairCapabilities(UUID originalSessionId, UUID newSessionId) {
+        List<CalculatedRepairCapabilitesPerDay> repairCapabilities =
+                calculatedRepairCapabilitiesPerDayRepository.findByIds(originalSessionId, null, null, null, null, null);
+
+        List<CalculatedRepairCapabilitesPerDay> updatedRepairCapabilitesPerDayList =
+                repairCapabilities.stream().map(crcpd -> crcpd.copy(newSessionId)).collect(Collectors.toList());
+
+        calculatedRepairCapabilitiesPerDayRepository.saveAll(updatedRepairCapabilitesPerDayList);
     }
 
     @Override

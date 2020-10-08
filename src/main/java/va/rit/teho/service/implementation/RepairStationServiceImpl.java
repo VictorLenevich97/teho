@@ -105,23 +105,28 @@ public class RepairStationServiceImpl implements RepairStationService {
 
     @Override
     public void updateEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList) {
-        List<RepairStationEquipmentStaff> stationEquipmentStaffList = repairStationEquipmentStaffList.stream().map(
-                repairStationEquipmentStaff -> {
-                    checkEquipmentStaffPreconditions(repairStationEquipmentStaff);
-                    RepairStationEquipmentStaff stationEquipmentStaff =
-                            repairStationEquipmentStaffRepository
-                                    .findById(repairStationEquipmentStaff.getEquipmentPerRepairStation())
-                                    .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationEquipmentStaff
-                                            .getEquipmentPerRepairStation()
-                                            .getRepairStationId() + " по ВВСТ с id = " + repairStationEquipmentStaff
-                                            .getEquipmentPerRepairStation()
-                                            .getEquipmentSubTypeId() + " не найдены!"));
-
-                    stationEquipmentStaff.setAvailableStaff(repairStationEquipmentStaff.getAvailableStaff());
-                    stationEquipmentStaff.setTotalStaff(repairStationEquipmentStaff.getTotalStaff());
-                    return stationEquipmentStaff;
-                }).collect(Collectors.toList());
+        List<RepairStationEquipmentStaff> stationEquipmentStaffList =
+                repairStationEquipmentStaffList
+                        .stream()
+                        .map(this::getRepairStationEquipmentStaff)
+                        .collect(Collectors.toList());
         repairStationEquipmentStaffRepository.saveAll(stationEquipmentStaffList);
+    }
+
+    private RepairStationEquipmentStaff getRepairStationEquipmentStaff(RepairStationEquipmentStaff repairStationEquipmentStaff) {
+        checkEquipmentStaffPreconditions(repairStationEquipmentStaff);
+        RepairStationEquipmentStaff stationEquipmentStaff =
+                repairStationEquipmentStaffRepository
+                        .findById(repairStationEquipmentStaff.getEquipmentPerRepairStation())
+                        .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationEquipmentStaff
+                                .getEquipmentPerRepairStation()
+                                .getRepairStationId() + " по виду ВВСТ с id = " + repairStationEquipmentStaff
+                                .getEquipmentPerRepairStation()
+                                .getEquipmentSubTypeId() + " не найдены!"));
+
+        stationEquipmentStaff.setAvailableStaff(repairStationEquipmentStaff.getAvailableStaff());
+        stationEquipmentStaff.setTotalStaff(repairStationEquipmentStaff.getTotalStaff());
+        return stationEquipmentStaff;
     }
 
     @Override
@@ -130,7 +135,8 @@ public class RepairStationServiceImpl implements RepairStationService {
                                                                                                                  List<Long> equipmentTypeIds,
                                                                                                                  List<Long> equipmentSubTypeIds) {
         List<RepairStationEquipmentStaff> equipmentStaffList =
-                repairStationEquipmentStaffRepository.findFiltered(repairStationIds,
+                repairStationEquipmentStaffRepository.findFiltered(sessionId,
+                                                                   repairStationIds,
                                                                    equipmentTypeIds,
                                                                    equipmentSubTypeIds);
 
@@ -142,6 +148,19 @@ public class RepairStationServiceImpl implements RepairStationService {
                                           repairStationEquipmentStaff);
         }
         return result;
+    }
+
+    @Override
+    public void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId) {
+        List<RepairStationEquipmentStaff> equipmentStaffList =
+                repairStationEquipmentStaffRepository.findFiltered(originalSessionId,
+                                                                   null,
+                                                                   null,
+                                                                   null);
+        List<RepairStationEquipmentStaff> updatedRepairStationEquipmentStaffList =
+                equipmentStaffList.stream().map(rses -> rses.copy(newSessionId)).collect(Collectors.toList());
+
+        repairStationEquipmentStaffRepository.saveAll(updatedRepairStationEquipmentStaffList);
     }
 
 }
