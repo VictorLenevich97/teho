@@ -138,6 +138,7 @@ public class RepairCapabilitiesController {
             List<Equipment> columns,
             RepairStation rs) {
         return new TableDataDTO.RowData<>(
+                rs.getId(),
                 rs.getName(),
                 columns.stream().collect(Collectors.toMap(equipment -> equipment.getId().toString(),
                                                           equipment -> calculatedRepairCapabilities

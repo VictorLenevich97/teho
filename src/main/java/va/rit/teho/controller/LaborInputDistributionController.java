@@ -3,10 +3,7 @@ package va.rit.teho.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import va.rit.teho.dto.DistributionIntervalDTO;
-import va.rit.teho.dto.LaborInputDistributionDTO;
-import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
-import va.rit.teho.dto.equipment.EquipmentTypeDTO;
+import va.rit.teho.dto.*;
 import va.rit.teho.entity.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
@@ -43,34 +40,47 @@ public class LaborInputDistributionController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<LaborInputDistributionDTO>> getDistributionData(@RequestParam(required = false) List<Long> typeId) {
+    public ResponseEntity<TableDataDTO<LaborInputDistributionDTO.CountAndLaborInputDTO>> getDistributionData(@RequestParam(required = false) List<Long> typeId) {
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
                 laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(), typeId);
-
-        List<LaborInputDistributionDTO> laborInputDistributionDTOList = laborInputDistribution
-                .entrySet()
-                .stream()
-                .map(this::mapLaborInputDistributionDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(laborInputDistributionDTOList);
-    }
-
-    private LaborInputDistributionDTO mapLaborInputDistributionDTO(
-            Map.Entry<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> typeEntry) {
-        List<LaborInputDistributionDTO.SubTypeDistributionDTO> subTypeDistribution =
-                typeEntry
-                        .getValue()
-                        .entrySet()
+        List<NestedColumnsDTO> columns =
+                laborInputDistributionService
+                        .getDistributionIntervals()
                         .stream()
-                        .map(subTypeEntry -> new LaborInputDistributionDTO.SubTypeDistributionDTO(
-                                EquipmentSubTypeDTO.from(subTypeEntry.getKey()),
-                                subTypeEntry
-                                        .getValue()
-                                        .stream()
-                                        .map(LaborInputDistributionDTO.EquipmentLaborInputDistributionDTO::from)
-                                        .collect(Collectors.toList())))
+                        .map(wdi -> new LaborDistributionNestedColumnsDTO(wdi.getId(),
+                                                                          wdi.getLowerBound(),
+                                                                          wdi.getUpperBound()))
                         .collect(Collectors.toList());
-        return new LaborInputDistributionDTO(EquipmentTypeDTO.from(typeEntry.getKey()), subTypeDistribution);
+        List<LaborDistributionRowData> data =
+                laborInputDistribution
+                        .values()
+                        .stream()
+                        .flatMap(subTypeMap -> subTypeMap
+                                .values()
+                                .stream()
+                                .flatMap(l -> l
+                                        .stream()
+                                        .map(elid -> {
+                                            Map<String, LaborInputDistributionDTO.CountAndLaborInputDTO> countAndLaborInputDTOMap =
+                                                    elid
+                                                            .getIntervalCountAndLaborInputMap()
+                                                            .entrySet()
+                                                            .stream()
+                                                            .collect(Collectors.toMap(e -> e.getKey().toString(),
+                                                                                      e -> new LaborInputDistributionDTO.CountAndLaborInputDTO(
+                                                                                              e.getValue().getCount(),
+                                                                                              e
+                                                                                                      .getValue()
+                                                                                                      .getLaborInput())));
+                                            return new LaborDistributionRowData(elid.getBaseName(),
+                                                                                countAndLaborInputDTOMap,
+                                                                                elid.getEquipmentName(),
+                                                                                elid.getAvgDailyFailure(),
+                                                                                elid.getStandardLaborInput(),
+                                                                                elid.getTotalRepairComplexity());
+                                        })))
+                        .collect(Collectors.toList());
+        return ResponseEntity.ok(new TableDataDTO<>(columns, data));
     }
 
     @PostMapping("/{coefficient}")

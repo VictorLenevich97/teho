@@ -26,6 +26,9 @@ import java.util.stream.Stream;
 @RequestMapping("repair-station")
 public class RepairStationController {
 
+    private static final String KEY_TOTAL_STAFF = "total";
+    private static final String KEY_AVAILABLE_STAFF = "available";
+
     private final RepairStationService repairStationService;
     private final EquipmentTypeService equipmentTypeService;
 
@@ -143,7 +146,7 @@ public class RepairStationController {
                         .collect(Collectors.toList());
         List<NestedColumnsDTO> nestedColumnsTotal =
                 Stream
-                        .of("total", "available")
+                        .of(KEY_TOTAL_STAFF, KEY_AVAILABLE_STAFF)
                         .flatMap(postfix -> equipmentTypeListMap
                                 .entrySet()
                                 .stream()
@@ -179,11 +182,11 @@ public class RepairStationController {
                     repairStationMap.getOrDefault(rs, Collections.emptyMap()).get(est);
             Map<String, Integer> innerMap = new HashMap<>();
             boolean emptyStaff = repairStationEquipmentStaff == null;
-            innerMap.put("total", emptyStaff ? 0 : repairStationEquipmentStaff.getTotalStaff());
-            innerMap.put("available", emptyStaff ? 0 : repairStationEquipmentStaff.getAvailableStaff());
+            innerMap.put(KEY_TOTAL_STAFF, emptyStaff ? 0 : repairStationEquipmentStaff.getTotalStaff());
+            innerMap.put(KEY_AVAILABLE_STAFF, emptyStaff ? 0 : repairStationEquipmentStaff.getAvailableStaff());
             dataMap.put(est.getId().toString(), innerMap);
         }
-        return new TableDataDTO.RowData<>(rs.getName(), dataMap);
+        return new TableDataDTO.RowData<>(rs.getId(), rs.getName(), dataMap);
     }
 
 

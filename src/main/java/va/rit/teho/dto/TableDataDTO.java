@@ -1,19 +1,21 @@
 package va.rit.teho.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 import java.util.Map;
 
 public class TableDataDTO<T> {
     private final List<NestedColumnsDTO> columns;
-    private final List<RowData<T>> rows;
+    private final List<? extends RowData<T>> rows;
 
     public TableDataDTO(List<NestedColumnsDTO> columns,
-                        List<RowData<T>> rows) {
+                        List<? extends RowData<T>> rows) {
         this.columns = columns;
         this.rows = rows;
     }
 
-    public List<RowData<T>> getRows() {
+    public List<? extends RowData<T>> getRows() {
         return rows;
     }
 
@@ -21,7 +23,9 @@ public class TableDataDTO<T> {
         return columns;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class RowData<T> {
+        private final Long id;
         private final String name;
         private final Map<String, T> data;
 
@@ -33,7 +37,12 @@ public class TableDataDTO<T> {
             return data;
         }
 
-        public RowData(String name, Map<String, T> data) {
+        public Long getId() {
+            return id;
+        }
+
+        public RowData(Long id, String name, Map<String, T> data) {
+            this.id = id;
             this.name = name;
             this.data = data;
         }

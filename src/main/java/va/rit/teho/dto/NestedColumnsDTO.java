@@ -6,12 +6,16 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NestedColumnsDTO {
-    private final String title;
+    private String title;
     private Object key;
     private List<NestedColumnsDTO> columns;
 
     public Object getKey() {
         return key;
+    }
+
+    public NestedColumnsDTO(List<NestedColumnsDTO> columns) {
+        this.columns = columns;
     }
 
     public NestedColumnsDTO(Object key, String title) {
