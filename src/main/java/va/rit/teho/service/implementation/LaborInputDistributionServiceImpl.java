@@ -105,8 +105,8 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     private Stream<EquipmentInRepair> calculateEquipmentLaborInputDistribution(
             UUID sessionId,
             double coefficient,
-            AbstractMap.SimpleEntry<EquipmentPerBase, Integer> equipmentPerBaseAndLaborInput) {
-        EquipmentPerBase equipmentPerBase = equipmentPerBaseAndLaborInput.getKey();
+            EquipmentPerBaseWithLaborInput equipmentPerBaseAndLaborInput) {
+        EquipmentPerBase equipmentPerBase = equipmentPerBaseAndLaborInput.getEquipmentPerBase();
         double avgDailyFailure =
                 calculationService.calculateEquipmentFailureAmount(
                         equipmentPerBase.getAmount(), equipmentPerBase.getIntensity(), coefficient);
@@ -116,13 +116,13 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                                                             equipmentPerBase.getBase().getId(),
                                                             equipmentPerBase.getEquipment().getId(),
                                                             avgDailyFailure,
-                                                            equipmentPerBaseAndLaborInput.getValue(),
+                                                            equipmentPerBaseAndLaborInput.getLaborInput(),
                                                             interval));
     }
 
     private void calculateAndSave(UUID sessionId,
                                   double coefficient,
-                                  List<AbstractMap.SimpleEntry<EquipmentPerBase, Integer>> equipmentPerBases) {
+                                  List<EquipmentPerBaseWithLaborInput> equipmentPerBases) {
         List<EquipmentInRepair> calculated =
                 equipmentPerBases
                         .stream()
