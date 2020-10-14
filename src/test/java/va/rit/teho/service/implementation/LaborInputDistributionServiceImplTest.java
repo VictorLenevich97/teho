@@ -7,7 +7,7 @@
 //import va.rit.teho.entity.*;
 //import va.rit.teho.enums.RepairTypeEnum;
 //import va.rit.teho.enums.RestorationTypeEnum;
-//import va.rit.teho.model.Pair;
+//
 //import va.rit.teho.repository.*;
 //import va.rit.teho.service.CalculationService;
 //import va.rit.teho.service.LaborInputDistributionService;
@@ -177,7 +177,7 @@
 //                                                          Long repairTypeId,
 //                                                          Long subTypeId,
 //                                                          Long typeId,
-//                                                          Function<Long, OngoingStubbing<List<Pair<EquipmentPerBase, Integer>>>> repositoryFunctionStub,
+//                                                          Function<Long, OngoingStubbing<List<AbstractMap.SimpleEntry<EquipmentPerBase, Integer>>>> repositoryFunctionStub,
 //                                                          Runnable updateDistribution) {
 //        RepairType repairType = new RepairType(repairTypeId);
 //        when(repairTypeRepository.findByName(RepairTypeEnum.CURRENT_REPAIR.getName()))
@@ -191,7 +191,7 @@
 //        Equipment e = new Equipment("eqName", equipmentSubType);
 //        e.setId(5L);
 //        EquipmentPerBase equipmentPerBase = new EquipmentPerBase(base, e, 50, 20);
-//        Pair<EquipmentPerBase, Integer> equipmentPerBaseWithLaborInput = Pair.of(equipmentPerBase, 120);
+//        AbstractMap.SimpleEntry<EquipmentPerBase, Integer> equipmentPerBaseWithLaborInput = Pair.of(equipmentPerBase, 120);
 //        repositoryFunctionStub.apply(repairType.getId())
 //                              .thenReturn(Collections.singletonList(equipmentPerBaseWithLaborInput));
 //        double avgDailyFailure = 123.12;

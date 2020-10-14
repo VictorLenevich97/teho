@@ -3,23 +3,23 @@ package va.rit.teho.dto;
 import java.util.Arrays;
 
 public class LaborDistributionNestedColumnsDTO extends NestedColumnsDTO {
-    private final Integer lowerBound;
-    private final Integer upperBound;
+    private final Integer from;
+    private final Integer to;
 
     public LaborDistributionNestedColumnsDTO(Long key,
                                              Integer lowerBound,
                                              Integer upperBound) {
         super(Arrays.asList(new NestedColumnsDTO(Arrays.asList(key.toString(), "count"), "Количество"),
                             new NestedColumnsDTO(Arrays.asList(key.toString(), "laborInput"), "Qij")));
-        this.lowerBound = lowerBound;
-        this.upperBound = upperBound;
+        this.from = lowerBound;
+        this.to = upperBound;
     }
 
-    public Integer getLowerBound() {
-        return lowerBound;
+    public Integer getFrom() {
+        return from;
     }
 
-    public Integer getUpperBound() {
-        return upperBound;
+    public Integer getTo() {
+        return to;
     }
 }

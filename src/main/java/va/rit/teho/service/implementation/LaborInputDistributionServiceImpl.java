@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.*;
 import va.rit.teho.enums.RepairTypeEnum;
 import va.rit.teho.exception.NotFoundException;
-import va.rit.teho.model.Pair;
 import va.rit.teho.repository.EquipmentInRepairRepository;
 import va.rit.teho.repository.EquipmentPerBaseRepository;
 import va.rit.teho.repository.RepairTypeRepository;
@@ -106,25 +105,24 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     private Stream<EquipmentInRepair> calculateEquipmentLaborInputDistribution(
             UUID sessionId,
             double coefficient,
-            Pair<EquipmentPerBase, Integer> equipmentPerBaseAndLaborInput) {
-        EquipmentPerBase equipmentPerBase = equipmentPerBaseAndLaborInput.getLeft();
+            AbstractMap.SimpleEntry<EquipmentPerBase, Integer> equipmentPerBaseAndLaborInput) {
+        EquipmentPerBase equipmentPerBase = equipmentPerBaseAndLaborInput.getKey();
         double avgDailyFailure =
                 calculationService.calculateEquipmentFailureAmount(
                         equipmentPerBase.getAmount(), equipmentPerBase.getIntensity(), coefficient);
-        int standardLaborInput = equipmentPerBaseAndLaborInput.getRight();
         return StreamSupport
                 .stream(workhoursDistributionIntervalRepository.findAll().spliterator(), false)
                 .map(interval -> calculateEquipmentInRepair(sessionId,
                                                             equipmentPerBase.getBase().getId(),
                                                             equipmentPerBase.getEquipment().getId(),
                                                             avgDailyFailure,
-                                                            standardLaborInput,
+                                                            equipmentPerBaseAndLaborInput.getValue(),
                                                             interval));
     }
 
     private void calculateAndSave(UUID sessionId,
                                   double coefficient,
-                                  List<Pair<EquipmentPerBase, Integer>> equipmentPerBases) {
+                                  List<AbstractMap.SimpleEntry<EquipmentPerBase, Integer>> equipmentPerBases) {
         List<EquipmentInRepair> calculated =
                 equipmentPerBases
                         .stream()

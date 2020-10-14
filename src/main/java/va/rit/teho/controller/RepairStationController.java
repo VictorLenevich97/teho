@@ -1,5 +1,6 @@
 package va.rit.teho.controller;
 
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -7,12 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.EquipmentStaffDTO;
 import va.rit.teho.dto.NestedColumnsDTO;
 import va.rit.teho.dto.RepairStationDTO;
-import va.rit.teho.dto.TableDataDTO;
+import va.rit.teho.dto.table.RowData;
+import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
-import va.rit.teho.model.Pair;
 import va.rit.teho.server.TehoSessionData;
 import va.rit.teho.service.EquipmentTypeService;
 import va.rit.teho.service.RepairStationService;
@@ -59,10 +60,10 @@ public class RepairStationController {
         Pair<RepairStation, List<RepairStationEquipmentStaff>> repairStationListPair =
                 repairStationService.get(repairStationId);
         RepairStationDTO repairStationDTO = RepairStationDTO
-                .from(repairStationListPair.getLeft())
+                .from(repairStationListPair.getFirst())
                 .setEquipmentStaff(
                         repairStationListPair
-                                .getRight()
+                                .getSecond()
                                 .stream()
                                 .map(EquipmentStaffDTO::from)
                                 .collect(Collectors.toList()));
@@ -90,7 +91,7 @@ public class RepairStationController {
     }
 
     @GetMapping("/staff")
-    public ResponseEntity<TableDataDTO<Map<String, Integer>>> getEquipmentStaff(
+    public ResponseEntity<TableDataDTO<Map<String, Map<String, Integer>>>> getEquipmentStaff(
             @RequestParam(required = false) List<Long> repairStationId,
             @RequestParam(required = false) List<Long> equipmentTypeId,
             @RequestParam(required = false) List<Long> equipmentSubTypeId) {
@@ -103,7 +104,7 @@ public class RepairStationController {
                                                                     repairStationId,
                                                                     equipmentTypeId,
                                                                     equipmentSubTypeId);
-        TableDataDTO<Map<String, Integer>> equipmentStaffDTO =
+        TableDataDTO<Map<String, Map<String, Integer>>> equipmentStaffDTO =
                 buildEquipmentStaffDTO(repairStationList,
                                        typesWithSubTypes,
                                        repairStationEquipmentStaff);
@@ -134,7 +135,7 @@ public class RepairStationController {
         return ResponseEntity.accepted().build();
     }
 
-    private TableDataDTO<Map<String, Integer>> buildEquipmentStaffDTO(
+    private TableDataDTO<Map<String, Map<String, Integer>>> buildEquipmentStaffDTO(
             List<RepairStation> repairStationList,
             Map<EquipmentType, List<EquipmentSubType>> equipmentTypeListMap,
             Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap) {
@@ -152,7 +153,7 @@ public class RepairStationController {
                                 .stream()
                                 .map(entry -> this.getEquipmentStaffNestedColumnsDTO(entry, postfix)))
                         .collect(Collectors.toList());
-        List<TableDataDTO.RowData<Map<String, Integer>>> rows =
+        List<RowData<Map<String, Map<String, Integer>>>> rows =
                 repairStationList
                         .stream()
                         .map(rs -> getEquipmentStaffRow(repairStationMap, columns, rs))
@@ -172,7 +173,7 @@ public class RepairStationController {
                                   .collect(Collectors.toList()));
     }
 
-    private TableDataDTO.RowData<Map<String, Integer>> getEquipmentStaffRow(
+    private RowData<Map<String, Map<String, Integer>>> getEquipmentStaffRow(
             Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap,
             List<EquipmentSubType> columns,
             RepairStation rs) {
@@ -186,7 +187,7 @@ public class RepairStationController {
             innerMap.put(KEY_AVAILABLE_STAFF, emptyStaff ? 0 : repairStationEquipmentStaff.getAvailableStaff());
             dataMap.put(est.getId().toString(), innerMap);
         }
-        return new TableDataDTO.RowData<>(rs.getId(), rs.getName(), dataMap);
+        return new RowData<>(rs.getId(), rs.getName(), dataMap);
     }
 
 

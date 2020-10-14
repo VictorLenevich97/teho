@@ -1,11 +1,11 @@
 package va.rit.teho.service.implementation;
 
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.*;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
-import va.rit.teho.model.Pair;
 import va.rit.teho.repository.RepairStationEquipmentStaffRepository;
 import va.rit.teho.repository.RepairStationRepository;
 import va.rit.teho.service.BaseService;

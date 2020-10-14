@@ -1,9 +1,9 @@
 package va.rit.teho.service;
 
+import org.springframework.data.util.Pair;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
-import va.rit.teho.model.Pair;
 
 import java.util.List;
 import java.util.Map;

@@ -2,6 +2,7 @@ package va.rit.teho.controller.equipment;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.TestRunner;
@@ -10,7 +11,7 @@ import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
 import va.rit.teho.dto.equipment.EquipmentTypeDTO;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
-import va.rit.teho.model.Pair;
+
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,7 +46,7 @@ public class EquipmentTypeControllerTest extends ControllerTest {
         List<EquipmentSubType> equipmentSubTypes = Arrays.asList(firstEquipmentSubType, secondEquipmentSubType);
 
         when(equipmentTypeService.getTypeWithSubTypes(equipmentType.getId())).thenReturn(Pair.of(equipmentType,
-                                                                                             equipmentSubTypes));
+                                                                                                 equipmentSubTypes));
 
         mockMvc.perform(get("/equipment-type/{id}", equipmentType.getId())).andExpect(status().isOk())
                .andExpect(jsonPath("$.type.shortName", is(equipmentType.getShortName())))

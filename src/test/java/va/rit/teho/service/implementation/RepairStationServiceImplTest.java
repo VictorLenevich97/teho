@@ -5,7 +5,7 @@
 //import org.mockito.Mockito;
 //import va.rit.teho.entity.*;
 //import va.rit.teho.exception.IncorrectParamException;
-//import va.rit.teho.model.Pair;
+//
 //import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
 //import va.rit.teho.repository.RepairStationRepository;
 //import va.rit.teho.service.BaseService;
@@ -58,7 +58,7 @@
 //        List<RepairStationEquipmentStaff> repairStationEquipmentStaffList =
 //                Collections
 //                        .singletonList(new RepairStationEquipmentStaff(null, 2, 1));
-//        Pair<RepairStation, List<RepairStationEquipmentStaff>> result = Pair.of(repairStation,
+//        AbstractMap.SimpleEntry<RepairStation, List<RepairStationEquipmentStaff>> result = Pair.of(repairStation,
 //                                                                                repairStationEquipmentStaffList);
 //
 //        when(repairStationRepository.findById(repairStationId)).thenReturn(Optional.of(repairStation));

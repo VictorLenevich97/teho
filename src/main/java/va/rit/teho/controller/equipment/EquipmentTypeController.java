@@ -1,5 +1,6 @@
 package va.rit.teho.controller.equipment;
 
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -9,7 +10,6 @@ import va.rit.teho.dto.equipment.EquipmentSubTypePerTypeDTO;
 import va.rit.teho.dto.equipment.EquipmentTypeDTO;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
-import va.rit.teho.model.Pair;
 import va.rit.teho.service.EquipmentTypeService;
 
 import java.util.Collections;
@@ -56,8 +56,8 @@ public class EquipmentTypeController {
     @ResponseBody
     public ResponseEntity<EquipmentSubTypePerTypeDTO> getEquipmentTypeById(@PathVariable Long typeId) {
         Pair<EquipmentType, List<EquipmentSubType>> typeWithSubTypes = equipmentTypeService.getTypeWithSubTypes(typeId);
-        return ResponseEntity.ok(EquipmentSubTypePerTypeDTO.from(typeWithSubTypes.getLeft(),
-                                                                 typeWithSubTypes.getRight()));
+        return ResponseEntity.ok(EquipmentSubTypePerTypeDTO.from(typeWithSubTypes.getFirst(),
+                                                                 typeWithSubTypes.getSecond()));
     }
 
     @PostMapping

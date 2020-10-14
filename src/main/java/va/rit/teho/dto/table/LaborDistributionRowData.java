@@ -1,11 +1,12 @@
-package va.rit.teho.dto;
+package va.rit.teho.dto.table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import va.rit.teho.dto.CountAndLaborInputDTO;
 
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LaborDistributionRowData extends TableDataDTO.RowData<LaborInputDistributionDTO.CountAndLaborInputDTO> {
+public class LaborDistributionRowData extends RowData<Map<String, CountAndLaborInputDTO>> {
     private final String equipmentName;
     private final Double avgDailyFailure;
     private final Integer standardLaborInput;
@@ -28,7 +29,7 @@ public class LaborDistributionRowData extends TableDataDTO.RowData<LaborInputDis
     }
 
     public LaborDistributionRowData(String name,
-                                    Map<String, LaborInputDistributionDTO.CountAndLaborInputDTO> data,
+                                    Map<String, CountAndLaborInputDTO> data,
                                     String equipmentName,
                                     Double avgDailyFailure,
                                     Integer standardLaborInput,
