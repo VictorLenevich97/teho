@@ -51,4 +51,27 @@ public interface EquipmentInRepairRepository
     }
 
 
+    @Query(value = "select equipment.name, sum(amount) as amount, sum(equipment_in_repair.count) as c " +
+            "from equipment_in_repair left join equipment_per_base " +
+            "on equipment_in_repair.equipment_id = equipment_per_base.equipment_id and equipment_in_repair.base_id = equipment_per_base.base_id " +
+            "inner join workhours_distribution_interval on equipment_in_repair.workhours_distribution_interval_id = workhours_distribution_interval.id " +
+            "inner join equipment on equipment_in_repair.equipment_id = equipment.id " +
+            "group by equipment.name", nativeQuery = true)
+    List<List<Object>> findAllGroupedByEquipmentName();
+
+    @Query(value = "select " +
+            "(select coalesce(sum(equipment_in_repair.count), 0) from equipment_in_repair " +
+            "inner join workhours_distribution_interval on equipment_in_repair.workhours_distribution_interval_id = workhours_distribution_interval.id " +
+            "inner join equipment on equipment_in_repair.equipment_id = equipment.id " +
+            "where workhours_distribution_interval.restoration_type_id = 1 and equipment.name = ?1" +
+            ") as tactical, " +
+            "(select coalesce(sum(equipment_in_repair.count), 0) from equipment_in_repair " +
+            "inner join workhours_distribution_interval on equipment_in_repair.workhours_distribution_interval_id = workhours_distribution_interval.id " +
+            "inner join equipment on equipment_in_repair.equipment_id = equipment.id " +
+            "where workhours_distribution_interval.restoration_type_id = 2 and equipment.name = ?1) as operational, " +
+            "(select coalesce(sum(equipment_in_repair.count), 0) from equipment_in_repair " +
+            "inner join workhours_distribution_interval on equipment_in_repair.workhours_distribution_interval_id = workhours_distribution_interval.id " +
+            "inner join equipment on equipment_in_repair.equipment_id = equipment.id " +
+            " where workhours_distribution_interval.restoration_type_id = 3 and equipment.name = ?1) as stratigic", nativeQuery = true)
+    List<List<Object>> sumEquipmentByRestorationLevelTypes(String equipmentName);
 }
