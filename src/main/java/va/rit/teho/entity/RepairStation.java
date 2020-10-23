@@ -12,7 +12,7 @@ public class RepairStation {
 
     private String name;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "repair_station_id", referencedColumnName = "id")
+    @JoinColumn(name = "repair_station_type_id", referencedColumnName = "id")
     private RepairStationType repairStationType;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "base_id", referencedColumnName = "id")

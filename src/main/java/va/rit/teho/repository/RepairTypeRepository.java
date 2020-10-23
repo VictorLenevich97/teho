@@ -1,5 +1,6 @@
 package va.rit.teho.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import va.rit.teho.entity.RepairType;
@@ -14,4 +15,5 @@ public interface RepairTypeRepository extends CrudRepository<RepairType, Long> {
     List<RepairType> findAllByRepairableTrue();
 
     List<RepairType> findAllByRepairableFalse();
+
 }

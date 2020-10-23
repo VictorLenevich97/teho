@@ -1,12 +1,15 @@
 package va.rit.teho.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import va.rit.teho.entity.EquipmentSubTypePerRepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
+
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentStaffDTO {
 
-    Long equipmentId;
+    Long equipmentSubTypeId;
     Integer totalStaff;
     Integer availableStaff;
 
@@ -14,27 +17,28 @@ public class EquipmentStaffDTO {
         this.totalStaff = totalStaff;
         this.availableStaff = availableStaff;
     }
+
     public EquipmentStaffDTO() {
     }
 
-    public EquipmentStaffDTO(Long equipmentKey, Integer totalStaff, Integer availableStaff) {
-        this.equipmentId = equipmentKey;
+    public EquipmentStaffDTO(Long equipmentSubTypeKey, Integer totalStaff, Integer availableStaff) {
+        this.equipmentSubTypeId = equipmentSubTypeKey;
         this.totalStaff = totalStaff;
         this.availableStaff = availableStaff;
     }
 
     public static EquipmentStaffDTO from(RepairStationEquipmentStaff repairStationEquipmentStaff) {
-        return new EquipmentStaffDTO(repairStationEquipmentStaff.getEquipment().getId(),
+        return new EquipmentStaffDTO(repairStationEquipmentStaff.getEquipmentSubType().getId(),
                                      repairStationEquipmentStaff.getTotalStaff(),
                                      repairStationEquipmentStaff.getAvailableStaff());
     }
 
-    public Long getEquipmentId() {
-        return equipmentId;
+    public Long getEquipmentSubTypeId() {
+        return equipmentSubTypeId;
     }
 
-    public void setEquipmentId(Long equipmentId) {
-        this.equipmentId = equipmentId;
+    public void setEquipmentSubTypeId(Long equipmentSubTypeId) {
+        this.equipmentSubTypeId = equipmentSubTypeId;
     }
 
     public Integer getTotalStaff() {
@@ -51,5 +55,13 @@ public class EquipmentStaffDTO {
 
     public void setAvailableStaff(Integer availableStaff) {
         this.availableStaff = availableStaff;
+    }
+
+    public RepairStationEquipmentStaff toEntity(UUID sessionId,
+                                                Long repairStationId) {
+        return new RepairStationEquipmentStaff(
+                new EquipmentSubTypePerRepairStation(repairStationId, equipmentSubTypeId, sessionId),
+                totalStaff,
+                availableStaff);
     }
 }

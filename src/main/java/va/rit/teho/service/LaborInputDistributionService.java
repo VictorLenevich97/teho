@@ -7,6 +7,7 @@ import va.rit.teho.entity.WorkhoursDistributionInterval;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Распределение ремонтного фонда подразделения по трудоемкости ремонта
@@ -18,23 +19,25 @@ public interface LaborInputDistributionService {
      *
      * @return Map, ключ это тип ВВСТ, значение - список данных о записи
      */
-    Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> getLaborInputDistribution(List<Long> equipmentTypeIds);
+    Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> getLaborInputDistribution(UUID sessionId, List<Long> equipmentTypeIds);
 
     /**
      * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ.
      */
-    void updateLaborInputDistribution();
+    void updateLaborInputDistribution(UUID sessionId, double coefficient);
 
     /**
      * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ, относящихся к Base с id = baseId.
      *
      * @param baseId id Base
      */
-    void updateLaborInputDistributionPerBase(Long baseId);
+    void updateLaborInputDistributionPerBase(UUID sessionId, double coefficient, Long baseId);
 
-    void updateLaborInputDistributionPerEquipmentSubType(Long equipmentSubTypeId);
+    void updateLaborInputDistributionPerEquipmentSubType(UUID sessionId, double coefficient, Long equipmentSubTypeId);
 
-    void updateLaborInputDistributionPerEquipmentType(Long equipmentType);
+    void updateLaborInputDistributionPerEquipmentType(UUID sessionId, double coefficient, Long equipmentType);
+
+    void copyLaborInputDistributionData(UUID originalSessionId, UUID newSessionId);
 
     List<WorkhoursDistributionInterval> getDistributionIntervals();
 

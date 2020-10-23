@@ -73,7 +73,7 @@ public class BaseServiceImplTest {
         Equipment e = new Equipment("n", new EquipmentSubType("", "", new EquipmentType("", "")));
         when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
         when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(e));
-        EquipmentPerBase epb = new EquipmentPerBase(BASE, e, intensity, amount);
+        EquipmentPerBase epb = new EquipmentPerBase(BASE.getId(), e.getId(), intensity, amount);
 
         service.addEquipmentToBase(baseId, equipmentId, intensity, amount);
 
@@ -105,7 +105,7 @@ public class BaseServiceImplTest {
         Equipment e = new Equipment("n", new EquipmentSubType("", "", new EquipmentType("", "")));
         when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
         when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(e));
-        EquipmentPerBase epb = new EquipmentPerBase(BASE, e, intensity, amount);
+        EquipmentPerBase epb = new EquipmentPerBase(BASE.getId(), e.getId(), intensity, amount);
         when(equipmentPerBaseRepository.findById(new EquipmentPerBaseAmount(baseId,
                                                                             equipmentId))).thenReturn(Optional.of(epb));
 

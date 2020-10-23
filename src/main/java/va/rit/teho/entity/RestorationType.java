@@ -42,22 +42,17 @@ public class RestorationType {
         return workhoursDistributionIntervals;
     }
 
-    public void setWorkhoursDistributionIntervals(Set<WorkhoursDistributionInterval> workhoursDistributionIntervals) {
-        this.workhoursDistributionIntervals = workhoursDistributionIntervals;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RestorationType that = (RestorationType) o;
         return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(workhoursDistributionIntervals, that.workhoursDistributionIntervals);
+                Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, workhoursDistributionIntervals);
+        return Objects.hash(id, name);
     }
 }

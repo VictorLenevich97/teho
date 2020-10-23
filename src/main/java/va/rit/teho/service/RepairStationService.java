@@ -1,10 +1,13 @@
 package va.rit.teho.service;
 
+import org.springframework.data.util.Pair;
+import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.RepairStation;
 import va.rit.teho.entity.RepairStationEquipmentStaff;
-import va.rit.teho.model.Pair;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public interface RepairStationService {
 
@@ -16,8 +19,15 @@ public interface RepairStationService {
 
     void update(Long id, String name, Long baseId, Long typeId, int amount);
 
-    void setEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
+    void setEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList);
 
-    void updateEquipmentStaff(Long repairStationId, Long equipmentId, int availableStaff, int totalStaff);
+    void updateEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList);
+
+    Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> getRepairStationEquipmentStaff(UUID sessionId,
+                                                                                                          List<Long> repairStationIds,
+                                                                                                          List<Long> equipmentTypeIds,
+                                                                                                          List<Long> equipmentSubTypeIds);
+
+    void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId);
 
 }

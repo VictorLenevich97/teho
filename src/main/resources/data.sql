@@ -1,3 +1,15 @@
+DELETE FROM workhours_distribution_interval;
+DELETE FROM equipment_labor_input_per_type;
+DELETE FROM restoration_type;
+DELETE FROM repair_type;
+DELETE FROM equipment_per_base;
+DELETE FROM equipment;
+DELETE FROM equipment_sub_type;
+DELETE FROM equipment_type;
+DELETE FROM repair_station;
+DELETE FROM repair_station_type;
+DELETE FROM base;
+
 INSERT INTO base VALUES (1, 'б 1', 'б1');
 INSERT INTO base VALUES (2, 'б 2', 'б2');
 
@@ -22,9 +34,13 @@ INSERT INTO equipment_per_base values (1, 1, 20, 3);
 INSERT INTO equipment_per_base values (2, 2, 3, 14);
 INSERT INTO equipment_per_base values (1, 3, 9, 7);
 INSERT INTO equipment_per_base values (2, 4, 12, 22);
-
-INSERT INTO repair_station_equipment_staff VALUES (1, 1, 5, 10);
-INSERT INTO repair_station_equipment_staff VALUES (2, 1, 3, 5);
+--
+-- INSERT INTO repair_station_equipment_staff VALUES (1, 1, 5, 10);
+-- INSERT INTO repair_station_equipment_staff VALUES (2, 1, 3, 5);
+-- INSERT INTO repair_station_equipment_staff VALUES (3, 1, 12, 15);
+-- INSERT INTO repair_station_equipment_staff VALUES (1, 2, 7, 11);
+-- INSERT INTO repair_station_equipment_staff VALUES (2, 2, 8, 12);
+-- INSERT INTO repair_station_equipment_staff VALUES (3, 2, 9, 13);
 
 INSERT INTO repair_type VALUES (1, 'Текущий', true);
 INSERT INTO repair_type VALUES (2, 'Средний', true);
@@ -41,6 +57,8 @@ INSERT INTO equipment_labor_input_per_type VALUES (3, 1, 123);
 INSERT INTO equipment_labor_input_per_type VALUES (4, 1, 412);
 INSERT INTO equipment_labor_input_per_type VALUES (1, 2, 240);
 INSERT INTO equipment_labor_input_per_type VALUES (2, 2, 320);
+INSERT INTO equipment_labor_input_per_type VALUES (3, 2, 350);
+INSERT INTO equipment_labor_input_per_type VALUES (4, 2, 420);
 
 INSERT INTO workhours_distribution_interval VALUES (1, 0, 10, 1);
 INSERT INTO workhours_distribution_interval VALUES (2, 10, 20, 1);

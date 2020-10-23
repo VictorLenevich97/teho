@@ -6,8 +6,6 @@ import java.util.Objects;
 public class EquipmentLaborInputDistribution {
 
     private final String baseName;
-    private final EquipmentType equipmentType;
-    private final EquipmentSubType equipmentSubType;
     private final String equipmentName;
     private final double avgDailyFailure;
     private final int standardLaborInput;
@@ -16,16 +14,12 @@ public class EquipmentLaborInputDistribution {
 
     public EquipmentLaborInputDistribution(
             String baseName,
-            EquipmentType equipmentType,
-            EquipmentSubType equipmentSubType,
             String equipmentName,
             double avgDailyFailure,
             int standardLaborInput,
             Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap,
             double totalRepairComplexity) {
         this.baseName = baseName;
-        this.equipmentType = equipmentType;
-        this.equipmentSubType = equipmentSubType;
         this.equipmentName = equipmentName;
         this.avgDailyFailure = avgDailyFailure;
         this.standardLaborInput = standardLaborInput;
@@ -37,20 +31,12 @@ public class EquipmentLaborInputDistribution {
         return new Builder();
     }
 
-    public EquipmentSubType getEquipmentSubType() {
-        return equipmentSubType;
-    }
-
     public double getTotalRepairComplexity() {
         return totalRepairComplexity;
     }
 
     public String getBaseName() {
         return baseName;
-    }
-
-    public EquipmentType getEquipmentType() {
-        return equipmentType;
     }
 
     public String getEquipmentName() {
@@ -78,8 +64,6 @@ public class EquipmentLaborInputDistribution {
                 standardLaborInput == that.standardLaborInput &&
                 Double.compare(that.totalRepairComplexity, totalRepairComplexity) == 0 &&
                 Objects.equals(baseName, that.baseName) &&
-                Objects.equals(equipmentType, that.equipmentType) &&
-                Objects.equals(equipmentSubType, that.equipmentSubType) &&
                 Objects.equals(equipmentName, that.equipmentName) &&
                 Objects.equals(intervalCountAndLaborInputMap, that.intervalCountAndLaborInputMap);
     }
@@ -87,8 +71,6 @@ public class EquipmentLaborInputDistribution {
     @Override
     public int hashCode() {
         return Objects.hash(baseName,
-                            equipmentType,
-                            equipmentSubType,
                             equipmentName,
                             avgDailyFailure,
                             standardLaborInput,
@@ -98,8 +80,6 @@ public class EquipmentLaborInputDistribution {
 
     public static class Builder {
         private String baseName;
-        private EquipmentType equipmentType;
-        private EquipmentSubType equipmentSubType;
         private String equipmentName;
         private double avgDailyFailure;
         private int standardLaborInput;
@@ -108,16 +88,6 @@ public class EquipmentLaborInputDistribution {
 
         public Builder baseName(String baseName) {
             this.baseName = baseName;
-            return this;
-        }
-
-        public Builder equipmentType(EquipmentType equipmentType) {
-            this.equipmentType = equipmentType;
-            return this;
-        }
-
-        public Builder equipmentSubType(EquipmentSubType equipmentSubType) {
-            this.equipmentSubType = equipmentSubType;
             return this;
         }
 
@@ -148,8 +118,6 @@ public class EquipmentLaborInputDistribution {
 
         public EquipmentLaborInputDistribution build() {
             return new EquipmentLaborInputDistribution(baseName,
-                                                       equipmentType,
-                                                       equipmentSubType,
                                                        equipmentName,
                                                        avgDailyFailure,
                                                        standardLaborInput,
@@ -157,8 +125,5 @@ public class EquipmentLaborInputDistribution {
                                                        totalRepairComplexity);
         }
 
-        public Map<Long, CountAndLaborInput> getIntervalCountAndLaborInputMap() {
-            return intervalCountAndLaborInputMap;
-        }
     }
 }

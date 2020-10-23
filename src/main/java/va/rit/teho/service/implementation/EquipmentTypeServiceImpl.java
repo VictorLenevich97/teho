@@ -2,13 +2,13 @@ package va.rit.teho.service.implementation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
-import va.rit.teho.model.Pair;
 import va.rit.teho.repository.EquipmentSubTypeRepository;
 import va.rit.teho.repository.EquipmentTypeRepository;
 import va.rit.teho.service.EquipmentTypeService;
@@ -94,6 +94,12 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
         return equipmentSubTypeRepository
                 .save(new EquipmentSubType(shortName, fullName, getEquipmentTypeById(typeId)))
                 .getId();
+    }
+
+    @Override
+    public EquipmentSubType getSubType(Long subTypeId) {
+        return equipmentSubTypeRepository.findById(subTypeId).orElseThrow(() -> new IncorrectParamException("subTypeId",
+                                                                                                            subTypeId));
     }
 
     @Override

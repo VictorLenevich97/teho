@@ -1,8 +1,8 @@
 package va.rit.teho.service;
 
+import org.springframework.data.util.Pair;
 import va.rit.teho.entity.EquipmentSubType;
 import va.rit.teho.entity.EquipmentType;
-import va.rit.teho.model.Pair;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,8 @@ public interface EquipmentTypeService {
     void updateType(Long id, String shortName, String fullName);
 
     Long addSubType(Long typeId, String shortName, String fullName);
+
+    EquipmentSubType getSubType(Long subTypeId);
 
     void updateSubType(Long id, Long typeId, String shortName, String fullName);
 

@@ -2,6 +2,7 @@ package va.rit.teho.entity;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class EquipmentInRepair {
@@ -24,6 +25,11 @@ public class EquipmentInRepair {
     @JoinColumn(name = "workhours_distribution_interval_id")
     WorkhoursDistributionInterval workhoursDistributionInterval;
 
+    @ManyToOne
+    @MapsId("session_id")
+    @JoinColumn(name = "session_id")
+    TehoSession tehoSession;
+
     private double count;
     private double avgLaborInput;
 
@@ -32,15 +38,9 @@ public class EquipmentInRepair {
     }
 
     public EquipmentInRepair(EquipmentInRepairId equipmentInRepairId,
-                             Base base,
-                             Equipment equipment,
-                             WorkhoursDistributionInterval workhoursDistributionInterval,
                              double count,
                              double avgLaborInput) {
         this.equipmentInRepairId = equipmentInRepairId;
-        this.base = base;
-        this.equipment = equipment;
-        this.workhoursDistributionInterval = workhoursDistributionInterval;
         this.count = count;
         this.avgLaborInput = avgLaborInput;
     }
@@ -93,6 +93,10 @@ public class EquipmentInRepair {
         this.workhoursDistributionInterval = workhoursDistributionInterval;
     }
 
+    public TehoSession getTehoSession() {
+        return tehoSession;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -109,5 +113,13 @@ public class EquipmentInRepair {
     @Override
     public int hashCode() {
         return Objects.hash(equipmentInRepairId, base, equipment, workhoursDistributionInterval, count, avgLaborInput);
+    }
+
+    public void setTehoSession(TehoSession tehoSession) {
+        this.tehoSession = tehoSession;
+    }
+
+    public EquipmentInRepair copy(UUID newSessionId) {
+        return new EquipmentInRepair(getEquipmentInRepairId().copy(newSessionId), getCount(), getAvgLaborInput());
     }
 }

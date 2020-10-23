@@ -2,33 +2,51 @@ package va.rit.teho.entity;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 public class CalculatedRepairCapabilitesPerDay {
 
     @EmbeddedId
-    EquipmentPerRepairStation equipmentPerRepairStation;
+    EquipmentPerRepairStationWithRepairType equipmentPerRepairStationWithRepairType;
+
     @ManyToOne
     @MapsId("repair_station_id")
     @JoinColumn(name = "repair_station_id")
     RepairStation repairStation;
+
     @ManyToOne
     @MapsId("equipment_id")
     @JoinColumn(name = "equipment_id")
     Equipment equipment;
+
     double capability;
+
+    @ManyToOne
+    @MapsId("repair_type_id")
+    @JoinColumn(name = "repair_type_id")
+    RepairType repairType;
+
+    @ManyToOne
+    @MapsId("session_id")
+    @JoinColumn(name = "session_id")
+    TehoSession tehoSession;
 
     public CalculatedRepairCapabilitesPerDay() {
     }
 
-    public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStation equipmentPerRepairStation,
-                                             RepairStation repairStation,
-                                             Equipment equipment,
+    public CalculatedRepairCapabilitesPerDay(EquipmentPerRepairStationWithRepairType equipmentPerRepairStationWithRepairType,
                                              double capability) {
-        this.equipmentPerRepairStation = equipmentPerRepairStation;
-        this.repairStation = repairStation;
-        this.equipment = equipment;
+        this.equipmentPerRepairStationWithRepairType = equipmentPerRepairStationWithRepairType;
         this.capability = capability;
+    }
+
+    public RepairType getRepairType() {
+        return repairType;
+    }
+
+    public void setRepairType(RepairType repairType) {
+        this.repairType = repairType;
     }
 
     @Override
@@ -37,22 +55,33 @@ public class CalculatedRepairCapabilitesPerDay {
         if (o == null || getClass() != o.getClass()) return false;
         CalculatedRepairCapabilitesPerDay that = (CalculatedRepairCapabilitesPerDay) o;
         return Double.compare(that.capability, capability) == 0 &&
-                Objects.equals(equipmentPerRepairStation, that.equipmentPerRepairStation) &&
+                Objects.equals(equipmentPerRepairStationWithRepairType, that.equipmentPerRepairStationWithRepairType) &&
                 Objects.equals(repairStation, that.repairStation) &&
-                Objects.equals(equipment, that.equipment);
+                Objects.equals(equipment, that.equipment) &&
+                Objects.equals(repairType, that.repairType) &&
+                Objects.equals(tehoSession, that.tehoSession);
+    }
+
+    public TehoSession getTehoSession() {
+        return tehoSession;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(equipmentPerRepairStation, repairStation, equipment, capability);
+        return Objects.hash(equipmentPerRepairStationWithRepairType,
+                            repairStation,
+                            equipment,
+                            repairType,
+                            capability,
+                            tehoSession);
     }
 
-    public EquipmentPerRepairStation getEquipmentPerRepairStation() {
-        return equipmentPerRepairStation;
+    public EquipmentPerRepairStationWithRepairType getEquipmentPerRepairStation() {
+        return equipmentPerRepairStationWithRepairType;
     }
 
-    public void setEquipmentPerRepairStation(EquipmentPerRepairStation equipmentPerRepairStation) {
-        this.equipmentPerRepairStation = equipmentPerRepairStation;
+    public void setEquipmentPerRepairStation(EquipmentPerRepairStationWithRepairType equipmentPerRepairStation) {
+        this.equipmentPerRepairStationWithRepairType = equipmentPerRepairStation;
     }
 
     public RepairStation getRepairStation() {
@@ -77,5 +106,10 @@ public class CalculatedRepairCapabilitesPerDay {
 
     public void setCapability(double capability) {
         this.capability = capability;
+    }
+
+    public CalculatedRepairCapabilitesPerDay copy(UUID newSessionId) {
+        return new CalculatedRepairCapabilitesPerDay(getEquipmentPerRepairStation().copy(newSessionId),
+                                                     getCapability());
     }
 }
