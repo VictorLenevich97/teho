@@ -48,11 +48,11 @@ public class RepairFundDistributionReportStyler implements ReportRowStyler {
     }
 
     private boolean rowIsSubtype(Row row) {
-        return allCellsAreBlank(row.getCell(1), row.getCell(2));
+        return !allCellsAreBlank(row.getCell(0)) && allCellsAreBlank(row.getCell(1), row.getCell(2));
     }
 
     private boolean rowIsTotalResult(Row row) {
-        return allCellsAreBlank(row.getCell(1));
+        return !allCellsAreBlank(row.getCell(0)) && allCellsAreBlank(row.getCell(1));
     }
 
     private void mergeAllCellsInRow(Row row) {
@@ -78,6 +78,6 @@ public class RepairFundDistributionReportStyler implements ReportRowStyler {
     }
 
     private boolean allCellsAreBlank(Cell... cells) {
-        return Stream.of(cells).allMatch(cell -> cell.getCellType().equals(BLANK));
+        return Stream.of(cells).allMatch(cell -> cell == null || cell.getCellType().equals(BLANK));
     }
 }
