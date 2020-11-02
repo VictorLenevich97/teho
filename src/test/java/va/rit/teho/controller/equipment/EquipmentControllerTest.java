@@ -8,7 +8,7 @@ import va.rit.teho.TestRunner;
 import va.rit.teho.controller.ControllerTest;
 import va.rit.teho.dto.equipment.EquipmentDTO;
 import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
-import va.rit.teho.entity.Equipment;
+import va.rit.teho.entity.equipment.Equipment;
 
 import java.util.Collections;
 
@@ -40,7 +40,7 @@ public class EquipmentControllerTest extends ControllerTest {
     public void testGetEquipmentById() throws Exception {
         Equipment equipment = equipment(1L, "equipName", 2L, "subTypeName", 3L, "typeName");
 
-        when(equipmentService.getEquipment(equipment.getId())).thenReturn(equipment);
+        when(equipmentService.get(equipment.getId())).thenReturn(equipment);
 
         mockMvc.perform(get("/equipment/{id}", equipment.getId()))
                .andExpect(status().isOk())

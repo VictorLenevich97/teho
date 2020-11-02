@@ -5,9 +5,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import va.rit.teho.dto.RepairTypeDTO;
-import va.rit.teho.entity.RepairType;
-import va.rit.teho.service.RepairTypeService;
+import va.rit.teho.dto.common.RepairTypeDTO;
+import va.rit.teho.entity.common.RepairType;
+import va.rit.teho.service.common.RepairTypeService;
 
 import java.util.Comparator;
 import java.util.List;
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class RepairTypeController {
 
     private final RepairTypeService repairTypeService;
-
 
     public RepairTypeController(RepairTypeService repairTypeService) {
         this.repairTypeService = repairTypeService;

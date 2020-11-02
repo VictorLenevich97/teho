@@ -2,7 +2,8 @@ package va.rit.teho.service.implementation;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import va.rit.teho.service.CalculationService;
+import va.rit.teho.service.common.CalculationService;
+import va.rit.teho.service.implementation.common.CalculationServiceImpl;
 
 public class CalculationServiceImplTest {
 
@@ -15,7 +16,7 @@ public class CalculationServiceImplTest {
         double k = 1.23;
         Assertions.assertEquals(
                 (totalAmount * intensity * k) / 100,
-                calculationService.calculateEquipmentFailureAmount(totalAmount, intensity, k));
+                calculationService.calculateAvgDailyFailure(totalAmount, intensity, k));
     }
 
     @Test
@@ -30,10 +31,10 @@ public class CalculationServiceImplTest {
 
         Assertions.assertEquals(
                 expectedResult,
-                calculationService.calculateEquipmentRequiringRepair(upperBound,
-                                                                     lowerBound,
-                                                                     avgDailyFailure,
-                                                                     standardLaborInput));
+                calculationService.calculateEquipmentInRepairCount(upperBound,
+                                                                   lowerBound,
+                                                                   avgDailyFailure,
+                                                                   standardLaborInput));
     }
 
     @Test
@@ -42,7 +43,7 @@ public class CalculationServiceImplTest {
         int upperBound = 12;
         double expectedResult = 0.75 * count * upperBound;
         Assertions.assertEquals(expectedResult,
-                                calculationService.calculateEquipmentRepairComplexity(count, upperBound));
+                                calculationService.calculateEquipmentInRepairLaborInput(count, upperBound));
     }
 
     @Test

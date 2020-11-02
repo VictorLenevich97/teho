@@ -5,10 +5,10 @@
 //import org.mockito.Mockito;
 //import va.rit.teho.entity.*;
 //import va.rit.teho.enums.RepairTypeEnum;
-//import va.rit.teho.repository.CalculatedRepairCapabilitiesPerDayRepository;
+//import va.rit.teho.repository.repairstation.CalculatedRepairCapabilitiesPerDayRepository;
 //import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
-//import va.rit.teho.service.CalculationService;
-//import va.rit.teho.service.RepairCapabilitiesService;
+//import va.rit.teho.service.common.CalculationService;
+//import va.rit.teho.service.repairstation.RepairCapabilitiesService;
 //
 //import java.util.Collections;
 //import java.util.List;

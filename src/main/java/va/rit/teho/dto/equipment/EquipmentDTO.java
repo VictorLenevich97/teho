@@ -1,7 +1,7 @@
 package va.rit.teho.dto.equipment;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import va.rit.teho.entity.Equipment;
+import va.rit.teho.entity.equipment.Equipment;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentDTO {

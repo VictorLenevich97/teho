@@ -1,7 +1,5 @@
 package va.rit.teho.dto.table;
 
-import va.rit.teho.dto.NestedColumnsDTO;
-
 import java.util.List;
 
 public class TableDataDTO<T> {

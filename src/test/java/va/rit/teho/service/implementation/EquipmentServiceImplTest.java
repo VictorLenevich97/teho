@@ -3,12 +3,15 @@ package va.rit.teho.service.implementation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import va.rit.teho.entity.Equipment;
-import va.rit.teho.entity.EquipmentSubType;
-import va.rit.teho.entity.EquipmentType;
-import va.rit.teho.repository.EquipmentRepository;
-import va.rit.teho.repository.EquipmentSubTypeRepository;
-import va.rit.teho.service.EquipmentService;
+import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.repository.equipment.EquipmentLaborInputPerTypeRepository;
+import va.rit.teho.repository.equipment.EquipmentRepository;
+import va.rit.teho.repository.equipment.EquipmentSubTypeRepository;
+import va.rit.teho.service.equipment.EquipmentService;
+import va.rit.teho.service.equipment.EquipmentTypeService;
+import va.rit.teho.service.implementation.equipment.EquipmentServiceImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,10 +29,14 @@ public class EquipmentServiceImplTest {
                     new EquipmentSubType("s", "f", new EquipmentType("s", "f")));
 
     private final EquipmentRepository equipmentRepository = Mockito.mock(EquipmentRepository.class);
-    private final EquipmentSubTypeRepository equipmentSubTypeRepository = Mockito.mock(EquipmentSubTypeRepository.class);
+    private final EquipmentLaborInputPerTypeRepository equipmentLaborInputPerTypeRepository = Mockito.mock(
+            EquipmentLaborInputPerTypeRepository.class);
+    private final EquipmentTypeService equipmentTypeService = Mockito.mock(EquipmentTypeService.class);
 
     private final EquipmentService equipmentService =
-            new EquipmentServiceImpl(equipmentRepository, equipmentSubTypeRepository);
+            new EquipmentServiceImpl(equipmentTypeService,
+                                     equipmentRepository,
+                                     equipmentLaborInputPerTypeRepository);
 
     @Test
     public void testList() {
@@ -44,7 +51,7 @@ public class EquipmentServiceImplTest {
         Long equipmentId = 2L;
         when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(EQUIPMENT));
 
-        Assertions.assertEquals(EQUIPMENT, equipmentService.getEquipment(equipmentId));
+        Assertions.assertEquals(EQUIPMENT, equipmentService.get(equipmentId));
     }
 
     @Test
@@ -54,7 +61,7 @@ public class EquipmentServiceImplTest {
         Equipment equipmentToAdd = new Equipment("eqName", equipmentSubType);
         Equipment addedEquipment = new Equipment(equipmentToAdd.getName(), equipmentToAdd.getEquipmentSubType());
         addedEquipment.setId(15L);
-        when(equipmentSubTypeRepository.findById(equipmentSubTypeId)).thenReturn(Optional.of(equipmentSubType));
+        when(equipmentTypeService.getSubType(equipmentSubTypeId)).thenReturn(equipmentSubType);
         when(equipmentRepository.save(equipmentToAdd)).thenReturn(addedEquipment);
         Assertions.assertEquals(addedEquipment.getId(),
                                 equipmentService.add(equipmentToAdd.getName(), equipmentSubTypeId));
@@ -69,7 +76,7 @@ public class EquipmentServiceImplTest {
         Equipment equipmentToAdd = new Equipment("eqName", equipmentSubType);
         Equipment addedEquipment = new Equipment(equipmentToAdd.getName(), equipmentToAdd.getEquipmentSubType());
         addedEquipment.setId(15L);
-        when(equipmentSubTypeRepository.findById(equipmentSubTypeId)).thenReturn(Optional.of(equipmentSubType));
+        when(equipmentTypeService.getSubType(equipmentSubTypeId)).thenReturn(equipmentSubType);
         when(equipmentRepository.findById(addedEquipment.getId())).thenReturn(Optional.of(addedEquipment));
         when(equipmentRepository.save(equipmentToAdd)).thenReturn(addedEquipment);
 

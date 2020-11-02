@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
 import va.rit.teho.dto.equipment.EquipmentSubTypePerTypeDTO;
 import va.rit.teho.dto.equipment.EquipmentTypeDTO;
-import va.rit.teho.entity.EquipmentSubType;
-import va.rit.teho.entity.EquipmentType;
-import va.rit.teho.service.EquipmentTypeService;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.service.equipment.EquipmentTypeService;
 
 import java.util.Collections;
 import java.util.List;

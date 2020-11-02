@@ -4,8 +4,8 @@
 //import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 //import org.springframework.test.context.ContextConfiguration;
 //import va.rit.teho.TestRunner;
-//import va.rit.teho.entity.Equipment;
-//import va.rit.teho.entity.RepairStation;
+//import va.rit.teho.entity.equipment.Equipment;
+//import va.rit.teho.entity.repairstation.RepairStation;
 //
 //import java.util.Arrays;
 //import java.util.Collections;

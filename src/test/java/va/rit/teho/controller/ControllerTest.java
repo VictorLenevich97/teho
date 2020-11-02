@@ -4,9 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import va.rit.teho.entity.*;
-import va.rit.teho.service.*;
-import va.rit.teho.service.implementation.RepairTypeServiceImpl;
+import va.rit.teho.entity.base.Base;
+import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.entity.repairstation.RepairStation;
+import va.rit.teho.entity.repairstation.RepairStationType;
+import va.rit.teho.service.base.BaseService;
+import va.rit.teho.service.equipment.EquipmentService;
+import va.rit.teho.service.equipment.EquipmentTypeService;
+import va.rit.teho.service.implementation.common.RepairTypeServiceImpl;
+import va.rit.teho.service.labordistribution.LaborInputDistributionService;
+import va.rit.teho.service.repairstation.RepairCapabilitiesService;
+import va.rit.teho.service.repairstation.RepairStationService;
+import va.rit.teho.service.repairstation.RepairStationTypeService;
 
 public abstract class ControllerTest {
 

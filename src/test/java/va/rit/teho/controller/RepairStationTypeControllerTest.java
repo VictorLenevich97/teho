@@ -5,8 +5,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.TestRunner;
-import va.rit.teho.dto.RepairStationTypeDTO;
-import va.rit.teho.entity.RepairStationType;
+import va.rit.teho.controller.repairstation.RepairStationTypeController;
+import va.rit.teho.dto.repairstation.RepairStationTypeDTO;
+import va.rit.teho.entity.repairstation.RepairStationType;
 
 import java.util.Collections;
 import java.util.List;

@@ -9,8 +9,8 @@ import va.rit.teho.TestRunner;
 import va.rit.teho.controller.ControllerTest;
 import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
 import va.rit.teho.dto.equipment.EquipmentTypeDTO;
-import va.rit.teho.entity.EquipmentSubType;
-import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 
 
 import java.util.Arrays;

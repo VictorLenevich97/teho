@@ -9,8 +9,8 @@
 //import va.rit.teho.enums.RestorationTypeEnum;
 //
 //import va.rit.teho.repository.*;
-//import va.rit.teho.service.CalculationService;
-//import va.rit.teho.service.LaborInputDistributionService;
+//import va.rit.teho.service.common.CalculationService;
+//import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 //
 //import java.util.*;
 //import java.util.function.Function;

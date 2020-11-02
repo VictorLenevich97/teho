@@ -3,9 +3,10 @@ package va.rit.teho.service.implementation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import va.rit.teho.entity.RepairType;
-import va.rit.teho.repository.RepairTypeRepository;
-import va.rit.teho.service.RepairTypeService;
+import va.rit.teho.entity.common.RepairType;
+import va.rit.teho.repository.common.RepairTypeRepository;
+import va.rit.teho.service.common.RepairTypeService;
+import va.rit.teho.service.implementation.common.RepairTypeServiceImpl;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +19,7 @@ public class RepairTypeServiceImplTest {
 
     @Test
     public void testList() {
-        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", true));
+        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true));
 
         when(repairTypeRepository.findAll()).thenReturn(repairTypeList);
 
@@ -27,18 +28,18 @@ public class RepairTypeServiceImplTest {
 
     @Test
     public void testListRepairableTrue() {
-        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", true));
+        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true));
 
-        when(repairTypeRepository.findAllByRepairableTrue()).thenReturn(repairTypeList);
+        when(repairTypeRepository.findAllByCalculatable(true)).thenReturn(repairTypeList);
 
         Assertions.assertEquals(repairTypeList, repairTypeService.list(true));
     }
 
     @Test
     public void testListRepairableFalse() {
-        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", true));
+        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true));
 
-        when(repairTypeRepository.findAllByRepairableFalse()).thenReturn(repairTypeList);
+        when(repairTypeRepository.findAllByCalculatable(false)).thenReturn(repairTypeList);
 
         Assertions.assertEquals(repairTypeList, repairTypeService.list(false));
     }
