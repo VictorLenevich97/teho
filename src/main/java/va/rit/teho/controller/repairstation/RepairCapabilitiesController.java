@@ -1,8 +1,13 @@
 package va.rit.teho.controller.repairstation;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.RowData;
 import va.rit.teho.dto.table.TableDataDTO;
@@ -22,7 +27,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("repair-capabilities")
+@RequestMapping(path = "repair-capabilities", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "Производственные возможности РВО")
 public class RepairCapabilitiesController {
 
     private final RepairCapabilitiesService repairCapabilitiesService;
@@ -46,7 +52,8 @@ public class RepairCapabilitiesController {
      */
     @PostMapping("/repair-type/{id}")
     @ResponseBody
-    public ResponseEntity<TableDataDTO<Map<String, Double>>> calculateAndGet(@PathVariable("id") Long repairTypeId) {
+    @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для всех РВО по всем ВВСТ)")
+    public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGet(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilities(tehoSession.getSessionId(),
                                                                             repairTypeId);
         return getCalculatedRepairCapabilities(repairTypeId,
@@ -58,12 +65,13 @@ public class RepairCapabilitiesController {
 
     @PostMapping("/repair-type/{id}/repair-station/{repairStationId}")
     @ResponseBody
-    public ResponseEntity<TableDataDTO<Map<String, Double>>> calculateAndGetPerStation(@PathVariable("id") Long repairTypeId,
-                                                                                       @PathVariable Long repairStationId) {
+    @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для указанного РВО)")
+    public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGetPerStation(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true)@PathVariable("id") Long repairTypeId,
+                                                                                       @ApiParam(value = "Ключ РВО", required = true)@PathVariable Long repairStationId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilitiesPerStation(tehoSession.getSessionId(),
                                                                                       repairStationId,
                                                                                       repairTypeId);
-        TableDataDTO<Map<String, Double>> repairCapabilitiesDTO =
+        TableDataDTO<Map<String, String>> repairCapabilitiesDTO =
                 getCalculatedRepairCapabilities(repairTypeId,
                                                 Collections.singletonList(repairStationId),
                                                 Collections.emptyList(),
@@ -87,7 +95,7 @@ public class RepairCapabilitiesController {
                         .collect(Collectors.toList()));
     }
 
-    private TableDataDTO<Map<String, Double>> buildRepairCapabilitiesDTO(List<RepairStation> repairStationList,
+    private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(List<RepairStation> repairStationList,
                                                                          Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped,
                                                                          Map<RepairStation, Map<Equipment, Double>> calculatedRepairCapabilities) {
         List<Equipment> columns =
@@ -102,7 +110,7 @@ public class RepairCapabilitiesController {
                        .stream()
                        .map(this::getRepairCapabilitiesNestedColumnsDTO)
                        .collect(Collectors.toList());
-        List<RowData<Map<String, Double>>> data =
+        List<RowData<Map<String, String>>> data =
                 repairStationList
                         .stream()
                         .map(rs -> getRepairCapabilitiesRow(calculatedRepairCapabilities, columns, rs))
@@ -110,7 +118,7 @@ public class RepairCapabilitiesController {
         return new TableDataDTO<>(equipmentPerTypeDTOList, data);
     }
 
-    private RowData<Map<String, Double>> getRepairCapabilitiesRow(
+    private RowData<Map<String, String>> getRepairCapabilitiesRow(
             Map<RepairStation, Map<Equipment, Double>> calculatedRepairCapabilities,
             List<Equipment> columns,
             RepairStation rs) {
@@ -118,19 +126,24 @@ public class RepairCapabilitiesController {
                 rs.getId(),
                 rs.getName(),
                 columns.stream().collect(Collectors.toMap(equipment -> equipment.getId().toString(),
-                                                          equipment -> calculatedRepairCapabilities
-                                                                  .getOrDefault(rs, Collections.emptyMap())
-                                                                  .getOrDefault(equipment, 0.0))));
+                                                          equipment ->
+                                                                  Formatter.formatDouble(calculatedRepairCapabilities
+                                                                                                 .getOrDefault(rs,
+                                                                                                               Collections
+                                                                                                                       .emptyMap())
+                                                                                                 .getOrDefault(equipment,
+                                                                                                               0.0)))));
     }
 
     @GetMapping("/repair-type/{id}")
     @ResponseBody
-    public ResponseEntity<TableDataDTO<Map<String, Double>>> getCalculatedRepairCapabilities(
-            @PathVariable("id") Long repairTypeId,
-            @RequestParam(required = false) List<Long> repairStationId,
-            @RequestParam(required = false) List<Long> equipmentId,
-            @RequestParam(required = false) List<Long> equipmentTypeId,
-            @RequestParam(required = false) List<Long> equipmentSubTypeId) {
+    @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
+    public ResponseEntity<TableDataDTO<Map<String, String>>> getCalculatedRepairCapabilities(
+            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
+            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairStationId,
+            @ApiParam(value = "Ключи ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentId,
+            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
+            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId) {
         List<RepairStation> repairStationList = repairStationService.list(repairStationId);
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped =
                 equipmentService.listGroupedByTypes(equipmentId,
@@ -143,7 +156,7 @@ public class RepairCapabilitiesController {
                                                                           equipmentId,
                                                                           equipmentSubTypeId,
                                                                           equipmentTypeId);
-        TableDataDTO<Map<String, Double>> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(repairStationList,
+        TableDataDTO<Map<String, String>> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(repairStationList,
                                                                                                  grouped,
                                                                                                  calculatedRepairCapabilities);
         return ResponseEntity.ok(repairCapabilitiesFullDTO);

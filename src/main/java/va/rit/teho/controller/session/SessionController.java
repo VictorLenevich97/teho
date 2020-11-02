@@ -1,6 +1,10 @@
 package va.rit.teho.controller.session;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +17,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("session")
+@RequestMapping(path = "session", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "Сессии")
 public class SessionController {
 
     private final SessionService sessionService;
@@ -23,24 +28,29 @@ public class SessionController {
     }
 
     @GetMapping
+    @ApiOperation(value = "Получить список сессий")
     public ResponseEntity<List<SessionDTO>> listSessions() {
         return ResponseEntity.ok(sessionService.list().stream().map(SessionDTO::from).collect(Collectors.toList()));
     }
 
     @PostMapping
-    public ResponseEntity<SessionDTO> createSession(@RequestBody SessionDTO sessionDTO) {
+    @ApiOperation(value = "Создать сессию")
+    public ResponseEntity<SessionDTO> createSession(@ApiParam(value = "Данные о сессии", required = true) @RequestBody SessionDTO sessionDTO) {
         TehoSession tehoSession = sessionService.create(sessionDTO.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
     }
 
     @PutMapping("/{sessionId}")
-    public ResponseEntity<SessionDTO> copySession(@PathVariable UUID sessionId, @RequestBody SessionDTO sessionDTO) {
+    @ApiOperation(value = "Скопировать сессию")
+    public ResponseEntity<SessionDTO> copySession(@ApiParam(value = "Ключ оригинальной сессии", required = true) @PathVariable UUID sessionId,
+                                                  @ApiParam(value = "Данные о новой сессии", required = true) @RequestBody SessionDTO sessionDTO) {
         TehoSession tehoSession = sessionService.copy(sessionId, sessionDTO.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
     }
 
     @DeleteMapping("/{sessionId}")
-    public ResponseEntity<Object> deleteSession(@PathVariable UUID sessionId) {
+    @ApiOperation(value = "Удалить сессию и все связанные с ней данные")
+    public ResponseEntity<Object> deleteSession(@ApiParam(value = "Ключ сессии", required = true) @PathVariable UUID sessionId) {
         sessionService.delete(sessionId);
         return ResponseEntity.noContent().build();
     }

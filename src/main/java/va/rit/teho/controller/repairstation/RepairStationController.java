@@ -1,7 +1,11 @@
 package va.rit.teho.controller.repairstation;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +28,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("repair-station")
+@RequestMapping(path = "repair-station", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "РВО")
 public class RepairStationController {
 
     private static final String KEY_TOTAL_STAFF = "total";
@@ -51,8 +56,9 @@ public class RepairStationController {
 
     @GetMapping
     @ResponseBody
+    @ApiOperation(value = "Получить список РВО")
     public ResponseEntity<List<RepairStationDTO>> listRepairStations(
-            @RequestParam(value = "id", required = false) List<Long> ids) {
+            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(value = "id", required = false) List<Long> ids) {
         List<RepairStationDTO> repairStationDTOList =
                 repairStationService.list(Optional.ofNullable(ids).orElse(Collections.emptyList()))
                                     .stream()
@@ -63,7 +69,8 @@ public class RepairStationController {
 
     @GetMapping("/{repairStationId}")
     @ResponseBody
-    public ResponseEntity<RepairStationDTO> getRepairStation(@PathVariable Long repairStationId) {
+    @ApiOperation(value = "Получить детальные данные по РВО")
+    public ResponseEntity<RepairStationDTO> getRepairStation(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairStationId) {
         Pair<RepairStation, List<RepairStationEquipmentStaff>> repairStationListPair =
                 repairStationService.get(repairStationId);
         RepairStationDTO repairStationDTO = RepairStationDTO
@@ -78,7 +85,8 @@ public class RepairStationController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> addRepairStation(@RequestBody RepairStationDTO repairStationDTO) {
+    @ApiOperation(value = "Добавление РВО")
+    public ResponseEntity<Object> addRepairStation(@ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairStationDTO repairStationDTO) {
         repairStationService.add(repairStationDTO.getName(),
                                  repairStationDTO.getBase().getId(),
                                  repairStationDTO.getType().getId(),
@@ -87,8 +95,9 @@ public class RepairStationController {
     }
 
     @PutMapping("/{repairStationId}")
-    public ResponseEntity<Object> updateRepairStation(@PathVariable Long repairStationId,
-                                                      @RequestBody RepairStationDTO repairStationDTO) {
+    @ApiOperation(value = "Обновление РВО")
+    public ResponseEntity<Object> updateRepairStation(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairStationId,
+                                                      @ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairStationDTO repairStationDTO) {
         repairStationService.update(repairStationId,
                                     repairStationDTO.getName(),
                                     repairStationDTO.getBase().getId(),
@@ -98,10 +107,11 @@ public class RepairStationController {
     }
 
     @GetMapping("/staff")
+    @ApiOperation(value = "Получение состава, штатной численности и укомплектованности РВО (в табличном виде)")
     public ResponseEntity<TableDataDTO<Map<String, Map<String, Integer>>>> getEquipmentStaff(
-            @RequestParam(required = false) List<Long> repairStationId,
-            @RequestParam(required = false) List<Long> equipmentTypeId,
-            @RequestParam(required = false) List<Long> equipmentSubTypeId) {
+            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairStationId,
+            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
+            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId) {
         List<RepairStation> repairStationList = repairStationService.list(repairStationId);
         Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes =
                 equipmentTypeService.listTypesWithSubTypes(equipmentTypeId,
@@ -119,8 +129,9 @@ public class RepairStationController {
     }
 
     @PostMapping("/{repairStationId}/staff")
-    public ResponseEntity<Object> setRepairStationEquipmentStaff(@PathVariable Long repairStationId,
-                                                                 @RequestBody RepairStationStaffDTO equipmentStaffDTO) {
+    @ApiOperation(value = "Добавление информации по личному составу РВО")
+    public ResponseEntity<Object> setRepairStationEquipmentStaff(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairStationId,
+                                                                 @ApiParam(value = "Данные по численности л/с", required = true) @RequestBody RepairStationStaffDTO equipmentStaffDTO) {
         repairStationService.setEquipmentStaff(
                 Collections.singletonList(equipmentStaffDTO.toEntity(tehoSession.getSessionId(),
                                                                      repairStationId)));
@@ -128,8 +139,9 @@ public class RepairStationController {
     }
 
     @PutMapping("/{repairStationId}/staff")
-    public ResponseEntity<Object> updateRepairStationEquipmentStaff(@PathVariable Long repairStationId,
-                                                                    @RequestBody List<RepairStationStaffDTO> equipmentStaffDTOList) {
+    @ApiOperation(value = "Обновление информации по личному составу РВО")
+    public ResponseEntity<Object> updateRepairStationEquipmentStaff(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairStationId,
+                                                                    @ApiParam(value = "Данные по численности л/с", required = true) @RequestBody List<RepairStationStaffDTO> equipmentStaffDTOList) {
         repairStationService.updateEquipmentStaff(
                 equipmentStaffDTOList
                         .stream()

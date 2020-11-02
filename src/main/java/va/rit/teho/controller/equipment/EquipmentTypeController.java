@@ -1,7 +1,11 @@
 package va.rit.teho.controller.equipment;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("equipment-type")
+@RequestMapping(path = "equipment-type", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "Типы и подтипы ВВСТ")
 public class EquipmentTypeController {
 
     private final EquipmentTypeService equipmentTypeService;
@@ -28,7 +33,8 @@ public class EquipmentTypeController {
 
     @GetMapping
     @ResponseBody
-    public ResponseEntity<List<EquipmentTypeDTO>> getEquipmentTypes(@RequestParam(value = "id", required = false) List<Long> typeIds) {
+    @ApiOperation(value = "Получить типы ВВСТ")
+    public ResponseEntity<List<EquipmentTypeDTO>> getEquipmentTypes(@ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> typeIds) {
         List<Long> typeIdsFilter = typeIds == null ? Collections.emptyList() : typeIds;
         List<EquipmentTypeDTO> equipmentTypeDTOList = equipmentTypeService.listTypes(typeIdsFilter)
                                                                           .stream()
@@ -39,9 +45,10 @@ public class EquipmentTypeController {
 
     @GetMapping("/subtype")
     @ResponseBody
+    @ApiOperation(value = "Получить подтипы ВВСТ")
     public ResponseEntity<List<EquipmentSubTypePerTypeDTO>> getEquipmentSubTypes(
-            @RequestParam(value = "id", required = false) List<Long> subTypeIds,
-            @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
+            @ApiParam(value = "Ключи подтипов, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> subTypeIds,
+            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
         List<EquipmentSubTypePerTypeDTO> equipmentSubTypePerTypeDTOList =
                 equipmentTypeService
                         .listTypesWithSubTypes(typeIds, subTypeIds)
@@ -54,36 +61,41 @@ public class EquipmentTypeController {
 
     @GetMapping("/{typeId}")
     @ResponseBody
-    public ResponseEntity<EquipmentSubTypePerTypeDTO> getEquipmentTypeById(@PathVariable Long typeId) {
+    @ApiOperation(value = "Получить данные о типе ВВСТ (со списком подтипов)")
+    public ResponseEntity<EquipmentSubTypePerTypeDTO> getEquipmentTypeById(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId) {
         Pair<EquipmentType, List<EquipmentSubType>> typeWithSubTypes = equipmentTypeService.getTypeWithSubTypes(typeId);
         return ResponseEntity.ok(EquipmentSubTypePerTypeDTO.from(typeWithSubTypes.getFirst(),
                                                                  typeWithSubTypes.getSecond()));
     }
 
     @PostMapping
-    public ResponseEntity<Object> addEquipmentType(@RequestBody EquipmentTypeDTO equipmentTypeDTO) {
+    @ApiOperation(value = "Добавить тип ВВСТ")
+    public ResponseEntity<Object> addEquipmentType(@ApiParam("Данные о типе ВВСТ") @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
         equipmentTypeService.addType(equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{typeId}")
-    public ResponseEntity<Object> updateEquipmentType(@PathVariable Long typeId,
-                                                      @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
+    @ApiOperation(value = "Обновить тип ВВСТ")
+    public ResponseEntity<Object> updateEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
+                                                      @ApiParam(value = "Данные о типе ВВСТ", required = true) @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
         equipmentTypeService.updateType(typeId, equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
     @PostMapping("/{typeId}/subtype")
-    public ResponseEntity<Object> addEquipmentSubType(@PathVariable Long typeId,
-                                                      @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
+    @ApiOperation(value = "Добавить подтип ВВСТ")
+    public ResponseEntity<Object> addEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
+                                                      @ApiParam(value = "Данные о подтипе ВВСТ", required = true) @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
         equipmentTypeService.addSubType(typeId, equipmentSubTypeDTO.getShortName(), equipmentSubTypeDTO.getFullName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{typeId}/subtype/{subTypeId}")
-    public ResponseEntity<Object> updateEquipmentSubType(@PathVariable Long typeId,
-                                                         @PathVariable Long subTypeId,
-                                                         @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
+    @ApiOperation(value = "Обновить подтип ВВСТ")
+    public ResponseEntity<Object> updateEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
+                                                         @ApiParam(value = "Ключ подтипа ВВСТ", required = true) @PathVariable Long subTypeId,
+                                                         @ApiParam(value = "Данные о подтипе ВВСТ", required = true) @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
         equipmentTypeService.updateSubType(subTypeId,
                                            typeId,
                                            equipmentSubTypeDTO.getShortName(),

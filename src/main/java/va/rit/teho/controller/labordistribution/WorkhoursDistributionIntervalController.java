@@ -1,5 +1,8 @@
 package va.rit.teho.controller.labordistribution;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +15,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("workhours-distribution-interval")
+@RequestMapping(path = "workhours-distribution-interval", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "Интервалы трудоемкости ремонта")
 public class WorkhoursDistributionIntervalController {
     private final LaborInputDistributionService laborInputDistributionService;
 
@@ -22,6 +26,7 @@ public class WorkhoursDistributionIntervalController {
 
     @GetMapping
     @ResponseBody
+    @ApiOperation(value = "Получить список интервалов трудоемкости ремонта")
     public ResponseEntity<List<DistributionIntervalDTO>> getDistributionIntervals() {
         return ResponseEntity.ok(
                 laborInputDistributionService

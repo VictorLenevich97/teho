@@ -1,5 +1,9 @@
 package va.rit.teho.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("repair-type")
+@RequestMapping(path = "repair-type", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "Типы ремонта")
 public class RepairTypeController {
 
     private final RepairTypeService repairTypeService;
@@ -24,7 +29,10 @@ public class RepairTypeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RepairTypeDTO>> listRepairTypes(@RequestParam(required = false) Boolean repairable) {
+    @ApiOperation(value = "Получить список типов ремонта")
+    public ResponseEntity<List<RepairTypeDTO>> listRepairTypes(
+            @ApiParam(value = "Фильтр по индикатору, определяющему используется ли тип ремонта в расчетах. В случае, когда параметр не указан, возвращаются все типы ремонта.",
+                    example = "true") @RequestParam(required = false) Boolean repairable) {
         List<RepairType> types;
         if (repairable == null) {
             types = repairTypeService.list();
