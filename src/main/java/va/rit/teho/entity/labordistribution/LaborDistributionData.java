@@ -5,6 +5,7 @@ import va.rit.teho.entity.equipment.EquipmentSubType;
 import java.util.Objects;
 
 public class LaborDistributionData {
+
     private CompositeKey compositeKey;
     private String baseName;
     private String equipmentName;

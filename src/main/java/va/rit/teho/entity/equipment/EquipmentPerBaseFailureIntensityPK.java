@@ -75,5 +75,9 @@ public class EquipmentPerBaseFailureIntensityPK implements Serializable {
     public UUID getSessionId() {
         return sessionId;
     }
+
+    public EquipmentPerBaseFailureIntensityPK copy(UUID newSessionId) {
+        return new EquipmentPerBaseFailureIntensityPK(baseId, equipmentId, stageId, repairTypeId, newSessionId);
+    }
 }
 

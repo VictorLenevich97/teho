@@ -4,13 +4,13 @@ import va.rit.teho.dto.table.RowData;
 
 import java.util.Map;
 
-public class RepairStationStaffRowData extends RowData<Map<String, Map<String, Integer>>> {
+public class RepairStationStaffRowData extends RowData<Map<String, RepairStationStaffDTO>> {
     private final String repairStationType;
     private final int amount;
 
     public RepairStationStaffRowData(Long id,
                                      String name,
-                                     Map<String, Map<String, Integer>> data, String repairStationType, int amount) {
+                                     Map<String, RepairStationStaffDTO> data, String repairStationType, int amount) {
         super(id, name, data);
         this.repairStationType = repairStationType;
         this.amount = amount;

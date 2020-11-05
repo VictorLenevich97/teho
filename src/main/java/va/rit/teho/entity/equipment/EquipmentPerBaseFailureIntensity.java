@@ -6,6 +6,7 @@ import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.session.TehoSession;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 public class EquipmentPerBaseFailureIntensity {
@@ -91,5 +92,11 @@ public class EquipmentPerBaseFailureIntensity {
 
     public Double getAvgDailyFailure() {
         return avgDailyFailure;
+    }
+
+    public EquipmentPerBaseFailureIntensity copy(UUID newSessionId) {
+        return new EquipmentPerBaseFailureIntensity(getEquipmentPerBaseWithRepairTypeId().copy(newSessionId),
+                                                    intensityPercentage,
+                                                    avgDailyFailure);
     }
 }

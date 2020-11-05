@@ -3,6 +3,7 @@ package va.rit.teho.entity.labordistribution;
 import java.util.Objects;
 
 public class CountAndLaborInput {
+
     private final double count;
     private final double laborInput;
 

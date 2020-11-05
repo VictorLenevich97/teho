@@ -64,12 +64,9 @@ public class EquipmentPerBaseController {
                                          tehoSession.getSessionId(),
                                          baseId,
                                          equipmentId,
-                                         intensityPerRepairTypeAndStageDTO
-                                                 .getRepairTypeId(),
-                                         intensityPerRepairTypeAndStageDTO
-                                                 .getStageId(),
-                                         intensityPerRepairTypeAndStageDTO
-                                                 .getIntensity()));
+                                         intensityPerRepairTypeAndStageDTO.getRepairTypeId(),
+                                         intensityPerRepairTypeAndStageDTO.getStageId(),
+                                         intensityPerRepairTypeAndStageDTO.getIntensity()));
         return ResponseEntity.accepted().build();
     }
 
@@ -77,19 +74,20 @@ public class EquipmentPerBaseController {
     @ApiOperation(value = "Обновить ВВСТ в ВЧ")
     public ResponseEntity<Object> updateEquipmentInBase(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long baseId,
                                                         @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                        @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody IntensityAndAmountDTO intensityAndAmount) {
-        equipmentPerBaseService.updateEquipmentInBase(baseId,
-                                                      equipmentId,
-                                                      intensityAndAmount.getAmount());
-        intensityAndAmount
-                .getIntensity()
-                .forEach(intensityPerRepairTypeAndStageDTO ->
-                                 equipmentPerBaseService.setEquipmentPerBaseFailureIntensity(
-                                         tehoSession.getSessionId(), baseId,
-                                         equipmentId,
-                                         intensityPerRepairTypeAndStageDTO.getRepairTypeId(),
-                                         intensityPerRepairTypeAndStageDTO.getStageId(),
-                                         intensityPerRepairTypeAndStageDTO.getIntensity()));
+                                                        @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody Map<Long, Map<Long, Integer>> intensityData) {
+        //TODO: вынести в отдельный endpoint (?)
+//        equipmentPerBaseService.updateEquipmentInBase(baseId,
+//                                                      equipmentId,
+//                                                      intensityAndAmount.getAmount());
+        intensityData.forEach((stageId, repairTypeIntensityMap) ->
+                                      repairTypeIntensityMap.forEach((repairTypeId, intensity) ->
+                                                                             equipmentPerBaseService.setEquipmentPerBaseFailureIntensity(
+                                                                                     tehoSession.getSessionId(),
+                                                                                     baseId,
+                                                                                     equipmentId,
+                                                                                     repairTypeId,
+                                                                                     stageId,
+                                                                                     intensity)));
         return ResponseEntity.accepted().build();
     }
 
@@ -127,7 +125,7 @@ public class EquipmentPerBaseController {
         }
 
         List<EquipmentFailureIntensityRowData<String>> rowData =
-                equipmentPerBaseService.getEquipmentInBases()
+                equipmentPerBaseService.getEquipmentInBase(baseId)
                                        .stream()
                                        .map(epb -> getEquipmentFailureIntensityRowData(failureIntensityData,
                                                                                        stages,
@@ -175,7 +173,8 @@ public class EquipmentPerBaseController {
                                          equipmentPerBaseFailureIntensity)));
             }
         }
-        return new EquipmentFailureIntensityRowData<>(epb.getBase().getShortName(),
+        return new EquipmentFailureIntensityRowData<>(epb.getEquipment().getId(),
+                                                      epb.getBase().getShortName(),
                                                       epb.getEquipment().getName(),
                                                       epb.getAmount(),
                                                       data);

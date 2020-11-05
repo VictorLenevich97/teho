@@ -26,7 +26,7 @@ public interface EquipmentPerBaseService {
                                              Long stageId,
                                              Integer intensity);
 
-    List<EquipmentPerBase> getEquipmentInBases();
+    List<EquipmentPerBase> getEquipmentInBase(Long baseId);
 
     void updateAvgDailyFailureData(UUID sessionId, double coefficient);
 
@@ -36,5 +36,7 @@ public interface EquipmentPerBaseService {
 
     List<EquipmentPerBaseFailureIntensityAndLaborInput> listWithIntensityAndLaborInput(UUID sessionId,
                                                                                        Long repairTypeId);
+
+    void copyEquipmentPerBaseData(UUID originalSessionId, UUID newSessionId);
 
 }

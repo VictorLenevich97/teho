@@ -23,5 +23,8 @@ public interface EquipmentPerBaseFailureIntensityRepository
             "EquipmentPerBaseFailureIntensity epbfi INNER JOIN EquipmentLaborInputPerType elipt ON epbfi.equipment.id = elipt.equipment.id AND elipt.repairType.id = :repairTypeId WHERE epbfi.tehoSession.id = :sessionId")
     List<EquipmentPerBaseFailureIntensityAndLaborInput> findAllWithLaborInput(UUID sessionId, Long repairTypeId);
 
+    List<EquipmentPerBaseFailureIntensity> findAllByTehoSessionId(UUID sessionId);
+
     List<EquipmentPerBaseFailureIntensity> findAllByTehoSessionIdAndBaseId(UUID sessionId, Long baseId);
+
 }

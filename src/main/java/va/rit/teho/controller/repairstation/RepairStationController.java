@@ -108,7 +108,7 @@ public class RepairStationController {
 
     @GetMapping("/staff")
     @ApiOperation(value = "Получение состава, штатной численности и укомплектованности РВО (в табличном виде)")
-    public ResponseEntity<TableDataDTO<Map<String, Map<String, Integer>>>> getEquipmentStaff(
+    public ResponseEntity<TableDataDTO<Map<String, RepairStationStaffDTO>>> getEquipmentStaff(
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairStationId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
             @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId) {
@@ -121,37 +121,29 @@ public class RepairStationController {
                                                                            repairStationId,
                                                                            equipmentTypeId,
                                                                            equipmentSubTypeId);
-        TableDataDTO<Map<String, Map<String, Integer>>> equipmentStaffDTO =
+        TableDataDTO<Map<String, RepairStationStaffDTO>> equipmentStaffDTO =
                 buildEquipmentStaffDTO(repairStationList,
                                        typesWithSubTypes,
                                        repairStationEquipmentStaff);
         return ResponseEntity.ok(equipmentStaffDTO);
     }
 
-    @PostMapping("/{repairStationId}/staff")
-    @ApiOperation(value = "Добавление информации по личному составу РВО")
-    public ResponseEntity<Object> setRepairStationEquipmentStaff(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairStationId,
-                                                                 @ApiParam(value = "Данные по численности л/с", required = true) @RequestBody RepairStationStaffDTO equipmentStaffDTO) {
-        repairStationService.setEquipmentStaff(
-                Collections.singletonList(equipmentStaffDTO.toEntity(tehoSession.getSessionId(),
-                                                                     repairStationId)));
-        return ResponseEntity.accepted().build();
-    }
-
     @PutMapping("/{repairStationId}/staff")
     @ApiOperation(value = "Обновление информации по личному составу РВО")
     public ResponseEntity<Object> updateRepairStationEquipmentStaff(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairStationId,
-                                                                    @ApiParam(value = "Данные по численности л/с", required = true) @RequestBody List<RepairStationStaffDTO> equipmentStaffDTOList) {
+                                                                    @ApiParam(value = "Данные по численности л/с", required = true) @RequestBody Map<Long, RepairStationStaffDTO> staff) {
         repairStationService.updateEquipmentStaff(
-                equipmentStaffDTOList
+                staff
+                        .entrySet()
                         .stream()
-                        .map(equipmentStaffDTO -> equipmentStaffDTO.toEntity(tehoSession.getSessionId(),
-                                                                             repairStationId))
+                        .map(staffDTOEntry -> staffDTOEntry.getValue().toEntity(tehoSession.getSessionId(),
+                                                                                staffDTOEntry.getKey(),
+                                                                                repairStationId))
                         .collect(Collectors.toList()));
         return ResponseEntity.accepted().build();
     }
 
-    private TableDataDTO<Map<String, Map<String, Integer>>> buildEquipmentStaffDTO(
+    private TableDataDTO<Map<String, RepairStationStaffDTO>> buildEquipmentStaffDTO(
             List<RepairStation> repairStationList,
             Map<EquipmentType, List<EquipmentSubType>> equipmentTypeListMap,
             Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap) {
@@ -179,7 +171,7 @@ public class RepairStationController {
 //                                                                                                  staffKeyEntry.getKey()))
 //                                             .collect(Collectors.toList())))
 //                        .collect(Collectors.toList());
-        List<RowData<Map<String, Map<String, Integer>>>> rows = repairStationList
+        List<RowData<Map<String, RepairStationStaffDTO>>> rows = repairStationList
                 .stream()
                 .map(rs -> getEquipmentStaffRow(repairStationMap, columns, rs))
                 .collect(Collectors.toList());
@@ -204,23 +196,20 @@ public class RepairStationController {
                                   .collect(Collectors.toList()));
     }
 
-    private RowData<Map<String, Map<String, Integer>>> getEquipmentStaffRow(
+    private RowData<Map<String, RepairStationStaffDTO>> getEquipmentStaffRow(
             Map<RepairStation, Map<EquipmentSubType, RepairStationEquipmentStaff>> repairStationMap,
             List<EquipmentSubType> columns,
             RepairStation rs) {
-        Map<String, Map<String, Integer>> dataMap = new HashMap<>();
+        Map<String, RepairStationStaffDTO> dataMap = new HashMap<>();
         for (EquipmentSubType est : columns) {
             RepairStationEquipmentStaff repairStationEquipmentStaff =
                     repairStationMap.getOrDefault(rs, Collections.emptyMap()).get(est);
-            Map<String, Integer> innerMap = new HashMap<>();
             boolean emptyStaff = repairStationEquipmentStaff == null;
-            innerMap.put(KEY_TOTAL_STAFF,
-                         emptyStaff || repairStationEquipmentStaff.getTotalStaff() == null ? 0 : repairStationEquipmentStaff
-                                 .getTotalStaff());
-            innerMap.put(KEY_AVAILABLE_STAFF,
-                         emptyStaff || repairStationEquipmentStaff.getAvailableStaff() == null ? 0 : repairStationEquipmentStaff
-                                 .getAvailableStaff());
-            dataMap.put(est.getId().toString(), innerMap);
+            int totalStaff = emptyStaff || repairStationEquipmentStaff.getTotalStaff() == null ? 0 : repairStationEquipmentStaff
+                    .getTotalStaff();
+            int availableStaff = emptyStaff || repairStationEquipmentStaff.getAvailableStaff() == null ? 0 : repairStationEquipmentStaff
+                    .getAvailableStaff();
+            dataMap.put(est.getId().toString(), new RepairStationStaffDTO(totalStaff, availableStaff));
         }
         return new RepairStationStaffRowData(rs.getId(),
                                              rs.getName(),

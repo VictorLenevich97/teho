@@ -68,19 +68,15 @@ public class EquipmentPerBaseServiceImpl implements EquipmentPerBaseService {
 
         EquipmentPerBaseFailureIntensity equipmentPerBaseFailureIntensity =
                 new EquipmentPerBaseFailureIntensity(
-                        new EquipmentPerBaseFailureIntensityPK(baseId,
-                                                               equipmentId,
-                                                               stageId,
-                                                               repairTypeId,
-                                                               sessionId),
+                        new EquipmentPerBaseFailureIntensityPK(baseId, equipmentId, stageId, repairTypeId, sessionId),
                         intensity,
                         null);
         equipmentPerBaseFailureIntensityRepository.save(equipmentPerBaseFailureIntensity);
     }
 
     @Override
-    public List<EquipmentPerBase> getEquipmentInBases() {
-        return (List<EquipmentPerBase>) equipmentPerBaseRepository.findAll();
+    public List<EquipmentPerBase> getEquipmentInBase(Long baseId) {
+        return equipmentPerBaseRepository.findAllByBaseId(baseId);
     }
 
     @Override
@@ -141,6 +137,18 @@ public class EquipmentPerBaseServiceImpl implements EquipmentPerBaseService {
     public List<EquipmentPerBaseFailureIntensityAndLaborInput> listWithIntensityAndLaborInput(UUID sessionId,
                                                                                               Long repairTypeId) {
         return equipmentPerBaseFailureIntensityRepository.findAllWithLaborInput(sessionId, repairTypeId);
+    }
+
+    @Override
+    public void copyEquipmentPerBaseData(UUID originalSessionId, UUID newSessionId) {
+        List<EquipmentPerBaseFailureIntensity> equipmentPerBaseFailureIntensities =
+                equipmentPerBaseFailureIntensityRepository
+                        .findAllByTehoSessionId(originalSessionId)
+                        .stream()
+                        .map(equipmentPerBaseFailureIntensity -> equipmentPerBaseFailureIntensity.copy(newSessionId))
+                        .collect(Collectors.toList());
+
+        equipmentPerBaseFailureIntensityRepository.saveAll(equipmentPerBaseFailureIntensities);
     }
 
 

@@ -103,36 +103,10 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
-    public void setEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList) {
+    public void updateEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList) {
         repairStationEquipmentStaffList.forEach(this::checkEquipmentStaffPreconditions);
 
         repairStationEquipmentStaffRepository.saveAll(repairStationEquipmentStaffList);
-    }
-
-    @Override
-    public void updateEquipmentStaff(List<RepairStationEquipmentStaff> repairStationEquipmentStaffList) {
-        List<RepairStationEquipmentStaff> stationEquipmentStaffList =
-                repairStationEquipmentStaffList
-                        .stream()
-                        .map(this::getRepairStationEquipmentStaff)
-                        .collect(Collectors.toList());
-        repairStationEquipmentStaffRepository.saveAll(stationEquipmentStaffList);
-    }
-
-    private RepairStationEquipmentStaff getRepairStationEquipmentStaff(RepairStationEquipmentStaff repairStationEquipmentStaff) {
-        checkEquipmentStaffPreconditions(repairStationEquipmentStaff);
-        RepairStationEquipmentStaff stationEquipmentStaff =
-                repairStationEquipmentStaffRepository
-                        .findById(repairStationEquipmentStaff.getEquipmentPerRepairStation())
-                        .orElseThrow(() -> new NotFoundException("Прозиводственные возможности РВО с id = " + repairStationEquipmentStaff
-                                .getEquipmentPerRepairStation()
-                                .getRepairStationId() + " по виду ВВСТ с id = " + repairStationEquipmentStaff
-                                .getEquipmentPerRepairStation()
-                                .getEquipmentSubTypeId() + " не найдены!"));
-
-        stationEquipmentStaff.setAvailableStaff(repairStationEquipmentStaff.getAvailableStaff());
-        stationEquipmentStaff.setTotalStaff(repairStationEquipmentStaff.getTotalStaff());
-        return stationEquipmentStaff;
     }
 
     @Override

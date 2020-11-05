@@ -58,9 +58,12 @@ public class RepairStationStaffDTO {
     }
 
     public RepairStationEquipmentStaff toEntity(UUID sessionId,
+                                                Long equipmentSubTypeId,
                                                 Long repairStationId) {
         return new RepairStationEquipmentStaff(
-                new RepairStationEquipmentStaffPK(repairStationId, equipmentSubTypeId, sessionId),
+                new RepairStationEquipmentStaffPK(repairStationId,
+                                                  this.equipmentSubTypeId == null ? equipmentSubTypeId : this.equipmentSubTypeId,
+                                                  sessionId),
                 total,
                 available);
     }
