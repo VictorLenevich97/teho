@@ -19,6 +19,7 @@ public interface LaborDistributionRepository
     List<LaborDistribution> findByTehoSessionId(UUID sessionId);
 
     @Query("SELECT new va.rit.teho.entity.labordistribution.LaborDistributionData(ld.equipment.equipmentSubType, " +
+            "ld.base.id, " +
             "ld.base.fullName, " +
             "ld.equipment.id, " +
             "ld.equipment.name, " +
@@ -31,6 +32,7 @@ public interface LaborDistributionRepository
             "(coalesce(:equipmentTypeIds, null) is null or ld.equipment.equipmentSubType.equipmentType.id IN (:equipmentTypeIds)) " +
             "AND ld.stage.id = :stageId " +
             "GROUP BY ld.equipment.equipmentSubType, " +
+            "ld.base.id, " +
             "ld.base.fullName, " +
             "ld.equipment.id, " +
             "ld.equipment.name, " +

@@ -72,7 +72,7 @@ public class RepairStationController {
     @ApiOperation(value = "Получить детальные данные по РВО")
     public ResponseEntity<RepairStationDTO> getRepairStation(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairStationId) {
         Pair<RepairStation, List<RepairStationEquipmentStaff>> repairStationListPair =
-                repairStationService.get(repairStationId);
+                repairStationService.get(repairStationId, tehoSession.getSessionId());
         RepairStationDTO repairStationDTO = RepairStationDTO
                 .from(repairStationListPair.getFirst())
                 .setStaff(

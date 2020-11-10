@@ -4,10 +4,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
 import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
@@ -18,12 +21,18 @@ import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentPerBase;
 import va.rit.teho.entity.equipment.EquipmentPerBaseFailureIntensity;
+import va.rit.teho.repository.equipment.EquipmentPerBaseFailureIntensityRepository;
 import va.rit.teho.server.config.TehoSessionData;
+import va.rit.teho.service.DataExporter;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.common.StageService;
 import va.rit.teho.service.equipment.EquipmentPerBaseService;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -36,16 +45,19 @@ public class EquipmentPerBaseController {
     private final StageService stageService;
     private final RepairTypeService repairTypeService;
     private final EquipmentPerBaseService equipmentPerBaseService;
+    private final EquipmentPerBaseFailureIntensityRepository equipmentPerBaseFailureIntensityRepository;
 
     @Resource
     private TehoSessionData tehoSession;
 
     public EquipmentPerBaseController(StageService stageService,
                                       RepairTypeService repairTypeService,
-                                      EquipmentPerBaseService equipmentPerBaseService) {
+                                      EquipmentPerBaseService equipmentPerBaseService,
+                                      EquipmentPerBaseFailureIntensityRepository equipmentPerBaseFailureIntensityRepository) {
         this.stageService = stageService;
         this.repairTypeService = repairTypeService;
         this.equipmentPerBaseService = equipmentPerBaseService;
+        this.equipmentPerBaseFailureIntensityRepository = equipmentPerBaseFailureIntensityRepository;
     }
 
 
@@ -56,7 +68,7 @@ public class EquipmentPerBaseController {
                                                      @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody IntensityAndAmountDTO intensityAndAmount) {
         equipmentPerBaseService.addEquipmentToBase(baseId,
                                                    equipmentId,
-                                                   intensityAndAmount.getAmount());
+                                                   (long) intensityAndAmount.getAmount());
         intensityAndAmount
                 .getIntensity()
                 .forEach(intensityPerRepairTypeAndStageDTO ->
@@ -108,6 +120,20 @@ public class EquipmentPerBaseController {
                                                                                    Function<T, String> formatter) {
         Map<Pair<Base, Equipment>, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData =
                 equipmentPerBaseService.getFailureIntensityData(tehoSession.getSessionId(), baseId);
+        return getTableDataDTO(baseId,
+                               (epb) -> Pair.of(epb.getBase(), epb.getEquipment()),
+                               getter,
+                               defaultValue,
+                               formatter,
+                               failureIntensityData);
+    }
+
+    private <K, T> TableDataDTO<Map<String, Map<String, String>>> getTableDataDTO(Long baseId,
+                                                                                  Function<EquipmentPerBase, K> keyGetter,
+                                                                                  Function<EquipmentPerBaseFailureIntensity, T> getter,
+                                                                                  T defaultValue,
+                                                                                  Function<T, String> formatter,
+                                                                                  Map<K, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData) {
         List<Stage> stages = stageService.list();
         List<RepairType> repairTypes = repairTypeService.list(true);
 
@@ -125,17 +151,32 @@ public class EquipmentPerBaseController {
         }
 
         List<EquipmentFailureIntensityRowData<String>> rowData =
-                equipmentPerBaseService.getEquipmentInBase(baseId)
-                                       .stream()
-                                       .map(epb -> getEquipmentFailureIntensityRowData(failureIntensityData,
-                                                                                       stages,
-                                                                                       repairTypes,
-                                                                                       epb,
-                                                                                       getter,
-                                                                                       defaultValue,
-                                                                                       formatter))
-                                       .collect(Collectors.toList());
+                (baseId == null ? equipmentPerBaseService.getTotalEquipmentInBase() :
+                        equipmentPerBaseService.getEquipmentInBase(baseId))
+                        .stream()
+                        .map(epb -> getEquipmentFailureIntensityRowData(failureIntensityData,
+                                                                        keyGetter,
+                                                                        stages,
+                                                                        repairTypes,
+                                                                        epb,
+                                                                        getter,
+                                                                        defaultValue,
+                                                                        formatter))
+                        .collect(Collectors.toList());
         return new TableDataDTO<>(stageColumns, rowData);
+    }
+
+    @GetMapping("/base/equipment/daily-failure")
+    @ResponseBody
+    public TableDataDTO<Map<String, Map<String, String>>> getTotalEquipmentPerBaseDailyFailureData() {
+        Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData =
+                equipmentPerBaseService.getTotalFailureIntensityData(tehoSession.getSessionId());
+        return getTableDataDTO(null,
+                               EquipmentPerBase::getEquipment,
+                               EquipmentPerBaseFailureIntensity::getAvgDailyFailure,
+                               0.0,
+                               va.rit.teho.controller.helper.Formatter::formatDouble,
+                               failureIntensityData);
     }
 
     @GetMapping("/base/{baseId}/equipment/daily-failure")
@@ -148,33 +189,34 @@ public class EquipmentPerBaseController {
                                         va.rit.teho.controller.helper.Formatter::formatDouble);
     }
 
-    private <T> EquipmentFailureIntensityRowData<String> getEquipmentFailureIntensityRowData(Map<Pair<Base, Equipment>, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData,
-                                                                                             List<Stage> stages,
-                                                                                             List<RepairType> repairTypes,
-                                                                                             EquipmentPerBase epb,
-                                                                                             Function<EquipmentPerBaseFailureIntensity, T> getter,
-                                                                                             T defaultValue,
-                                                                                             Function<T, String> formatter) {
+    private <K, T> EquipmentFailureIntensityRowData<String> getEquipmentFailureIntensityRowData(Map<K, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData,
+                                                                                                Function<EquipmentPerBase, K> keyGetter,
+                                                                                                List<Stage> stages,
+                                                                                                List<RepairType> repairTypes,
+                                                                                                EquipmentPerBase epb,
+                                                                                                Function<EquipmentPerBaseFailureIntensity, T> getter,
+                                                                                                T defaultValue,
+                                                                                                Function<T, String> formatter) {
         Map<String, Map<String, String>> data = new HashMap<>();
 
         for (Stage s : stages) {
             for (RepairType rt : repairTypes) {
                 EquipmentPerBaseFailureIntensity equipmentPerBaseFailureIntensity =
                         failureIntensityData
-                                .getOrDefault(Pair.of(epb.getBase(), epb.getEquipment()), Collections.emptyMap())
+                                .getOrDefault(keyGetter.apply(epb), Collections.emptyMap())
                                 .getOrDefault(rt, Collections.emptyMap())
                                 .get(s);
 
                 data.computeIfAbsent(s.getId().toString(), (e) -> new HashMap<>())
                     .put(rt.getId().toString(),
-                         formatter.apply(
-                                 equipmentPerBaseFailureIntensity == null ? defaultValue : getter.apply(
-                                         equipmentPerBaseFailureIntensity) == null ? defaultValue : getter.apply(
-                                         equipmentPerBaseFailureIntensity)));
+                         formatter
+                                    .apply(equipmentPerBaseFailureIntensity == null ?
+                                                defaultValue : getter.apply(equipmentPerBaseFailureIntensity) == null ?
+                                         defaultValue : getter.apply(equipmentPerBaseFailureIntensity)));
             }
         }
         return new EquipmentFailureIntensityRowData<>(epb.getEquipment().getId(),
-                                                      epb.getBase().getShortName(),
+                                                      epb.getBase() == null ? "" : epb.getBase().getShortName(),
                                                       epb.getEquipment().getName(),
                                                       epb.getAmount(),
                                                       data);

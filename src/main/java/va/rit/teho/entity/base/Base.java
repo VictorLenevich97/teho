@@ -3,12 +3,13 @@ package va.rit.teho.entity.base;
 import va.rit.teho.entity.repairstation.RepairStation;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "base")
-public class Base {
+public class Base implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

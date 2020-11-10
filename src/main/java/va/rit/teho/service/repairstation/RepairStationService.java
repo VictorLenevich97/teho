@@ -13,7 +13,7 @@ public interface RepairStationService {
 
     List<RepairStation> list(List<Long> filterIds);
 
-    Pair<RepairStation, List<RepairStationEquipmentStaff>> get(Long repairStationId);
+    Pair<RepairStation, List<RepairStationEquipmentStaff>> get(Long repairStationId, UUID sessionId);
 
     Long add(String name, Long baseId, Long typeId, int amount);
 
@@ -26,9 +26,9 @@ public interface RepairStationService {
                                                                                                                  List<Long> equipmentTypeIds,
                                                                                                                  List<Long> equipmentSubTypeIds);
 
-    List<RepairStationEquipmentStaff> listRepairStationEquipmentStaff(Long repairStationId);
+    List<RepairStationEquipmentStaff> listRepairStationEquipmentStaff(Long repairStationId, UUID sessionId);
 
-    List<RepairStationEquipmentStaff> listRepairStationEquipmentStaff();
+    List<RepairStationEquipmentStaff> listRepairStationEquipmentStaff(UUID sessionId);
 
     void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId);
 

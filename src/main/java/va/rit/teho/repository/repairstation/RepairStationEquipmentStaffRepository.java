@@ -12,7 +12,9 @@ import java.util.UUID;
 @Repository
 public interface RepairStationEquipmentStaffRepository
         extends CrudRepository<RepairStationEquipmentStaff, RepairStationEquipmentStaffPK> {
-    List<RepairStationEquipmentStaff> findAllByRepairStationId(Long repairStationId);
+    List<RepairStationEquipmentStaff> findAllByTehoSessionId(UUID sessionId);
+
+    List<RepairStationEquipmentStaff> findAllByRepairStationIdAndTehoSessionId(Long repairStationId, UUID sessionId);
 
     @Query("SELECT rses from RepairStationEquipmentStaff rses WHERE " +
             "rses.tehoSession.id = :sessionId AND " +

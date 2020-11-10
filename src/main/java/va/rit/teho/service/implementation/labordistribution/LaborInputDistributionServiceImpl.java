@@ -87,7 +87,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     private LaborDistribution calculateLaborDistribution(UUID sessionId,
                                                          Long baseId,
                                                          Long equipmentId,
-                                                         double avgDailyFailure,
+                                                         Double avgDailyFailure,
                                                          int standardLaborInput,
                                                          WorkhoursDistributionInterval interval,
                                                          Long stageId) {
@@ -105,7 +105,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     private Stream<LaborDistribution> calculateEquipmentLaborInputDistribution(
             UUID sessionId,
             Long stageId,
-            double avgDailyFailure,
+            Double avgDailyFailure,
             EquipmentPerBaseFailureIntensityAndLaborInput equipmentPerBaseAndLaborInput) {
         return StreamSupport
                 .stream(workhoursDistributionIntervalRepository.findAll().spliterator(), false)
@@ -135,10 +135,12 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     public void updateLaborInputDistribution(UUID sessionId) {
         List<RepairType> repairTypeList = repairTypeService.list(true);
         repairTypeList
-                .forEach(repairType -> calculateAndSave(sessionId,
-                                                        equipmentPerBaseService.listWithIntensityAndLaborInput(
-                                                                sessionId,
-                                                                repairType.getId())));
+                .forEach(repairType -> {
+                    List<EquipmentPerBaseFailureIntensityAndLaborInput> equipmentPerBases = equipmentPerBaseService.listWithIntensityAndLaborInput(
+                            sessionId,
+                            repairType.getId());
+                    calculateAndSave(sessionId, equipmentPerBases);
+                });
     }
 
     @Override

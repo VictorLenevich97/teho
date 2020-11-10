@@ -54,9 +54,9 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
-    public Pair<RepairStation, List<RepairStationEquipmentStaff>> get(Long repairStationId) {
+    public Pair<RepairStation, List<RepairStationEquipmentStaff>> get(Long repairStationId, UUID sessionId) {
         return Pair.of(getRepairStationOrThrow(repairStationId),
-                       repairStationEquipmentStaffRepository.findAllByRepairStationId(repairStationId));
+                       repairStationEquipmentStaffRepository.findAllByRepairStationIdAndTehoSessionId(repairStationId, sessionId));
     }
 
     @Override
@@ -132,13 +132,13 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
-    public List<RepairStationEquipmentStaff> listRepairStationEquipmentStaff(Long repairStationId) {
-        return repairStationEquipmentStaffRepository.findAllByRepairStationId(repairStationId);
+    public List<RepairStationEquipmentStaff> listRepairStationEquipmentStaff(Long repairStationId, UUID sessionId) {
+        return repairStationEquipmentStaffRepository.findAllByRepairStationIdAndTehoSessionId(repairStationId, sessionId);
     }
 
     @Override
-    public List<RepairStationEquipmentStaff> listRepairStationEquipmentStaff() {
-        return (List<RepairStationEquipmentStaff>) repairStationEquipmentStaffRepository.findAll();
+    public List<RepairStationEquipmentStaff> listRepairStationEquipmentStaff(UUID sessionId) {
+        return repairStationEquipmentStaffRepository.findAllByTehoSessionId(sessionId);
     }
 
     @Override

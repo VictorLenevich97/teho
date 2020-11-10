@@ -1,11 +1,12 @@
 package va.rit.teho.entity.common;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
 @Table(name = "repair_type")
-public class RepairType {
+public class RepairType implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

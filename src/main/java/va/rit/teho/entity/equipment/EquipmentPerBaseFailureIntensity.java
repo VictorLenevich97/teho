@@ -6,10 +6,11 @@ import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.session.TehoSession;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-public class EquipmentPerBaseFailureIntensity {
+public class EquipmentPerBaseFailureIntensity implements Serializable {
 
     @EmbeddedId
     EquipmentPerBaseFailureIntensityPK equipmentPerBaseWithStageAndRepairType;
@@ -98,5 +99,23 @@ public class EquipmentPerBaseFailureIntensity {
         return new EquipmentPerBaseFailureIntensity(getEquipmentPerBaseWithRepairTypeId().copy(newSessionId),
                                                     intensityPercentage,
                                                     avgDailyFailure);
+    }
+
+    @Override
+    public String toString() {
+        return "EquipmentPerBaseFailureIntensity{" +
+                "equipmentPerBaseWithStageAndRepairType=" + equipmentPerBaseWithStageAndRepairType +
+                ", base=" + base +
+                ", equipment=" + equipment +
+                ", stage=" + stage +
+                ", repairType=" + repairType +
+                ", tehoSession=" + tehoSession +
+                ", intensityPercentage=" + intensityPercentage +
+                ", avgDailyFailure=" + avgDailyFailure +
+                '}';
+    }
+
+    public void setAvgDailyFailure(Double avgDailyFailure) {
+        this.avgDailyFailure = avgDailyFailure;
     }
 }

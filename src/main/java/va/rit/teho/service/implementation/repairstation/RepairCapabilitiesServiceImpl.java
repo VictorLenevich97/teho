@@ -80,7 +80,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
 
     @Override
     public void calculateAndUpdateRepairCapabilities(UUID sessionId, Long repairTypeId) {
-        List<RepairStationEquipmentStaff> repairStationStaff = repairStationService.listRepairStationEquipmentStaff();
+        List<RepairStationEquipmentStaff> repairStationStaff = repairStationService.listRepairStationEquipmentStaff(sessionId);
         calculateAndUpdateRepairCapabilities(sessionId, repairStationStaff, repairTypeId);
     }
 
@@ -106,7 +106,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                                                Long repairStationId,
                                                                Long repairTypeId) {
         List<RepairStationEquipmentStaff> repairStationStaff =
-                repairStationService.listRepairStationEquipmentStaff(repairStationId);
+                repairStationService.listRepairStationEquipmentStaff(repairStationId, sessionId);
 
         calculateAndUpdateRepairCapabilities(sessionId, repairStationStaff, repairTypeId);
     }

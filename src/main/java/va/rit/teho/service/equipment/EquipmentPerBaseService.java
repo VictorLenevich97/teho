@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public interface EquipmentPerBaseService {
 
-    void addEquipmentToBase(Long baseId, Long equipmentId, int amount);
+    void addEquipmentToBase(Long baseId, Long equipmentId, Long amount);
 
     void updateEquipmentInBase(Long baseId, Long equipmentId, int amount);
 
@@ -28,7 +28,11 @@ public interface EquipmentPerBaseService {
 
     List<EquipmentPerBase> getEquipmentInBase(Long baseId);
 
+    List<EquipmentPerBase> getTotalEquipmentInBase();
+
     void updateAvgDailyFailureData(UUID sessionId, double coefficient);
+
+    Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> getTotalFailureIntensityData(UUID sessionId);
 
     Map<Pair<Base, Equipment>, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> getFailureIntensityData(
             UUID sessionId,

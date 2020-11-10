@@ -23,7 +23,7 @@ public interface CalculationService {
      */
     double calculateEquipmentInRepairCount(Integer upperBound,
                                            Integer lowerBound,
-                                           double avgDailyFailure,
+                                           Double avgDailyFailure,
                                            int standardLaborInput);
 
     /**

@@ -15,11 +15,11 @@ public class CalculationServiceImpl implements CalculationService {
     public double calculateEquipmentInRepairCount(
             Integer upperBound,
             Integer lowerBound,
-            double avgDailyFailure,
+            Double avgDailyFailure,
             int standardLaborInput) {
-        return Math.abs(avgDailyFailure *
-                                (Math.sin((Math.PI * (upperBound == null ? 1000 : upperBound)) / (2 * standardLaborInput)) -
-                                        Math.sin((Math.PI * (lowerBound == null ? 0 : lowerBound)) / (2 * standardLaborInput))));
+        return avgDailyFailure == null ? 0.0 : Math.abs(avgDailyFailure *
+                                                                (Math.sin((Math.PI * (upperBound == null ? 1000 : upperBound)) / (2 * standardLaborInput)) -
+                                                                        Math.sin((Math.PI * (lowerBound == null ? 0 : lowerBound)) / (2 * standardLaborInput))));
     }
 
     @Override

@@ -1,12 +1,13 @@
 package va.rit.teho.entity.equipment;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "equipment_sub_type")
-public class EquipmentSubType {
+public class EquipmentSubType implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

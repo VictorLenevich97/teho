@@ -62,6 +62,7 @@ public class SessionFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         boolean repairStationStaffPath = !(path.contains("/repair-station") && path.contains("/staff"));
         boolean equipmentPerBasePath = !(path.contains("/base") && path.contains("/equipment"));
-        return filterPaths.stream().noneMatch(path::contains) && repairStationStaffPath && equipmentPerBasePath;
+        boolean equipmentPerBaseFilePath = !(path.contains("/base") && path.contains("/export"));
+        return filterPaths.stream().noneMatch(path::contains) && repairStationStaffPath && equipmentPerBasePath && equipmentPerBaseFilePath;
     }
 }

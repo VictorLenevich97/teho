@@ -26,9 +26,14 @@ public class EquipmentPerBase {
     public EquipmentPerBase() {
     }
 
-    public EquipmentPerBase(Long baseId, Long equipmentId, int amount) {
+    public EquipmentPerBase(Long baseId, Long equipmentId, Long amount) {
         this.id = new EquipmentPerBasePK(baseId, equipmentId);
-        this.amount = amount;
+        this.amount = amount.intValue();
+    }
+
+    public EquipmentPerBase(Equipment equipment, Long amount) {
+        this.equipment = equipment;
+        this.amount = amount.intValue();
     }
 
     @Override

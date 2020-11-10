@@ -18,6 +18,7 @@ public class LaborDistributionData {
     }
 
     public LaborDistributionData(EquipmentSubType subType,
+                                 Long baseId,
                                  String baseName,
                                  Long equipmentId,
                                  String equipmentName,
@@ -25,7 +26,7 @@ public class LaborDistributionData {
                                  Long intervalId,
                                  Double count,
                                  Double avgLaborInput) {
-        this.compositeKey = new CompositeKey(subType, equipmentId);
+        this.compositeKey = new CompositeKey(subType, baseId, equipmentId);
         this.baseName = baseName;
         this.equipmentName = equipmentName;
         this.laborInput = laborInput;
@@ -64,10 +65,12 @@ public class LaborDistributionData {
 
     public static class CompositeKey {
         private final EquipmentSubType subType;
+        private final Long baseId;
         private final Long equipmentId;
 
-        public CompositeKey(EquipmentSubType subType, Long equipmentId) {
+        public CompositeKey(EquipmentSubType subType, Long baseId, Long equipmentId) {
             this.subType = subType;
+            this.baseId = baseId;
             this.equipmentId = equipmentId;
         }
 
@@ -75,22 +78,24 @@ public class LaborDistributionData {
             return subType;
         }
 
+
+        public Long getBaseId() {
+            return baseId;
+        }
+
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            CompositeKey tempKey = (CompositeKey) o;
-            return Objects.equals(subType, tempKey.subType) &&
-                    Objects.equals(equipmentId, tempKey.equipmentId);
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CompositeKey that = (CompositeKey) o;
+            return Objects.equals(subType, that.subType) &&
+                    Objects.equals(baseId, that.baseId) &&
+                    Objects.equals(equipmentId, that.equipmentId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(subType, equipmentId);
+            return Objects.hash(subType, baseId, equipmentId);
         }
 
         public Long getEquipmentId() {

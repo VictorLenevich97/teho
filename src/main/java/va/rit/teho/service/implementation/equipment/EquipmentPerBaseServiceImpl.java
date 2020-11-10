@@ -80,6 +80,11 @@ public class EquipmentPerBaseServiceImpl implements EquipmentPerBaseService {
     }
 
     @Override
+    public List<EquipmentPerBase> getTotalEquipmentInBase() {
+        return equipmentPerBaseRepository.findTotal();
+    }
+
+    @Override
     public void updateAvgDailyFailureData(UUID sessionId, double coefficient) {
         List<EquipmentPerBaseFailureIntensity> updatedWithAvgDailyFailureData =
                 equipmentPerBaseFailureIntensityRepository
@@ -105,7 +110,30 @@ public class EquipmentPerBaseServiceImpl implements EquipmentPerBaseService {
     }
 
     @Override
-    public void addEquipmentToBase(Long baseId, Long equipmentId, int amount) {
+    public Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> getTotalFailureIntensityData(
+            UUID sessionId) {
+        List<EquipmentPerBaseFailureIntensity> equipmentPerBaseFailureIntensityList =
+                equipmentPerBaseFailureIntensityRepository.findAllByTehoSessionId(sessionId);
+        Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> result = new HashMap<>();
+
+        for (EquipmentPerBaseFailureIntensity equipmentPerBaseFailureIntensity : equipmentPerBaseFailureIntensityList) {
+            Map<Stage, EquipmentPerBaseFailureIntensity> map = result
+                    .computeIfAbsent(equipmentPerBaseFailureIntensity.getEquipment(), (e) -> new HashMap<>())
+                    .computeIfAbsent(equipmentPerBaseFailureIntensity.getRepairType(), (e) -> new HashMap<>());
+            EquipmentPerBaseFailureIntensity existing = map.getOrDefault(equipmentPerBaseFailureIntensity.getStage(),
+                                                                         null);
+            if (existing != null) {
+                existing.setAvgDailyFailure((existing.getAvgDailyFailure() == null ? 0.0 : existing.getAvgDailyFailure()) + (equipmentPerBaseFailureIntensity
+                        .getAvgDailyFailure() == null ? 0.0 : equipmentPerBaseFailureIntensity.getAvgDailyFailure()));
+            } else {
+                map.put(equipmentPerBaseFailureIntensity.getStage(), equipmentPerBaseFailureIntensity);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void addEquipmentToBase(Long baseId, Long equipmentId, Long amount) {
         baseService.get(baseId);
         equipmentService.get(equipmentId);
         equipmentPerBaseRepository.findById(new EquipmentPerBasePK(baseId, equipmentId)).ifPresent(epb -> {
