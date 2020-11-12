@@ -5,10 +5,10 @@
 //import org.springframework.http.MediaType;
 //import org.springframework.test.context.ContextConfiguration;
 //import va.rit.teho.TestRunner;
-//import va.rit.teho.dto.BaseDTO;
+//import va.rit.teho.dto.base.BaseDTO;
 //import va.rit.teho.dto.EquipmentStaffDTO;
-//import va.rit.teho.dto.RepairStationDTO;
-//import va.rit.teho.dto.RepairStationTypeDTO;
+//import va.rit.teho.dto.repairstation.RepairStationDTO;
+//import va.rit.teho.dto.repairstation.RepairStationTypeDTO;
 //import va.rit.teho.entity.*;
 //
 //

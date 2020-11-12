@@ -4,14 +4,14 @@ package va.rit.teho.service.implementation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import va.rit.teho.entity.*;
+import va.rit.teho.entity.base.Base;
 import va.rit.teho.exception.BaseNotFoundException;
 import va.rit.teho.exception.EmptyFieldException;
-import va.rit.teho.exception.EquipmentNotFoundException;
-import va.rit.teho.repository.BaseRepository;
-import va.rit.teho.repository.EquipmentPerBaseRepository;
-import va.rit.teho.repository.EquipmentRepository;
-import va.rit.teho.service.BaseService;
+import va.rit.teho.repository.base.BaseRepository;
+import va.rit.teho.repository.equipment.EquipmentPerBaseRepository;
+import va.rit.teho.repository.equipment.EquipmentRepository;
+import va.rit.teho.service.base.BaseService;
+import va.rit.teho.service.implementation.base.BaseServiceImpl;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -30,7 +30,7 @@ public class BaseServiceImplTest {
     private final EquipmentPerBaseRepository equipmentPerBaseRepository = Mockito.mock(EquipmentPerBaseRepository.class);
 
     private final BaseService service =
-            new BaseServiceImpl(baseRepository, equipmentRepository, equipmentPerBaseRepository);
+            new BaseServiceImpl(baseRepository);
 
     @Test
     public void testAdd() {
@@ -63,56 +63,56 @@ public class BaseServiceImplTest {
 
         verify(baseRepository).save(BASE);
     }
-
-    @Test
-    public void testAddEquipmentToBase() {
-        Long baseId = 1L;
-        Long equipmentId = 1L;
-        int intensity = 10;
-        int amount = 15;
-        Equipment e = new Equipment("n", new EquipmentSubType("", "", new EquipmentType("", "")));
-        when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
-        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(e));
-        EquipmentPerBase epb = new EquipmentPerBase(BASE.getId(), e.getId(), intensity, amount);
-
-        service.addEquipmentToBase(baseId, equipmentId, intensity, amount);
-
-        verify(equipmentPerBaseRepository).save(epb);
-    }
-
-    @Test
-    public void testAddEquipmentToBaseBaseNotFound() {
-        Long baseId = 1L;
-        when(baseRepository.findById(baseId)).thenReturn(Optional.empty());
-        Assertions.assertThrows(BaseNotFoundException.class, () -> service.addEquipmentToBase(1L, 1L, 0, 0));
-    }
-
-    @Test
-    public void testAddEquipmentToBaseEquipmentNotFound() {
-        Long baseId = 1L;
-        Long equipmentId = 1L;
-        when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
-        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.empty());
-        Assertions.assertThrows(EquipmentNotFoundException.class, () -> service.addEquipmentToBase(1L, 1L, 0, 0));
-    }
-
-    @Test
-    public void testUpdateEquipmentInBase() {
-        Long baseId = 1L;
-        Long equipmentId = 1L;
-        int intensity = 10;
-        int amount = 15;
-        Equipment e = new Equipment("n", new EquipmentSubType("", "", new EquipmentType("", "")));
-        when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
-        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(e));
-        EquipmentPerBase epb = new EquipmentPerBase(BASE.getId(), e.getId(), intensity, amount);
-        when(equipmentPerBaseRepository.findById(new EquipmentPerBaseAmount(baseId,
-                                                                            equipmentId))).thenReturn(Optional.of(epb));
-
-        service.updateEquipmentInBase(baseId, equipmentId, intensity, amount);
-
-        verify(equipmentPerBaseRepository).save(epb);
-    }
+//
+//    @Test
+//    public void testAddEquipmentToBase() {
+//        Long baseId = 1L;
+//        Long equipmentId = 1L;
+//        int intensity = 10;
+//        int amount = 15;
+//        Equipment e = new Equipment("n", new EquipmentSubType("", "", new EquipmentType("", "")));
+//        when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
+//        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(e));
+//        EquipmentPerBase epb = new EquipmentPerBase(BASE.getId(), e.getId(), amount);
+//
+//        service.addEquipmentToBase(baseId, equipmentId, amount);
+//
+//        verify(equipmentPerBaseRepository).save(epb);
+//    }
+//
+//    @Test
+//    public void testAddEquipmentToBaseBaseNotFound() {
+//        Long baseId = 1L;
+//        when(baseRepository.findById(baseId)).thenReturn(Optional.empty());
+//        Assertions.assertThrows(BaseNotFoundException.class, () -> service.addEquipmentToBase(1L, 1L, 0));
+//    }
+//
+//    @Test
+//    public void testAddEquipmentToBaseEquipmentNotFound() {
+//        Long baseId = 1L;
+//        Long equipmentId = 1L;
+//        when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
+//        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.empty());
+//        Assertions.assertThrows(EquipmentNotFoundException.class, () -> service.addEquipmentToBase(1L, 1L, 0));
+//    }
+//
+//    @Test
+//    public void testUpdateEquipmentInBase() {
+//        Long baseId = 1L;
+//        Long equipmentId = 1L;
+//        int intensity = 10;
+//        int amount = 15;
+//        Equipment e = new Equipment("n", new EquipmentSubType("", "", new EquipmentType("", "")));
+//        when(baseRepository.findById(baseId)).thenReturn(Optional.of(BASE));
+//        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(e));
+//        EquipmentPerBase epb = new EquipmentPerBase(BASE.getId(), e.getId(), amount);
+//        when(equipmentPerBaseRepository.findById(new EquipmentPerBaseId(baseId,
+//                                                                        equipmentId))).thenReturn(Optional.of(epb));
+//
+//        service.updateEquipmentInBase(baseId, equipmentId, amount);
+//
+//        verify(equipmentPerBaseRepository).save(epb);
+//    }
 
     @Test
     public void testGet() {

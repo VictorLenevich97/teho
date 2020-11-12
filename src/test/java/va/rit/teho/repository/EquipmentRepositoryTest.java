@@ -6,9 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.RepositoryTestRunner;
-import va.rit.teho.entity.Equipment;
-import va.rit.teho.entity.EquipmentSubType;
-import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.repository.equipment.EquipmentRepository;
 
 import javax.annotation.Resource;
 import java.util.Collections;

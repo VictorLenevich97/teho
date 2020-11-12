@@ -1,7 +1,7 @@
 package va.rit.teho.dto.equipment;
 
-import va.rit.teho.entity.EquipmentSubType;
-import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 
 import java.util.Collection;
 import java.util.List;

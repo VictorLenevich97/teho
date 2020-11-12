@@ -4,12 +4,13 @@ package va.rit.teho.service.implementation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import va.rit.teho.entity.RepairStationType;
+import va.rit.teho.entity.repairstation.RepairStationType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
-import va.rit.teho.repository.RepairStationTypeRepository;
-import va.rit.teho.service.RepairStationTypeService;
+import va.rit.teho.repository.repairstation.RepairStationTypeRepository;
+import va.rit.teho.service.implementation.repairstation.RepairStationTypeServiceImpl;
+import va.rit.teho.service.repairstation.RepairStationTypeService;
 
 import java.util.Collections;
 import java.util.List;

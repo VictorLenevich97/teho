@@ -7,11 +7,11 @@
 //import va.rit.teho.exception.IncorrectParamException;
 //
 //import va.rit.teho.repository.RepairStationEquipmentCapabilitiesRepository;
-//import va.rit.teho.repository.RepairStationRepository;
-//import va.rit.teho.service.BaseService;
-//import va.rit.teho.service.EquipmentService;
-//import va.rit.teho.service.RepairStationService;
-//import va.rit.teho.service.RepairStationTypeService;
+//import va.rit.teho.repository.repairstation.RepairStationRepository;
+//import va.rit.teho.service.base.BaseService;
+//import va.rit.teho.service.equipment.EquipmentService;
+//import va.rit.teho.service.repairstation.RepairStationService;
+//import va.rit.teho.service.repairstation.RepairStationTypeService;
 //
 //import java.util.Collections;
 //import java.util.List;

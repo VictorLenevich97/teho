@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.RepositoryTestRunner;
-import va.rit.teho.entity.Base;
+import va.rit.teho.entity.base.Base;
+import va.rit.teho.repository.base.BaseRepository;
 
 import javax.annotation.Resource;
 import java.util.Optional;

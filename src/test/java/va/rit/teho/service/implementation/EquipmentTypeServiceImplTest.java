@@ -4,15 +4,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.data.util.Pair;
-import va.rit.teho.entity.EquipmentSubType;
-import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
 
-import va.rit.teho.repository.EquipmentSubTypeRepository;
-import va.rit.teho.repository.EquipmentTypeRepository;
-import va.rit.teho.service.EquipmentTypeService;
+import va.rit.teho.repository.equipment.EquipmentSubTypeRepository;
+import va.rit.teho.repository.equipment.EquipmentTypeRepository;
+import va.rit.teho.service.equipment.EquipmentTypeService;
+import va.rit.teho.service.implementation.equipment.EquipmentTypeServiceImpl;
 
 import java.util.Collections;
 import java.util.List;

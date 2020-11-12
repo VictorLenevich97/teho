@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.TestRunner;
-import va.rit.teho.entity.RepairType;
+import va.rit.teho.entity.common.RepairType;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +21,7 @@ public class RepairTypeControllerTest extends ControllerTest {
 
     @Test
     public void testListRepairTypes() throws Exception {
-        RepairType repairType = new RepairType("repair-type", true);
+        RepairType repairType = new RepairType("repair-type", "", true);
 
         List<RepairType> repairTypeList = Collections.singletonList(repairType);
         when(repairTypeService.list()).thenReturn(repairTypeList);
@@ -33,7 +33,7 @@ public class RepairTypeControllerTest extends ControllerTest {
 
     @Test
     public void testListRepairableRepairTypes() throws Exception {
-        RepairType repairType = new RepairType("repair-type", true);
+        RepairType repairType = new RepairType("repair-type", "", true);
 
         List<RepairType> repairTypeList = Collections.singletonList(repairType);
         when(repairTypeService.list(true)).thenReturn(repairTypeList);

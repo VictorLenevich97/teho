@@ -1,13 +1,13 @@
 package va.rit.teho.service.report;
 
 import org.springframework.stereotype.Service;
-import va.rit.teho.entity.CountAndLaborInput;
-import va.rit.teho.entity.EquipmentLaborInputDistribution;
-import va.rit.teho.entity.EquipmentSubType;
-import va.rit.teho.entity.EquipmentType;
+import va.rit.teho.entity.labordistribution.CountAndLaborInput;
+import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.report.ReportRow;
-import va.rit.teho.repository.EquipmentTypeRepository;
-import va.rit.teho.service.LaborInputDistributionService;
+import va.rit.teho.repository.equipment.EquipmentTypeRepository;
+import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,8 +28,10 @@ public class RepairFundDistributionDataCreator implements ReportDataCreator {
         List<ReportRow> reportData = new ArrayList<>();
 
         List<Long> allEquipmentTypeIdList = ((List<EquipmentType>) equipmentTypeRepository.findAll()).stream().map(EquipmentType::getId).collect(Collectors.toList());
+
+        //TODO: С появлением сессий нужно передавать как минимум ее ID, придется прикрутить
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
-                laborInputDistributionService.getLaborInputDistribution(allEquipmentTypeIdList);
+                null;//laborInputDistributionService.getLaborInputDistribution(allEquipmentTypeIdList);
 
         laborInputDistribution.keySet().forEach(equipmentType -> {
             reportData.add(new ReportRow(Collections.singletonList(equipmentType.getFullName())));
