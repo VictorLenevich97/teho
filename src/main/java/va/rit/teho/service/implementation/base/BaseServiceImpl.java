@@ -29,6 +29,7 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
+    @Transactional
     public Long add(String shortName, String fullName) {
         checkIfEmptyField(shortName);
         checkIfEmptyField(fullName);

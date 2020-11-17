@@ -29,8 +29,7 @@ public class BaseServiceImplTest {
 
     private final EquipmentPerBaseRepository equipmentPerBaseRepository = Mockito.mock(EquipmentPerBaseRepository.class);
 
-    private final BaseService service =
-            new BaseServiceImpl(baseRepository);
+    private final BaseService service = new BaseServiceImpl(baseRepository);
 
     @Test
     public void testAdd() {

@@ -6,19 +6,27 @@ DELETE FROM equipment_per_base;
 DELETE FROM equipment;
 DELETE FROM equipment_sub_type;
 DELETE FROM equipment_type;
-DELETE FROM repair_station;
+DELETE FROM repair_division;
 DELETE FROM repair_station_type;
 DELETE FROM base;
 
 INSERT INTO base VALUES (1, 'ГрА', 'ГрА');
 INSERT INTO base VALUES (2, 'омб', 'омб');
 
-INSERT INTO repair_station_type VALUES (1, 'МТО-80', 5, 3);
-INSERT INTO repair_station_type VALUES (2, 'МТО-АТ-М1', 10, 8);
+INSERT INTO repair_division_unit_type VALUES (1, 'вто', 3, 5);
+INSERT INTO repair_division_unit_type VALUES (2, 'ремр', 8, 10);
+INSERT INTO repair_division_unit_type VALUES (3, 'орвб', 8, 10);
+INSERT INTO repair_division_unit_type VALUES (4, 'рвп', 10, 12);
 
-INSERT INTO repair_station VALUES (1, 'грр вто 1 омб', 1, 1, 1);
-INSERT INTO repair_station VALUES (2, 'ото вто 1 омб', 1, 1, 1);
-INSERT INTO repair_station VALUES (3, 'ото ремр 2 омб', 2, 2, 1);
+INSERT INTO repair_station_type VALUES (1, 'МТО-80');
+INSERT INTO repair_station_type VALUES (2, 'МТО-АТ-М1');
+
+INSERT INTO repair_division VALUES (1, '1 омб');
+INSERT INTO repair_division VALUES (2, '2 омб');
+
+INSERT INTO repair_division_unit VALUES (1, 'грр вто 1 омб', 1, 1,1, 1);
+INSERT INTO repair_division_unit VALUES (2, 'ото вто 1 омб', 1, 1,1, 1);
+INSERT INTO repair_division_unit VALUES (3, 'ото ремр 2 омб', 2, 2,2, 2);
 
 INSERT INTO equipment_type VALUES (1, 'РАВ', 'РАВ');
 INSERT INTO equipment_type VALUES (2, 'БТВТ', 'БТВТ');
@@ -88,7 +96,7 @@ INSERT INTO stage VALUES (4,4);
 
 alter sequence base_id_seq restart with 3;
 alter sequence repair_station_type_id_seq restart with 3;
-alter sequence repair_station_id_seq restart with 4;
+alter sequence repair_division_unit_id_seq restart with 4;
 alter sequence equipment_type_id_seq restart with 4;
 alter sequence equipment_sub_type_id_seq restart with 15;
 alter sequence equipment_id_seq restart with 5;

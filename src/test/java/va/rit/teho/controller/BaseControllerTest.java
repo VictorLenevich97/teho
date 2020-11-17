@@ -11,6 +11,7 @@ import va.rit.teho.entity.base.Base;
 import va.rit.teho.exception.BaseNotFoundException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -58,7 +59,7 @@ public class BaseControllerTest extends ControllerTest {
     @Test
     public void testAddBase() throws Exception {
         Long baseId = 1L;
-        BaseDTO base = new BaseDTO(baseId, "short", "full");
+        BaseDTO base = new BaseDTO(baseId, "short", "full", Collections.emptyList());
         when(baseService.add(base.getShortName(), base.getFullName())).thenReturn(baseId);
 
         mockMvc.perform(
@@ -71,7 +72,7 @@ public class BaseControllerTest extends ControllerTest {
     @Test
     public void testUpdateBase() throws Exception {
         Long baseId = 1L;
-        BaseDTO base = new BaseDTO(baseId, "short", "full");
+        BaseDTO base = new BaseDTO(baseId, "short", "full", Collections.emptyList());
         when(baseService.add(base.getShortName(), base.getFullName())).thenReturn(baseId);
 
         mockMvc.perform(

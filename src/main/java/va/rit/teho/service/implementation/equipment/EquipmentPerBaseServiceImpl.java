@@ -75,13 +75,13 @@ public class EquipmentPerBaseServiceImpl implements EquipmentPerBaseService {
     }
 
     @Override
-    public List<EquipmentPerBase> getEquipmentInBase(Long baseId) {
-        return equipmentPerBaseRepository.findAllByBaseId(baseId);
+    public List<EquipmentPerBase> getEquipmentInBase(Long baseId, List<Long> equipmentIds) {
+        return equipmentPerBaseRepository.findAllByBaseId(baseId, equipmentIds);
     }
 
     @Override
-    public List<EquipmentPerBase> getTotalEquipmentInBase() {
-        return equipmentPerBaseRepository.findTotal();
+    public List<EquipmentPerBase> getTotalEquipmentInBase(List<Long> equipmentIds) {
+        return equipmentPerBaseRepository.findTotal(equipmentIds);
     }
 
     @Override
@@ -144,11 +144,24 @@ public class EquipmentPerBaseServiceImpl implements EquipmentPerBaseService {
     }
 
     @Override
+    public void addEquipmentToBase(Long baseId, List<Long> equipmentId, int amount) {
+        List<EquipmentPerBase> equipmentPerBaseList = equipmentId
+                .stream()
+                .map(id -> new EquipmentPerBase(baseId, id, (long) amount))
+                .collect(Collectors.toList());
+
+        equipmentPerBaseRepository.saveAll(equipmentPerBaseList);
+    }
+
+    @Override
     public Map<Pair<Base, Equipment>, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> getFailureIntensityData(
             UUID sessionId,
-            Long baseId) {
+            Long baseId,
+            List<Long> equipmentIds) {
         List<EquipmentPerBaseFailureIntensity> equipmentPerBaseFailureIntensityList =
-                equipmentPerBaseFailureIntensityRepository.findAllByTehoSessionIdAndBaseId(sessionId, baseId);
+                equipmentPerBaseFailureIntensityRepository.findAllByTehoSessionIdAndBaseId(sessionId,
+                                                                                           baseId,
+                                                                                           equipmentIds);
         Map<Pair<Base, Equipment>, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> result = new HashMap<>();
 
         for (EquipmentPerBaseFailureIntensity equipmentPerBaseFailureIntensity : equipmentPerBaseFailureIntensityList) {

@@ -8,16 +8,16 @@ import va.rit.teho.entity.base.Base;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
-import va.rit.teho.entity.repairstation.RepairStation;
-import va.rit.teho.entity.repairstation.RepairStationType;
+import va.rit.teho.entity.repairdivision.RepairDivisionUnit;
+import va.rit.teho.entity.repairdivision.RepairStationType;
 import va.rit.teho.service.base.BaseService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.implementation.common.RepairTypeServiceImpl;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
-import va.rit.teho.service.repairstation.RepairCapabilitiesService;
-import va.rit.teho.service.repairstation.RepairStationService;
-import va.rit.teho.service.repairstation.RepairStationTypeService;
+import va.rit.teho.service.repairdivision.RepairCapabilitiesService;
+import va.rit.teho.service.repairdivision.RepairDivisionService;
+import va.rit.teho.service.repairdivision.RepairDivisionUnitTypeService;
 
 public abstract class ControllerTest {
 
@@ -36,10 +36,10 @@ public abstract class ControllerTest {
     protected RepairCapabilitiesService repairCapabilitiesService;
 
     @MockBean
-    protected RepairStationService repairStationService;
+    protected RepairDivisionService repairDivisionService;
 
     @MockBean
-    protected RepairStationTypeService repairStationTypeService;
+    protected RepairDivisionUnitTypeService repairDivisionUnitTypeService;
 
     @MockBean
     protected RepairTypeServiceImpl repairTypeService;
@@ -80,26 +80,25 @@ public abstract class ControllerTest {
     }
 
     protected RepairStationType repairStationType(Long id, String name, int workingHoursMin, int workingHoursMax) {
-        RepairStationType rst = new RepairStationType(name, workingHoursMin, workingHoursMax);
+        RepairStationType rst = new RepairStationType(name);
         rst.setId(id);
         return rst;
     }
 
-    protected RepairStation repairStation(Long id,
-                                          String name,
-                                          Long typeId,
-                                          String typeName,
-                                          int workingHoursMin,
-                                          int workingHoursMax,
-                                          Base b) {
-        RepairStation repairStation = new RepairStation(name,
-                                                        repairStationType(typeId,
+    protected RepairDivisionUnit repairStation(Long id,
+                                               String name,
+                                               Long typeId,
+                                               String typeName,
+                                               int workingHoursMin,
+                                               int workingHoursMax) {
+        RepairDivisionUnit repairDivisionUnit = new RepairDivisionUnit(name,
+                                                                       repairStationType(typeId,
                                                                           typeName,
                                                                           workingHoursMin,
                                                                           workingHoursMax),
-                                                        b,
-                                                        3);
-        repairStation.setId(id);
-        return repairStation;
+                                                                       null,
+                                                                       3);
+        repairDivisionUnit.setId(id);
+        return repairDivisionUnit;
     }
 }

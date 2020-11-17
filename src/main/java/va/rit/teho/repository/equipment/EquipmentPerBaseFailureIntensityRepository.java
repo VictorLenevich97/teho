@@ -25,6 +25,8 @@ public interface EquipmentPerBaseFailureIntensityRepository
 
     List<EquipmentPerBaseFailureIntensity> findAllByTehoSessionId(UUID sessionId);
 
-    List<EquipmentPerBaseFailureIntensity> findAllByTehoSessionIdAndBaseId(UUID sessionId, Long baseId);
+    @Query("SELECT epbfi from EquipmentPerBaseFailureIntensity epbfi WHERE epbfi.tehoSession.id = :sessionId AND epbfi.base.id = :baseId AND " +
+            "(coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds))")
+    List<EquipmentPerBaseFailureIntensity> findAllByTehoSessionIdAndBaseId(UUID sessionId, Long baseId, List<Long> equipmentIds);
 
 }
