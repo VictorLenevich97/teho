@@ -11,6 +11,8 @@ public interface EquipmentTypeService {
 
     List<EquipmentType> listTypes(List<Long> typeIds);
 
+    List<EquipmentSubType> listSubTypes(List<Long> typeIds);
+
     Map<EquipmentType, List<EquipmentSubType>> listTypesWithSubTypes(List<Long> typeIds, List<Long> subTypeIds);
 
     Pair<EquipmentType, List<EquipmentSubType>> getTypeWithSubTypes(Long typeId);

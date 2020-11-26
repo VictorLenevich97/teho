@@ -66,4 +66,5 @@ public class EquipmentType implements Serializable {
     public int hashCode() {
         return Objects.hash(id, shortName, fullName);
     }
+
 }

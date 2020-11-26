@@ -17,6 +17,8 @@ public interface EquipmentPerBaseService {
 
     void addEquipmentToBase(Long baseId, Long equipmentId, Long amount);
 
+    void addEquipmentToBase(Long baseId, List<Long> equipmentId, int amount);
+
     void updateEquipmentInBase(Long baseId, Long equipmentId, int amount);
 
     void setEquipmentPerBaseFailureIntensity(UUID sessionId,
@@ -26,9 +28,9 @@ public interface EquipmentPerBaseService {
                                              Long stageId,
                                              Integer intensity);
 
-    List<EquipmentPerBase> getEquipmentInBase(Long baseId);
+    List<EquipmentPerBase> getEquipmentInBase(Long baseId, List<Long> equipmentIds);
 
-    List<EquipmentPerBase> getTotalEquipmentInBase();
+    List<EquipmentPerBase> getTotalEquipmentInBase(List<Long> equipmentIds);
 
     void updateAvgDailyFailureData(UUID sessionId, double coefficient);
 
@@ -36,7 +38,8 @@ public interface EquipmentPerBaseService {
 
     Map<Pair<Base, Equipment>, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> getFailureIntensityData(
             UUID sessionId,
-            Long baseId);
+            Long baseId,
+            List<Long> equipmentIds);
 
     List<EquipmentPerBaseFailureIntensityAndLaborInput> listWithIntensityAndLaborInput(UUID sessionId,
                                                                                        Long repairTypeId);

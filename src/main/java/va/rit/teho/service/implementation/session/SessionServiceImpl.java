@@ -7,8 +7,8 @@ import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.session.SessionRepository;
 import va.rit.teho.service.equipment.EquipmentPerBaseService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
-import va.rit.teho.service.repairstation.RepairCapabilitiesService;
-import va.rit.teho.service.repairstation.RepairStationService;
+import va.rit.teho.service.repairdivision.RepairCapabilitiesService;
+import va.rit.teho.service.repairdivision.RepairDivisionService;
 import va.rit.teho.service.session.SessionService;
 
 import java.util.List;
@@ -21,18 +21,18 @@ public class SessionServiceImpl implements SessionService {
     private final SessionRepository sessionRepository;
 
     private final EquipmentPerBaseService equipmentPerBaseService;
-    private final RepairStationService repairStationService;
+    private final RepairDivisionService repairDivisionService;
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final LaborInputDistributionService laborInputDistributionService;
 
     public SessionServiceImpl(SessionRepository sessionRepository,
                               EquipmentPerBaseService equipmentPerBaseService,
-                              RepairStationService repairStationService,
+                              RepairDivisionService repairDivisionService,
                               RepairCapabilitiesService repairCapabilitiesService,
                               LaborInputDistributionService laborInputDistributionService) {
         this.sessionRepository = sessionRepository;
         this.equipmentPerBaseService = equipmentPerBaseService;
-        this.repairStationService = repairStationService;
+        this.repairDivisionService = repairDivisionService;
         this.repairCapabilitiesService = repairCapabilitiesService;
         this.laborInputDistributionService = laborInputDistributionService;
     }
@@ -59,7 +59,7 @@ public class SessionServiceImpl implements SessionService {
         get(sessionId); //проверка на существование
         TehoSession newSession = create(name);
         equipmentPerBaseService.copyEquipmentPerBaseData(sessionId, newSession.getId());
-        repairStationService.copyEquipmentStaff(sessionId, newSession.getId());
+        repairDivisionService.copyEquipmentStaff(sessionId, newSession.getId());
         repairCapabilitiesService.copyRepairCapabilities(sessionId, newSession.getId());
         laborInputDistributionService.copyLaborInputDistributionData(sessionId, newSession.getId());
         return newSession;

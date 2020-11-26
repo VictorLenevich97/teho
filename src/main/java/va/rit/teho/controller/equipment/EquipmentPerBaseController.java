@@ -4,14 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.data.util.Pair;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
+import va.rit.teho.dto.equipment.EquipmentPerBaseSaveDTO;
 import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
@@ -21,18 +19,12 @@ import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentPerBase;
 import va.rit.teho.entity.equipment.EquipmentPerBaseFailureIntensity;
-import va.rit.teho.repository.equipment.EquipmentPerBaseFailureIntensityRepository;
 import va.rit.teho.server.config.TehoSessionData;
-import va.rit.teho.service.DataExporter;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.common.StageService;
 import va.rit.teho.service.equipment.EquipmentPerBaseService;
 
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,19 +37,16 @@ public class EquipmentPerBaseController {
     private final StageService stageService;
     private final RepairTypeService repairTypeService;
     private final EquipmentPerBaseService equipmentPerBaseService;
-    private final EquipmentPerBaseFailureIntensityRepository equipmentPerBaseFailureIntensityRepository;
 
     @Resource
     private TehoSessionData tehoSession;
 
     public EquipmentPerBaseController(StageService stageService,
                                       RepairTypeService repairTypeService,
-                                      EquipmentPerBaseService equipmentPerBaseService,
-                                      EquipmentPerBaseFailureIntensityRepository equipmentPerBaseFailureIntensityRepository) {
+                                      EquipmentPerBaseService equipmentPerBaseService) {
         this.stageService = stageService;
         this.repairTypeService = repairTypeService;
         this.equipmentPerBaseService = equipmentPerBaseService;
-        this.equipmentPerBaseFailureIntensityRepository = equipmentPerBaseFailureIntensityRepository;
     }
 
 
@@ -86,20 +75,23 @@ public class EquipmentPerBaseController {
     @ApiOperation(value = "Обновить ВВСТ в ВЧ")
     public ResponseEntity<Object> updateEquipmentInBase(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long baseId,
                                                         @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                        @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody Map<Long, Map<Long, Integer>> intensityData) {
-        //TODO: вынести в отдельный endpoint (?)
-//        equipmentPerBaseService.updateEquipmentInBase(baseId,
-//                                                      equipmentId,
-//                                                      intensityAndAmount.getAmount());
-        intensityData.forEach((stageId, repairTypeIntensityMap) ->
-                                      repairTypeIntensityMap.forEach((repairTypeId, intensity) ->
-                                                                             equipmentPerBaseService.setEquipmentPerBaseFailureIntensity(
-                                                                                     tehoSession.getSessionId(),
-                                                                                     baseId,
-                                                                                     equipmentId,
-                                                                                     repairTypeId,
-                                                                                     stageId,
-                                                                                     intensity)));
+                                                        @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody
+                                                                EquipmentPerBaseSaveDTO equipmentPerBaseSaveDTO) {
+        equipmentPerBaseService.updateEquipmentInBase(baseId,
+                                                      equipmentId,
+                                                      equipmentPerBaseSaveDTO.getAmount());
+        equipmentPerBaseSaveDTO.getData().forEach((stageId, repairTypeIntensityMap) ->
+                                                          repairTypeIntensityMap
+                                                                  .forEach((repairTypeId, intensity) ->
+                                                                                   equipmentPerBaseService
+                                                                                           .setEquipmentPerBaseFailureIntensity(
+                                                                                                   tehoSession
+                                                                                                           .getSessionId(),
+                                                                                                   baseId,
+                                                                                                   equipmentId,
+                                                                                                   repairTypeId,
+                                                                                                   stageId,
+                                                                                                   intensity)));
         return ResponseEntity.accepted().build();
     }
 
@@ -107,25 +99,31 @@ public class EquipmentPerBaseController {
     @GetMapping("/base/{baseId}/equipment")
     @ResponseBody
     @ApiOperation(value = "Получить данные о ВВСТ в ВЧ (в табличном виде)")
-    public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerBaseData(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long baseId) {
+    public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerBaseData(
+            @ApiParam(value = "Ключ ВЧ", required = true, example = "1")
+            @PathVariable Long baseId,
+            @RequestParam(required = false) List<Long> equipmentIds) {
         return this.getEquipmentRowData(baseId,
                                         EquipmentPerBaseFailureIntensity::getIntensityPercentage,
                                         0,
-                                        Object::toString);
+                                        Object::toString,
+                                        equipmentIds);
     }
 
     private <T> TableDataDTO<Map<String, Map<String, String>>> getEquipmentRowData(Long baseId,
                                                                                    Function<EquipmentPerBaseFailureIntensity, T> getter,
                                                                                    T defaultValue,
-                                                                                   Function<T, String> formatter) {
+                                                                                   Function<T, String> formatter,
+                                                                                   List<Long> equipmentIds) {
         Map<Pair<Base, Equipment>, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData =
-                equipmentPerBaseService.getFailureIntensityData(tehoSession.getSessionId(), baseId);
+                equipmentPerBaseService.getFailureIntensityData(tehoSession.getSessionId(), baseId, equipmentIds);
         return getTableDataDTO(baseId,
                                (epb) -> Pair.of(epb.getBase(), epb.getEquipment()),
                                getter,
                                defaultValue,
                                formatter,
-                               failureIntensityData);
+                               failureIntensityData,
+                               equipmentIds);
     }
 
     private <K, T> TableDataDTO<Map<String, Map<String, String>>> getTableDataDTO(Long baseId,
@@ -133,7 +131,8 @@ public class EquipmentPerBaseController {
                                                                                   Function<EquipmentPerBaseFailureIntensity, T> getter,
                                                                                   T defaultValue,
                                                                                   Function<T, String> formatter,
-                                                                                  Map<K, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData) {
+                                                                                  Map<K, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData,
+                                                                                  List<Long> equipmentIds) {
         List<Stage> stages = stageService.list();
         List<RepairType> repairTypes = repairTypeService.list(true);
 
@@ -151,8 +150,8 @@ public class EquipmentPerBaseController {
         }
 
         List<EquipmentFailureIntensityRowData<String>> rowData =
-                (baseId == null ? equipmentPerBaseService.getTotalEquipmentInBase() :
-                        equipmentPerBaseService.getEquipmentInBase(baseId))
+                (baseId == null ? equipmentPerBaseService.getTotalEquipmentInBase(equipmentIds) :
+                        equipmentPerBaseService.getEquipmentInBase(baseId, equipmentIds))
                         .stream()
                         .map(epb -> getEquipmentFailureIntensityRowData(failureIntensityData,
                                                                         keyGetter,
@@ -168,7 +167,8 @@ public class EquipmentPerBaseController {
 
     @GetMapping("/base/equipment/daily-failure")
     @ResponseBody
-    public TableDataDTO<Map<String, Map<String, String>>> getTotalEquipmentPerBaseDailyFailureData() {
+    public TableDataDTO<Map<String, Map<String, String>>> getTotalEquipmentPerBaseDailyFailureData(
+            @RequestParam(required = false) List<Long> equipmentIds) {
         Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData =
                 equipmentPerBaseService.getTotalFailureIntensityData(tehoSession.getSessionId());
         return getTableDataDTO(null,
@@ -176,17 +176,21 @@ public class EquipmentPerBaseController {
                                EquipmentPerBaseFailureIntensity::getAvgDailyFailure,
                                0.0,
                                va.rit.teho.controller.helper.Formatter::formatDouble,
-                               failureIntensityData);
+                               failureIntensityData,
+                               equipmentIds);
     }
 
     @GetMapping("/base/{baseId}/equipment/daily-failure")
     @ResponseBody
     @ApiOperation(value = "Получить данные о ВВСТ в ВЧ c интенсивностью выхода в ремонт в ед. (в табличном виде)")
-    public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerBaseDailyFailureData(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long baseId) {
+    public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerBaseDailyFailureData(
+            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long baseId,
+            @RequestParam(required = false) List<Long> equipmentIds) {
         return this.getEquipmentRowData(baseId,
                                         EquipmentPerBaseFailureIntensity::getAvgDailyFailure,
                                         0.0,
-                                        va.rit.teho.controller.helper.Formatter::formatDouble);
+                                        va.rit.teho.controller.helper.Formatter::formatDouble,
+                                        equipmentIds);
     }
 
     private <K, T> EquipmentFailureIntensityRowData<String> getEquipmentFailureIntensityRowData(Map<K, Map<RepairType, Map<Stage, EquipmentPerBaseFailureIntensity>>> failureIntensityData,

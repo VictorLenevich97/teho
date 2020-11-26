@@ -1,6 +1,7 @@
 package va.rit.teho.entity.base;
 
-import va.rit.teho.entity.repairstation.RepairStation;
+import va.rit.teho.entity.equipment.EquipmentLaborInputPerType;
+import va.rit.teho.entity.equipment.EquipmentPerBase;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,11 +20,11 @@ public class Base implements Serializable {
 
     private String fullName;
 
-    @OneToMany(mappedBy = "base")
-    Set<RepairStation> repairStations;
+    @OneToMany(mappedBy = "equipment")
+    private Set<EquipmentPerBase> equipmentPerBases;
 
-    public Set<RepairStation> getRepairStations() {
-        return repairStations;
+    public Set<EquipmentPerBase> getEquipmentPerBases() {
+        return equipmentPerBases;
     }
 
     public Base() {
