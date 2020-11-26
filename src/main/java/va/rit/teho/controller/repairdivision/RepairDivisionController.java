@@ -26,6 +26,7 @@ import va.rit.teho.service.repairdivision.RepairDivisionService;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping(path = "repair-division", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -58,9 +59,13 @@ public class RepairDivisionController {
     @ResponseBody
     @ApiOperation(value = "Получить список РВО")
     public ResponseEntity<List<RepairDivisionUnitDTO>> listRepairDivisionUnits(
-            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(value = "id", required = false) List<Long> ids) {
+            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(value = "id", required = false) List<Long> ids,
+            @RequestParam(required = false, defaultValue = "1") int pageNum,
+            @RequestParam(required = false, defaultValue = "100") int pageSize) {
         List<RepairDivisionUnitDTO> repairDivisionUnitDTOList =
-                repairDivisionService.listUnits(Optional.ofNullable(ids).orElse(Collections.emptyList()))
+                repairDivisionService.listUnits(Optional.ofNullable(ids).orElse(Collections.emptyList()),
+                                                pageNum,
+                                                pageSize)
                                      .stream()
                                      .map(RepairDivisionUnitDTO::from)
                                      .collect(Collectors.toList());
@@ -111,8 +116,12 @@ public class RepairDivisionController {
     public ResponseEntity<TableDataDTO<Map<String, RepairDivisionUnitEquipmentStaffDTO>>> getEquipmentStaff(
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairDivisionUnitId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
-            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId) {
-        List<RepairDivisionUnit> repairDivisionUnitList = repairDivisionService.listUnits(repairDivisionUnitId);
+            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId,
+            @RequestParam(required = false, defaultValue = "1") int pageNum,
+            @RequestParam(required = false, defaultValue = "100") int pageSize) {
+        List<RepairDivisionUnit> repairDivisionUnitList = repairDivisionService.listUnits(repairDivisionUnitId,
+                                                                                          pageNum,
+                                                                                          pageSize);
         Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes =
                 equipmentTypeService.listTypesWithSubTypes(equipmentTypeId,
                                                            equipmentSubTypeId);
@@ -153,11 +162,12 @@ public class RepairDivisionController {
                         .stream()
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
-        List<NestedColumnsDTO> nestedColumnsTotal = equipmentTypeListMap
-                .entrySet()
-                .stream()
-                .map(this::getEquipmentStaffNestedColumnsDTO)
-                .collect(Collectors.toList());
+        List<NestedColumnsDTO> nestedColumnsTotal =
+                equipmentTypeListMap
+                        .entrySet()
+                        .stream()
+                        .flatMap(this::getEquipmentStaffNestedColumnsDTO)
+                        .collect(Collectors.toList());
         //TODO: вернуть старую иерархию столбцов при необходимости
 //        List<NestedColumnsDTO> nestedColumnsTotal =
 //                STAFF_KEYS_AND_TEXT
@@ -178,22 +188,31 @@ public class RepairDivisionController {
         return new TableDataDTO<>(nestedColumnsTotal, rows);
     }
 
-    private NestedColumnsDTO getEquipmentStaffNestedColumnsDTO(
+    private Stream<NestedColumnsDTO> getEquipmentStaffNestedColumnsDTO(
             Map.Entry<EquipmentType, List<EquipmentSubType>> equipmentTypeEntry) {
-        return new NestedColumnsDTO(
-                equipmentTypeEntry.getKey().getShortName(),
+        EquipmentType equipmentType = equipmentTypeEntry.getKey();
+        if (equipmentType == null) {
+            return equipmentTypeEntry
+                    .getValue()
+                    .stream()
+                    .map(this::getEquipmentSubTypeNestedColumnsDTOFunction);
+        }
+        return Stream.of(new NestedColumnsDTO(
+                equipmentType.getShortName(),
                 equipmentTypeEntry.getValue()
                                   .stream()
-                                  .map(est -> new NestedColumnsDTO(est.getShortName(),
-                                                                   STAFF_KEYS_AND_TEXT
-                                                                           .entrySet()
-                                                                           .stream()
-                                                                           .map(e -> new NestedColumnsDTO(Arrays.asList(
-                                                                                   est.getId().toString(),
-                                                                                   e.getKey()), e.getValue()))
-                                                                           .collect(
-                                                                                   Collectors.toList())))
-                                  .collect(Collectors.toList()));
+                                  .map(this::getEquipmentSubTypeNestedColumnsDTOFunction)
+                                  .collect(Collectors.toList())));
+    }
+
+    private NestedColumnsDTO getEquipmentSubTypeNestedColumnsDTOFunction(EquipmentSubType est) {
+        return new NestedColumnsDTO(est.getShortName(),
+                                    STAFF_KEYS_AND_TEXT
+                                            .entrySet()
+                                            .stream()
+                                            .map(e -> new NestedColumnsDTO(
+                                                    Arrays.asList(est.getId().toString(), e.getKey()), e.getValue()))
+                                            .collect(Collectors.toList()));
     }
 
     private RowData<Map<String, RepairDivisionUnitEquipmentStaffDTO>> getEquipmentStaffRow(

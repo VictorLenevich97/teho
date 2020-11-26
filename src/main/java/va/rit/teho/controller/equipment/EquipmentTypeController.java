@@ -46,7 +46,21 @@ public class EquipmentTypeController {
     @GetMapping("/subtype")
     @ResponseBody
     @ApiOperation(value = "Получить подтипы ВВСТ")
-    public ResponseEntity<List<EquipmentSubTypePerTypeDTO>> getEquipmentSubTypes(
+    public ResponseEntity<List<EquipmentSubTypeDTO>> getEquipmentSubTypes(
+            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
+        List<EquipmentSubTypeDTO> equipmentSubTypePerTypeDTOList =
+                equipmentTypeService
+                        .listSubTypes(typeIds)
+                        .stream()
+                        .map(EquipmentSubTypeDTO::from)
+                        .collect(Collectors.toList());
+        return ResponseEntity.ok(equipmentSubTypePerTypeDTOList);
+    }
+
+    @GetMapping("/subtype-grouped")
+    @ResponseBody
+    @ApiOperation(value = "Получить подтипы ВВСТ, сгруппированные с типами")
+    public ResponseEntity<List<EquipmentSubTypePerTypeDTO>> getEquipmentSubTypesGrouped(
             @ApiParam(value = "Ключи подтипов, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> subTypeIds,
             @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
         List<EquipmentSubTypePerTypeDTO> equipmentSubTypePerTypeDTOList =

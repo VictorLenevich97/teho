@@ -14,9 +14,10 @@ import va.rit.teho.repository.equipment.EquipmentSubTypeRepository;
 import va.rit.teho.repository.equipment.EquipmentTypeRepository;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -45,9 +46,18 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     @Override
+    public List<EquipmentSubType> listSubTypes(List<Long> typeIds) {
+        return equipmentSubTypeRepository.findByIds(null, typeIds);
+    }
+
+    @Override
     public Map<EquipmentType, List<EquipmentSubType>> listTypesWithSubTypes(List<Long> typeIds, List<Long> subTypeIds) {
         List<EquipmentSubType> equipmentSubTypes = equipmentSubTypeRepository.findByIds(subTypeIds, typeIds);
-        return equipmentSubTypes.stream().collect(Collectors.groupingBy(EquipmentSubType::getEquipmentType));
+        Map<EquipmentType, List<EquipmentSubType>> map = new LinkedHashMap<>();
+        for (EquipmentSubType equipmentSubType : equipmentSubTypes) {
+            map.computeIfAbsent(equipmentSubType.getEquipmentType(), k -> new ArrayList<>()).add(equipmentSubType);
+        }
+        return map;
     }
 
     @Override

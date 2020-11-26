@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface RepairDivisionService {
 
-    List<RepairDivisionUnit> listUnits(List<Long> filterIds);
+    List<RepairDivisionUnit> listUnits(List<Long> filterIds, Integer pageNum, Integer pageSize);
 
     Pair<RepairDivisionUnit, List<RepairDivisionUnitEquipmentStaff>> getUnitWithStaff(Long repairDivisionUntId, UUID sessionId);
 

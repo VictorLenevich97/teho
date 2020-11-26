@@ -45,6 +45,7 @@ INSERT INTO equipment_sub_type VALUES (11, 'БМП', 'БМП', 2);
 INSERT INTO equipment_sub_type VALUES (12, 'БТР, БРДМ', 'БТР, БРДМ', 2);
 INSERT INTO equipment_sub_type VALUES (13, 'КМ', 'КМ', 3);
 INSERT INTO equipment_sub_type VALUES (14, 'ГМ', 'ГМ', 3);
+INSERT INTO equipment_sub_type VALUES (15, 'ТЫЛ', 'ТЫЛ', null);
 
 INSERT INTO equipment VALUES (1, 'equipment1', 1);
 INSERT INTO equipment VALUES (2, '125 мм', 2);
@@ -87,7 +88,6 @@ INSERT INTO workhours_distribution_interval VALUES (3, 20, 50, 2);
 INSERT INTO workhours_distribution_interval VALUES (4, 50, 100, 2);
 INSERT INTO workhours_distribution_interval VALUES (5, 100, 200, 2);
 INSERT INTO workhours_distribution_interval VALUES (6, 200, 400, 3);
-INSERT INTO workhours_distribution_interval VALUES (7, 400, null, 3);
 
 INSERT INTO stage VALUES (1,1);
 INSERT INTO stage VALUES (2,2);
@@ -98,8 +98,8 @@ alter sequence base_id_seq restart with 3;
 alter sequence repair_station_type_id_seq restart with 3;
 alter sequence repair_division_unit_id_seq restart with 4;
 alter sequence equipment_type_id_seq restart with 4;
-alter sequence equipment_sub_type_id_seq restart with 15;
+alter sequence equipment_sub_type_id_seq restart with 16;
 alter sequence equipment_id_seq restart with 5;
 alter sequence repair_type_id_seq restart with 5;
 alter sequence restoration_type_id_seq restart with 4;
-alter sequence workhours_distribution_interval_id_seq restart with 8;
+alter sequence workhours_distribution_interval_id_seq restart with 7;

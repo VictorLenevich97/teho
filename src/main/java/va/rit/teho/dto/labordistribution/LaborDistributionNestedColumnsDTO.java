@@ -12,7 +12,7 @@ public class LaborDistributionNestedColumnsDTO extends NestedColumnsDTO {
                                              Integer lowerBound,
                                              Integer upperBound) {
         super(Arrays.asList(new NestedColumnsDTO(Arrays.asList(key.toString(), "count"), "Количество"),
-                            new NestedColumnsDTO(Arrays.asList(key.toString(), "laborInput"), "Qij")));
+                            new NestedColumnsDTO(Arrays.asList(key.toString(), "laborInput"), "Qij, чел.-час.")));
         this.from = lowerBound;
         this.to = upperBound;
     }

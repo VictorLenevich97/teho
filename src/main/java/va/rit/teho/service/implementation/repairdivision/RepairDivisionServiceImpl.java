@@ -1,5 +1,6 @@
 package va.rit.teho.service.implementation.repairdivision;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +50,8 @@ public class RepairDivisionServiceImpl implements RepairDivisionService {
     }
 
     @Override
-    public List<RepairDivisionUnit> listUnits(List<Long> filterIds) {
-        return repairDivisionUnitRepository.findSorted(filterIds);
+    public List<RepairDivisionUnit> listUnits(List<Long> filterIds, Integer pageNum, Integer pageSize) {
+        return repairDivisionUnitRepository.findSorted(filterIds, PageRequest.of(pageNum - 1, pageSize));
     }
 
     @Override

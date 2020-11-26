@@ -30,11 +30,13 @@ public class RepairDivisionUnit {
         //Пустой конструктор для автоматической инициализации
     }
 
-    public RepairDivisionUnit(String name, RepairStationType repairStationType,
+    public RepairDivisionUnit(String name,
+                              RepairStationType repairStationType,
                               RepairDivisionUnitType repairDivisionUnitType,
                               int stationAmount) {
         this.name = name;
         this.repairStationType = repairStationType;
+        this.repairDivisionUnitType = repairDivisionUnitType;
         this.stationAmount = stationAmount;
     }
 
