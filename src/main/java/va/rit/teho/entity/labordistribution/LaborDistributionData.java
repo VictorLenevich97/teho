@@ -13,8 +13,13 @@ public class LaborDistributionData {
     private Long intervalId;
     private Double count;
     private Double avgLaborInput;
+    private Double avgDailyFailure;
 
     public LaborDistributionData() {
+    }
+
+    public Double getAvgDailyFailure() {
+        return avgDailyFailure;
     }
 
     public LaborDistributionData(EquipmentSubType subType,
@@ -25,7 +30,8 @@ public class LaborDistributionData {
                                  Integer laborInput,
                                  Long intervalId,
                                  Double count,
-                                 Double avgLaborInput) {
+                                 Double avgLaborInput,
+                                 Double avgDailyFailure) {
         this.compositeKey = new CompositeKey(subType, baseId, equipmentId);
         this.baseName = baseName;
         this.equipmentName = equipmentName;
@@ -33,6 +39,7 @@ public class LaborDistributionData {
         this.intervalId = intervalId;
         this.count = count;
         this.avgLaborInput = avgLaborInput;
+        this.avgDailyFailure = avgDailyFailure;
     }
 
     public Integer getLaborInput() {

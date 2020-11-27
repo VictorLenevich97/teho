@@ -57,7 +57,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 .builder()
                 .baseName(eir.getBaseName())
                 .equipmentName(eir.getEquipmentName())
-                .avgDailyFailure(eir.getCount())
+                .avgDailyFailure(eir.getAvgDailyFailure())
                 .standardLaborInput(eir.getLaborInput())
                 .intervalCountAndLaborInputMap(laborInputMap)
                 .totalRepairComplexity(
@@ -90,14 +90,15 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                                                          Double avgDailyFailure,
                                                          int standardLaborInput,
                                                          WorkhoursDistributionInterval interval,
-                                                         Long stageId) {
+                                                         Long stageId,
+                                                         Long repairTypeId) {
         double count = calculationService.calculateEquipmentInRepairCount(interval.getUpperBound(),
                                                                           interval.getLowerBound(),
                                                                           avgDailyFailure,
                                                                           standardLaborInput);
         double laborInput = calculationService.calculateEquipmentInRepairLaborInput(count, interval.getUpperBound());
 
-        return new LaborDistribution(new LaborDistributionPK(baseId, equipmentId, interval.getId(), stageId, sessionId),
+        return new LaborDistribution(new LaborDistributionPK(baseId, equipmentId, interval.getId(), stageId, repairTypeId, sessionId),
                                      count,
                                      laborInput);
     }
@@ -105,6 +106,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     private Stream<LaborDistribution> calculateEquipmentLaborInputDistribution(
             UUID sessionId,
             Long stageId,
+            Long repairTypeId,
             Double avgDailyFailure,
             EquipmentPerBaseFailureIntensityAndLaborInput equipmentPerBaseAndLaborInput) {
         return StreamSupport
@@ -115,16 +117,19 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                                                             avgDailyFailure,
                                                             equipmentPerBaseAndLaborInput.getLaborInput(),
                                                             interval,
-                                                            stageId));
+                                                            stageId,
+                                                            repairTypeId));
     }
 
-    private void calculateAndSave(UUID sessionId,
+    private void calculateAndSave(Long repairTypeId,
+                                  UUID sessionId,
                                   List<EquipmentPerBaseFailureIntensityAndLaborInput> equipmentPerBases) {
         List<LaborDistribution> calculated =
                 equipmentPerBases
                         .stream()
                         .flatMap(epb -> this.calculateEquipmentLaborInputDistribution(sessionId,
                                                                                       epb.getStageId(),
+                                                                                      repairTypeId,
                                                                                       epb.getAvgDailyFailure(),
                                                                                       epb))
                         .collect(Collectors.toList());
@@ -139,7 +144,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                     List<EquipmentPerBaseFailureIntensityAndLaborInput> equipmentPerBases = equipmentPerBaseService.listWithIntensityAndLaborInput(
                             sessionId,
                             repairType.getId());
-                    calculateAndSave(sessionId, equipmentPerBases);
+                    calculateAndSave(repairType.getId(), sessionId, equipmentPerBases);
                 });
     }
 

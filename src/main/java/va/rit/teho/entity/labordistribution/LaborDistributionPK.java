@@ -16,18 +16,26 @@ public class LaborDistributionPK implements Serializable {
     private Long workhoursDistributionIntervalId;
     @Column(name = "stage_id")
     private Long stageId;
+    @Column(name = "repair_type_id")
+    private Long repairTypeId;
     @Column(name = "session_id")
     private UUID sessionId;
+
+    public Long getRepairTypeId() {
+        return repairTypeId;
+    }
 
     public LaborDistributionPK(Long baseId,
                                Long equipmentId,
                                Long workhoursDistributionIntervalId,
                                Long stageId,
+                               Long repairTypeId,
                                UUID sessionId) {
         this.baseId = baseId;
         this.equipmentId = equipmentId;
         this.workhoursDistributionIntervalId = workhoursDistributionIntervalId;
         this.stageId = stageId;
+        this.repairTypeId = repairTypeId;
         this.sessionId = sessionId;
     }
 
@@ -43,7 +51,7 @@ public class LaborDistributionPK implements Serializable {
     }
 
     public LaborDistributionPK copy(UUID sessionId) {
-        return new LaborDistributionPK(baseId, equipmentId, workhoursDistributionIntervalId, stageId, sessionId);
+        return new LaborDistributionPK(baseId, equipmentId, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId);
     }
 
     public Long getWorkhoursDistributionIntervalId() {
@@ -67,11 +75,12 @@ public class LaborDistributionPK implements Serializable {
                 Objects.equals(equipmentId, that.equipmentId) &&
                 Objects.equals(workhoursDistributionIntervalId, that.workhoursDistributionIntervalId) &&
                 Objects.equals(stageId, that.stageId) &&
+                Objects.equals(repairTypeId, that.repairTypeId) &&
                 Objects.equals(sessionId, that.sessionId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(baseId, equipmentId, workhoursDistributionIntervalId, stageId, sessionId);
+        return Objects.hash(baseId, equipmentId, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId);
     }
 }

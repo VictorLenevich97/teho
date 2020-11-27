@@ -26,20 +26,13 @@ public interface LaborDistributionRepository
             "ipt.amount, " +
             "ld.workhoursDistributionInterval.id, " +
             "ld.count, " +
-            "ld.avgLaborInput) FROM LaborDistribution ld " +
+            "ld.avgLaborInput, " +
+            "epbfi.avgDailyFailure) FROM LaborDistribution ld " +
             "INNER JOIN EquipmentLaborInputPerType ipt ON ld.equipment.id = ipt.equipment.id " +
+            "INNER JOIN EquipmentPerBaseFailureIntensity epbfi on (ld.equipment.id = epbfi.equipment.id and ld.base.id = epbfi.base.id and ld.tehoSession.id = epbfi.tehoSession.id and ld.stage.id = epbfi.stage.id and ipt.repairType.id = epbfi.repairType.id) " +
             "WHERE ipt.repairType.id = :repairTypeId AND ld.tehoSession.id = :sessionId AND" +
             "(coalesce(:equipmentTypeIds, null) is null or ld.equipment.equipmentSubType.equipmentType.id IN (:equipmentTypeIds)) " +
-            "AND ld.stage.id = :stageId " +
-            "GROUP BY ld.equipment.equipmentSubType, " +
-            "ld.base.id, " +
-            "ld.base.fullName, " +
-            "ld.equipment.id, " +
-            "ld.equipment.name, " +
-            "ipt.amount, " +
-            "ld.workhoursDistributionInterval.id, " +
-            "ld.count, " +
-            "ld.avgLaborInput")
+            "AND ld.stage.id = :stageId AND ld.repairType.id = :repairTypeId")
     List<LaborDistributionData> findAllAsData(UUID sessionId,
                                               Long repairTypeId,
                                               Long stageId,

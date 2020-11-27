@@ -1,6 +1,7 @@
 package va.rit.teho.entity.labordistribution;
 
 import va.rit.teho.entity.base.Base;
+import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.session.TehoSession;
@@ -34,6 +35,11 @@ public class LaborDistribution {
     @MapsId("stage_id")
     @JoinColumn(name = "stage_id")
     Stage stage;
+
+    @ManyToOne
+    @MapsId("repair_type_id")
+    @JoinColumn(name = "repair_type_id")
+    RepairType repairType;
 
     @ManyToOne
     @MapsId("session_id")
