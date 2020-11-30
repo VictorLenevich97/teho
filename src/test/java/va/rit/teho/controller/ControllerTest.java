@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import va.rit.teho.entity.base.Base;
+import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairdivision.RepairDivisionUnit;
 import va.rit.teho.entity.repairdivision.RepairStationType;
-import va.rit.teho.service.base.BaseService;
+import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.implementation.common.RepairTypeServiceImpl;
@@ -27,7 +27,7 @@ public abstract class ControllerTest {
     protected MockMvc mockMvc;
 
     @MockBean
-    protected BaseService baseService;
+    protected FormationService formationService;
 
     @MockBean
     protected LaborInputDistributionService laborInputDistributionService;
@@ -50,8 +50,8 @@ public abstract class ControllerTest {
     @MockBean
     protected EquipmentTypeService equipmentTypeService;
 
-    protected Base base(Long id, String name) {
-        Base b = new Base("short" + name, "full" + name);
+    protected Formation base(Long id, String name) {
+        Formation b = new Formation("short" + name, "full" + name);
         b.setId(id);
         return b;
     }

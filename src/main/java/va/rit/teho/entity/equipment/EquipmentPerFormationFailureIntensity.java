@@ -1,6 +1,6 @@
 package va.rit.teho.entity.equipment;
 
-import va.rit.teho.entity.base.Base;
+import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.session.TehoSession;
@@ -10,15 +10,15 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-public class EquipmentPerBaseFailureIntensity implements Serializable {
+public class EquipmentPerFormationFailureIntensity implements Serializable {
 
     @EmbeddedId
-    EquipmentPerBaseFailureIntensityPK equipmentPerBaseWithStageAndRepairType;
+    EquipmentPerFormationFailureIntensityPK equipmentPerFormationWithStageAndRepairType;
 
     @ManyToOne
-    @MapsId("base_id")
-    @JoinColumn(name = "base_id")
-    Base base;
+    @MapsId("formation_id")
+    @JoinColumn(name = "formation_id")
+    Formation formation;
 
     @ManyToOne
     @MapsId("equipment_id")
@@ -44,23 +44,23 @@ public class EquipmentPerBaseFailureIntensity implements Serializable {
 
     Double avgDailyFailure;
 
-    public EquipmentPerBaseFailureIntensity(EquipmentPerBaseFailureIntensityPK equipmentPerBaseWithStageAndRepairType,
-                                            int intensity,
-                                            Double avgDailyFailure) {
-        this.equipmentPerBaseWithStageAndRepairType = equipmentPerBaseWithStageAndRepairType;
+    public EquipmentPerFormationFailureIntensity(EquipmentPerFormationFailureIntensityPK equipmentPerFormationWithStageAndRepairType,
+                                                 int intensity,
+                                                 Double avgDailyFailure) {
+        this.equipmentPerFormationWithStageAndRepairType = equipmentPerFormationWithStageAndRepairType;
         this.intensityPercentage = intensity;
         this.avgDailyFailure = avgDailyFailure;
     }
 
-    public EquipmentPerBaseFailureIntensity() {
+    public EquipmentPerFormationFailureIntensity() {
     }
 
-    public EquipmentPerBaseFailureIntensityPK getEquipmentPerBaseWithRepairTypeId() {
-        return equipmentPerBaseWithStageAndRepairType;
+    public EquipmentPerFormationFailureIntensityPK getEquipmentPerFormationWithRepairTypeId() {
+        return equipmentPerFormationWithStageAndRepairType;
     }
 
-    public Base getBase() {
-        return base;
+    public Formation getFormation() {
+        return formation;
     }
 
     public Equipment getEquipment() {
@@ -69,14 +69,6 @@ public class EquipmentPerBaseFailureIntensity implements Serializable {
 
     public int getIntensityPercentage() {
         return intensityPercentage;
-    }
-
-    public EquipmentPerBaseFailureIntensityPK getEquipmentPerBaseWithStageAndRepairType() {
-        return equipmentPerBaseWithStageAndRepairType;
-    }
-
-    public EquipmentPerBaseFailureIntensityPK getEquipmentPerBaseWithStage() {
-        return equipmentPerBaseWithStageAndRepairType;
     }
 
     public Stage getStage() {
@@ -95,17 +87,17 @@ public class EquipmentPerBaseFailureIntensity implements Serializable {
         return avgDailyFailure;
     }
 
-    public EquipmentPerBaseFailureIntensity copy(UUID newSessionId) {
-        return new EquipmentPerBaseFailureIntensity(getEquipmentPerBaseWithRepairTypeId().copy(newSessionId),
-                                                    intensityPercentage,
-                                                    avgDailyFailure);
+    public EquipmentPerFormationFailureIntensity copy(UUID newSessionId) {
+        return new EquipmentPerFormationFailureIntensity(getEquipmentPerFormationWithRepairTypeId().copy(newSessionId),
+                                                         intensityPercentage,
+                                                         avgDailyFailure);
     }
 
     @Override
     public String toString() {
         return "EquipmentPerBaseFailureIntensity{" +
-                "equipmentPerBaseWithStageAndRepairType=" + equipmentPerBaseWithStageAndRepairType +
-                ", base=" + base +
+                "equipmentPerBaseWithStageAndRepairType=" + equipmentPerFormationWithStageAndRepairType +
+                ", base=" + formation +
                 ", equipment=" + equipment +
                 ", stage=" + stage +
                 ", repairType=" + repairType +

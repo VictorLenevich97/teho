@@ -10,11 +10,11 @@ public class EquipmentFailureIntensityRowData<T> extends RowData<Map<String, Map
     private final Integer amount;
 
     public EquipmentFailureIntensityRowData(Long id,
-                                            String baseName,
+                                            String formationName,
                                             String equipmentName,
                                             Integer amount,
                                             Map<String, Map<String, T>> data) {
-        super(null, baseName, data);
+        super(null, formationName, data);
         this.equipmentName = equipmentName;
         this.amount = amount;
         this.id = id;

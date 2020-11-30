@@ -7,10 +7,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Embeddable
-public class EquipmentPerBaseFailureIntensityPK implements Serializable {
+public class EquipmentPerFormationFailureIntensityPK implements Serializable {
 
-    @Column(name = "base_id")
-    Long baseId;
+    @Column(name = "formation_id")
+    Long formationId;
     @Column(name = "equipment_id")
     Long equipmentId;
     @Column(name = "stage_id")
@@ -20,31 +20,31 @@ public class EquipmentPerBaseFailureIntensityPK implements Serializable {
     @Column(name = "session_id")
     UUID sessionId;
 
-    public EquipmentPerBaseFailureIntensityPK(Long baseId,
-                                              Long equipmentId,
-                                              Long stageId,
-                                              Long repairTypeId,
-                                              UUID sessionId) {
-        this.baseId = baseId;
+    public EquipmentPerFormationFailureIntensityPK(Long formationId,
+                                                   Long equipmentId,
+                                                   Long stageId,
+                                                   Long repairTypeId,
+                                                   UUID sessionId) {
+        this.formationId = formationId;
         this.equipmentId = equipmentId;
         this.stageId = stageId;
         this.repairTypeId = repairTypeId;
         this.sessionId = sessionId;
     }
 
-    public EquipmentPerBaseFailureIntensityPK(EquipmentPerBaseFailureIntensityAndAmount epbfi, UUID sessionId) {
-        this(epbfi.getBaseId(), epbfi.getEquipmentId(), epbfi.getStageId(), epbfi.getRepairTypeId(), sessionId);
+    public EquipmentPerFormationFailureIntensityPK(EquipmentPerFormationFailureIntensityAndAmount epbfi, UUID sessionId) {
+        this(epbfi.getFormationId(), epbfi.getEquipmentId(), epbfi.getStageId(), epbfi.getRepairTypeId(), sessionId);
     }
 
-    public EquipmentPerBaseFailureIntensityPK() {
+    public EquipmentPerFormationFailureIntensityPK() {
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EquipmentPerBaseFailureIntensityPK that = (EquipmentPerBaseFailureIntensityPK) o;
-        return Objects.equals(baseId, that.baseId) &&
+        EquipmentPerFormationFailureIntensityPK that = (EquipmentPerFormationFailureIntensityPK) o;
+        return Objects.equals(formationId, that.formationId) &&
                 Objects.equals(equipmentId, that.equipmentId) &&
                 Objects.equals(stageId, that.stageId) &&
                 Objects.equals(repairTypeId, that.repairTypeId) &&
@@ -53,11 +53,11 @@ public class EquipmentPerBaseFailureIntensityPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(baseId, equipmentId, stageId, repairTypeId, sessionId);
+        return Objects.hash(formationId, equipmentId, stageId, repairTypeId, sessionId);
     }
 
-    public Long getBaseId() {
-        return baseId;
+    public Long getFormationId() {
+        return formationId;
     }
 
     public Long getEquipmentId() {
@@ -76,8 +76,8 @@ public class EquipmentPerBaseFailureIntensityPK implements Serializable {
         return sessionId;
     }
 
-    public EquipmentPerBaseFailureIntensityPK copy(UUID newSessionId) {
-        return new EquipmentPerBaseFailureIntensityPK(baseId, equipmentId, stageId, repairTypeId, newSessionId);
+    public EquipmentPerFormationFailureIntensityPK copy(UUID newSessionId) {
+        return new EquipmentPerFormationFailureIntensityPK(formationId, equipmentId, stageId, repairTypeId, newSessionId);
     }
 }
 

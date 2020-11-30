@@ -7,7 +7,7 @@ import java.util.Objects;
 public class LaborDistributionData {
 
     private CompositeKey compositeKey;
-    private String baseName;
+    private String formationName;
     private String equipmentName;
     private Integer laborInput;
     private Long intervalId;
@@ -23,8 +23,8 @@ public class LaborDistributionData {
     }
 
     public LaborDistributionData(EquipmentSubType subType,
-                                 Long baseId,
-                                 String baseName,
+                                 Long formationId,
+                                 String formationName,
                                  Long equipmentId,
                                  String equipmentName,
                                  Integer laborInput,
@@ -32,8 +32,8 @@ public class LaborDistributionData {
                                  Double count,
                                  Double avgLaborInput,
                                  Double avgDailyFailure) {
-        this.compositeKey = new CompositeKey(subType, baseId, equipmentId);
-        this.baseName = baseName;
+        this.compositeKey = new CompositeKey(subType, formationId, equipmentId);
+        this.formationName = formationName;
         this.equipmentName = equipmentName;
         this.laborInput = laborInput;
         this.intervalId = intervalId;
@@ -46,8 +46,8 @@ public class LaborDistributionData {
         return laborInput;
     }
 
-    public String getBaseName() {
-        return baseName;
+    public String getFormationName() {
+        return formationName;
     }
 
     public CompositeKey getCompositeKey() {
@@ -72,12 +72,12 @@ public class LaborDistributionData {
 
     public static class CompositeKey {
         private final EquipmentSubType subType;
-        private final Long baseId;
+        private final Long formationId;
         private final Long equipmentId;
 
-        public CompositeKey(EquipmentSubType subType, Long baseId, Long equipmentId) {
+        public CompositeKey(EquipmentSubType subType, Long formationId, Long equipmentId) {
             this.subType = subType;
-            this.baseId = baseId;
+            this.formationId = formationId;
             this.equipmentId = equipmentId;
         }
 
@@ -86,8 +86,8 @@ public class LaborDistributionData {
         }
 
 
-        public Long getBaseId() {
-            return baseId;
+        public Long getFormationId() {
+            return formationId;
         }
 
         @Override
@@ -96,13 +96,13 @@ public class LaborDistributionData {
             if (o == null || getClass() != o.getClass()) return false;
             CompositeKey that = (CompositeKey) o;
             return Objects.equals(subType, that.subType) &&
-                    Objects.equals(baseId, that.baseId) &&
+                    Objects.equals(formationId, that.formationId) &&
                     Objects.equals(equipmentId, that.equipmentId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(subType, baseId, equipmentId);
+            return Objects.hash(subType, formationId, equipmentId);
         }
 
         public Long getEquipmentId() {

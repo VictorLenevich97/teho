@@ -3,7 +3,7 @@ package va.rit.teho.service.implementation.labordistribution;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
-import va.rit.teho.entity.equipment.EquipmentPerBaseFailureIntensityAndLaborInput;
+import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.*;
@@ -11,7 +11,7 @@ import va.rit.teho.repository.labordistribution.LaborDistributionRepository;
 import va.rit.teho.repository.labordistribution.WorkhoursDistributionIntervalRepository;
 import va.rit.teho.service.common.CalculationService;
 import va.rit.teho.service.common.RepairTypeService;
-import va.rit.teho.service.equipment.EquipmentPerBaseService;
+import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 
 import java.util.*;
@@ -24,7 +24,7 @@ import java.util.stream.StreamSupport;
 public class LaborInputDistributionServiceImpl implements LaborInputDistributionService {
 
     private final CalculationService calculationService;
-    private final EquipmentPerBaseService equipmentPerBaseService;
+    private final EquipmentPerFormationService equipmentPerFormationService;
     private final RepairTypeService repairTypeService;
 
     private final LaborDistributionRepository laborDistributionRepository;
@@ -33,12 +33,12 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     public LaborInputDistributionServiceImpl(
             WorkhoursDistributionIntervalRepository workhoursDistributionIntervalRepository,
             CalculationService calculationService,
-            EquipmentPerBaseService equipmentPerBaseService,
+            EquipmentPerFormationService equipmentPerFormationService,
             RepairTypeService repairTypeService,
             LaborDistributionRepository laborDistributionRepository) {
         this.workhoursDistributionIntervalRepository = workhoursDistributionIntervalRepository;
         this.calculationService = calculationService;
-        this.equipmentPerBaseService = equipmentPerBaseService;
+        this.equipmentPerFormationService = equipmentPerFormationService;
         this.repairTypeService = repairTypeService;
         this.laborDistributionRepository = laborDistributionRepository;
     }
@@ -55,7 +55,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
 
         return EquipmentLaborInputDistribution
                 .builder()
-                .baseName(eir.getBaseName())
+                .formationName(eir.getFormationName())
                 .equipmentName(eir.getEquipmentName())
                 .avgDailyFailure(eir.getAvgDailyFailure())
                 .standardLaborInput(eir.getLaborInput())
@@ -85,7 +85,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     }
 
     private LaborDistribution calculateLaborDistribution(UUID sessionId,
-                                                         Long baseId,
+                                                         Long formationId,
                                                          Long equipmentId,
                                                          Double avgDailyFailure,
                                                          int standardLaborInput,
@@ -98,7 +98,12 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                                                                           standardLaborInput);
         double laborInput = calculationService.calculateEquipmentInRepairLaborInput(count, interval.getUpperBound());
 
-        return new LaborDistribution(new LaborDistributionPK(baseId, equipmentId, interval.getId(), stageId, repairTypeId, sessionId),
+        return new LaborDistribution(new LaborDistributionPK(formationId,
+                                                             equipmentId,
+                                                             interval.getId(),
+                                                             stageId,
+                                                             repairTypeId,
+                                                             sessionId),
                                      count,
                                      laborInput);
     }
@@ -108,14 +113,14 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
             Long stageId,
             Long repairTypeId,
             Double avgDailyFailure,
-            EquipmentPerBaseFailureIntensityAndLaborInput equipmentPerBaseAndLaborInput) {
+            EquipmentPerFormationFailureIntensityAndLaborInput equipmentPerFormationAndLaborInput) {
         return StreamSupport
                 .stream(workhoursDistributionIntervalRepository.findAll().spliterator(), false)
                 .map(interval -> calculateLaborDistribution(sessionId,
-                                                            equipmentPerBaseAndLaborInput.getBaseId(),
-                                                            equipmentPerBaseAndLaborInput.getEquipmentId(),
+                                                            equipmentPerFormationAndLaborInput.getFormationId(),
+                                                            equipmentPerFormationAndLaborInput.getEquipmentId(),
                                                             avgDailyFailure,
-                                                            equipmentPerBaseAndLaborInput.getLaborInput(),
+                                                            equipmentPerFormationAndLaborInput.getLaborInput(),
                                                             interval,
                                                             stageId,
                                                             repairTypeId));
@@ -123,9 +128,9 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
 
     private void calculateAndSave(Long repairTypeId,
                                   UUID sessionId,
-                                  List<EquipmentPerBaseFailureIntensityAndLaborInput> equipmentPerBases) {
+                                  List<EquipmentPerFormationFailureIntensityAndLaborInput> equipmentPerFormations) {
         List<LaborDistribution> calculated =
-                equipmentPerBases
+                equipmentPerFormations
                         .stream()
                         .flatMap(epb -> this.calculateEquipmentLaborInputDistribution(sessionId,
                                                                                       epb.getStageId(),
@@ -141,10 +146,9 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         List<RepairType> repairTypeList = repairTypeService.list(true);
         repairTypeList
                 .forEach(repairType -> {
-                    List<EquipmentPerBaseFailureIntensityAndLaborInput> equipmentPerBases = equipmentPerBaseService.listWithIntensityAndLaborInput(
-                            sessionId,
-                            repairType.getId());
-                    calculateAndSave(repairType.getId(), sessionId, equipmentPerBases);
+                    List<EquipmentPerFormationFailureIntensityAndLaborInput> equipmentPerFormations =
+                            equipmentPerFormationService.listWithIntensityAndLaborInput(sessionId, repairType.getId());
+                    calculateAndSave(repairType.getId(), sessionId, equipmentPerFormations);
                 });
     }
 

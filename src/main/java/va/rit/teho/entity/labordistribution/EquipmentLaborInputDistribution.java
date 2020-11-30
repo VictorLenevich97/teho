@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class EquipmentLaborInputDistribution {
 
-    private final String baseName;
+    private final String formationName;
     private final String equipmentName;
     private final double avgDailyFailure;
     private final int standardLaborInput;
@@ -13,13 +13,13 @@ public class EquipmentLaborInputDistribution {
     private final double totalRepairComplexity;
 
     public EquipmentLaborInputDistribution(
-            String baseName,
+            String formationName,
             String equipmentName,
             double avgDailyFailure,
             int standardLaborInput,
             Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap,
             double totalRepairComplexity) {
-        this.baseName = baseName;
+        this.formationName = formationName;
         this.equipmentName = equipmentName;
         this.avgDailyFailure = avgDailyFailure;
         this.standardLaborInput = standardLaborInput;
@@ -35,8 +35,8 @@ public class EquipmentLaborInputDistribution {
         return totalRepairComplexity;
     }
 
-    public String getBaseName() {
-        return baseName;
+    public String getFormationName() {
+        return formationName;
     }
 
     public String getEquipmentName() {
@@ -63,14 +63,14 @@ public class EquipmentLaborInputDistribution {
         return Double.compare(that.avgDailyFailure, avgDailyFailure) == 0 &&
                 standardLaborInput == that.standardLaborInput &&
                 Double.compare(that.totalRepairComplexity, totalRepairComplexity) == 0 &&
-                Objects.equals(baseName, that.baseName) &&
+                Objects.equals(formationName, that.formationName) &&
                 Objects.equals(equipmentName, that.equipmentName) &&
                 Objects.equals(intervalCountAndLaborInputMap, that.intervalCountAndLaborInputMap);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(baseName,
+        return Objects.hash(formationName,
                             equipmentName,
                             avgDailyFailure,
                             standardLaborInput,
@@ -79,15 +79,15 @@ public class EquipmentLaborInputDistribution {
     }
 
     public static class Builder {
-        private String baseName;
+        private String formationName;
         private String equipmentName;
         private double avgDailyFailure;
         private int standardLaborInput;
         private Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap;
         private double totalRepairComplexity;
 
-        public Builder baseName(String baseName) {
-            this.baseName = baseName;
+        public Builder formationName(String formationName) {
+            this.formationName = formationName;
             return this;
         }
 
@@ -117,7 +117,7 @@ public class EquipmentLaborInputDistribution {
         }
 
         public EquipmentLaborInputDistribution build() {
-            return new EquipmentLaborInputDistribution(baseName,
+            return new EquipmentLaborInputDistribution(formationName,
                                                        equipmentName,
                                                        avgDailyFailure,
                                                        standardLaborInput,

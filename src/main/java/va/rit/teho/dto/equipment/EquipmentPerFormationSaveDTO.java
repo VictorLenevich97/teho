@@ -2,7 +2,7 @@ package va.rit.teho.dto.equipment;
 
 import java.util.Map;
 
-public class EquipmentPerBaseSaveDTO {
+public class EquipmentPerFormationSaveDTO {
     Map<Long, Map<Long, Integer>> data;
     int amount;
 
@@ -14,7 +14,7 @@ public class EquipmentPerBaseSaveDTO {
         return amount;
     }
 
-    public EquipmentPerBaseSaveDTO(Map<Long, Map<Long, Integer>> data, int amount) {
+    public EquipmentPerFormationSaveDTO(Map<Long, Map<Long, Integer>> data, int amount) {
         this.data = data;
         this.amount = amount;
     }

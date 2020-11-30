@@ -1,20 +1,20 @@
 package va.rit.teho.entity.equipment;
 
-import va.rit.teho.entity.base.Base;
+import va.rit.teho.entity.formation.Formation;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-public class EquipmentPerBase {
+public class EquipmentPerFormation {
 
     @EmbeddedId
-    EquipmentPerBasePK id;
+    EquipmentPerFormationPK id;
 
     @ManyToOne
-    @MapsId("base_id")
-    @JoinColumn(name = "base_id")
-    Base base;
+    @MapsId("formation_id")
+    @JoinColumn(name = "formation_id")
+    Formation formation;
 
     @ManyToOne
     @MapsId("equipment_id")
@@ -23,15 +23,15 @@ public class EquipmentPerBase {
 
     int amount;
 
-    public EquipmentPerBase() {
+    public EquipmentPerFormation() {
     }
 
-    public EquipmentPerBase(Long baseId, Long equipmentId, Long amount) {
-        this.id = new EquipmentPerBasePK(baseId, equipmentId);
+    public EquipmentPerFormation(Long formationId, Long equipmentId, Long amount) {
+        this.id = new EquipmentPerFormationPK(formationId, equipmentId);
         this.amount = amount.intValue();
     }
 
-    public EquipmentPerBase(Equipment equipment, Long amount) {
+    public EquipmentPerFormation(Equipment equipment, Long amount) {
         this.equipment = equipment;
         this.amount = amount.intValue();
     }
@@ -40,32 +40,32 @@ public class EquipmentPerBase {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EquipmentPerBase that = (EquipmentPerBase) o;
+        EquipmentPerFormation that = (EquipmentPerFormation) o;
         return amount == that.amount &&
                 Objects.equals(id, that.id) &&
-                Objects.equals(base, that.base) &&
+                Objects.equals(formation, that.formation) &&
                 Objects.equals(equipment, that.equipment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, base, equipment, amount);
+        return Objects.hash(id, formation, equipment, amount);
     }
 
-    public EquipmentPerBasePK getId() {
+    public EquipmentPerFormationPK getId() {
         return id;
     }
 
-    public void setId(EquipmentPerBasePK id) {
+    public void setId(EquipmentPerFormationPK id) {
         this.id = id;
     }
 
-    public Base getBase() {
-        return base;
+    public Formation getFormation() {
+        return formation;
     }
 
-    public void setBase(Base base) {
-        this.base = base;
+    public void setFormation(Formation formation) {
+        this.formation = formation;
     }
 
     public Equipment getEquipment() {

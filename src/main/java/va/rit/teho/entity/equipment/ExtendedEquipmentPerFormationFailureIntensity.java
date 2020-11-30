@@ -1,21 +1,21 @@
 package va.rit.teho.entity.equipment;
 
-public abstract class ExtendedEquipmentPerBaseFailureIntensity {
+public abstract class ExtendedEquipmentPerFormationFailureIntensity {
 
-    private final Long baseId;
+    private final Long formationId;
     private final Long equipmentId;
     private final Long stageId;
     private final Long repairTypeId;
     private final int failureIntensity;
     private final Double avgDailyFailure;
 
-    public ExtendedEquipmentPerBaseFailureIntensity(Long baseId,
-                                                    Long equipmentId,
-                                                    Long stageId,
-                                                    Long repairTypeId,
-                                                    int failureIntensity,
-                                                    Double avgDailyFailure) {
-        this.baseId = baseId;
+    public ExtendedEquipmentPerFormationFailureIntensity(Long formationId,
+                                                         Long equipmentId,
+                                                         Long stageId,
+                                                         Long repairTypeId,
+                                                         int failureIntensity,
+                                                         Double avgDailyFailure) {
+        this.formationId = formationId;
         this.equipmentId = equipmentId;
         this.stageId = stageId;
         this.repairTypeId = repairTypeId;
@@ -27,8 +27,8 @@ public abstract class ExtendedEquipmentPerBaseFailureIntensity {
         return avgDailyFailure;
     }
 
-    public Long getBaseId() {
-        return baseId;
+    public Long getFormationId() {
+        return formationId;
     }
 
     public Long getEquipmentId() {

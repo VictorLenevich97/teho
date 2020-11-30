@@ -1,7 +1,6 @@
-package va.rit.teho.entity.base;
+package va.rit.teho.entity.formation;
 
-import va.rit.teho.entity.equipment.EquipmentLaborInputPerType;
-import va.rit.teho.entity.equipment.EquipmentPerBase;
+import va.rit.teho.entity.equipment.EquipmentPerFormation;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -9,8 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "base")
-public class Base implements Serializable {
+@Table(name = "formation")
+public class Formation implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,16 +20,16 @@ public class Base implements Serializable {
     private String fullName;
 
     @OneToMany(mappedBy = "equipment")
-    private Set<EquipmentPerBase> equipmentPerBases;
+    private Set<EquipmentPerFormation> equipmentPerFormations;
 
-    public Set<EquipmentPerBase> getEquipmentPerBases() {
-        return equipmentPerBases;
+    public Set<EquipmentPerFormation> getEquipmentPerFormations() {
+        return equipmentPerFormations;
     }
 
-    public Base() {
+    public Formation() {
     }
 
-    public Base(String shortName, String fullName) {
+    public Formation(String shortName, String fullName) {
         this.shortName = shortName;
         this.fullName = fullName;
     }
@@ -63,10 +62,10 @@ public class Base implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Base base = (Base) o;
-        return Objects.equals(id, base.id) &&
-                Objects.equals(shortName, base.shortName) &&
-                Objects.equals(fullName, base.fullName);
+        Formation formation = (Formation) o;
+        return Objects.equals(id, formation.id) &&
+                Objects.equals(shortName, formation.shortName) &&
+                Objects.equals(fullName, formation.fullName);
     }
 
     @Override

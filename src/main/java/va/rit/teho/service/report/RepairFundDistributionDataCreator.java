@@ -49,7 +49,7 @@ public class RepairFundDistributionDataCreator implements ReportDataCreator {
             map.get(equipmentSubType).forEach(distribution -> {
                 List<Object> row = new ArrayList<>();
                 row.addAll(Arrays.asList(
-                        distribution.getBaseName(),
+                        distribution.getFormationName(),
                         distribution.getEquipmentName(),
                         distribution.getAvgDailyFailure(),
                         (double) distribution.getStandardLaborInput())

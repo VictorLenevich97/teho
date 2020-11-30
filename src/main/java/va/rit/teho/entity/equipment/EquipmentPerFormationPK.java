@@ -6,27 +6,27 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class EquipmentPerBasePK implements Serializable {
+public class EquipmentPerFormationPK implements Serializable {
 
-    @Column(name = "base_id")
-    Long baseId;
+    @Column(name = "formation_id")
+    Long formationId;
     @Column(name = "equipment_id")
     Long equipmentId;
 
-    public EquipmentPerBasePK() {
+    public EquipmentPerFormationPK() {
     }
 
-    public EquipmentPerBasePK(Long baseId, Long equipmentId) {
-        this.baseId = baseId;
+    public EquipmentPerFormationPK(Long formationId, Long equipmentId) {
+        this.formationId = formationId;
         this.equipmentId = equipmentId;
     }
 
-    public Long getBaseId() {
-        return baseId;
+    public Long getFormationId() {
+        return formationId;
     }
 
-    public void setBaseId(Long baseId) {
-        this.baseId = baseId;
+    public void setFormationId(Long formationId) {
+        this.formationId = formationId;
     }
 
     public Long getEquipmentId() {
@@ -41,13 +41,13 @@ public class EquipmentPerBasePK implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        EquipmentPerBasePK that = (EquipmentPerBasePK) o;
-        return Objects.equals(baseId, that.baseId) &&
+        EquipmentPerFormationPK that = (EquipmentPerFormationPK) o;
+        return Objects.equals(formationId, that.formationId) &&
                 Objects.equals(equipmentId, that.equipmentId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(baseId, equipmentId);
+        return Objects.hash(formationId, equipmentId);
     }
 }

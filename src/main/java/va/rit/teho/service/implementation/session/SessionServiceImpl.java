@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.session.SessionRepository;
-import va.rit.teho.service.equipment.EquipmentPerBaseService;
+import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.repairdivision.RepairCapabilitiesService;
 import va.rit.teho.service.repairdivision.RepairDivisionService;
@@ -20,18 +20,18 @@ public class SessionServiceImpl implements SessionService {
 
     private final SessionRepository sessionRepository;
 
-    private final EquipmentPerBaseService equipmentPerBaseService;
+    private final EquipmentPerFormationService equipmentPerFormationService;
     private final RepairDivisionService repairDivisionService;
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final LaborInputDistributionService laborInputDistributionService;
 
     public SessionServiceImpl(SessionRepository sessionRepository,
-                              EquipmentPerBaseService equipmentPerBaseService,
+                              EquipmentPerFormationService equipmentPerFormationService,
                               RepairDivisionService repairDivisionService,
                               RepairCapabilitiesService repairCapabilitiesService,
                               LaborInputDistributionService laborInputDistributionService) {
         this.sessionRepository = sessionRepository;
-        this.equipmentPerBaseService = equipmentPerBaseService;
+        this.equipmentPerFormationService = equipmentPerFormationService;
         this.repairDivisionService = repairDivisionService;
         this.repairCapabilitiesService = repairCapabilitiesService;
         this.laborInputDistributionService = laborInputDistributionService;
@@ -58,7 +58,7 @@ public class SessionServiceImpl implements SessionService {
     public TehoSession copy(UUID sessionId, String name) {
         get(sessionId); //проверка на существование
         TehoSession newSession = create(name);
-        equipmentPerBaseService.copyEquipmentPerBaseData(sessionId, newSession.getId());
+        equipmentPerFormationService.copyEquipmentPerFormationData(sessionId, newSession.getId());
         repairDivisionService.copyEquipmentStaff(sessionId, newSession.getId());
         repairCapabilitiesService.copyRepairCapabilities(sessionId, newSession.getId());
         laborInputDistributionService.copyLaborInputDistributionData(sessionId, newSession.getId());

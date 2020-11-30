@@ -1,7 +1,7 @@
 package va.rit.teho.entity.session;
 
 import org.hibernate.annotations.GenericGenerator;
-import va.rit.teho.entity.equipment.EquipmentPerBaseFailureIntensity;
+import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
 import va.rit.teho.entity.labordistribution.LaborDistribution;
 import va.rit.teho.entity.repairdivision.RepairDivisionUnitEquipmentStaff;
 import va.rit.teho.entity.repairdivision.RepairDivisionUnitRepairCapability;
@@ -36,7 +36,7 @@ public class TehoSession implements Serializable {
     private Set<RepairDivisionUnitRepairCapability> repairDivisionRepairCapabilities;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tehoSession", orphanRemoval = true)
-    private Set<EquipmentPerBaseFailureIntensity> equipmentPerBaseFailureIntensities;
+    private Set<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensities;
 
     @Column(name = "creation_ts")
     private Instant creationTimestamp;

@@ -1,6 +1,6 @@
 package va.rit.teho.entity.labordistribution;
 
-import va.rit.teho.entity.base.Base;
+import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.Equipment;
@@ -17,9 +17,9 @@ public class LaborDistribution {
     LaborDistributionPK laborDistributionId;
 
     @ManyToOne
-    @MapsId("base_id")
-    @JoinColumn(name = "base_id")
-    Base base;
+    @MapsId("formation_id")
+    @JoinColumn(name = "formation_id")
+    Formation formation;
 
     @ManyToOne
     @MapsId("equipment_id")
@@ -85,12 +85,12 @@ public class LaborDistribution {
         this.laborDistributionId = laborDistributionId;
     }
 
-    public Base getBase() {
-        return base;
+    public Formation getFormation() {
+        return formation;
     }
 
-    public void setBase(Base base) {
-        this.base = base;
+    public void setFormation(Formation formation) {
+        this.formation = formation;
     }
 
     public Equipment getEquipment() {
@@ -121,14 +121,15 @@ public class LaborDistribution {
         return Double.compare(that.count, count) == 0 &&
                 Double.compare(that.avgLaborInput, avgLaborInput) == 0 &&
                 Objects.equals(laborDistributionId, that.laborDistributionId) &&
-                Objects.equals(base, that.base) &&
+                Objects.equals(formation, that.formation) &&
                 Objects.equals(equipment, that.equipment) &&
                 Objects.equals(workhoursDistributionInterval, that.workhoursDistributionInterval);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(laborDistributionId, base, equipment, workhoursDistributionInterval, count, avgLaborInput);
+        return Objects.hash(laborDistributionId,
+                            formation, equipment, workhoursDistributionInterval, count, avgLaborInput);
     }
 
     public void setTehoSession(TehoSession tehoSession) {
