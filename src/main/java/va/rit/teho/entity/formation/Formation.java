@@ -19,6 +19,10 @@ public class Formation implements Serializable {
 
     private String fullName;
 
+    @ManyToOne
+    @JoinColumn(name = "parent_formation_id")
+    private Formation parentFormation;
+
     @OneToMany(mappedBy = "equipment")
     private Set<EquipmentPerFormation> equipmentPerFormations;
 
@@ -32,6 +36,10 @@ public class Formation implements Serializable {
     public Formation(String shortName, String fullName) {
         this.shortName = shortName;
         this.fullName = fullName;
+    }
+
+    public Formation getParentFormation() {
+        return parentFormation;
     }
 
     public Long getId() {

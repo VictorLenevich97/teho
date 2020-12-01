@@ -7,8 +7,8 @@ import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.session.SessionRepository;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
-import va.rit.teho.service.repairdivision.RepairCapabilitiesService;
-import va.rit.teho.service.repairdivision.RepairDivisionService;
+import va.rit.teho.service.repairformation.RepairCapabilitiesService;
+import va.rit.teho.service.repairformation.RepairFormationService;
 import va.rit.teho.service.session.SessionService;
 
 import java.util.List;
@@ -21,18 +21,18 @@ public class SessionServiceImpl implements SessionService {
     private final SessionRepository sessionRepository;
 
     private final EquipmentPerFormationService equipmentPerFormationService;
-    private final RepairDivisionService repairDivisionService;
+    private final RepairFormationService repairFormationService;
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final LaborInputDistributionService laborInputDistributionService;
 
     public SessionServiceImpl(SessionRepository sessionRepository,
                               EquipmentPerFormationService equipmentPerFormationService,
-                              RepairDivisionService repairDivisionService,
+                              RepairFormationService repairFormationService,
                               RepairCapabilitiesService repairCapabilitiesService,
                               LaborInputDistributionService laborInputDistributionService) {
         this.sessionRepository = sessionRepository;
         this.equipmentPerFormationService = equipmentPerFormationService;
-        this.repairDivisionService = repairDivisionService;
+        this.repairFormationService = repairFormationService;
         this.repairCapabilitiesService = repairCapabilitiesService;
         this.laborInputDistributionService = laborInputDistributionService;
     }
@@ -59,7 +59,7 @@ public class SessionServiceImpl implements SessionService {
         get(sessionId); //проверка на существование
         TehoSession newSession = create(name);
         equipmentPerFormationService.copyEquipmentPerFormationData(sessionId, newSession.getId());
-        repairDivisionService.copyEquipmentStaff(sessionId, newSession.getId());
+        repairFormationService.copyEquipmentStaff(sessionId, newSession.getId());
         repairCapabilitiesService.copyRepairCapabilities(sessionId, newSession.getId());
         laborInputDistributionService.copyLaborInputDistributionData(sessionId, newSession.getId());
         return newSession;

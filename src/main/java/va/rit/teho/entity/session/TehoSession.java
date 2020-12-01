@@ -3,8 +3,8 @@ package va.rit.teho.entity.session;
 import org.hibernate.annotations.GenericGenerator;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
 import va.rit.teho.entity.labordistribution.LaborDistribution;
-import va.rit.teho.entity.repairdivision.RepairDivisionUnitEquipmentStaff;
-import va.rit.teho.entity.repairdivision.RepairDivisionUnitRepairCapability;
+import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
+import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -30,10 +30,10 @@ public class TehoSession implements Serializable {
     private Set<LaborDistribution> laborDistributionSet;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tehoSession", orphanRemoval = true)
-    private Set<RepairDivisionUnitEquipmentStaff> repairDivisionUnitEquipmentStaffSet;
+    private Set<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffSet;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tehoSession", orphanRemoval = true)
-    private Set<RepairDivisionUnitRepairCapability> repairDivisionRepairCapabilities;
+    private Set<RepairFormationUnitRepairCapability> repairFormationRepairCapabilities;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tehoSession", orphanRemoval = true)
     private Set<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensities;
@@ -65,7 +65,7 @@ public class TehoSession implements Serializable {
         return laborDistributionSet;
     }
 
-    public Set<RepairDivisionUnitEquipmentStaff> getRepairDivisionUnitEquipmentStaffSet() {
-        return repairDivisionUnitEquipmentStaffSet;
+    public Set<RepairFormationUnitEquipmentStaff> getRepairFormationUnitEquipmentStaffSet() {
+        return repairFormationUnitEquipmentStaffSet;
     }
 }
