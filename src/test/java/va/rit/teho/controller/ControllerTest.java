@@ -16,8 +16,8 @@ import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.implementation.common.RepairTypeServiceImpl;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.repairformation.RepairCapabilitiesService;
-import va.rit.teho.service.repairformation.RepairFormationService;
-import va.rit.teho.service.repairformation.RepairFormationUnitTypeService;
+import va.rit.teho.service.repairformation.RepairFormationUnitService;
+import va.rit.teho.service.repairformation.RepairFormationTypeService;
 
 public abstract class ControllerTest {
 
@@ -36,10 +36,10 @@ public abstract class ControllerTest {
     protected RepairCapabilitiesService repairCapabilitiesService;
 
     @MockBean
-    protected RepairFormationService repairFormationService;
+    protected RepairFormationUnitService repairFormationUnitService;
 
     @MockBean
-    protected RepairFormationUnitTypeService repairFormationUnitTypeService;
+    protected RepairFormationTypeService repairFormationTypeService;
 
     @MockBean
     protected RepairTypeServiceImpl repairTypeService;

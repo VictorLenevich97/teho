@@ -27,7 +27,7 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
     public void testListRepairStationTypes() throws Exception {
         RepairStationType repairStationType = new RepairStationType("stationType");
         List<RepairStationType> repairStationTypes = Collections.singletonList(repairStationType);
-        when(repairFormationUnitTypeService.listTypes()).thenReturn(null);
+        when(repairFormationTypeService.listTypes()).thenReturn(null);
 
         mockMvc.perform(get("/repair-station/type"))
                .andExpect(status().isOk())
@@ -38,7 +38,7 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
     public void testAddRepairStationType() throws Exception {
         RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(null, "name", 2, 22);
 
-        when(repairFormationUnitTypeService
+        when(repairFormationTypeService
                      .addType(repairFormationTypeDTO.getName(),
                               repairFormationTypeDTO.getWorkingHoursMin(),
                               repairFormationTypeDTO.getWorkingHoursMax())).thenReturn(2L);
@@ -46,9 +46,9 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
         mockMvc.perform(post("/repair-station/type").contentType(MediaType.APPLICATION_JSON)
                                                     .content(objectMapper.writeValueAsString(repairFormationTypeDTO)))
                .andExpect(status().isCreated());
-        verify(repairFormationUnitTypeService).addType(repairFormationTypeDTO.getName(),
-                                                       repairFormationTypeDTO.getWorkingHoursMin(),
-                                                       repairFormationTypeDTO.getWorkingHoursMax());
+        verify(repairFormationTypeService).addType(repairFormationTypeDTO.getName(),
+                                                   repairFormationTypeDTO.getWorkingHoursMin(),
+                                                   repairFormationTypeDTO.getWorkingHoursMax());
     }
 
     @Test
@@ -61,9 +61,9 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
                                                                       .content(objectMapper.writeValueAsString(
                                                                               repairFormationTypeDTO)))
                .andExpect(status().isAccepted());
-        verify(repairFormationUnitTypeService).updateType(repairFormationTypeDTO.getId(),
-                                                          repairFormationTypeDTO.getName(),
-                                                          repairFormationTypeDTO.getWorkingHoursMin(),
-                                                          repairFormationTypeDTO.getWorkingHoursMax());
+        verify(repairFormationTypeService).updateType(repairFormationTypeDTO.getId(),
+                                                      repairFormationTypeDTO.getName(),
+                                                      repairFormationTypeDTO.getWorkingHoursMin(),
+                                                      repairFormationTypeDTO.getWorkingHoursMax());
     }
 }

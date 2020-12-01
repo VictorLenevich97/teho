@@ -9,9 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.formation.FormationDTO;
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.equipment.EquipmentService;
+import va.rit.teho.service.formation.FormationService;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -47,7 +47,8 @@ public class FormationController {
 
     @PutMapping("/{formationId}")
     @ApiOperation(value = "Обновить Часть/Подразделение")
-    public ResponseEntity<Object> updateFormation(@PathVariable Long formationId, @RequestBody FormationDTO formationModel) {
+    public ResponseEntity<Object> updateFormation(@PathVariable Long formationId,
+                                                  @RequestBody FormationDTO formationModel) {
         formationService.update(formationId, formationModel.getShortName(), formationModel.getFullName());
         return ResponseEntity.accepted().build();
     }
@@ -63,7 +64,7 @@ public class FormationController {
     @ResponseBody
     @ApiOperation(value = "Получить подробности о Часть/Подразделение")
     public ResponseEntity<FormationDTO> getFormation(@PathVariable Long formationId) {
-        return ResponseEntity.ok(FormationDTO.from(formationService.get(formationId)));
+        return ResponseEntity.ok(FormationDTO.from(formationService.get(formationId), true));
     }
 
 }

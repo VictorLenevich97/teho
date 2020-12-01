@@ -18,4 +18,10 @@ public interface RepairFormationUnitRepository extends PagingAndSortingRepositor
             "ORDER BY rdu.id ASC")
     List<RepairFormationUnit> findSorted(List<Long> repairFormationUnitIds, Pageable pageable);
 
+
+    @Query("SELECT rdu from RepairFormationUnit rdu WHERE rdu.repairFormation.id = :repairFormationId AND " +
+            "(coalesce(:repairFormationUnitIds, null) is null or rdu.id in (:repairFormationUnitIds)) " +
+            "ORDER BY rdu.id ASC")
+    List<RepairFormationUnit> findSorted(Long repairFormationId, List<Long> repairFormationUnitIds, Pageable pageable);
+
 }

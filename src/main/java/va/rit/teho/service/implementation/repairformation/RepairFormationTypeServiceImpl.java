@@ -7,17 +7,17 @@ import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.repairformation.RepairFormationUnitTypeRepository;
-import va.rit.teho.service.repairformation.RepairFormationUnitTypeService;
+import va.rit.teho.service.repairformation.RepairFormationTypeService;
 
 import java.util.List;
 
 @Service
 @Transactional
-public class RepairFormationUnitTypeServiceImpl implements RepairFormationUnitTypeService {
+public class RepairFormationTypeServiceImpl implements RepairFormationTypeService {
 
     private final RepairFormationUnitTypeRepository repairFormationUnitTypeRepository;
 
-    public RepairFormationUnitTypeServiceImpl(RepairFormationUnitTypeRepository repairFormationUnitTypeRepository) {
+    public RepairFormationTypeServiceImpl(RepairFormationUnitTypeRepository repairFormationUnitTypeRepository) {
         this.repairFormationUnitTypeRepository = repairFormationUnitTypeRepository;
     }
 

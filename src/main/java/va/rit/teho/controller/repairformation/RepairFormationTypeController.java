@@ -9,49 +9,49 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.repairformation.RepairFormationTypeDTO;
-import va.rit.teho.service.repairformation.RepairFormationUnitTypeService;
+import va.rit.teho.service.repairformation.RepairFormationTypeService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "repair-formation-type", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "formation/repair-formation/type", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Типы РВО")
 public class RepairFormationTypeController {
 
-    private final RepairFormationUnitTypeService repairFormationUnitTypeService;
+    private final RepairFormationTypeService repairFormationTypeService;
 
-    public RepairFormationTypeController(RepairFormationUnitTypeService repairFormationUnitTypeService) {
-        this.repairFormationUnitTypeService = repairFormationUnitTypeService;
+    public RepairFormationTypeController(RepairFormationTypeService repairFormationTypeService) {
+        this.repairFormationTypeService = repairFormationTypeService;
     }
 
     @GetMapping
     @ApiOperation(value = "Получение списка типов РВО")
     public ResponseEntity<List<RepairFormationTypeDTO>> listRepairStationTypes() {
-        List<RepairFormationTypeDTO> repairFormationTypeDTOList = repairFormationUnitTypeService.listTypes()
-                                                                                                .stream()
-                                                                                                .map(RepairFormationTypeDTO::from)
-                                                                                                .collect(Collectors.toList());
+        List<RepairFormationTypeDTO> repairFormationTypeDTOList = repairFormationTypeService.listTypes()
+                                                                                            .stream()
+                                                                                            .map(RepairFormationTypeDTO::from)
+                                                                                            .collect(Collectors.toList());
         return ResponseEntity.ok(repairFormationTypeDTOList);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавление типа РВО")
     public ResponseEntity<Object> addRepairStationType(@ApiParam(value = "Данные о типе РВО", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
-        repairFormationUnitTypeService.addType(repairFormationTypeDTO.getName(),
-                                               repairFormationTypeDTO.getWorkingHoursMin(),
-                                               repairFormationTypeDTO.getWorkingHoursMax());
+        repairFormationTypeService.addType(repairFormationTypeDTO.getName(),
+                                           repairFormationTypeDTO.getWorkingHoursMin(),
+                                           repairFormationTypeDTO.getWorkingHoursMax());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{typeId}")
+    @PutMapping(path = "/{typeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление типа РВО")
     public ResponseEntity<Object> updateRepairStationType(@ApiParam(value = "Ключ типа РВО", required = true) @PathVariable Long typeId,
                                                           @ApiParam(value = "Данные о типе РВО", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
-        repairFormationUnitTypeService.updateType(typeId,
-                                                  repairFormationTypeDTO.getName(),
-                                                  repairFormationTypeDTO.getWorkingHoursMin(),
-                                                  repairFormationTypeDTO.getWorkingHoursMax());
+        repairFormationTypeService.updateType(typeId,
+                                              repairFormationTypeDTO.getName(),
+                                              repairFormationTypeDTO.getWorkingHoursMin(),
+                                              repairFormationTypeDTO.getWorkingHoursMax());
         return ResponseEntity.accepted().build();
     }
 

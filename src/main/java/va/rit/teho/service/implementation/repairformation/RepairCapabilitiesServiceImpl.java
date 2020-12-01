@@ -12,7 +12,7 @@ import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.repairformation.RepairFormationUnitRepairCapabilityRepository;
 import va.rit.teho.service.common.CalculationService;
 import va.rit.teho.service.repairformation.RepairCapabilitiesService;
-import va.rit.teho.service.repairformation.RepairFormationService;
+import va.rit.teho.service.repairformation.RepairFormationUnitService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,15 +28,15 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     private final RepairFormationUnitRepairCapabilityRepository calculatedRepairCapabilitiesPerDayRepository;
 
     private final CalculationService calculationService;
-    private final RepairFormationService repairFormationService;
+    private final RepairFormationUnitService repairFormationUnitService;
 
     public RepairCapabilitiesServiceImpl(
             RepairFormationUnitRepairCapabilityRepository calculatedRepairCapabilitiesPerDayRepository,
             CalculationService calculationService,
-            RepairFormationService repairFormationService) {
+            RepairFormationUnitService repairFormationUnitService) {
         this.calculatedRepairCapabilitiesPerDayRepository = calculatedRepairCapabilitiesPerDayRepository;
         this.calculationService = calculationService;
-        this.repairFormationService = repairFormationService;
+        this.repairFormationUnitService = repairFormationUnitService;
     }
 
     private Function<Equipment, RepairFormationUnitRepairCapability> getCalculatedRepairCapabilitesPerDay(UUID sessionId,
@@ -80,7 +80,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
 
     @Override
     public void calculateAndUpdateRepairCapabilities(UUID sessionId, Long repairTypeId) {
-        List<RepairFormationUnitEquipmentStaff> repairFormationStaff = repairFormationService.listRepairFormationUnitEquipmentStaff(sessionId);
+        List<RepairFormationUnitEquipmentStaff> repairFormationStaff = repairFormationUnitService.listEquipmentStaff(sessionId);
         calculateAndUpdateRepairCapabilities(sessionId, repairFormationStaff, repairTypeId);
     }
 
@@ -106,7 +106,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                                                Long repairFormationUnitId,
                                                                Long repairTypeId) {
         List<RepairFormationUnitEquipmentStaff> repairFormationUnitStaff =
-                repairFormationService.listRepairFormationUnitEquipmentStaff(repairFormationUnitId, sessionId);
+                repairFormationUnitService.listEquipmentStaff(repairFormationUnitId, sessionId);
 
         calculateAndUpdateRepairCapabilities(sessionId, repairFormationUnitStaff, repairTypeId);
     }

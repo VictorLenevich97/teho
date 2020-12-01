@@ -4,7 +4,7 @@ import va.rit.teho.entity.repairformation.RepairFormationType;
 
 import java.util.List;
 
-public interface RepairFormationUnitTypeService {
+public interface RepairFormationTypeService {
 
     RepairFormationType get(Long id);
 

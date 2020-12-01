@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "repair-station", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "repair-station", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Мастерские")
 public class RepairStationController {
     private final RepairStationService repairStationService;
@@ -23,7 +23,7 @@ public class RepairStationController {
         this.repairStationService = repairStationService;
     }
 
-    @GetMapping("/type")
+    @GetMapping(path = "/type", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<List<IdAndNameDTO>> listRepairStationTypes() {
         return ResponseEntity.ok(repairStationService

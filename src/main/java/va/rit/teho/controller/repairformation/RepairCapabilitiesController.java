@@ -18,7 +18,7 @@ import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.repairformation.RepairCapabilitiesService;
-import va.rit.teho.service.repairformation.RepairFormationService;
+import va.rit.teho.service.repairformation.RepairFormationUnitService;
 
 import javax.annotation.Resource;
 import java.util.Collections;
@@ -27,21 +27,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "repair-capabilities", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "repair-capabilities", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Производственные возможности РВО")
 public class RepairCapabilitiesController {
 
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final EquipmentService equipmentService;
-    private final RepairFormationService repairFormationService;
+    private final RepairFormationUnitService repairFormationUnitService;
 
     public RepairCapabilitiesController(
             RepairCapabilitiesService repairCapabilitiesService,
             EquipmentService equipmentService,
-            RepairFormationService repairFormationService) {
+            RepairFormationUnitService repairFormationUnitService) {
         this.repairCapabilitiesService = repairCapabilitiesService;
         this.equipmentService = equipmentService;
-        this.repairFormationService = repairFormationService;
+        this.repairFormationUnitService = repairFormationUnitService;
     }
 
     @Resource
@@ -50,7 +50,7 @@ public class RepairCapabilitiesController {
     /**
      * Расчет производственных возможностей РВО по ремонту (сразу для всех РВО по всем ВВСТ).
      */
-    @PostMapping("/repair-type/{id}")
+    @PostMapping(path = "/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для всех РВО по всем ВВСТ)")
     public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGet(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId) {
@@ -65,7 +65,7 @@ public class RepairCapabilitiesController {
                                                100);
     }
 
-    @PostMapping("/repair-type/{id}/repair-formation/{repairFormationUnitId}")
+    @PostMapping(path = "/repair-type/{id}/repair-formation/{repairFormationUnitId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для указанного РВО)")
     public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGetPerStation(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId,
@@ -152,9 +152,9 @@ public class RepairCapabilitiesController {
             @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
-        List<RepairFormationUnit> repairFormationUnitList = repairFormationService.listUnits(repairFormationUnitId,
-                                                                                             pageNum,
-                                                                                             pageSize);
+        List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(repairFormationUnitId,
+                                                                                            pageNum,
+                                                                                            pageSize);
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped =
                 equipmentService.listGroupedByTypes(equipmentId,
                                                     equipmentSubTypeId,

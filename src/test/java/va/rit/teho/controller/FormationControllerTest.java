@@ -59,7 +59,7 @@ public class FormationControllerTest extends ControllerTest {
     @Test
     public void testAddBase() throws Exception {
         Long formationId = 1L;
-        FormationDTO base = new FormationDTO(formationId, "short", "full", Collections.emptyList());
+        FormationDTO base = new FormationDTO(formationId, "short", "full", null, Collections.emptyList());
         when(formationService.add(base.getShortName(), base.getFullName())).thenReturn(formationId);
 
         mockMvc.perform(
@@ -72,7 +72,7 @@ public class FormationControllerTest extends ControllerTest {
     @Test
     public void testUpdateBase() throws Exception {
         Long formationId = 1L;
-        FormationDTO base = new FormationDTO(formationId, "short", "full", Collections.emptyList());
+        FormationDTO base = new FormationDTO(formationId, "short", "full", null, Collections.emptyList());
         when(formationService.add(base.getShortName(), base.getFullName())).thenReturn(formationId);
 
         mockMvc.perform(

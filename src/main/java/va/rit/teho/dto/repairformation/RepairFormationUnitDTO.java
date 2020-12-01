@@ -10,7 +10,7 @@ import java.util.List;
 public class RepairFormationUnitDTO {
     private Long id;
     private String name;
-    private RepairFormationDTO repairFormationDTO;
+    private RepairFormationDTO repairFormation;
     private IdAndNameDTO stationType;
     private Integer amount;
     private List<RepairFormationUnitEquipmentStaffDTO> staff;
@@ -29,12 +29,12 @@ public class RepairFormationUnitDTO {
 
     public RepairFormationUnitDTO(Long id,
                                   String name,
-                                  RepairFormationDTO repairFormationDTO,
+                                  RepairFormationDTO repairFormation,
                                   IdAndNameDTO stationType,
                                   Integer amount) {
         this.id = id;
         this.name = name;
-        this.repairFormationDTO = repairFormationDTO;
+        this.repairFormation = repairFormation;
         this.stationType = stationType;
         this.amount = amount;
     }
@@ -73,8 +73,8 @@ public class RepairFormationUnitDTO {
         this.name = name;
     }
 
-    public RepairFormationDTO getRepairFormationDTO() {
-        return repairFormationDTO;
+    public RepairFormationDTO getRepairFormation() {
+        return repairFormation;
     }
 
     public Integer getAmount() {
