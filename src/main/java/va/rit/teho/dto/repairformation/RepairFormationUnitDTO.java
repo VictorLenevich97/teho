@@ -10,7 +10,7 @@ import java.util.List;
 public class RepairFormationUnitDTO {
     private Long id;
     private String name;
-    private RepairFormationTypeDTO type;
+    private RepairFormationDTO repairFormationDTO;
     private IdAndNameDTO stationType;
     private Integer amount;
     private List<RepairFormationUnitEquipmentStaffDTO> staff;
@@ -29,12 +29,12 @@ public class RepairFormationUnitDTO {
 
     public RepairFormationUnitDTO(Long id,
                                   String name,
-                                  RepairFormationTypeDTO type,
+                                  RepairFormationDTO repairFormationDTO,
                                   IdAndNameDTO stationType,
                                   Integer amount) {
         this.id = id;
         this.name = name;
-        this.type = type;
+        this.repairFormationDTO = repairFormationDTO;
         this.stationType = stationType;
         this.amount = amount;
     }
@@ -42,9 +42,9 @@ public class RepairFormationUnitDTO {
     public static RepairFormationUnitDTO from(RepairFormationUnit repairFormationUnit) {
         return new RepairFormationUnitDTO(repairFormationUnit.getId(),
                                           repairFormationUnit.getName(),
-                                          RepairFormationTypeDTO.from(repairFormationUnit.getRepairFormation().getRepairFormationType()),
+                                          RepairFormationDTO.from(repairFormationUnit.getRepairFormation(), false),
                                           new IdAndNameDTO(repairFormationUnit.getRepairStationType().getId(),
-                                                          repairFormationUnit.getRepairStationType().getName()),
+                                                           repairFormationUnit.getRepairStationType().getName()),
                                           repairFormationUnit.getStationAmount());
     }
 
@@ -73,14 +73,9 @@ public class RepairFormationUnitDTO {
         this.name = name;
     }
 
-    public RepairFormationTypeDTO getType() {
-        return type;
+    public RepairFormationDTO getRepairFormationDTO() {
+        return repairFormationDTO;
     }
-
-    public void setType(RepairFormationTypeDTO type) {
-        this.type = type;
-    }
-
 
     public Integer getAmount() {
         return amount;

@@ -91,10 +91,10 @@ public class RepairFormationController {
 
     @PostMapping
     @ApiOperation(value = "Добавление РВО")
-    public ResponseEntity<Object> addRepairFormationUnit(@ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
-        //TODO: change typeId to formationId
+    public ResponseEntity<Object> addRepairFormationUnit(
+            @ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
         repairFormationService.addUnit(repairFormationUnitDTO.getName(),
-                                       repairFormationUnitDTO.getType().getId(),
+                                       repairFormationUnitDTO.getRepairFormationDTO().getId(),
                                        repairFormationUnitDTO.getStationType().getId(),
                                        repairFormationUnitDTO.getAmount());
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -104,10 +104,9 @@ public class RepairFormationController {
     @ApiOperation(value = "Обновление РВО")
     public ResponseEntity<Object> updateRepairFormationUnit(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
                                                            @ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
-        //TODO: change typeId to formationId
         repairFormationService.updateUnit(repairFormationUnitId,
                                           repairFormationUnitDTO.getName(),
-                                          repairFormationUnitDTO.getType().getId(),
+                                          repairFormationUnitDTO.getRepairFormationDTO().getId(),
                                           repairFormationUnitDTO.getStationType().getId(),
                                           repairFormationUnitDTO.getAmount());
         return ResponseEntity.accepted().build();
