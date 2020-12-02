@@ -108,7 +108,7 @@ public class LaborInputDistributionController {
                                             Formatter.formatDouble(elid.getTotalRepairComplexity()));
     }
 
-    @PostMapping(path = "/{coefficient}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/{coefficient}")
     @ApiOperation(value = "Обновить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта")
     public ResponseEntity<Object> updateDistributionData(@ApiParam(value = "Коэффициент (k), используемый в расчетах", required = true) @PathVariable Double coefficient) {
         equipmentPerFormationService.updateAvgDailyFailureData(tehoSession.getSessionId(), coefficient);
