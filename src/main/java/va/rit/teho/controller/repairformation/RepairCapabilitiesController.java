@@ -34,6 +34,8 @@ public class RepairCapabilitiesController {
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final EquipmentService equipmentService;
     private final RepairFormationUnitService repairFormationUnitService;
+    @Resource
+    private TehoSessionData tehoSession;
 
     public RepairCapabilitiesController(
             RepairCapabilitiesService repairCapabilitiesService,
@@ -43,9 +45,6 @@ public class RepairCapabilitiesController {
         this.equipmentService = equipmentService;
         this.repairFormationUnitService = repairFormationUnitService;
     }
-
-    @Resource
-    private TehoSessionData tehoSession;
 
     /**
      * Расчет производственных возможностей РВО по ремонту (сразу для всех РВО по всем ВВСТ).

@@ -13,12 +13,12 @@ import va.rit.teho.dto.equipment.EquipmentPerFormationSaveDTO;
 import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
-import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
+import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.common.StageService;
@@ -30,7 +30,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "ВВСТ по ВЧ")
 public class EquipmentPerFormationController {
 
@@ -50,7 +50,7 @@ public class EquipmentPerFormationController {
     }
 
 
-    @PostMapping("/formation/{formationId}/equipment/{equipmentId}")
+    @PostMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить ВВСТ в ВЧ")
     public ResponseEntity<Object> addEquipmentToFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
                                                           @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
@@ -71,7 +71,7 @@ public class EquipmentPerFormationController {
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping("/formation/{formationId}/equipment/{equipmentId}")
+    @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить ВВСТ в ВЧ")
     public ResponseEntity<Object> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
                                                              @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
@@ -81,17 +81,17 @@ public class EquipmentPerFormationController {
                                                                 equipmentId,
                                                                 equipmentPerFormationSaveDTO.getAmount());
         equipmentPerFormationSaveDTO.getData().forEach((stageId, repairTypeIntensityMap) ->
-                                                          repairTypeIntensityMap
-                                                                  .forEach((repairTypeId, intensity) ->
-                                                                                   equipmentPerFormationService
-                                                                                           .setEquipmentPerFormationFailureIntensity(
-                                                                                                   tehoSession
-                                                                                                           .getSessionId(),
-                                                                                                   formationId,
-                                                                                                   equipmentId,
-                                                                                                   repairTypeId,
-                                                                                                   stageId,
-                                                                                                   intensity)));
+                                                               repairTypeIntensityMap
+                                                                       .forEach((repairTypeId, intensity) ->
+                                                                                        equipmentPerFormationService
+                                                                                                .setEquipmentPerFormationFailureIntensity(
+                                                                                                        tehoSession
+                                                                                                                .getSessionId(),
+                                                                                                        formationId,
+                                                                                                        equipmentId,
+                                                                                                        repairTypeId,
+                                                                                                        stageId,
+                                                                                                        intensity)));
         return ResponseEntity.accepted().build();
     }
 
@@ -116,7 +116,9 @@ public class EquipmentPerFormationController {
                                                                                    Function<T, String> formatter,
                                                                                    List<Long> equipmentIds) {
         Map<Pair<Formation, Equipment>, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> failureIntensityData =
-                equipmentPerFormationService.getFailureIntensityData(tehoSession.getSessionId(), formationId, equipmentIds);
+                equipmentPerFormationService.getFailureIntensityData(tehoSession.getSessionId(),
+                                                                     formationId,
+                                                                     equipmentIds);
         return getTableDataDTO(formationId,
                                (epb) -> Pair.of(epb.getFormation(), epb.getEquipment()),
                                getter,
@@ -214,13 +216,15 @@ public class EquipmentPerFormationController {
                 data.computeIfAbsent(s.getId().toString(), (e) -> new HashMap<>())
                     .put(rt.getId().toString(),
                          formatter
-                                    .apply(equipmentPerFormationFailureIntensity == null ?
+                                 .apply(equipmentPerFormationFailureIntensity == null ?
                                                 defaultValue : getter.apply(equipmentPerFormationFailureIntensity) == null ?
                                          defaultValue : getter.apply(equipmentPerFormationFailureIntensity)));
             }
         }
         return new EquipmentFailureIntensityRowData<>(epb.getEquipment().getId(),
-                                                      epb.getFormation() == null ? "" : epb.getFormation().getShortName(),
+                                                      epb.getFormation() == null ? "" : epb
+                                                              .getFormation()
+                                                              .getShortName(),
                                                       epb.getEquipment().getName(),
                                                       epb.getAmount(),
                                                       data);

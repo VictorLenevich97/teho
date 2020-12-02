@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "formation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "formation", produces = MediaType.APPLICATION_JSON_VALUE)
 @Transactional
 @Api(tags = "Часть/Подразделение")
 public class FormationController {
@@ -35,7 +35,7 @@ public class FormationController {
         this.equipmentPerFormationService = equipmentPerFormationService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @ApiOperation(value = "Добавить Часть/Подразделение")
     public ResponseEntity<Object> addFormation(@RequestBody FormationDTO formationModel) {
@@ -45,7 +45,7 @@ public class FormationController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{formationId}")
+    @PutMapping(path = "/{formationId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить Часть/Подразделение")
     public ResponseEntity<Object> updateFormation(@PathVariable Long formationId,
                                                   @RequestBody FormationDTO formationModel) {

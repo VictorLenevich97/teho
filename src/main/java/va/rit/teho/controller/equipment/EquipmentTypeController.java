@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "equipment-type", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "equipment-type", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Типы и подтипы ВВСТ")
 public class EquipmentTypeController {
 
@@ -82,14 +82,14 @@ public class EquipmentTypeController {
                                                                  typeWithSubTypes.getSecond()));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить тип ВВСТ")
     public ResponseEntity<Object> addEquipmentType(@ApiParam("Данные о типе ВВСТ") @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
         equipmentTypeService.addType(equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{typeId}")
+    @PutMapping(path = "/{typeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить тип ВВСТ")
     public ResponseEntity<Object> updateEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
                                                       @ApiParam(value = "Данные о типе ВВСТ", required = true) @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
@@ -97,7 +97,7 @@ public class EquipmentTypeController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
-    @PostMapping("/{typeId}/subtype")
+    @PostMapping(path = "/{typeId}/subtype", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить подтип ВВСТ")
     public ResponseEntity<Object> addEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
                                                       @ApiParam(value = "Данные о подтипе ВВСТ", required = true) @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
@@ -105,7 +105,7 @@ public class EquipmentTypeController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{typeId}/subtype/{subTypeId}")
+    @PutMapping(path = "/{typeId}/subtype/{subTypeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить подтип ВВСТ")
     public ResponseEntity<Object> updateEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
                                                          @ApiParam(value = "Ключ подтипа ВВСТ", required = true) @PathVariable Long subTypeId,

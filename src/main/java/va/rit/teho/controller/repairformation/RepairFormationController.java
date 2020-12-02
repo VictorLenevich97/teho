@@ -21,13 +21,12 @@ import java.util.stream.Collectors;
 public class RepairFormationController {
 
     private final RepairFormationService repairFormationService;
+    @Resource
+    private TehoSessionData tehoSession;
 
     public RepairFormationController(RepairFormationService repairFormationService) {
         this.repairFormationService = repairFormationService;
     }
-
-    @Resource
-    private TehoSessionData tehoSession;
 
     @GetMapping("/formation/{formationId}/repair-formation")
     public ResponseEntity<List<RepairFormationDTO>> listRepairFormations(

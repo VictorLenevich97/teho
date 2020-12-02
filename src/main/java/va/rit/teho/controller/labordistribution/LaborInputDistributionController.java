@@ -27,22 +27,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "labor-distribution", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "labor-distribution", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Распределение ремонтного фонда")
 public class LaborInputDistributionController {
 
     private final EquipmentPerFormationService equipmentPerFormationService;
     private final LaborInputDistributionService laborInputDistributionService;
+    @Resource
+    private TehoSessionData tehoSession;
 
     public LaborInputDistributionController(EquipmentPerFormationService equipmentPerFormationService,
                                             LaborInputDistributionService laborInputDistributionService) {
         this.equipmentPerFormationService = equipmentPerFormationService;
         this.laborInputDistributionService = laborInputDistributionService;
     }
-
-    @Resource
-    private TehoSessionData tehoSession;
-
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}")
     @ResponseBody
@@ -110,7 +108,7 @@ public class LaborInputDistributionController {
                                             Formatter.formatDouble(elid.getTotalRepairComplexity()));
     }
 
-    @PostMapping("/{coefficient}")
+    @PostMapping(path = "/{coefficient}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта")
     public ResponseEntity<Object> updateDistributionData(@ApiParam(value = "Коэффициент (k), используемый в расчетах", required = true) @PathVariable Double coefficient) {
         equipmentPerFormationService.updateAvgDailyFailureData(tehoSession.getSessionId(), coefficient);

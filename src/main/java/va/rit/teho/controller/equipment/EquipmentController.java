@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "equipment", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "equipment", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "ВВСТ")
 public class EquipmentController {
 
@@ -51,13 +51,14 @@ public class EquipmentController {
     }
 
 
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить ВВСТ")
     public ResponseEntity<Object> addNewEquipment(@ApiParam(value = "Данные о ВВСТ", required = true) @RequestBody EquipmentDTO equipmentDTO) {
         equipmentService.add(equipmentDTO.getName(), equipmentDTO.getSubType().getId());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{equipmentId}")
+    @PutMapping(path = "/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить ВВСТ")
     public ResponseEntity<Object> updateEquipment(@ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
                                                   @ApiParam(value = "Данные о ВВСТ", required = true) @RequestBody EquipmentDTO equipmentDTO) {

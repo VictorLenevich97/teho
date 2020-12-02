@@ -45,15 +45,14 @@ public class RepairFormationUnitController {
 
     private final RepairFormationUnitService repairFormationUnitService;
     private final EquipmentTypeService equipmentTypeService;
+    @Resource
+    private TehoSessionData tehoSession;
 
     public RepairFormationUnitController(RepairFormationUnitService repairFormationUnitService,
                                          EquipmentTypeService equipmentTypeService) {
         this.repairFormationUnitService = repairFormationUnitService;
         this.equipmentTypeService = equipmentTypeService;
     }
-
-    @Resource
-    private TehoSessionData tehoSession;
 
     @GetMapping("/formation/repair-formation/unit")
     @ResponseBody
