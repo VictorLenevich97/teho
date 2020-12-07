@@ -3,6 +3,8 @@ package va.rit.teho.entity.repairformation;
 import va.rit.teho.entity.formation.Formation;
 
 import javax.persistence.*;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "repair_formation")
@@ -21,6 +23,13 @@ public class RepairFormation {
     @ManyToOne
     @JoinColumn(name = "formation_id", nullable = false)
     private Formation formation;
+
+    @OneToMany(mappedBy = "repairFormation")
+    private Set<RepairFormationUnit> repairFormationUnits;
+
+    public Set<RepairFormationUnit> getRepairFormationUnitSet() {
+        return repairFormationUnits;
+    }
 
     public RepairFormation() {
     }

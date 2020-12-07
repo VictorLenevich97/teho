@@ -18,7 +18,7 @@ public class RepairFormationUnit {
 
     private int stationAmount;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "repair_formation_id", referencedColumnName = "id")
     private RepairFormation repairFormation;
 
