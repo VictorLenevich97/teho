@@ -97,12 +97,10 @@ public class RepairFormationUnitController {
         return ResponseEntity.ok(equipmentStaffDTO);
     }
 
-    @GetMapping("/formation/{formationId}/repair-formation/{repairFormationId}/unit/{repairFormationUnitId}")
+    @GetMapping("/formation/repair-formation/unit/{repairFormationUnitId}")
     @ResponseBody
     @ApiOperation(value = "Получить детальные данные по РВО")
     public ResponseEntity<RepairFormationUnitDTO> getRepairFormationUnit(
-            @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId,
-            @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId) {
         Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> repairFormationUnitListPair =
                 repairFormationUnitService.getWithStaff(repairFormationUnitId, tehoSession.getSessionId());
@@ -117,9 +115,8 @@ public class RepairFormationUnitController {
         return ResponseEntity.ok(repairFormationUnitDTO);
     }
 
-    @GetMapping("/formation/{formationId}/repair-formation/{repairFormationId}/unit")
+    @GetMapping("/formation/repair-formation/{repairFormationId}/unit")
     public ResponseEntity<List<RepairFormationUnitDTO>> listRepairFormationUnitsInFormation(
-            @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId,
             @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(value = "id", required = false) List<Long> ids,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
@@ -130,39 +127,35 @@ public class RepairFormationUnitController {
                                                            .collect(Collectors.toList()));
     }
 
-    @PostMapping(path = "/formation/{formationId}/repair-formation/{repairFormationId}/unit", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/formation/repair-formation/{repairFormationId}/unit", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавление РВО")
     public ResponseEntity<Object> addRepairFormationUnit(
-            @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId,
             @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
             @ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
         repairFormationUnitService.add(repairFormationUnitDTO.getName(),
-                                       repairFormationUnitDTO.getRepairFormation().getId(),
+                                       repairFormationId,
                                        repairFormationUnitDTO.getStationType().getId(),
                                        repairFormationUnitDTO.getAmount());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping(path = "/formation/{formationId}/repair-formation/{repairFormationId}/unit/{repairFormationUnitId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/formation/repair-formation/{repairFormationId}/unit/{repairFormationUnitId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление РВО")
     public ResponseEntity<Object> updateRepairFormationUnit(
-            @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId,
             @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
             @ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
         repairFormationUnitService.update(repairFormationUnitId,
                                           repairFormationUnitDTO.getName(),
-                                          repairFormationUnitDTO.getRepairFormation().getId(),
+                                          repairFormationId,
                                           repairFormationUnitDTO.getStationType().getId(),
                                           repairFormationUnitDTO.getAmount());
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping(path = "/formation/{formationId}/repair-formation/{repairFormationId}/unit/{repairFormationUnitId}/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/formation/repair-formation/unit/{repairFormationUnitId}/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление информации по личному составу РВО")
     public ResponseEntity<Object> updateRepairFormationUnitEquipmentStaff(
-            @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId,
-            @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
             @ApiParam(value = "Данные по численности л/с", required = true) @RequestBody Map<Long, RepairFormationUnitEquipmentStaffDTO> staff) {
         repairFormationUnitService.updateEquipmentStaff(

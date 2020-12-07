@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "repair-capabilities", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path="formation/repair-formation/unit",produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Производственные возможности РВО")
 public class RepairCapabilitiesController {
 
@@ -49,7 +49,7 @@ public class RepairCapabilitiesController {
     /**
      * Расчет производственных возможностей РВО по ремонту (сразу для всех РВО по всем ВВСТ).
      */
-    @PostMapping(path = "/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для всех РВО по всем ВВСТ)")
     public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGet(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId) {
@@ -64,7 +64,7 @@ public class RepairCapabilitiesController {
                                                100);
     }
 
-    @PostMapping(path = "/repair-type/{id}/repair-formation/{repairFormationUnitId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для указанного РВО)")
     public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGetPerStation(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId,
@@ -140,7 +140,7 @@ public class RepairCapabilitiesController {
                                                                                                                0.0)))));
     }
 
-    @GetMapping("/repair-type/{id}")
+    @GetMapping("/capabilities/repair-type/{id}")
     @ResponseBody
     @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
     public ResponseEntity<TableDataDTO<Map<String, String>>> getCalculatedRepairCapabilities(

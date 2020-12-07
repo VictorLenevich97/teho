@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 public class RepairFormationController {
 
     private final RepairFormationService repairFormationService;
-    @Resource
-    private TehoSessionData tehoSession;
 
     public RepairFormationController(RepairFormationService repairFormationService) {
         this.repairFormationService = repairFormationService;
@@ -44,7 +42,7 @@ public class RepairFormationController {
             @RequestBody RepairFormationDTO repairFormationDTO) {
         repairFormationService.add(repairFormationDTO.getName(),
                                    repairFormationDTO.getType().getId(),
-                                   repairFormationDTO.getFormation().getId());
+                                   formationId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
