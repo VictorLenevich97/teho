@@ -74,7 +74,7 @@
 //            when(equipmentTypeRepository.findAll()).thenReturn(Collections.singletonList(equipmentType));
 //        }
 //        EquipmentInRepairData equipmentInRepairData = new EquipmentInRepairData(equipmentSubType,
-//                                                                                "basename",
+//                                                                                "formationName",
 //                                                                                e.getId(),
 //                                                                                e.getName(),
 //                                                                                100,
@@ -96,7 +96,7 @@
 //        EquipmentLaborInputDistribution elid =
 //                EquipmentLaborInputDistribution.builder()
 //                                               .avgDailyFailure(equipmentInRepairData.getCount())
-//                                               .baseName(equipmentInRepairData.getBaseName())
+//                                               .formationName(equipmentInRepairData.getformationName())
 //                                               .equipmentName(e.getName())
 //                                               .equipmentSubType(equipmentSubType)
 //                                               .equipmentType(equipmentType)
@@ -128,24 +128,24 @@
 //    @Test
 //    public void testUpdateLaborInputDistributionPerBase() {
 //        long repairTypeId = 2L;
-//        long baseId = 3L;
-//        testInternalUpdateLaborInputDistribution(baseId,
+//        long formationId = 3L;
+//        testInternalUpdateLaborInputDistribution(formationId,
 //                                                 repairTypeId,
 //                                                 0L,
 //                                                 0L,
 //                                                 l -> when(equipmentPerBaseRepository.findAllWithLaborInputAndBase(
 //                                                         repairTypeId,
-//                                                         baseId)),
+//                                                         formationId)),
 //                                                 () -> laborInputDistributionService.updateLaborInputDistributionPerBase(
-//                                                         baseId));
+//                                                         formationId));
 //    }
 //
 //    @Test
 //    public void testUpdateLaborInputDistributionPerEquipmentSubType() {
 //        long repairTypeId = 2L;
-//        long baseId = 3L;
+//        long formationId = 3L;
 //        long subTypeId = 5L;
-//        testInternalUpdateLaborInputDistribution(baseId,
+//        testInternalUpdateLaborInputDistribution(formationId,
 //                                                 repairTypeId,
 //                                                 subTypeId,
 //                                                 0L,
@@ -159,10 +159,10 @@
 //    @Test
 //    public void testUpdateLaborInputDistributionPerEquipmentType() {
 //        long repairTypeId = 2L;
-//        long baseId = 3L;
+//        long formationId = 3L;
 //        long subTypeId = 5L;
 //        long typeId = 7L;
-//        testInternalUpdateLaborInputDistribution(baseId,
+//        testInternalUpdateLaborInputDistribution(formationId,
 //                                                 repairTypeId,
 //                                                 subTypeId,
 //                                                 typeId,
@@ -173,7 +173,7 @@
 //                                                         typeId));
 //    }
 //
-//    private void testInternalUpdateLaborInputDistribution(Long baseId,
+//    private void testInternalUpdateLaborInputDistribution(Long formationId,
 //                                                          Long repairTypeId,
 //                                                          Long subTypeId,
 //                                                          Long typeId,
@@ -183,7 +183,7 @@
 //        when(repairTypeRepository.findByName(RepairTypeEnum.CURRENT_REPAIR.getName()))
 //                .thenReturn(Optional.of(repairType));
 //        Base base = new Base("s", "f");
-//        base.setId(baseId);
+//        base.setId(formationId);
 //        EquipmentType equipmentType = new EquipmentType("s", "f");
 //        equipmentType.setId(typeId);
 //        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);

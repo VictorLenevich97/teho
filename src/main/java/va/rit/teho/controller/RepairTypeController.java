@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "repair-type", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "repair-type", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Типы ремонта")
 public class RepairTypeController {
 

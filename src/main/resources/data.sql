@@ -2,31 +2,31 @@ DELETE FROM workhours_distribution_interval;
 DELETE FROM equipment_labor_input_per_type;
 DELETE FROM restoration_type;
 DELETE FROM repair_type;
-DELETE FROM equipment_per_base;
+DELETE FROM equipment_per_formation;
 DELETE FROM equipment;
 DELETE FROM equipment_sub_type;
 DELETE FROM equipment_type;
-DELETE FROM repair_division;
+DELETE FROM repair_formation;
 DELETE FROM repair_station_type;
-DELETE FROM base;
+DELETE FROM formation;
 
-INSERT INTO base VALUES (1, 'ГрА', 'ГрА');
-INSERT INTO base VALUES (2, 'омб', 'омб');
+INSERT INTO formation VALUES (1, 'ГрА', 'ГрА');
+INSERT INTO formation VALUES (2, 'омб', 'омб', 1);
 
-INSERT INTO repair_division_unit_type VALUES (1, 'вто', 3, 5);
-INSERT INTO repair_division_unit_type VALUES (2, 'ремр', 8, 10);
-INSERT INTO repair_division_unit_type VALUES (3, 'орвб', 8, 10);
-INSERT INTO repair_division_unit_type VALUES (4, 'рвп', 10, 12);
+INSERT INTO repair_formation_type VALUES (1, 'вто', 3, 5);
+INSERT INTO repair_formation_type VALUES (2, 'ремр', 8, 10);
+INSERT INTO repair_formation_type VALUES (3, 'орвб', 8, 10);
+INSERT INTO repair_formation_type VALUES (4, 'рвп', 10, 12);
 
 INSERT INTO repair_station_type VALUES (1, 'МТО-80');
 INSERT INTO repair_station_type VALUES (2, 'МТО-АТ-М1');
 
-INSERT INTO repair_division VALUES (1, '1 омб');
-INSERT INTO repair_division VALUES (2, '2 омб');
+INSERT INTO repair_formation VALUES (1, '1 омб', 2, 3);
+INSERT INTO repair_formation VALUES (2, '2 омб', 2, 3);
 
-INSERT INTO repair_division_unit VALUES (1, 'грр вто 1 омб', 1, 1,1, 1);
-INSERT INTO repair_division_unit VALUES (2, 'ото вто 1 омб', 1, 1,1, 1);
-INSERT INTO repair_division_unit VALUES (3, 'ото ремр 2 омб', 2, 2,2, 2);
+INSERT INTO repair_formation_unit VALUES (1, 'грр вто 1 омб', 1, 1, 1);
+INSERT INTO repair_formation_unit VALUES (2, 'ото вто 1 омб', 1, 1, 2);
+INSERT INTO repair_formation_unit VALUES (3, 'ото ремр 2 омб', 2, 2, 1);
 
 INSERT INTO equipment_type VALUES (1, 'РАВ', 'РАВ');
 INSERT INTO equipment_type VALUES (2, 'БТВТ', 'БТВТ');
@@ -52,10 +52,10 @@ INSERT INTO equipment VALUES (2, '125 мм', 2);
 INSERT INTO equipment VALUES (3, 'equipment3', 1);
 INSERT INTO equipment VALUES (4, 'equipment4', 3);
 
-INSERT INTO equipment_per_base values (1, 1, 3);
-INSERT INTO equipment_per_base values (2, 2, 14);
-INSERT INTO equipment_per_base values (1, 3, 7);
-INSERT INTO equipment_per_base values (2, 4, 22);
+INSERT INTO equipment_per_formation values (1, 1, 3);
+INSERT INTO equipment_per_formation values (2, 2, 14);
+INSERT INTO equipment_per_formation values (1, 3, 7);
+INSERT INTO equipment_per_formation values (2, 4, 22);
 --
 -- INSERT INTO repair_station_equipment_staff VALUES (1, 1, 5, 10);
 -- INSERT INTO repair_station_equipment_staff VALUES (2, 1, 3, 5);
@@ -94,9 +94,9 @@ INSERT INTO stage VALUES (2,2);
 INSERT INTO stage VALUES (3,3);
 INSERT INTO stage VALUES (4,4);
 
-alter sequence base_id_seq restart with 3;
+alter sequence formation_id_seq restart with 3;
 alter sequence repair_station_type_id_seq restart with 3;
-alter sequence repair_division_unit_id_seq restart with 4;
+alter sequence repair_formation_unit_id_seq restart with 4;
 alter sequence equipment_type_id_seq restart with 4;
 alter sequence equipment_sub_type_id_seq restart with 16;
 alter sequence equipment_id_seq restart with 5;

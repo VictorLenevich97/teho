@@ -66,8 +66,8 @@
 //                                   is(equipmentSubType.getShortName())))
 //               .andExpect(jsonPath("$[0].subTypeDistribution[0].subType.fullName", is(equipmentSubType.getFullName())))
 //               .andExpect(jsonPath("$[0].subTypeDistribution[0].equipmentDistribution.size()", is(1)))
-//               .andExpect(jsonPath("$[0].subTypeDistribution[0].equipmentDistribution[0].baseName",
-//                                   is(elid.getBaseName())))
+//               .andExpect(jsonPath("$[0].subTypeDistribution[0].equipmentDistribution[0].formationName",
+//                                   is(elid.getformationName())))
 //               .andExpect(jsonPath("$[0].subTypeDistribution[0].equipmentDistribution[0].equipmentName",
 //                                   is(elid.getEquipmentName())))
 //               .andExpect(jsonPath("$[0].subTypeDistribution[0].equipmentDistribution[0].avgDailyFailure",
@@ -112,9 +112,9 @@
 //
 //    @Test
 //    public void testUpdateDistributionDataPerBase() throws Exception {
-//        Long baseId = 5L;
-//        mockMvc.perform(post("/labor-distribution/base/{id}", baseId)).andExpect(status().isAccepted());
+//        Long formationId = 5L;
+//        mockMvc.perform(post("/labor-distribution/formation/{id}", formationId)).andExpect(status().isAccepted());
 //
-//        verify(laborInputDistributionService).updateLaborInputDistributionPerBase(baseId);
+//        verify(laborInputDistributionService).updateLaborInputDistributionPerBase(formationId);
 //    }
 //}

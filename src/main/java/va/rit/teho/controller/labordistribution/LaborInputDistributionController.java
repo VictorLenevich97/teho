@@ -18,7 +18,7 @@ import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.server.config.TehoSessionData;
-import va.rit.teho.service.equipment.EquipmentPerBaseService;
+import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 
 import javax.annotation.Resource;
@@ -27,22 +27,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "labor-distribution", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "labor-distribution", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Распределение ремонтного фонда")
 public class LaborInputDistributionController {
 
-    private final EquipmentPerBaseService equipmentPerBaseService;
+    private final EquipmentPerFormationService equipmentPerFormationService;
     private final LaborInputDistributionService laborInputDistributionService;
-
-    public LaborInputDistributionController(EquipmentPerBaseService equipmentPerBaseService,
-                                            LaborInputDistributionService laborInputDistributionService) {
-        this.equipmentPerBaseService = equipmentPerBaseService;
-        this.laborInputDistributionService = laborInputDistributionService;
-    }
-
     @Resource
     private TehoSessionData tehoSession;
 
+    public LaborInputDistributionController(EquipmentPerFormationService equipmentPerFormationService,
+                                            LaborInputDistributionService laborInputDistributionService) {
+        this.equipmentPerFormationService = equipmentPerFormationService;
+        this.laborInputDistributionService = laborInputDistributionService;
+    }
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}")
     @ResponseBody
@@ -102,7 +100,7 @@ public class LaborInputDistributionController {
                                                   e -> new CountAndLaborInputDTO(
                                                           Formatter.formatDouble(e.getValue().getCount()),
                                                           Formatter.formatDouble(e.getValue().getLaborInput()))));
-        return new LaborDistributionRowData(elid.getBaseName(),
+        return new LaborDistributionRowData(elid.getFormationName(),
                                             countAndLaborInputDTOMap,
                                             elid.getEquipmentName(),
                                             Formatter.formatDouble(elid.getAvgDailyFailure()),
@@ -110,10 +108,10 @@ public class LaborInputDistributionController {
                                             Formatter.formatDouble(elid.getTotalRepairComplexity()));
     }
 
-    @PostMapping("/{coefficient}")
+    @PostMapping(path = "/{coefficient}")
     @ApiOperation(value = "Обновить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта")
     public ResponseEntity<Object> updateDistributionData(@ApiParam(value = "Коэффициент (k), используемый в расчетах", required = true) @PathVariable Double coefficient) {
-        equipmentPerBaseService.updateAvgDailyFailureData(tehoSession.getSessionId(), coefficient);
+        equipmentPerFormationService.updateAvgDailyFailureData(tehoSession.getSessionId(), coefficient);
         laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId());
         return ResponseEntity.accepted().build();
     }

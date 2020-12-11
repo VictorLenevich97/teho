@@ -17,7 +17,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "session", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "session", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Сессии")
 public class SessionController {
 
@@ -33,14 +33,14 @@ public class SessionController {
         return ResponseEntity.ok(sessionService.list().stream().map(SessionDTO::from).collect(Collectors.toList()));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Создать сессию")
     public ResponseEntity<SessionDTO> createSession(@ApiParam(value = "Данные о сессии", required = true) @RequestBody SessionDTO sessionDTO) {
         TehoSession tehoSession = sessionService.create(sessionDTO.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
     }
 
-    @PutMapping("/{sessionId}")
+    @PutMapping(path = "/{sessionId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Скопировать сессию")
     public ResponseEntity<SessionDTO> copySession(@ApiParam(value = "Ключ оригинальной сессии", required = true) @PathVariable UUID sessionId,
                                                   @ApiParam(value = "Данные о новой сессии", required = true) @RequestBody SessionDTO sessionDTO) {

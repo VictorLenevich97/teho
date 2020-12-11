@@ -8,8 +8,8 @@ import java.util.UUID;
 
 @Embeddable
 public class LaborDistributionPK implements Serializable {
-    @Column(name = "base_id")
-    private Long baseId;
+    @Column(name = "formation_id")
+    private Long formationId;
     @Column(name = "equipment_id")
     private Long equipmentId;
     @Column(name = "workhours_distribution_interval_id")
@@ -25,13 +25,13 @@ public class LaborDistributionPK implements Serializable {
         return repairTypeId;
     }
 
-    public LaborDistributionPK(Long baseId,
+    public LaborDistributionPK(Long formationId,
                                Long equipmentId,
                                Long workhoursDistributionIntervalId,
                                Long stageId,
                                Long repairTypeId,
                                UUID sessionId) {
-        this.baseId = baseId;
+        this.formationId = formationId;
         this.equipmentId = equipmentId;
         this.workhoursDistributionIntervalId = workhoursDistributionIntervalId;
         this.stageId = stageId;
@@ -42,8 +42,8 @@ public class LaborDistributionPK implements Serializable {
     public LaborDistributionPK() {
     }
 
-    public Long getBaseId() {
-        return baseId;
+    public Long getFormationId() {
+        return formationId;
     }
 
     public Long getEquipmentId() {
@@ -51,7 +51,7 @@ public class LaborDistributionPK implements Serializable {
     }
 
     public LaborDistributionPK copy(UUID sessionId) {
-        return new LaborDistributionPK(baseId, equipmentId, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId);
+        return new LaborDistributionPK(formationId, equipmentId, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId);
     }
 
     public Long getWorkhoursDistributionIntervalId() {
@@ -71,7 +71,7 @@ public class LaborDistributionPK implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LaborDistributionPK that = (LaborDistributionPK) o;
-        return Objects.equals(baseId, that.baseId) &&
+        return Objects.equals(formationId, that.formationId) &&
                 Objects.equals(equipmentId, that.equipmentId) &&
                 Objects.equals(workhoursDistributionIntervalId, that.workhoursDistributionIntervalId) &&
                 Objects.equals(stageId, that.stageId) &&
@@ -81,6 +81,6 @@ public class LaborDistributionPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(baseId, equipmentId, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId);
+        return Objects.hash(formationId, equipmentId, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId);
     }
 }

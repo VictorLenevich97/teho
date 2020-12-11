@@ -19,8 +19,8 @@ public interface LaborDistributionRepository
     List<LaborDistribution> findByTehoSessionId(UUID sessionId);
 
     @Query("SELECT new va.rit.teho.entity.labordistribution.LaborDistributionData(ld.equipment.equipmentSubType, " +
-            "ld.base.id, " +
-            "ld.base.fullName, " +
+            "ld.formation.id, " +
+            "ld.formation.fullName, " +
             "ld.equipment.id, " +
             "ld.equipment.name, " +
             "ipt.amount, " +
@@ -29,7 +29,7 @@ public interface LaborDistributionRepository
             "ld.avgLaborInput, " +
             "epbfi.avgDailyFailure) FROM LaborDistribution ld " +
             "INNER JOIN EquipmentLaborInputPerType ipt ON ld.equipment.id = ipt.equipment.id " +
-            "INNER JOIN EquipmentPerBaseFailureIntensity epbfi on (ld.equipment.id = epbfi.equipment.id and ld.base.id = epbfi.base.id and ld.tehoSession.id = epbfi.tehoSession.id and ld.stage.id = epbfi.stage.id and ipt.repairType.id = epbfi.repairType.id) " +
+            "INNER JOIN EquipmentPerFormationFailureIntensity epbfi on (ld.equipment.id = epbfi.equipment.id and ld.formation.id = epbfi.formation.id and ld.tehoSession.id = epbfi.tehoSession.id and ld.stage.id = epbfi.stage.id and ipt.repairType.id = epbfi.repairType.id) " +
             "WHERE ipt.repairType.id = :repairTypeId AND ld.tehoSession.id = :sessionId AND" +
             "(coalesce(:equipmentTypeIds, null) is null or ld.equipment.equipmentSubType.equipmentType.id IN (:equipmentTypeIds)) " +
             "AND ld.stage.id = :stageId AND ld.repairType.id = :repairTypeId")
@@ -56,7 +56,7 @@ public interface LaborDistributionRepository
 
     @Query(value = "select equipment.name, sum(amount) as amount, sum(labor_distribution.count) as c " +
             "from labor_distribution left join equipment_per_base " +
-            "on labor_distribution.equipment_id = equipment_per_base.equipment_id and labor_distribution.base_id = equipment_per_base.base_id " +
+            "on labor_distribution.equipment_id = equipment_per_formation.equipment_id and labor_distribution.formation_id = equipment_per_formation.formation_id " +
             "inner join workhours_distribution_interval on labor_distribution.workhours_distribution_interval_id = workhours_distribution_interval.id " +
             "inner join equipment on labor_distribution.equipment_id = equipment.id " +
             "group by equipment.name", nativeQuery = true)

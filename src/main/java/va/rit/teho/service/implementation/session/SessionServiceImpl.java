@@ -5,10 +5,10 @@ import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.session.SessionRepository;
-import va.rit.teho.service.equipment.EquipmentPerBaseService;
+import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
-import va.rit.teho.service.repairdivision.RepairCapabilitiesService;
-import va.rit.teho.service.repairdivision.RepairDivisionService;
+import va.rit.teho.service.repairformation.RepairCapabilitiesService;
+import va.rit.teho.service.repairformation.RepairFormationUnitService;
 import va.rit.teho.service.session.SessionService;
 
 import java.util.List;
@@ -20,19 +20,19 @@ public class SessionServiceImpl implements SessionService {
 
     private final SessionRepository sessionRepository;
 
-    private final EquipmentPerBaseService equipmentPerBaseService;
-    private final RepairDivisionService repairDivisionService;
+    private final EquipmentPerFormationService equipmentPerFormationService;
+    private final RepairFormationUnitService repairFormationUnitService;
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final LaborInputDistributionService laborInputDistributionService;
 
     public SessionServiceImpl(SessionRepository sessionRepository,
-                              EquipmentPerBaseService equipmentPerBaseService,
-                              RepairDivisionService repairDivisionService,
+                              EquipmentPerFormationService equipmentPerFormationService,
+                              RepairFormationUnitService repairFormationUnitService,
                               RepairCapabilitiesService repairCapabilitiesService,
                               LaborInputDistributionService laborInputDistributionService) {
         this.sessionRepository = sessionRepository;
-        this.equipmentPerBaseService = equipmentPerBaseService;
-        this.repairDivisionService = repairDivisionService;
+        this.equipmentPerFormationService = equipmentPerFormationService;
+        this.repairFormationUnitService = repairFormationUnitService;
         this.repairCapabilitiesService = repairCapabilitiesService;
         this.laborInputDistributionService = laborInputDistributionService;
     }
@@ -58,8 +58,8 @@ public class SessionServiceImpl implements SessionService {
     public TehoSession copy(UUID sessionId, String name) {
         get(sessionId); //проверка на существование
         TehoSession newSession = create(name);
-        equipmentPerBaseService.copyEquipmentPerBaseData(sessionId, newSession.getId());
-        repairDivisionService.copyEquipmentStaff(sessionId, newSession.getId());
+        equipmentPerFormationService.copyEquipmentPerFormationData(sessionId, newSession.getId());
+        repairFormationUnitService.copyEquipmentStaff(sessionId, newSession.getId());
         repairCapabilitiesService.copyRepairCapabilities(sessionId, newSession.getId());
         laborInputDistributionService.copyLaborInputDistributionData(sessionId, newSession.getId());
         return newSession;

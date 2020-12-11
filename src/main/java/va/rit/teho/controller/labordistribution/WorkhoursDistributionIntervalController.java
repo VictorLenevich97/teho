@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path = "workhours-distribution-interval", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "workhours-distribution-interval", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Интервалы трудоемкости ремонта")
 public class WorkhoursDistributionIntervalController {
     private final LaborInputDistributionService laborInputDistributionService;
