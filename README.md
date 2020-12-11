@@ -8,6 +8,7 @@
 Проект в Redmine - https://redmine.rit/redmine/projects/teho
 
 Ипользуемая база данных - Postgres
+
 Список команд для установки Postgres 9.2 в ОС Centos7:
 
 ```
