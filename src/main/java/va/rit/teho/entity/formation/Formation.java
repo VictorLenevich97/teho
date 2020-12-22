@@ -1,11 +1,13 @@
 package va.rit.teho.entity.formation;
 
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
+import va.rit.teho.entity.repairformation.RepairFormation;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "formation")
@@ -25,6 +27,20 @@ public class Formation implements Serializable {
 
     @OneToMany(mappedBy = "equipment")
     private Set<EquipmentPerFormation> equipmentPerFormations;
+
+    @OneToMany(mappedBy = "formation")
+    private Set<RepairFormation> repairFormations;
+
+    public Set<RepairFormation> getRepairFormations() {
+        return repairFormations;
+    }
+
+    public Set<Formation> getChildFormations() {
+        return childFormations;
+    }
+
+    @OneToMany(mappedBy = "parentFormation")
+    private Set<Formation> childFormations;
 
     public Set<EquipmentPerFormation> getEquipmentPerFormations() {
         return equipmentPerFormations;

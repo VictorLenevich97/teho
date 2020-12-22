@@ -13,10 +13,13 @@ DELETE FROM formation;
 INSERT INTO formation VALUES (1, 'ГрА', 'ГрА');
 INSERT INTO formation VALUES (2, 'омб', 'омб', 1);
 
-INSERT INTO repair_formation_type VALUES (1, 'вто', 3, 5);
-INSERT INTO repair_formation_type VALUES (2, 'ремр', 8, 10);
-INSERT INTO repair_formation_type VALUES (3, 'орвб', 8, 10);
-INSERT INTO repair_formation_type VALUES (4, 'рвп', 10, 12);
+INSERT INTO restoration_type VALUES (1, 'Тактический', 1);
+INSERT INTO restoration_type VALUES (2, 'Оперативный', 2);
+INSERT INTO restoration_type VALUES (3, 'Стратегический', 3);
+INSERT INTO repair_formation_type VALUES (1, 'вто', 3, 5, 1);
+INSERT INTO repair_formation_type VALUES (2, 'ремр', 8, 10,1);
+INSERT INTO repair_formation_type VALUES (3, 'орвб', 8, 10, 2);
+INSERT INTO repair_formation_type VALUES (4, 'рвп', 10, 12, 3);
 
 INSERT INTO repair_station_type VALUES (1, 'МТО-80');
 INSERT INTO repair_station_type VALUES (2, 'МТО-АТ-М1');
@@ -69,9 +72,6 @@ INSERT INTO repair_type VALUES (2, true, 'Средний', 'СР');
 INSERT INTO repair_type VALUES (3, false, 'Капитальный', 'КР');
 INSERT INTO repair_type VALUES (4, false, 'Безвозвратные потери', 'БП');
 
-INSERT INTO restoration_type VALUES (1, 'Тактический');
-INSERT INTO restoration_type VALUES (2, 'Оперативный');
-INSERT INTO restoration_type VALUES (3, 'Стратегический');
 
 INSERT INTO equipment_labor_input_per_type VALUES (1, 1, 140);
 INSERT INTO equipment_labor_input_per_type VALUES (2, 1, 220);

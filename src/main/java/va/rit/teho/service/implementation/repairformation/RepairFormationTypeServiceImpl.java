@@ -6,6 +6,7 @@ import va.rit.teho.entity.repairformation.RepairFormationType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
+import va.rit.teho.repository.labordistribution.RestorationTypeRepository;
 import va.rit.teho.repository.repairformation.RepairFormationUnitTypeRepository;
 import va.rit.teho.service.repairformation.RepairFormationTypeService;
 
@@ -16,9 +17,12 @@ import java.util.List;
 public class RepairFormationTypeServiceImpl implements RepairFormationTypeService {
 
     private final RepairFormationUnitTypeRepository repairFormationUnitTypeRepository;
+    private final RestorationTypeRepository restorationTypeRepository;
 
-    public RepairFormationTypeServiceImpl(RepairFormationUnitTypeRepository repairFormationUnitTypeRepository) {
+    public RepairFormationTypeServiceImpl(RepairFormationUnitTypeRepository repairFormationUnitTypeRepository,
+                                          RestorationTypeRepository restorationTypeRepository) {
         this.repairFormationUnitTypeRepository = repairFormationUnitTypeRepository;
+        this.restorationTypeRepository = restorationTypeRepository;
     }
 
     @Override
@@ -28,7 +32,7 @@ public class RepairFormationTypeServiceImpl implements RepairFormationTypeServic
     }
 
     @Override
-    public Long addType(String name, int workingHoursMin, int workingHoursMax) {
+    public Long addType(String name, Long restorationTypeId, int workingHoursMin, int workingHoursMax) {
         repairFormationUnitTypeRepository.findByName(name).ifPresent(rst -> {
             throw new AlreadyExistsException("Тип РВО", "название", name);
         });
@@ -36,6 +40,10 @@ public class RepairFormationTypeServiceImpl implements RepairFormationTypeServic
             throw new IncorrectParamException("Верхний предел рабочего времени производственником меньше нижнего!");
         }
         RepairFormationType repairFormationType = new RepairFormationType(name,
+                                                                          restorationTypeRepository
+                                                                                  .findById(restorationTypeId)
+                                                                                  .orElseThrow(() -> new NotFoundException(
+                                                                                          "Типа восстановления не существует")),
                                                                           workingHoursMin,
                                                                           workingHoursMax);
         return repairFormationUnitTypeRepository.save(repairFormationType).getId();

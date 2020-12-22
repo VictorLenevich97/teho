@@ -39,6 +39,7 @@ public class RepairFormationTypeController {
     @ApiOperation(value = "Добавление типа РВО")
     public ResponseEntity<Object> addRepairStationType(@ApiParam(value = "Данные о типе РВО", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
         repairFormationTypeService.addType(repairFormationTypeDTO.getName(),
+                                           repairFormationTypeDTO.getRestorationType().getId(),
                                            repairFormationTypeDTO.getWorkingHoursMin(),
                                            repairFormationTypeDTO.getWorkingHoursMax());
         return ResponseEntity.status(HttpStatus.CREATED).build();

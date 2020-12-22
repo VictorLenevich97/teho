@@ -1,5 +1,6 @@
 package va.rit.teho.service.formation;
 
+import va.rit.teho.entity.common.Tree;
 import va.rit.teho.entity.formation.Formation;
 
 import java.util.List;
@@ -13,4 +14,6 @@ public interface FormationService {
     Formation get(Long formationId);
 
     List<Formation> list();
+
+    List<Tree<Formation>> listHierarchy();
 }

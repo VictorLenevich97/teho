@@ -116,4 +116,10 @@ public class LaborInputDistributionController {
         return ResponseEntity.accepted().build();
     }
 
+    @PostMapping(path = "/equipment")
+    public ResponseEntity<Object> distributeEquipmentPerRFU() {
+        laborInputDistributionService.distribute(tehoSession.getSessionId());
+        return ResponseEntity.ok().build();
+    }
+
 }

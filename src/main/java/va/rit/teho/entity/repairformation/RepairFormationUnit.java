@@ -2,6 +2,7 @@ package va.rit.teho.entity.repairformation;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class RepairFormationUnit {
@@ -21,6 +22,14 @@ public class RepairFormationUnit {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "repair_formation_id", referencedColumnName = "id")
     private RepairFormation repairFormation;
+
+
+    public Set<RepairFormationUnitRepairCapability> getRepairCapabilities() {
+        return repairCapabilities;
+    }
+
+    @OneToMany(mappedBy = "repairFormationUnit")
+    private Set<RepairFormationUnitRepairCapability> repairCapabilities;
 
     public RepairFormationUnit() {
         //Пустой конструктор для автоматической инициализации

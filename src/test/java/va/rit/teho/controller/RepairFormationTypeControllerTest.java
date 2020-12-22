@@ -36,10 +36,11 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
 
     @Test
     public void testAddRepairStationType() throws Exception {
-        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(null, "name", 2, 22);
+        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(null, "name", null, 2, 22);
 
         when(repairFormationTypeService
                      .addType(repairFormationTypeDTO.getName(),
+                              null,
                               repairFormationTypeDTO.getWorkingHoursMin(),
                               repairFormationTypeDTO.getWorkingHoursMax())).thenReturn(2L);
 
@@ -47,13 +48,14 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
                                                     .content(objectMapper.writeValueAsString(repairFormationTypeDTO)))
                .andExpect(status().isCreated());
         verify(repairFormationTypeService).addType(repairFormationTypeDTO.getName(),
+                                                   null,
                                                    repairFormationTypeDTO.getWorkingHoursMin(),
                                                    repairFormationTypeDTO.getWorkingHoursMax());
     }
 
     @Test
     public void testUpdateRepairStationType() throws Exception {
-        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(2L, "name", 2, 22);
+        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(2L, "name", null, 2, 22);
 
 
         mockMvc.perform(put("/repair-station/type/{id}",
