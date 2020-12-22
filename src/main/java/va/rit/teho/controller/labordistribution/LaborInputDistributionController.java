@@ -33,6 +33,7 @@ public class LaborInputDistributionController {
 
     private final EquipmentPerFormationService equipmentPerFormationService;
     private final LaborInputDistributionService laborInputDistributionService;
+
     @Resource
     private TehoSessionData tehoSession;
 
@@ -116,10 +117,6 @@ public class LaborInputDistributionController {
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping(path = "/equipment")
-    public ResponseEntity<Object> distributeEquipmentPerRFU() {
-        laborInputDistributionService.distribute(tehoSession.getSessionId());
-        return ResponseEntity.ok().build();
-    }
+
 
 }

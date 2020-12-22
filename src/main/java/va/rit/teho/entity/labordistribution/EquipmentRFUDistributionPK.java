@@ -58,4 +58,8 @@ public class EquipmentRFUDistributionPK implements Serializable {
     public UUID getSessionId() {
         return sessionId;
     }
+
+    public EquipmentRFUDistributionPK copy(UUID newSessionId) {
+        return new EquipmentRFUDistributionPK(formationId, equipmentId, repairFormationUnitId, intervalId, newSessionId);
+    }
 }

@@ -6,6 +6,7 @@ import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.session.TehoSession;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "equipment_rfu_distribution")
@@ -99,6 +100,10 @@ public class EquipmentRFUDistribution {
 
     public WorkhoursDistributionInterval getWorkhoursDistributionInterval() {
         return workhoursDistributionInterval;
+    }
+
+    public EquipmentRFUDistribution copy(UUID newSessionId) {
+        return new EquipmentRFUDistribution(getEquipmentRFUDistributionPK().copy(newSessionId), repairing, unable);
     }
 
 }

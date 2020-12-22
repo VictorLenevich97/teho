@@ -36,6 +36,4 @@ public interface LaborInputDistributionService {
 
     List<LaborDistributionAggregatedData> getAggregatedDataForSessionAndFormation(Long formationId, UUID sessionId);
 
-    void distribute(UUID sessionId);
-
 }

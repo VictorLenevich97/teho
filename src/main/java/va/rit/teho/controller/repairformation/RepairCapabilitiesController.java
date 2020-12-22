@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping(path="formation/repair-formation/unit",produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "formation/repair-formation/unit", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Производственные возможности РВО")
 public class RepairCapabilitiesController {
 
@@ -112,10 +112,11 @@ public class RepairCapabilitiesController {
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
         List<NestedColumnsDTO> equipmentPerTypeDTOList =
-                grouped.entrySet()
-                       .stream()
-                       .map(this::getRepairCapabilitiesNestedColumnsDTO)
-                       .collect(Collectors.toList());
+                grouped
+                        .entrySet()
+                        .stream()
+                        .map(this::getRepairCapabilitiesNestedColumnsDTO)
+                        .collect(Collectors.toList());
         List<RowData<Map<String, String>>> data =
                 repairFormationUnitList
                         .stream()
