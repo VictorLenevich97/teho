@@ -1,11 +1,11 @@
 package va.rit.teho.dto.formation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModelProperty;
 import va.rit.teho.dto.common.AbstractNamedDTO;
 import va.rit.teho.dto.equipment.EquipmentDTO;
 import va.rit.teho.entity.formation.Formation;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,8 +14,10 @@ public class FormationDTO extends AbstractNamedDTO {
 
     private final Long id;
 
+    @ApiModelProperty(value = "parentFormation", example = "{\"id\": 1}")
     private final FormationDTO parentFormation;
 
+    @ApiModelProperty(hidden = true)
     private final List<EquipmentDTO> equipment;
 
     public FormationDTO getParentFormation() {
@@ -43,7 +45,7 @@ public class FormationDTO extends AbstractNamedDTO {
                                         .getEquipmentPerFormations()
                                         .stream()
                                         .map(epb -> EquipmentDTO.from(epb.getEquipment()))
-                                        .collect(Collectors.toList()) : Collections.emptyList());
+                                        .collect(Collectors.toList()) : null);
     }
 
     public static FormationDTO from(Formation formation) {

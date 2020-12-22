@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping(path = "formation", produces = MediaType.APPLICATION_JSON_VALUE)
 @Transactional
-@Api(tags = "Часть/Подразделение")
+@Api(tags = "Формирование (оно же Часть или Подразделение)")
 public class FormationController {
 
     private final FormationService formationService;
@@ -37,7 +37,7 @@ public class FormationController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    @ApiOperation(value = "Добавить Часть/Подразделение")
+    @ApiOperation(value = "Добавить Формирование", responseReference = "{\"test\": \"value\"}")
     public ResponseEntity<Object> addFormation(@RequestBody FormationDTO formationModel) {
         Long formationId = formationService.add(formationModel.getShortName(), formationModel.getFullName());
         List<Long> equipment = equipmentService.list().stream().map(Equipment::getId).collect(Collectors.toList());
@@ -46,7 +46,7 @@ public class FormationController {
     }
 
     @PutMapping(path = "/{formationId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Обновить Часть/Подразделение")
+    @ApiOperation(value = "Обновить Формирование")
     public ResponseEntity<Object> updateFormation(@PathVariable Long formationId,
                                                   @RequestBody FormationDTO formationModel) {
         formationService.update(formationId, formationModel.getShortName(), formationModel.getFullName());
@@ -55,14 +55,14 @@ public class FormationController {
 
     @GetMapping
     @ResponseBody
-    @ApiOperation(value = "Получить список Часть/Подразделение")
+    @ApiOperation(value = "Получить список Формирований")
     public ResponseEntity<List<FormationDTO>> listFormations() {
         return ResponseEntity.ok(formationService.list().stream().map(FormationDTO::from).collect(Collectors.toList()));
     }
 
     @GetMapping("/{formationId}")
     @ResponseBody
-    @ApiOperation(value = "Получить подробности о Часть/Подразделение")
+    @ApiOperation(value = "Получить подробности о Формировании")
     public ResponseEntity<FormationDTO> getFormation(@PathVariable Long formationId) {
         return ResponseEntity.ok(FormationDTO.from(formationService.get(formationId), true));
     }

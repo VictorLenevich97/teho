@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-@Api(tags = "ВВСТ по ВЧ")
+@Api(tags = "ВВСТ в Формированиях")
 public class EquipmentPerFormationController {
 
     private final StageService stageService;
@@ -51,7 +51,7 @@ public class EquipmentPerFormationController {
 
 
     @PostMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Добавить ВВСТ в ВЧ")
+    @ApiOperation(value = "Добавить ВВСТ в Формирование")
     public ResponseEntity<Object> addEquipmentToFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
                                                           @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
                                                           @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody IntensityAndAmountDTO intensityAndAmount) {
@@ -72,7 +72,7 @@ public class EquipmentPerFormationController {
     }
 
     @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Обновить ВВСТ в ВЧ")
+    @ApiOperation(value = "Обновить ВВСТ в Формировании")
     public ResponseEntity<Object> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
                                                              @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
                                                              @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody
@@ -98,7 +98,7 @@ public class EquipmentPerFormationController {
 
     @GetMapping("/formation/{formationId}/equipment")
     @ResponseBody
-    @ApiOperation(value = "Получить данные о ВВСТ в ВЧ (в табличном виде)")
+    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях (в табличном виде)")
     public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerFormationData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1")
             @PathVariable Long formationId,
@@ -184,7 +184,7 @@ public class EquipmentPerFormationController {
 
     @GetMapping("/formation/{formationId}/equipment/daily-failure")
     @ResponseBody
-    @ApiOperation(value = "Получить данные о ВВСТ в ВЧ c интенсивностью выхода в ремонт в ед. (в табличном виде)")
+    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях c интенсивностью выхода в ремонт в ед. (в табличном виде)")
     public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerFormationDailyFailureData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) {
