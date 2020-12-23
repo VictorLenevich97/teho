@@ -10,9 +10,9 @@ public interface FormationService {
 
     Formation add(String shortName, String fullName, Long parentFormationId);
 
-    void update(Long formationId, String shortName, String fullName);
+    Formation update(Long formationId, String shortName, String fullName);
 
-    void update(Long formationId, String shortName, String fullName, Long parentFormationId);
+    Formation update(Long formationId, String shortName, String fullName, Long parentFormationId);
 
     Formation get(Long formationId);
 

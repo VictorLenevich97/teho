@@ -53,17 +53,20 @@ public class FormationController {
 
     @PutMapping(path = "/{formationId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить Формирование")
-    public ResponseEntity<Object> updateFormation(@PathVariable Long formationId,
-                                                  @RequestBody FormationDTO formationModel) {
+    public ResponseEntity<FormationDTO> updateFormation(@PathVariable Long formationId,
+                                                        @RequestBody FormationDTO formationModel) {
+        Formation formation;
         if (formationModel.getParentFormation() == null) {
-            formationService.update(formationId, formationModel.getShortName(), formationModel.getFullName());
+            formation = formationService.update(formationId,
+                                                formationModel.getShortName(),
+                                                formationModel.getFullName());
         } else {
-            formationService.update(formationId,
-                                    formationModel.getShortName(),
-                                    formationModel.getFullName(),
-                                    formationModel.getParentFormation().getId());
+            formation = formationService.update(formationId,
+                                                formationModel.getShortName(),
+                                                formationModel.getFullName(),
+                                                formationModel.getParentFormation().getId());
         }
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.accepted().body(FormationDTO.from(formation));
     }
 
     @GetMapping
