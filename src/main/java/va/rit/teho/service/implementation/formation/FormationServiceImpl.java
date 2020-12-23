@@ -31,10 +31,10 @@ public class FormationServiceImpl implements FormationService {
 
     @Override
     @Transactional
-    public Long add(String shortName, String fullName) {
+    public Formation add(String shortName, String fullName) {
         checkPreRequisites(shortName, fullName);
         Formation formation = formationRepository.save(new Formation(shortName, fullName));
-        return formation.getId();
+        return formation;
     }
 
     private void checkPreRequisites(String shortName, String fullName) {
@@ -46,14 +46,14 @@ public class FormationServiceImpl implements FormationService {
     }
 
     @Override
-    public Long add(String shortName, String fullName, Long parentFormationId) {
+    public Formation add(String shortName, String fullName, Long parentFormationId) {
         checkPreRequisites(shortName, fullName);
         Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
         if (!optionalFormation.isPresent()) {
             throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
         }
         Formation formation = formationRepository.save(new Formation(shortName, fullName, optionalFormation.get()));
-        return formation.getId();
+        return formation;
     }
 
     @Override

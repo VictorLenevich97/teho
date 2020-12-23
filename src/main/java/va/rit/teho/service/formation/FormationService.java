@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface FormationService {
 
-    Long add(String shortName, String fullName);
+    Formation add(String shortName, String fullName);
 
-    Long add(String shortName, String fullName, Long parentFormationId);
+    Formation add(String shortName, String fullName, Long parentFormationId);
 
     void update(Long formationId, String shortName, String fullName);
 
