@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.formation.FormationDTO;
 import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.formation.FormationService;
@@ -38,16 +39,16 @@ public class FormationController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @ApiOperation(value = "Добавить Формирование")
-    public ResponseEntity<Object> addFormation(@RequestBody FormationDTO formationModel) {
-        Long formationId = formationModel.getParentFormation() == null ?
+    public ResponseEntity<FormationDTO> addFormation(@RequestBody FormationDTO formationModel) {
+        Formation addedFormation = formationModel.getParentFormation() == null ?
                 formationService.add(formationModel.getShortName(),
                                      formationModel.getFullName()) :
                 formationService.add(formationModel.getShortName(),
                                      formationModel.getFullName(),
                                      formationModel.getParentFormation().getId());
         List<Long> equipment = equipmentService.list().stream().map(Equipment::getId).collect(Collectors.toList());
-        equipmentPerFormationService.addEquipmentToFormation(formationId, equipment, 0);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        equipmentPerFormationService.addEquipmentToFormation(addedFormation.getId(), equipment, 0);
+        return ResponseEntity.status(HttpStatus.CREATED).body(FormationDTO.from(addedFormation, false));
     }
 
     @PutMapping(path = "/{formationId}", consumes = MediaType.APPLICATION_JSON_VALUE)
