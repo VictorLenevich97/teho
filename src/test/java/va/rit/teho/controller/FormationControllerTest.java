@@ -58,9 +58,11 @@ public class FormationControllerTest extends ControllerTest {
 
     @Test
     public void testAddBase() throws Exception {
+        Formation formation = new Formation();
         Long formationId = 1L;
+        formation.setId(formationId);
         FormationDTO base = new FormationDTO(formationId, "short", "full", null, Collections.emptyList());
-        when(formationService.add(base.getShortName(), base.getFullName())).thenReturn(formationId);
+        when(formationService.add(base.getShortName(), base.getFullName())).thenReturn(formation);
 
         mockMvc.perform(
                 post("/formation").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(base)))
@@ -71,9 +73,11 @@ public class FormationControllerTest extends ControllerTest {
 
     @Test
     public void testUpdateBase() throws Exception {
+        Formation formation = new Formation();
         Long formationId = 1L;
+        formation.setId(formationId);
         FormationDTO base = new FormationDTO(formationId, "short", "full", null, Collections.emptyList());
-        when(formationService.add(base.getShortName(), base.getFullName())).thenReturn(formationId);
+        when(formationService.add(base.getShortName(), base.getFullName())).thenReturn(formation);
 
         mockMvc.perform(
                 put("/formation/{id}", formationId).contentType(MediaType.APPLICATION_JSON)
