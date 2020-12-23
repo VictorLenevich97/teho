@@ -38,6 +38,12 @@ public class Formation implements Serializable {
         this.fullName = fullName;
     }
 
+    public Formation(String shortName, String fullName, Formation parentFormation) {
+        this.shortName = shortName;
+        this.fullName = fullName;
+        this.parentFormation = parentFormation;
+    }
+
     public Formation getParentFormation() {
         return parentFormation;
     }
@@ -79,5 +85,9 @@ public class Formation implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, shortName, fullName);
+    }
+
+    public void setParentFormation(Formation parentFormation) {
+        this.parentFormation = parentFormation;
     }
 }

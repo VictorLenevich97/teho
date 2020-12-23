@@ -4,8 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.exception.AlreadyExistsException;
-import va.rit.teho.exception.FormationNotFoundException;
 import va.rit.teho.exception.EmptyFieldException;
+import va.rit.teho.exception.FormationNotFoundException;
+import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.formation.FormationRepository;
 import va.rit.teho.service.formation.FormationService;
 
@@ -31,12 +32,27 @@ public class FormationServiceImpl implements FormationService {
     @Override
     @Transactional
     public Long add(String shortName, String fullName) {
+        checkPreRequisites(shortName, fullName);
+        Formation formation = formationRepository.save(new Formation(shortName, fullName));
+        return formation.getId();
+    }
+
+    private void checkPreRequisites(String shortName, String fullName) {
         checkIfEmptyField(shortName);
         checkIfEmptyField(fullName);
         formationRepository.findByFullName(fullName).ifPresent(b -> {
-            throw new AlreadyExistsException("ВЧ", "название", fullName);
+            throw new AlreadyExistsException("Формирование", "название", fullName);
         });
-        Formation formation = formationRepository.save(new Formation(shortName, fullName));
+    }
+
+    @Override
+    public Long add(String shortName, String fullName, Long parentFormationId) {
+        checkPreRequisites(shortName, fullName);
+        Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
+        if (!optionalFormation.isPresent()) {
+            throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
+        }
+        Formation formation = formationRepository.save(new Formation(shortName, fullName, optionalFormation.get()));
         return formation.getId();
     }
 
@@ -45,6 +61,20 @@ public class FormationServiceImpl implements FormationService {
         Formation formation = getFormationOrThrow(formationId);
         formation.setFullName(fullName);
         formation.setShortName(shortName);
+        formationRepository.save(formation);
+    }
+
+    @Override
+    public void update(Long formationId, String shortName, String fullName, Long parentFormationId) {
+        Formation formation = getFormationOrThrow(formationId);
+        Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
+        if (!optionalFormation.isPresent()) {
+            throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
+        }
+
+        formation.setFullName(fullName);
+        formation.setShortName(shortName);
+        formation.setParentFormation(optionalFormation.get());
         formationRepository.save(formation);
     }
 

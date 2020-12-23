@@ -27,7 +27,7 @@ public class RepairFormationTypeController {
 
     @GetMapping
     @ApiOperation(value = "Получение списка типов Ремонтных Формирований")
-    public ResponseEntity<List<RepairFormationTypeDTO>> listRepairStationTypes() {
+    public ResponseEntity<List<RepairFormationTypeDTO>> listRepairFormationTypes() {
         List<RepairFormationTypeDTO> repairFormationTypeDTOList = repairFormationTypeService.listTypes()
                                                                                             .stream()
                                                                                             .map(RepairFormationTypeDTO::from)
@@ -37,7 +37,7 @@ public class RepairFormationTypeController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавление типа Ремонтных Формирований")
-    public ResponseEntity<Object> addRepairStationType(@ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
+    public ResponseEntity<Object> addRepairFormationType(@ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
         repairFormationTypeService.addType(repairFormationTypeDTO.getName(),
                                            repairFormationTypeDTO.getWorkingHoursMin(),
                                            repairFormationTypeDTO.getWorkingHoursMax());
@@ -46,7 +46,7 @@ public class RepairFormationTypeController {
 
     @PutMapping(path = "/{typeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление типа Ремонтных Формирований")
-    public ResponseEntity<Object> updateRepairStationType(@ApiParam(value = "Ключ типа Ремонтного Формирования", required = true) @PathVariable Long typeId,
+    public ResponseEntity<Object> updateRepairFormationType(@ApiParam(value = "Ключ типа Ремонтного Формирования", required = true) @PathVariable Long typeId,
                                                           @ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
         repairFormationTypeService.updateType(typeId,
                                               repairFormationTypeDTO.getName(),
@@ -54,5 +54,4 @@ public class RepairFormationTypeController {
                                               repairFormationTypeDTO.getWorkingHoursMax());
         return ResponseEntity.accepted().build();
     }
-
 }

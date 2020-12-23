@@ -37,9 +37,14 @@ public class FormationController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    @ApiOperation(value = "Добавить Формирование", responseReference = "{\"test\": \"value\"}")
+    @ApiOperation(value = "Добавить Формирование")
     public ResponseEntity<Object> addFormation(@RequestBody FormationDTO formationModel) {
-        Long formationId = formationService.add(formationModel.getShortName(), formationModel.getFullName());
+        Long formationId = formationModel.getParentFormation() == null ?
+                formationService.add(formationModel.getShortName(),
+                                     formationModel.getFullName()) :
+                formationService.add(formationModel.getShortName(),
+                                     formationModel.getFullName(),
+                                     formationModel.getParentFormation().getId());
         List<Long> equipment = equipmentService.list().stream().map(Equipment::getId).collect(Collectors.toList());
         equipmentPerFormationService.addEquipmentToFormation(formationId, equipment, 0);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -49,7 +54,14 @@ public class FormationController {
     @ApiOperation(value = "Обновить Формирование")
     public ResponseEntity<Object> updateFormation(@PathVariable Long formationId,
                                                   @RequestBody FormationDTO formationModel) {
-        formationService.update(formationId, formationModel.getShortName(), formationModel.getFullName());
+        if (formationModel.getParentFormation() == null) {
+            formationService.update(formationId, formationModel.getShortName(), formationModel.getFullName());
+        } else {
+            formationService.update(formationId,
+                                    formationModel.getShortName(),
+                                    formationModel.getFullName(),
+                                    formationModel.getParentFormation().getId());
+        }
         return ResponseEntity.accepted().build();
     }
 

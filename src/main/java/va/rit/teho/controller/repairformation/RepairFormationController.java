@@ -8,10 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.repairformation.RepairFormationDTO;
-import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.repairformation.RepairFormationService;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,12 +35,24 @@ public class RepairFormationController {
     }
 
     @PostMapping(path = "/formation/{formationId}/repair-formation", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> addRepairFormations(
+    public ResponseEntity<Object> addRepairFormation(
             @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId,
             @RequestBody RepairFormationDTO repairFormationDTO) {
         repairFormationService.add(repairFormationDTO.getName(),
                                    repairFormationDTO.getType().getId(),
                                    formationId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping(path = "/formation/{formationId}/repair-formation/{repairFormationId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> updateRepairFormation(
+            @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId,
+            @ApiParam(value = "Ключ обновляемого ремонтного формирования", required = true) @PathVariable Long repairFormationId,
+            @RequestBody RepairFormationDTO repairFormationDTO) {
+        repairFormationService.update(repairFormationId,
+                                      repairFormationDTO.getName(),
+                                      repairFormationDTO.getType().getId(),
+                                      formationId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
