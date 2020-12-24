@@ -29,7 +29,9 @@ public class SessionFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest httpServletRequest,
+                                    HttpServletResponse httpServletResponse,
+                                    FilterChain filterChain) throws ServletException, IOException {
         final String sessionId = httpServletRequest.getHeader("Session-Id");
         if (sessionId == null) {
             prepareBadRequestResponse(httpServletResponse, "Missing Session-Id header!");
@@ -61,8 +63,11 @@ public class SessionFilter extends OncePerRequestFilter {
         List<String> filterPaths = Arrays.asList("/repair-capabilities", "/labor-distribution", "/equipment-per-base");
         String path = request.getServletPath();
         boolean repairFormationStaffPath = !(path.contains("/repair-formation") && path.contains("/staff"));
-        boolean equipmentPerFormationPath = !(path.contains("/formation") && path.contains("/equipment"));
+        boolean equipmentPerFormationPath = !(path.contains("/formation") && path.contains("/equipment") && (path.contains(
+                "/table") || path.contains("/daily-failure")));
         boolean equipmentPerFormationFilePath = !(path.contains("/formation") && path.contains("/export"));
-        return filterPaths.stream().noneMatch(path::contains) && repairFormationStaffPath && equipmentPerFormationPath && equipmentPerFormationFilePath;
+        return filterPaths
+                .stream()
+                .noneMatch(path::contains) && repairFormationStaffPath && equipmentPerFormationPath && equipmentPerFormationFilePath;
     }
 }

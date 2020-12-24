@@ -25,10 +25,21 @@ public class RepairFormationController {
     }
 
     @GetMapping("/formation/{formationId}/repair-formation")
-    public ResponseEntity<List<RepairFormationDTO>> listRepairFormations(
+    @ResponseBody
+    public ResponseEntity<List<RepairFormationDTO>> listRepairFormationsInFormation(
             @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId) {
         return ResponseEntity.ok(repairFormationService
                                          .list(formationId)
+                                         .stream()
+                                         .map(rf -> RepairFormationDTO.from(rf, false))
+                                         .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/formation/repair-formation")
+    @ResponseBody
+    public ResponseEntity<List<RepairFormationDTO>> listRepairFormations() {
+        return ResponseEntity.ok(repairFormationService
+                                         .list()
                                          .stream()
                                          .map(rf -> RepairFormationDTO.from(rf, false))
                                          .collect(Collectors.toList()));
