@@ -77,7 +77,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
 
     @Override
     public List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, List<Long> equipmentIds) {
-        return equipmentPerFormationRepository.findAllByformationId(formationId, equipmentIds);
+        return equipmentPerFormationRepository.findAllByFormationId(formationId, equipmentIds);
     }
 
     @Override
@@ -131,6 +131,11 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
             }
         }
         return result;
+    }
+
+    @Override
+    public List<EquipmentPerFormation> list(Long formationId) {
+        return equipmentPerFormationRepository.findAllByFormationId(formationId, null);
     }
 
     @Override
