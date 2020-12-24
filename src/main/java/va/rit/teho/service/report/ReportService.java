@@ -1,12 +1,7 @@
 package va.rit.teho.service.report;
 
-import va.rit.teho.exception.TehoException;
+public interface ReportService<T> {
 
-public interface ReportService {
+    byte[] generateReport(T data);
 
-    byte[] generateLaborIntensityRepairNormReport() throws TehoException;
-
-    byte[] generateAverageDailyOutputReport() throws TehoException;
-
-    byte[] generateRepairFundDistributionReport() throws TehoException;
 }

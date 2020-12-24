@@ -1,6 +1,7 @@
 package va.rit.teho.entity.equipment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,7 +23,7 @@ public class Equipment implements Serializable {
     private EquipmentSubType equipmentSubType;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "equipment")
+    @OneToMany(mappedBy = "equipment", fetch=FetchType.EAGER)
     private Set<EquipmentLaborInputPerType> laborInputPerTypes;
 
     public Equipment() {

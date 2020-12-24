@@ -3,6 +3,7 @@ package va.rit.teho.controller.equipment;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentService;
+import va.rit.teho.service.implementation.report.equipment.EquipmentReportService;
 
 import java.util.List;
 import java.util.Map;
@@ -26,11 +28,14 @@ public class EquipmentController {
 
     private final EquipmentService equipmentService;
     private final RepairTypeService repairTypeService;
+    private final EquipmentReportService equipmentReportService;
 
     public EquipmentController(EquipmentService equipmentService,
-                               RepairTypeService repairTypeService) {
+                               RepairTypeService repairTypeService,
+                               EquipmentReportService equipmentReportService) {
         this.equipmentService = equipmentService;
         this.repairTypeService = repairTypeService;
+        this.equipmentReportService = equipmentReportService;
     }
 
     @GetMapping
@@ -91,5 +96,16 @@ public class EquipmentController {
                         .collect(Collectors.toList());
 
         return ResponseEntity.ok(new TableDataDTO<>(columns, data));
+    }
+
+    @GetMapping(value = "/labor-input/report", produces = "application/vnd.ms-excel")
+    @ResponseBody
+    public ResponseEntity<byte[]> equipmentLaborInputPerType() {
+        byte[] bytes = equipmentReportService.generateReport(equipmentService.listGroupedByTypes(null, null, null));
+        return ResponseEntity.ok().contentLength(bytes.length)
+                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                             .cacheControl(CacheControl.noCache())
+                             .header("Content-Disposition", "attachment; filename=" + "Список ВВСТ с указанием нормативной трудоемкости по видам ремонта.xls")
+                             .body(bytes);
     }
 }
