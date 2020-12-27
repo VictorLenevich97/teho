@@ -4,19 +4,17 @@ import va.rit.teho.entity.formation.Formation;
 
 import javax.persistence.*;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "repair_formation")
 public class RepairFormation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "type_id", referencedColumnName = "id", nullable = false)
     private RepairFormationType repairFormationType;
 
@@ -34,7 +32,8 @@ public class RepairFormation {
     public RepairFormation() {
     }
 
-    public RepairFormation(String name, Formation formation, RepairFormationType repairFormationType) {
+    public RepairFormation(Long id, String name, Formation formation, RepairFormationType repairFormationType) {
+        this.id = id;
         this.name = name;
         this.formation = formation;
         this.repairFormationType = repairFormationType;

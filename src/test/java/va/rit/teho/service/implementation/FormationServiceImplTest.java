@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 
 public class FormationServiceImplTest {
 
-    private final static Formation FORMATION = new Formation("short", "full");
+    private final static Formation FORMATION = new Formation(1L, "short", "full");
 
     private final FormationRepository formationRepository = Mockito.mock(FormationRepository.class);
 
@@ -36,11 +36,12 @@ public class FormationServiceImplTest {
     public void testAdd() {
         FORMATION.setId(1L);
 
+        when(formationRepository.getMaxId()).thenReturn(1L);
         when(formationRepository.save(any())).thenReturn(FORMATION);
 
         Assertions.assertEquals(service.add(FORMATION.getShortName(), FORMATION.getFullName()), FORMATION.getId());
 
-        verify(formationRepository).save(new Formation(FORMATION.getShortName(), FORMATION.getFullName()));
+        verify(formationRepository).save(new Formation(2L, FORMATION.getShortName(), FORMATION.getFullName()));
     }
 
     @Test

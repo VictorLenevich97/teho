@@ -69,9 +69,9 @@ public class EquipmentServiceImpl implements EquipmentService {
         if (equipmentRepository.findByName(name).isPresent()) {
             throw new AlreadyExistsException("ВВСТ", "имя", name);
         }
-        Equipment s = new Equipment(name, equipmentSubType);
-        Equipment saved = equipmentRepository.save(s);
-        return saved.getId();
+        long newId = equipmentRepository.getMaxId() + 1;
+        equipmentRepository.save(new Equipment(newId, name, equipmentSubType));
+        return newId;
     }
 
     @Override

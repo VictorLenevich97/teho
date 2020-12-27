@@ -38,11 +38,13 @@ public class RepairFormationServiceImpl implements RepairFormationService {
 
     @Override
     public Long add(String name, Long typeId, Long formationId) {
-        RepairFormation repairFormation = new RepairFormation(name,
+        Long newId = repairFormationRepository.getMaxId() + 1;
+        RepairFormation repairFormation = new RepairFormation(newId,
+                                                              name,
                                                               formationService.get(formationId),
                                                               repairFormationTypeService.get(typeId));
-        RepairFormation saved = repairFormationRepository.save(repairFormation);
-        return saved.getId();
+        repairFormationRepository.save(repairFormation);
+        return newId;
     }
 
     @Override
@@ -50,7 +52,8 @@ public class RepairFormationServiceImpl implements RepairFormationService {
         RepairFormation repairFormation = repairFormationRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Формирование не найдено!"));
-        RepairFormation updated = new RepairFormation(name,
+        RepairFormation updated = new RepairFormation(id,
+                                                      name,
                                                       formationService.get(formationId),
                                                       repairFormationTypeService.get(typeId));
         updated.setId(repairFormation.getId());

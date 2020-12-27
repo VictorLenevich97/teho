@@ -27,7 +27,7 @@ public class FormationControllerTest extends ControllerTest {
 
     @Test
     public void testListBases() throws Exception {
-        List<Formation> bases = Arrays.asList(new Formation("s", "f"), new Formation("s2", "f2"));
+        List<Formation> bases = Arrays.asList(new Formation(1L, "s", "f"), new Formation(1L, "s2", "f2"));
         when(formationService.list()).thenReturn(bases);
 
         mockMvc.perform(get("/formation")).andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(bases.size())));
@@ -36,7 +36,7 @@ public class FormationControllerTest extends ControllerTest {
     @Test
     public void testGetBaseById() throws Exception {
         Long formationId = 1L;
-        Formation formation = new Formation("s", "f");
+        Formation formation = new Formation(1L, "s", "f");
         formation.setId(formationId);
         when(formationService.get(formationId)).thenReturn(formation);
 
@@ -65,7 +65,9 @@ public class FormationControllerTest extends ControllerTest {
         when(formationService.add(base.getShortName(), base.getFullName())).thenReturn(formation);
 
         mockMvc.perform(
-                post("/formation").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(base)))
+                post("/formation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(base)))
                .andExpect(status().isCreated());
 
         verify(formationService).add(base.getShortName(), base.getFullName());
@@ -81,7 +83,7 @@ public class FormationControllerTest extends ControllerTest {
 
         mockMvc.perform(
                 put("/formation/{id}", formationId).contentType(MediaType.APPLICATION_JSON)
-                                         .content(objectMapper.writeValueAsString(base)))
+                                                   .content(objectMapper.writeValueAsString(base)))
                .andExpect(status().isAccepted());
 
         verify(formationService).update(formationId, base.getShortName(), base.getFullName());

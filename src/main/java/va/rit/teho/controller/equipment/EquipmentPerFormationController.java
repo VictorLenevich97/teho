@@ -59,16 +59,18 @@ public class EquipmentPerFormationController {
         equipmentPerFormationService.addEquipmentToFormation(formationId,
                                                              equipmentId,
                                                              (long) intensityAndAmount.getAmount());
-        intensityAndAmount
-                .getIntensity()
-                .forEach(intensityPerRepairTypeAndStageDTO ->
-                                 equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
-                                         tehoSession.getSessionId(),
-                                         formationId,
-                                         equipmentId,
-                                         intensityPerRepairTypeAndStageDTO.getRepairTypeId(),
-                                         intensityPerRepairTypeAndStageDTO.getStageId(),
-                                         intensityPerRepairTypeAndStageDTO.getIntensity()));
+        if (intensityAndAmount.getIntensity() != null) {
+            intensityAndAmount
+                    .getIntensity()
+                    .forEach(intensityPerRepairTypeAndStageDTO ->
+                                     equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
+                                             tehoSession.getSessionId(),
+                                             formationId,
+                                             equipmentId,
+                                             intensityPerRepairTypeAndStageDTO.getRepairTypeId(),
+                                             intensityPerRepairTypeAndStageDTO.getStageId(),
+                                             intensityPerRepairTypeAndStageDTO.getIntensity()));
+        }
         return ResponseEntity.accepted().build();
     }
 

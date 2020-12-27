@@ -12,7 +12,6 @@ import java.util.Set;
 public class Formation implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String shortName;
@@ -33,12 +32,14 @@ public class Formation implements Serializable {
     public Formation() {
     }
 
-    public Formation(String shortName, String fullName) {
+    public Formation(Long id, String shortName, String fullName) {
+        this.id = id;
         this.shortName = shortName;
         this.fullName = fullName;
     }
 
-    public Formation(String shortName, String fullName, Formation parentFormation) {
+    public Formation(Long id, String shortName, String fullName, Formation parentFormation) {
+        this.id = id;
         this.shortName = shortName;
         this.fullName = fullName;
         this.parentFormation = parentFormation;

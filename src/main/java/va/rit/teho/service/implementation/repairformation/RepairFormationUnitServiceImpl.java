@@ -16,7 +16,6 @@ import va.rit.teho.repository.repairformation.RepairFormationUnitRepository;
 import va.rit.teho.repository.repairformation.RepairStationTypeRepository;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
-import va.rit.teho.service.repairformation.RepairFormationTypeService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +75,9 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
         repairStationTypeRepository.findByName(name).ifPresent(repairStation -> {
             throw new AlreadyExistsException("РВО", "название", name);
         });
-        RepairFormationUnit repairFormationUnit = new RepairFormationUnit(name,
+        long newId = repairFormationUnitRepository.getMaxId() + 1;
+        RepairFormationUnit repairFormationUnit = new RepairFormationUnit(newId,
+                                                                          name,
                                                                           repairStationType,
                                                                           amount);
         return repairFormationUnitRepository.save(repairFormationUnit).getId();
