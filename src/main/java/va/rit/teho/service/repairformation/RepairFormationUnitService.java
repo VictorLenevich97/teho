@@ -18,9 +18,9 @@ public interface RepairFormationUnitService {
     Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(Long repairFormationUntId,
                                                                                     UUID sessionId);
 
-    Long add(String name, Long repairFormationId, Long stationTypeId, int amount);
+    RepairFormationUnit add(String name, Long repairFormationId, Long stationTypeId, int amount);
 
-    void update(Long id, String name, Long repairFormationId, Long stationTypeId, int amount);
+    RepairFormationUnit update(Long id, String name, Long repairFormationId, Long stationTypeId, int amount);
 
     void updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList);
 

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
+import va.rit.teho.dto.equipment.EquipmentPerFormationDTO;
 import va.rit.teho.dto.equipment.EquipmentPerFormationSaveDTO;
 import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
@@ -58,16 +59,18 @@ public class EquipmentPerFormationController {
         equipmentPerFormationService.addEquipmentToFormation(formationId,
                                                              equipmentId,
                                                              (long) intensityAndAmount.getAmount());
-        intensityAndAmount
-                .getIntensity()
-                .forEach(intensityPerRepairTypeAndStageDTO ->
-                                 equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
-                                         tehoSession.getSessionId(),
-                                         formationId,
-                                         equipmentId,
-                                         intensityPerRepairTypeAndStageDTO.getRepairTypeId(),
-                                         intensityPerRepairTypeAndStageDTO.getStageId(),
-                                         intensityPerRepairTypeAndStageDTO.getIntensity()));
+        if (intensityAndAmount.getIntensity() != null) {
+            intensityAndAmount
+                    .getIntensity()
+                    .forEach(intensityPerRepairTypeAndStageDTO ->
+                                     equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
+                                             tehoSession.getSessionId(),
+                                             formationId,
+                                             equipmentId,
+                                             intensityPerRepairTypeAndStageDTO.getRepairTypeId(),
+                                             intensityPerRepairTypeAndStageDTO.getStageId(),
+                                             intensityPerRepairTypeAndStageDTO.getIntensity()));
+        }
         return ResponseEntity.accepted().build();
     }
 
@@ -95,11 +98,23 @@ public class EquipmentPerFormationController {
         return ResponseEntity.accepted().build();
     }
 
-
     @GetMapping("/formation/{formationId}/equipment")
     @ResponseBody
     @ApiOperation(value = "Получить данные о ВВСТ в Формированиях (в табличном виде)")
-    public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerFormationData(
+    public ResponseEntity<List<EquipmentPerFormationDTO>> getEquipmentPerFormationData(
+            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId) {
+        return ResponseEntity.ok(equipmentPerFormationService
+                                         .list(formationId)
+                                         .stream()
+                                         .map(EquipmentPerFormationDTO::from)
+                                         .collect(Collectors.toList()));
+    }
+
+
+    @GetMapping("/formation/{formationId}/equipment/table")
+    @ResponseBody
+    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях (в табличном виде)")
+    public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerFormationTableData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1")
             @PathVariable Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) {

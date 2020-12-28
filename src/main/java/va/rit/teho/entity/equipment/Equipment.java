@@ -13,7 +13,6 @@ import java.util.Set;
 public class Equipment implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -29,7 +28,8 @@ public class Equipment implements Serializable {
     public Equipment() {
     }
 
-    public Equipment(String name, EquipmentSubType equipmentSubType) {
+    public Equipment(Long id, String name, EquipmentSubType equipmentSubType) {
+        this.id = id;
         this.name = name;
         this.equipmentSubType = equipmentSubType;
     }

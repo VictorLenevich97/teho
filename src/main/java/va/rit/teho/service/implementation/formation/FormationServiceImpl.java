@@ -33,8 +33,8 @@ public class FormationServiceImpl implements FormationService {
     @Transactional
     public Formation add(String shortName, String fullName) {
         checkPreRequisites(shortName, fullName);
-        Formation formation = formationRepository.save(new Formation(shortName, fullName));
-        return formation;
+        Long newId = formationRepository.getMaxId() + 1;
+        return formationRepository.save(new Formation(newId, shortName, fullName));
     }
 
     private void checkPreRequisites(String shortName, String fullName) {
@@ -52,20 +52,20 @@ public class FormationServiceImpl implements FormationService {
         if (!optionalFormation.isPresent()) {
             throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
         }
-        Formation formation = formationRepository.save(new Formation(shortName, fullName, optionalFormation.get()));
-        return formation;
+        long newId = formationRepository.getMaxId() + 1;
+        return formationRepository.save(new Formation(newId, shortName, fullName, optionalFormation.get()));
     }
 
     @Override
-    public void update(Long formationId, String shortName, String fullName) {
+    public Formation update(Long formationId, String shortName, String fullName) {
         Formation formation = getFormationOrThrow(formationId);
         formation.setFullName(fullName);
         formation.setShortName(shortName);
-        formationRepository.save(formation);
+        return formationRepository.save(formation);
     }
 
     @Override
-    public void update(Long formationId, String shortName, String fullName, Long parentFormationId) {
+    public Formation update(Long formationId, String shortName, String fullName, Long parentFormationId) {
         Formation formation = getFormationOrThrow(formationId);
         Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
         if (!optionalFormation.isPresent()) {
@@ -75,7 +75,7 @@ public class FormationServiceImpl implements FormationService {
         formation.setFullName(fullName);
         formation.setShortName(shortName);
         formation.setParentFormation(optionalFormation.get());
-        formationRepository.save(formation);
+        return formationRepository.save(formation);
     }
 
     private Formation getFormationOrThrow(Long formationId) {

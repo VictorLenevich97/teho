@@ -12,6 +12,9 @@ import java.util.Optional;
 @Repository
 public interface RepairFormationUnitRepository extends PagingAndSortingRepository<RepairFormationUnit, Long> {
 
+    @Query("SELECT COALESCE(max(rfu.id), 0) FROM RepairFormationUnit rfu")
+    Long getMaxId();
+
     Optional<RepairFormationUnit> findByName(String name);
 
     @Query("SELECT rdu from RepairFormationUnit rdu WHERE (coalesce(:repairFormationUnitIds, null) is null or rdu.id in (:repairFormationUnitIds)) " +

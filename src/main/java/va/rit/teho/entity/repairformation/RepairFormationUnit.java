@@ -7,7 +7,6 @@ import java.util.Objects;
 public class RepairFormationUnit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -26,18 +25,22 @@ public class RepairFormationUnit {
         //Пустой конструктор для автоматической инициализации
     }
 
-    public RepairFormationUnit(String name,
+    public RepairFormationUnit(Long id,
+                               String name,
                                RepairStationType repairStationType,
                                int stationAmount) {
+        this.id = id;
         this.name = name;
         this.repairStationType = repairStationType;
         this.stationAmount = stationAmount;
     }
 
-    public RepairFormationUnit(String name,
+    public RepairFormationUnit(Long id,
+                               String name,
                                RepairStationType repairStationType,
                                int stationAmount,
                                RepairFormation repairFormation) {
+        this.id = id;
         this.name = name;
         this.repairStationType = repairStationType;
         this.stationAmount = stationAmount;

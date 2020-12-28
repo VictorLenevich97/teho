@@ -16,7 +16,6 @@ import va.rit.teho.repository.repairformation.RepairFormationUnitRepository;
 import va.rit.teho.repository.repairformation.RepairStationTypeRepository;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
-import va.rit.teho.service.repairformation.RepairFormationTypeService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -69,21 +68,23 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public Long add(String name, Long repairFormationId, Long stationTypeId, int amount) {
+    public RepairFormationUnit add(String name, Long repairFormationId, Long stationTypeId, int amount) {
         RepairStationType repairStationType = repairStationTypeRepository
                 .findById(stationTypeId)
                 .orElseThrow(() -> new NotFoundException(""));
         repairStationTypeRepository.findByName(name).ifPresent(repairStation -> {
             throw new AlreadyExistsException("РВО", "название", name);
         });
-        RepairFormationUnit repairFormationUnit = new RepairFormationUnit(name,
+        long newId = repairFormationUnitRepository.getMaxId() + 1;
+        RepairFormationUnit repairFormationUnit = new RepairFormationUnit(newId,
+                                                                          name,
                                                                           repairStationType,
                                                                           amount);
-        return repairFormationUnitRepository.save(repairFormationUnit).getId();
+        return repairFormationUnitRepository.save(repairFormationUnit);
     }
 
     @Override
-    public void update(Long id, String name, Long repairFormationId, Long stationTypeId, int amount) {
+    public RepairFormationUnit update(Long id, String name, Long repairFormationId, Long stationTypeId, int amount) {
         RepairFormationUnit repairFormationUnit = getRepairStationOrThrow(id);
         RepairStationType repairStationType = repairStationTypeRepository
                 .findById(stationTypeId)
@@ -93,7 +94,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
         repairFormationUnit.setName(name);
         repairFormationUnit.setStationAmount(amount);
 
-        repairFormationUnitRepository.save(repairFormationUnit);
+        return repairFormationUnitRepository.save(repairFormationUnit);
     }
 
     private RepairFormationUnit getRepairStationOrThrow(Long id) {
