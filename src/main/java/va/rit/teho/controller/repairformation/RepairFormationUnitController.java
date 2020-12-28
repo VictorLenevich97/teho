@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.data.util.Pair;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,13 @@ import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentTypeService;
+import va.rit.teho.service.implementation.report.repairformation.RepairFormationUnitReportData;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
+import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,13 +50,18 @@ public class RepairFormationUnitController {
 
     private final RepairFormationUnitService repairFormationUnitService;
     private final EquipmentTypeService equipmentTypeService;
+    private final ReportService<RepairFormationUnitReportData> reportService;
+
+
     @Resource
     private TehoSessionData tehoSession;
 
     public RepairFormationUnitController(RepairFormationUnitService repairFormationUnitService,
-                                         EquipmentTypeService equipmentTypeService) {
+                                         EquipmentTypeService equipmentTypeService,
+                                         ReportService<RepairFormationUnitReportData> reportService) {
         this.repairFormationUnitService = repairFormationUnitService;
         this.equipmentTypeService = equipmentTypeService;
+        this.reportService = reportService;
     }
 
     @GetMapping("/formation/repair-formation/unit")
@@ -69,6 +79,37 @@ public class RepairFormationUnitController {
                                           .map(RepairFormationUnitDTO::from)
                                           .collect(Collectors.toList());
         return ResponseEntity.ok(repairFormationUnitDTOList);
+    }
+
+    @GetMapping("/formation/repair-formation/unit/staff/report")
+    @ApiOperation(value = "[ПЕЧАТЬ] Получение состава, штатной численности и укомплектованности РВО (в табличном виде)")
+    public ResponseEntity<byte[]> getEquipmentStaffReport(
+            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
+            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
+            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId,
+            @RequestParam(required = false, defaultValue = "1") int pageNum,
+            @RequestParam(required = false, defaultValue = "100") int pageSize) throws UnsupportedEncodingException {
+        List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(repairFormationUnitId,
+                                                                                            pageNum,
+                                                                                            pageSize);
+        Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes =
+                equipmentTypeService.listTypesWithSubTypes(equipmentTypeId,
+                                                           equipmentSubTypeId);
+        Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff =
+                repairFormationUnitService.getWithEquipmentStaffGrouped(tehoSession.getSessionId(),
+                                                                        repairFormationUnitId,
+                                                                        equipmentTypeId,
+                                                                        equipmentSubTypeId);
+        RepairFormationUnitReportData repairFormationUnitReportData = new RepairFormationUnitReportData(repairFormationUnitList, typesWithSubTypes, repairFormationUnitEquipmentStaff);
+        byte[] bytes = reportService.generateReport(repairFormationUnitReportData);
+        String encode = URLEncoder.encode("Состав и штатная численность РВО.xls",
+                                          "UTF-8");
+        return ResponseEntity.ok().contentLength(bytes.length)
+                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                             .cacheControl(CacheControl.noCache())
+                             .header("Content-Disposition", "attachment; filename=" + encode)
+                             .body(bytes);
+
     }
 
     @GetMapping("/formation/repair-formation/unit/staff")

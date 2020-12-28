@@ -26,27 +26,28 @@ public class EquipmentReportService
         extends AbstractReportService<Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>>, Equipment> {
 
     private final RepairTypeService repairTypeService;
+    private final List<RepairType> repairTypes;
 
     public EquipmentReportService(RepairTypeService repairTypeService) {
         this.repairTypeService = repairTypeService;
+        this.repairTypes = repairTypeService.list(true);
     }
 
-    private List<Header> buildHeader(List<RepairType> repairTypes) {
+    @Override
+    protected List<Header> buildHeader() {
         List<Header> result = new ArrayList<>();
-        result.add(new Header("Тип ВВСТ, марка техники", true));
-        result.add(new Header("Вид", true));
-        Header repairTypeHeader = new Header("Вид ремонта", true);
-        repairTypes.forEach(repairType -> repairTypeHeader.addChildren(new Header(repairType.getFullName(), true)));
+        result.add(new Header("Тип ВВСТ, марка техники", true, false));
+        result.add(new Header("Вид", true, false));
+        Header repairTypeHeader = new Header("Вид ремонта", true, false);
+        repairTypes.forEach(repairType -> repairTypeHeader.addChildren(new Header(repairType.getFullName(), true, false)));
         result.add(repairTypeHeader);
         return result;
     }
 
     @Override
-    public byte[] generateReport(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data) {
-        Sheet sheet = createSheet("Нормативы трудоемкости ремонта");
-        List<RepairType> repairTypes = repairTypeService.list(true);
-
-        final int[] lastRow = {writeHeader(sheet, buildHeader(repairTypes)) + 1};
+    protected void writeData(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data,
+                             Sheet sheet,
+                             int[] lastRow) {
         data.forEach((eqType, subTypeListMap) -> {
             int lastRowIndex = lastRow[0];
 
@@ -56,11 +57,11 @@ public class EquipmentReportService
 
             List<Equipment> equipmentList =
                     subTypeListMap.entrySet().stream().flatMap(e -> e.getValue().stream()).collect(Collectors.toList());
+
             writeRows(sheet, lastRowIndex + 1, equipmentList);
 
             lastRow[0] += subTypeListMap.size() + 1;
         });
-        return writeSheet(sheet);
     }
 
     private Function<Equipment, ReportCell> equipmentLaborInputFunction(RepairType rt) {
@@ -84,5 +85,10 @@ public class EquipmentReportService
                 .collect(Collectors.toList());
         populateCellFunctions.addAll(rtFunctions);
         return populateCellFunctions;
+    }
+
+    @Override
+    protected String reportName() {
+        return "Нормативы трудоемкости ремонта";
     }
 }

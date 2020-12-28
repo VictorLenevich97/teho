@@ -1,0 +1,35 @@
+package va.rit.teho.service.implementation.report.repairformation;
+
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.entity.repairformation.RepairFormationUnit;
+import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
+
+import java.util.List;
+import java.util.Map;
+
+public class RepairFormationUnitReportData {
+    private final List<RepairFormationUnit> repairFormationUnitList;
+    private final Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes;
+    private final Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff;
+
+    public RepairFormationUnitReportData(List<RepairFormationUnit> repairFormationUnitList,
+                                         Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes,
+                                         Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff) {
+        this.repairFormationUnitList = repairFormationUnitList;
+        this.typesWithSubTypes = typesWithSubTypes;
+        this.repairFormationUnitEquipmentStaff = repairFormationUnitEquipmentStaff;
+    }
+
+    public List<RepairFormationUnit> getRepairFormationUnitList() {
+        return repairFormationUnitList;
+    }
+
+    public Map<EquipmentType, List<EquipmentSubType>> getTypesWithSubTypes() {
+        return typesWithSubTypes;
+    }
+
+    public Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> getRepairFormationUnitEquipmentStaff() {
+        return repairFormationUnitEquipmentStaff;
+    }
+}

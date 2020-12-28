@@ -13,10 +13,15 @@ import va.rit.teho.dto.equipment.EquipmentDTO;
 import va.rit.teho.dto.equipment.EquipmentLaborInputPerTypeRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
+import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentService;
-import va.rit.teho.service.implementation.report.equipment.EquipmentReportService;
+import va.rit.teho.service.report.ReportService;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,11 +33,11 @@ public class EquipmentController {
 
     private final EquipmentService equipmentService;
     private final RepairTypeService repairTypeService;
-    private final EquipmentReportService equipmentReportService;
+    private final ReportService<Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>>> equipmentReportService;
 
     public EquipmentController(EquipmentService equipmentService,
                                RepairTypeService repairTypeService,
-                               EquipmentReportService equipmentReportService) {
+                               ReportService<Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>>> equipmentReportService) {
         this.equipmentService = equipmentService;
         this.repairTypeService = repairTypeService;
         this.equipmentReportService = equipmentReportService;
@@ -100,12 +105,14 @@ public class EquipmentController {
 
     @GetMapping(value = "/labor-input/report", produces = "application/vnd.ms-excel")
     @ResponseBody
-    public ResponseEntity<byte[]> equipmentLaborInputPerType() {
+    public ResponseEntity<byte[]> equipmentLaborInputPerType() throws UnsupportedEncodingException {
         byte[] bytes = equipmentReportService.generateReport(equipmentService.listGroupedByTypes(null, null, null));
+        String encode = URLEncoder.encode("Список ВВСТ (с трудоёмкостью).xls",
+                                          "UTF-8");
         return ResponseEntity.ok().contentLength(bytes.length)
                              .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
                              .cacheControl(CacheControl.noCache())
-                             .header("Content-Disposition", "attachment; filename=" + "Список ВВСТ с указанием нормативной трудоемкости по видам ремонта.xls")
+                             .header("Content-Disposition", "attachment; filename=" + encode)
                              .body(bytes);
     }
 }

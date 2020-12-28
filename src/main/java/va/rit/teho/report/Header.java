@@ -6,18 +6,28 @@ import java.util.List;
 public class Header {
     private final String name;
     private final boolean centered;
+    private final boolean vertical;
     private final List<Header> children;
 
-    public Header(String name, boolean centered) {
+    public Header(String name, boolean centered, boolean vertical) {
         this.name = name;
         this.centered = centered;
+        this.vertical = vertical;
         this.children = new ArrayList<>();
     }
 
     public Header(String name, List<Header> children) {
         this.name = name;
         this.children = children;
+        this.vertical = false;
         this.centered = false;
+    }
+
+    public Header(String name, boolean centered, List<Header> children) {
+        this.name = name;
+        this.children = children;
+        this.vertical = false;
+        this.centered = centered;
     }
 
     public boolean isCentered() {
@@ -56,5 +66,9 @@ public class Header {
                     .orElse(depth);
         }
         return depth;
+    }
+
+    public boolean isVertical() {
+        return vertical;
     }
 }

@@ -19,7 +19,9 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
 
     protected abstract List<Function<R, ReportCell>> populateCellFunctions();
 
-    protected Sheet createSheet(String name) {
+    protected abstract String reportName();
+
+    private Sheet createSheet(String name) {
         return wb.createSheet(name);
     }
 
@@ -27,6 +29,27 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
         alignCell(c, HorizontalAlignment.CENTER);
         return c;
     }
+
+    protected void rotateCell(Cell c) {
+        c.getCellStyle().setWrapText(true);
+        c.getCellStyle().setShrinkToFit(true);
+        c.getCellStyle().setRotation((short) 90);
+    }
+
+    protected abstract List<Header> buildHeader();
+
+    @Override
+    public byte[] generateReport(T data) {
+        Sheet sheet = createSheet(reportName());
+
+        final int[] lastRow = {writeHeader(sheet, buildHeader()) + 1};
+
+        writeData(data, sheet, lastRow);
+
+        return writeSheet(sheet);
+    }
+
+    protected abstract void writeData(T data, Sheet sheet, int[] lastRow);
 
     private void alignCell(Cell c, HorizontalAlignment horizontalAlignment) {
         CellStyle cellStyle = wb.createCellStyle();
@@ -37,7 +60,7 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
 
     protected byte[] writeSheet(Sheet sheet) {
         int columnCount = populateCellFunctions().size();
-        for(int i = 0; i < columnCount; i++) {
+        for (int i = 0; i < columnCount; i++) {
             sheet.autoSizeColumn(i, true);
         }
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -50,11 +73,13 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
         return new byte[0];
     }
 
-    private int writeHeader(Sheet sheet, va.rit.teho.report.Header header, int cRow, int cCol, int lowestLevel) {
+    private int writeHeader(Sheet sheet, Header header, int cRow, int cCol, int lowestLevel) {
+        CellStyle cellStyle = wb.createCellStyle();
+        cellStyle.setWrapText(true);
         int levelCount = 1;
         if (header.hasChildren()) {
             int hLengthSum = 0;
-            for (va.rit.teho.report.Header h : header.getChildren()) {
+            for (Header h : header.getChildren()) {
                 int headerLength = writeHeader(sheet, h, cRow + 1, cCol + hLengthSum, lowestLevel);
                 hLengthSum += headerLength;
             }
@@ -64,10 +89,15 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
             mergeCells(sheet, cRow, lowestLevel, cCol, cCol);
         }
         Row row = sheet.getRow(cRow) == null ? sheet.createRow(cRow) : sheet.getRow(cRow);
+        row.setHeight((short) -1);
+        row.setRowStyle(cellStyle);
         Cell cell = row.createCell(cCol);
         cell.setCellValue(header.getName());
         if (header.isCentered()) {
             alignCellCenter(cell);
+        }
+        if (header.isVertical()) {
+            rotateCell(cell);
         }
         return levelCount;
     }
@@ -75,10 +105,14 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
     protected void writeRows(Sheet sheet,
                              int rowStartIndex,
                              Collection<R> data) {
+        CellStyle cellStyle = wb.createCellStyle();
+        cellStyle.setWrapText(true);
         List<Function<R, ReportCell>> populateCellFunctions = populateCellFunctions();
         int i = 0;
         for (R item : data) {
             Row row = sheet.createRow(rowStartIndex + i);
+            row.setHeight((short) -1);
+            row.setRowStyle(cellStyle);
             for (int j = 0; j < populateCellFunctions.size(); j++) {
                 Cell cell = row.createCell(j);
                 ReportCell reportCell = populateCellFunctions.get(j).apply(item);
@@ -93,11 +127,11 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
         }
     }
 
-    protected int writeHeader(Sheet sheet, List<va.rit.teho.report.Header> headerList) {
+    protected int writeHeader(Sheet sheet, List<Header> headerList) {
         int cCol = 0;
         int lowestLevel = headerList
                 .stream()
-                .map(va.rit.teho.report.Header::depth)
+                .map(Header::depth)
                 .mapToInt(Integer::intValue)
                 .max()
                 .orElse(0);
