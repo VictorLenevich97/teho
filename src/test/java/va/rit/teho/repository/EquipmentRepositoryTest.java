@@ -30,14 +30,15 @@ public class EquipmentRepositoryTest {
 
     @Test
     public void testGetEquipmentGroupedByType() {
-        Equipment equipment = new Equipment("equipment",
+        Equipment equipment = new Equipment(0L,
+                                            "equipment",
                                             new EquipmentSubType("short",
                                                                  "full",
                                                                  new EquipmentType("shortType", "fullType")));
         Equipment savedEquipment1 = equipmentRepository.save(equipment);
 
-        Equipment equipment2 = new Equipment("equipment2", savedEquipment1.getEquipmentSubType());
-        Equipment equipment3 = new Equipment("equipment3", new EquipmentSubType("short2",
+        Equipment equipment2 = new Equipment(0L, "equipment2", savedEquipment1.getEquipmentSubType());
+        Equipment equipment3 = new Equipment(0L, "equipment3", new EquipmentSubType("short2",
                                                                                 "full2",
                                                                                 new EquipmentType("shortType2",
                                                                                                   "fullType2")));
@@ -67,11 +68,13 @@ public class EquipmentRepositoryTest {
 
     @Test
     public void testGetEquipmentGroupedByTypeFilterById() {
-        Equipment equipment = new Equipment("equipment",
+        Equipment equipment = new Equipment(0L,
+                                            "equipment",
                                             new EquipmentSubType("short",
                                                                  "full",
                                                                  new EquipmentType("shortType", "fullType")));
-        Equipment equipment2 = new Equipment("equipment2",
+        Equipment equipment2 = new Equipment(0L,
+                                             "equipment2",
                                              new EquipmentSubType("short2",
                                                                   "full2",
                                                                   new EquipmentType("shortType2", "fullType2")));
@@ -98,11 +101,13 @@ public class EquipmentRepositoryTest {
 
     @Test
     public void testGetEquipmentGroupedByTypeFilterByTypeId() {
-        Equipment equipment = new Equipment("equipment",
+        Equipment equipment = new Equipment(0L,
+                                            "equipment",
                                             new EquipmentSubType("short",
                                                                  "full",
                                                                  new EquipmentType("shortType", "fullType")));
-        Equipment equipment2 = new Equipment("equipment2",
+        Equipment equipment2 = new Equipment(0L,
+                                             "equipment2",
                                              new EquipmentSubType("short2",
                                                                   "full2",
                                                                   new EquipmentType("shortType2", "fullType2")));

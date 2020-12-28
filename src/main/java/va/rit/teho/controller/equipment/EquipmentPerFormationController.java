@@ -59,16 +59,18 @@ public class EquipmentPerFormationController {
         equipmentPerFormationService.addEquipmentToFormation(formationId,
                                                              equipmentId,
                                                              (long) intensityAndAmount.getAmount());
-        intensityAndAmount
-                .getIntensity()
-                .forEach(intensityPerRepairTypeAndStageDTO ->
-                                 equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
-                                         tehoSession.getSessionId(),
-                                         formationId,
-                                         equipmentId,
-                                         intensityPerRepairTypeAndStageDTO.getRepairTypeId(),
-                                         intensityPerRepairTypeAndStageDTO.getStageId(),
-                                         intensityPerRepairTypeAndStageDTO.getIntensity()));
+        if (intensityAndAmount.getIntensity() != null) {
+            intensityAndAmount
+                    .getIntensity()
+                    .forEach(intensityPerRepairTypeAndStageDTO ->
+                                     equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
+                                             tehoSession.getSessionId(),
+                                             formationId,
+                                             equipmentId,
+                                             intensityPerRepairTypeAndStageDTO.getRepairTypeId(),
+                                             intensityPerRepairTypeAndStageDTO.getStageId(),
+                                             intensityPerRepairTypeAndStageDTO.getIntensity()));
+        }
         return ResponseEntity.accepted().build();
     }
 
@@ -81,18 +83,20 @@ public class EquipmentPerFormationController {
         equipmentPerFormationService.updateEquipmentInFormation(formationId,
                                                                 equipmentId,
                                                                 equipmentPerFormationSaveDTO.getAmount());
-        equipmentPerFormationSaveDTO.getData().forEach((stageId, repairTypeIntensityMap) ->
-                                                               repairTypeIntensityMap
-                                                                       .forEach((repairTypeId, intensity) ->
-                                                                                        equipmentPerFormationService
-                                                                                                .setEquipmentPerFormationFailureIntensity(
-                                                                                                        tehoSession
-                                                                                                                .getSessionId(),
-                                                                                                        formationId,
-                                                                                                        equipmentId,
-                                                                                                        repairTypeId,
-                                                                                                        stageId,
-                                                                                                        intensity)));
+        if (equipmentPerFormationSaveDTO.getData() != null) {
+            equipmentPerFormationSaveDTO.getData().forEach((stageId, repairTypeIntensityMap) ->
+                                                                   repairTypeIntensityMap
+                                                                           .forEach((repairTypeId, intensity) ->
+                                                                                            equipmentPerFormationService
+                                                                                                    .setEquipmentPerFormationFailureIntensity(
+                                                                                                            tehoSession
+                                                                                                                    .getSessionId(),
+                                                                                                            formationId,
+                                                                                                            equipmentId,
+                                                                                                            repairTypeId,
+                                                                                                            stageId,
+                                                                                                            intensity)));
+        }
         return ResponseEntity.accepted().build();
     }
 

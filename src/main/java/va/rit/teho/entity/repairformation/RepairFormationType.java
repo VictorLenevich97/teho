@@ -2,12 +2,15 @@ package va.rit.teho.entity.repairformation;
 
 import va.rit.teho.entity.labordistribution.RestorationType;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class RepairFormationType {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -23,7 +26,12 @@ public class RepairFormationType {
     public RepairFormationType() {
     }
 
-    public RepairFormationType(String name, RestorationType restorationType, int workingHoursMin, int workingHoursMax) {
+    public RepairFormationType(Long id,
+                               String name,
+                               RestorationType restorationType,
+                               int workingHoursMin,
+                               int workingHoursMax) {
+        this.id = id;
         this.name = name;
         this.restorationType = restorationType;
         this.workingHoursMin = workingHoursMin;
@@ -33,6 +41,7 @@ public class RepairFormationType {
     public RestorationType getRestorationType() {
         return restorationType;
     }
+
     public Long getId() {
         return id;
     }
@@ -59,5 +68,9 @@ public class RepairFormationType {
 
     public void setWorkingHoursMax(int workingHoursMax) {
         this.workingHoursMax = workingHoursMax;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

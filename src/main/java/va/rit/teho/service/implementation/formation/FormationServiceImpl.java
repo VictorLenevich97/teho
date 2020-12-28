@@ -36,7 +36,8 @@ public class FormationServiceImpl implements FormationService {
     @Transactional
     public Formation add(String shortName, String fullName) {
         checkPreRequisites(shortName, fullName);
-        return formationRepository.save(new Formation(shortName, fullName));
+        Long newId = formationRepository.getMaxId() + 1;
+        return formationRepository.save(new Formation(newId, shortName, fullName));
     }
 
     private void checkPreRequisites(String shortName, String fullName) {
@@ -54,7 +55,8 @@ public class FormationServiceImpl implements FormationService {
         if (!optionalFormation.isPresent()) {
             throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
         }
-        return formationRepository.save(new Formation(shortName, fullName, optionalFormation.get()));
+        long newId = formationRepository.getMaxId() + 1;
+        return formationRepository.save(new Formation(newId, shortName, fullName, optionalFormation.get()));
     }
 
     @Override

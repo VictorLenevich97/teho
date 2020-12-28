@@ -10,8 +10,8 @@ public interface RepairFormationService {
 
     List<RepairFormation> list(Long formationId);
 
-    Long add(String name, Long typeId, Long formationId);
+    RepairFormation add(String name, Long typeId, Long formationId);
 
-    Long update(Long id, String name, Long typeId, Long formationId);
+    RepairFormation update(Long id, String name, Long typeId, Long formationId);
 
 }
