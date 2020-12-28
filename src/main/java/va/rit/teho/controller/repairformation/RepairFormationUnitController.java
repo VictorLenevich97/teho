@@ -129,28 +129,32 @@ public class RepairFormationUnitController {
 
     @PostMapping(path = "/formation/repair-formation/{repairFormationId}/unit", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавление РВО")
-    public ResponseEntity<Object> addRepairFormationUnit(
+    public ResponseEntity<RepairFormationUnitDTO> addRepairFormationUnit(
             @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
             @ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
-        repairFormationUnitService.add(repairFormationUnitDTO.getName(),
-                                       repairFormationId,
-                                       repairFormationUnitDTO.getStationType().getId(),
-                                       repairFormationUnitDTO.getAmount());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        RepairFormationUnit repairFormationUnit = repairFormationUnitService.add(repairFormationUnitDTO.getName(),
+                                                                                 repairFormationId,
+                                                                                 repairFormationUnitDTO
+                                                                                         .getStationType()
+                                                                                         .getId(),
+                                                                                 repairFormationUnitDTO.getAmount());
+        return ResponseEntity.status(HttpStatus.CREATED).body(RepairFormationUnitDTO.from(repairFormationUnit));
     }
 
     @PutMapping(path = "/formation/repair-formation/{repairFormationId}/unit/{repairFormationUnitId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление РВО")
-    public ResponseEntity<Object> updateRepairFormationUnit(
+    public ResponseEntity<RepairFormationUnitDTO> updateRepairFormationUnit(
             @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
             @ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
-        repairFormationUnitService.update(repairFormationUnitId,
-                                          repairFormationUnitDTO.getName(),
-                                          repairFormationId,
-                                          repairFormationUnitDTO.getStationType().getId(),
-                                          repairFormationUnitDTO.getAmount());
-        return ResponseEntity.accepted().build();
+        RepairFormationUnit repairFormationUnit = repairFormationUnitService.update(repairFormationUnitId,
+                                                                                    repairFormationUnitDTO.getName(),
+                                                                                    repairFormationId,
+                                                                                    repairFormationUnitDTO
+                                                                                            .getStationType()
+                                                                                            .getId(),
+                                                                                    repairFormationUnitDTO.getAmount());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(RepairFormationUnitDTO.from(repairFormationUnit));
     }
 
     @PutMapping(path = "/formation/repair-formation/unit/{repairFormationUnitId}/staff", consumes = MediaType.APPLICATION_JSON_VALUE)

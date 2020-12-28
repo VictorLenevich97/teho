@@ -68,7 +68,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public Long add(String name, Long repairFormationId, Long stationTypeId, int amount) {
+    public RepairFormationUnit add(String name, Long repairFormationId, Long stationTypeId, int amount) {
         RepairStationType repairStationType = repairStationTypeRepository
                 .findById(stationTypeId)
                 .orElseThrow(() -> new NotFoundException(""));
@@ -80,11 +80,11 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
                                                                           name,
                                                                           repairStationType,
                                                                           amount);
-        return repairFormationUnitRepository.save(repairFormationUnit).getId();
+        return repairFormationUnitRepository.save(repairFormationUnit);
     }
 
     @Override
-    public void update(Long id, String name, Long repairFormationId, Long stationTypeId, int amount) {
+    public RepairFormationUnit update(Long id, String name, Long repairFormationId, Long stationTypeId, int amount) {
         RepairFormationUnit repairFormationUnit = getRepairStationOrThrow(id);
         RepairStationType repairStationType = repairStationTypeRepository
                 .findById(stationTypeId)
@@ -94,7 +94,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
         repairFormationUnit.setName(name);
         repairFormationUnit.setStationAmount(amount);
 
-        repairFormationUnitRepository.save(repairFormationUnit);
+        return repairFormationUnitRepository.save(repairFormationUnit);
     }
 
     private RepairFormationUnit getRepairStationOrThrow(Long id) {
