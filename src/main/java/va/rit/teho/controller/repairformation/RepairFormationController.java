@@ -46,6 +46,12 @@ public class RepairFormationController {
                                          .collect(Collectors.toList()));
     }
 
+    @GetMapping("/formation/repair-formation/{repairFormationId}")
+    @ResponseBody
+    public ResponseEntity<RepairFormationDTO> getRepairFormationDetails(@PathVariable Long repairFormationId) {
+        return ResponseEntity.ok(RepairFormationDTO.from(repairFormationService.get(repairFormationId), true));
+    }
+
     @PostMapping(path = "/formation/{formationId}/repair-formation", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RepairFormationDTO> addRepairFormation(
             @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId,
