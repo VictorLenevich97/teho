@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
+import va.rit.teho.entity.repairformation.RepairFormationUnitCombinedData;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.report.Header;
 import va.rit.teho.report.ReportCell;
@@ -19,12 +20,12 @@ import java.util.stream.Stream;
 
 @Service
 public class RepairFormationUnitReportService
-        extends AbstractReportService<RepairFormationUnitReportData, RepairFormationUnit> {
+        extends AbstractReportService<RepairFormationUnitCombinedData, RepairFormationUnit> {
 
-    private final ThreadLocal<RepairFormationUnitReportData> data = new ThreadLocal<>();
+    private final ThreadLocal<RepairFormationUnitCombinedData> data = new ThreadLocal<>();
 
     @Override
-    public byte[] generateReport(RepairFormationUnitReportData data) {
+    public byte[] generateReport(RepairFormationUnitCombinedData data) {
         this.data.set(data);
         return super.generateReport(data);
     }
@@ -103,7 +104,7 @@ public class RepairFormationUnitReportService
     }
 
     @Override
-    protected void writeData(RepairFormationUnitReportData data, Sheet sheet, int[] lastRow) {
+    protected void writeData(RepairFormationUnitCombinedData data, Sheet sheet, int[] lastRow) {
         writeRows(sheet, lastRow[0], data.getRepairFormationUnitList());
     }
 }
