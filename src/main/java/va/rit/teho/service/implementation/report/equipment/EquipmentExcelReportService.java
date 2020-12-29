@@ -9,8 +9,8 @@ import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.exception.NotFoundException;
-import va.rit.teho.report.Header;
 import va.rit.teho.report.ReportCell;
+import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
@@ -34,13 +34,15 @@ public class EquipmentExcelReportService
     }
 
     @Override
-    protected List<Header> buildHeader() {
-        List<Header> result = new ArrayList<>();
-        result.add(new Header("Тип ВВСТ, марка техники", true, false));
-        result.add(new Header("Вид", true, false));
-        Header repairTypeHeader = new Header("Вид ремонта", true, false);
-        repairTypes.forEach(repairType -> repairTypeHeader.addChildren(new Header(repairType.getFullName(), true, false)));
-        result.add(repairTypeHeader);
+    protected List<ReportHeader> buildHeader() {
+        List<ReportHeader> result = new ArrayList<>();
+        result.add(new ReportHeader("Тип ВВСТ, марка техники", true, false));
+        result.add(new ReportHeader("Вид", true, false));
+        ReportHeader repairTypeReportHeader = new ReportHeader("Вид ремонта", true, false);
+        repairTypes.forEach(repairType -> repairTypeReportHeader.addSubHeader(new ReportHeader(repairType.getFullName(),
+                                                                                               true,
+                                                                                               false)));
+        result.add(repairTypeReportHeader);
         return result;
     }
 

@@ -3,8 +3,8 @@ package va.rit.teho.service.implementation.report;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import va.rit.teho.report.Header;
 import va.rit.teho.report.ReportCell;
+import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.report.ReportService;
 
 import java.io.ByteArrayOutputStream;
@@ -43,7 +43,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         c.getCellStyle().setRotation((short) 90);
     }
 
-    protected abstract List<Header> buildHeader();
+    protected abstract List<ReportHeader> buildHeader();
 
     @Override
     public byte[] generateReport(T data) {
@@ -80,11 +80,11 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         return new byte[0];
     }
 
-    private int writeHeader(Sheet sheet, Header header, int cRow, int cCol, int lowestLevel) {
+    private int writeHeader(Sheet sheet, ReportHeader reportHeader, int cRow, int cCol, int lowestLevel) {
         int levelCount = 1;
-        if (header.hasChildren()) {
+        if (reportHeader.hasSubHeaders()) {
             int hLengthSum = 0;
-            for (Header h : header.getChildren()) {
+            for (ReportHeader h : reportHeader.getSubHeaders()) {
                 int headerLength = writeHeader(sheet, h, cRow + 1, cCol + hLengthSum, lowestLevel);
                 hLengthSum += headerLength;
             }
@@ -97,11 +97,11 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         row.setHeight((short) -1);
         row.setRowStyle(rowStyle);
         Cell cell = row.createCell(cCol);
-        cell.setCellValue(header.getName());
-        if (header.isCentered()) {
+        cell.setCellValue(reportHeader.getName());
+        if (reportHeader.isCentered()) {
             alignCellCenter(cell);
         }
-        if (header.isVertical()) {
+        if (reportHeader.isVertical()) {
             rotateCell(cell);
         }
         return levelCount;
@@ -130,16 +130,16 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         }
     }
 
-    protected int writeHeader(Sheet sheet, List<Header> headerList) {
+    protected int writeHeader(Sheet sheet, List<ReportHeader> reportHeaderList) {
         int cCol = 0;
-        int lowestLevel = headerList
+        int lowestLevel = reportHeaderList
                 .stream()
-                .map(Header::depth)
+                .map(ReportHeader::depth)
                 .mapToInt(Integer::intValue)
                 .max()
                 .orElse(0);
-        for (Header header : headerList) {
-            cCol += writeHeader(sheet, header, 0, cCol, lowestLevel);
+        for (ReportHeader reportHeader : reportHeaderList) {
+            cCol += writeHeader(sheet, reportHeader, 0, cCol, lowestLevel);
         }
         return lowestLevel;
     }

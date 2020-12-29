@@ -3,29 +3,29 @@ package va.rit.teho.report;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Header {
+public class ReportHeader {
     private final String name;
     private final boolean centered;
     private final boolean vertical;
-    private final List<Header> children;
+    private final List<ReportHeader> subHeaders;
 
-    public Header(String name, boolean centered, boolean vertical) {
+    public ReportHeader(String name, boolean centered, boolean vertical) {
         this.name = name;
         this.centered = centered;
         this.vertical = vertical;
-        this.children = new ArrayList<>();
+        this.subHeaders = new ArrayList<>();
     }
 
-    public Header(String name, List<Header> children) {
+    public ReportHeader(String name, List<ReportHeader> subHeaders) {
         this.name = name;
-        this.children = children;
+        this.subHeaders = subHeaders;
         this.vertical = false;
         this.centered = false;
     }
 
-    public Header(String name, boolean centered, List<Header> children) {
+    public ReportHeader(String name, boolean centered, List<ReportHeader> subHeaders) {
         this.name = name;
-        this.children = children;
+        this.subHeaders = subHeaders;
         this.vertical = false;
         this.centered = centered;
     }
@@ -38,16 +38,16 @@ public class Header {
         return name;
     }
 
-    public List<Header> getChildren() {
-        return children;
+    public List<ReportHeader> getSubHeaders() {
+        return subHeaders;
     }
 
-    public boolean hasChildren() {
-        return !children.isEmpty();
+    public boolean hasSubHeaders() {
+        return !subHeaders.isEmpty();
     }
 
-    public Header addChildren(Header children) {
-        this.children.add(children);
+    public ReportHeader addSubHeader(ReportHeader children) {
+        this.subHeaders.add(children);
         return this;
     }
 
@@ -55,10 +55,10 @@ public class Header {
         return depth(this, 0);
     }
 
-    private int depth(Header header, int depth) {
-        if (header.hasChildren()) {
-            return header
-                    .children
+    private int depth(ReportHeader reportHeader, int depth) {
+        if (reportHeader.hasSubHeaders()) {
+            return reportHeader
+                    .subHeaders
                     .stream()
                     .map(h -> depth(h, depth + 1))
                     .mapToInt(Integer::intValue)

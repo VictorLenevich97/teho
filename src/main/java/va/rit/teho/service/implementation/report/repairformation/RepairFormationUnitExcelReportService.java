@@ -7,8 +7,8 @@ import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitCombinedData;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
-import va.rit.teho.report.Header;
 import va.rit.teho.report.ReportCell;
+import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
 import java.util.ArrayList;
@@ -70,19 +70,19 @@ public class RepairFormationUnitExcelReportService
     }
 
     @Override
-    protected List<Header> buildHeader() {
-        Header nameHeader = new Header("Наименование ремонтного органа формирования", true, true);
-        Header repairStationTypeHeader = new Header("Тип мастерской", true, true);
-        Header rstConutHeader = new Header("Кол-во", true, true);
-        return Arrays.asList(nameHeader,
-                             repairStationTypeHeader,
-                             rstConutHeader,
+    protected List<ReportHeader> buildHeader() {
+        ReportHeader nameReportHeader = new ReportHeader("Наименование ремонтного органа формирования", true, true);
+        ReportHeader repairStationTypeReportHeader = new ReportHeader("Тип мастерской", true, true);
+        ReportHeader rstCountReportHeader = new ReportHeader("Кол-во", true, true);
+        return Arrays.asList(nameReportHeader,
+                             repairStationTypeReportHeader,
+                             rstCountReportHeader,
                              getSubHeaders("По штату, чел."),
                              getSubHeaders("В наличии, чел."));
     }
 
-    private Header getSubHeaders(String topHeader) {
-        List<Header> subHeaders = data
+    private ReportHeader getSubHeaders(String topHeader) {
+        List<ReportHeader> subReportHeaders = data
                 .get()
                 .getTypesWithSubTypes()
                 .entrySet()
@@ -92,18 +92,18 @@ public class RepairFormationUnitExcelReportService
                         return e
                                 .getValue()
                                 .stream()
-                                .map(est -> new Header(est.getShortName(), true, true));
+                                .map(est -> new ReportHeader(est.getShortName(), true, true));
                     } else {
-                        return Stream.of(new Header(e.getKey().getShortName(),
-                                                    true,
-                                                    e.getValue()
-                                                     .stream()
-                                                     .map(est -> new Header(est.getShortName(), true, true))
-                                                     .collect(Collectors.toList())));
+                        return Stream.of(new ReportHeader(e.getKey().getShortName(),
+                                                          true,
+                                                          e.getValue()
+                                                           .stream()
+                                                           .map(est -> new ReportHeader(est.getShortName(), true, true))
+                                                           .collect(Collectors.toList())));
                     }
                 })
                 .collect(Collectors.toList());
-        return new Header(topHeader, true, subHeaders);
+        return new ReportHeader(topHeader, true, subReportHeaders);
     }
 
     @Override
