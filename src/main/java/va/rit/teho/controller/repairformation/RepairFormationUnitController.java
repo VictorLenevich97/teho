@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.data.util.Pair;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,16 @@ import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
+import va.rit.teho.entity.repairformation.RepairFormationUnitCombinedData;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
+import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,13 +50,17 @@ public class RepairFormationUnitController {
 
     private final RepairFormationUnitService repairFormationUnitService;
     private final EquipmentTypeService equipmentTypeService;
+    private final ReportService<RepairFormationUnitCombinedData> reportService;
+
     @Resource
     private TehoSessionData tehoSession;
 
     public RepairFormationUnitController(RepairFormationUnitService repairFormationUnitService,
-                                         EquipmentTypeService equipmentTypeService) {
+                                         EquipmentTypeService equipmentTypeService,
+                                         ReportService<RepairFormationUnitCombinedData> reportService) {
         this.repairFormationUnitService = repairFormationUnitService;
         this.equipmentTypeService = equipmentTypeService;
+        this.reportService = reportService;
     }
 
     @GetMapping("/formation/repair-formation/unit")
@@ -71,14 +80,36 @@ public class RepairFormationUnitController {
         return ResponseEntity.ok(repairFormationUnitDTOList);
     }
 
-    @GetMapping("/formation/repair-formation/unit/staff")
-    @ApiOperation(value = "Получение состава, штатной численности и укомплектованности РВО (в табличном виде)")
-    public ResponseEntity<TableDataDTO<Map<String, RepairFormationUnitEquipmentStaffDTO>>> getEquipmentStaff(
+    @GetMapping("/formation/repair-formation/unit/staff/report")
+    @ApiOperation(value = "[ПЕЧАТЬ] Получение состава, штатной численности и укомплектованности РВО (в табличном виде)")
+    public ResponseEntity<byte[]> getEquipmentStaffReport(
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
             @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
-            @RequestParam(required = false, defaultValue = "100") int pageSize) {
+            @RequestParam(required = false, defaultValue = "100") int pageSize) throws UnsupportedEncodingException {
+        RepairFormationUnitCombinedData repairFormationUnitCombinedData = getRepairFormationUnitCombinedData(
+                repairFormationUnitId,
+                equipmentTypeId,
+                equipmentSubTypeId,
+                pageNum,
+                pageSize);
+        byte[] bytes = reportService.generateReport(repairFormationUnitCombinedData);
+        String encode = URLEncoder.encode("Состав и штатная численность РВО.xls",
+                                          "UTF-8");
+        return ResponseEntity.ok().contentLength(bytes.length)
+                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                             .cacheControl(CacheControl.noCache())
+                             .header("Content-Disposition", "attachment; filename=" + encode)
+                             .body(bytes);
+
+    }
+
+    private RepairFormationUnitCombinedData getRepairFormationUnitCombinedData(List<Long> repairFormationUnitId,
+                                                                               List<Long> equipmentTypeId,
+                                                                               List<Long> equipmentSubTypeId,
+                                                                               int pageNum,
+                                                                               int pageSize) {
         List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(repairFormationUnitId,
                                                                                             pageNum,
                                                                                             pageSize);
@@ -90,10 +121,27 @@ public class RepairFormationUnitController {
                                                                         repairFormationUnitId,
                                                                         equipmentTypeId,
                                                                         equipmentSubTypeId);
+        return new RepairFormationUnitCombinedData(repairFormationUnitList,
+                                                   typesWithSubTypes,
+                                                   repairFormationUnitEquipmentStaff);
+    }
+
+    @GetMapping("/formation/repair-formation/unit/staff")
+    @ApiOperation(value = "Получение состава, штатной численности и укомплектованности РВО (в табличном виде)")
+    public ResponseEntity<TableDataDTO<Map<String, RepairFormationUnitEquipmentStaffDTO>>> getEquipmentStaff(
+            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
+            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
+            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId,
+            @RequestParam(required = false, defaultValue = "1") int pageNum,
+            @RequestParam(required = false, defaultValue = "100") int pageSize) {
+        RepairFormationUnitCombinedData repairFormationUnitCombinedData = getRepairFormationUnitCombinedData(
+                repairFormationUnitId,
+                equipmentTypeId,
+                equipmentSubTypeId,
+                pageNum,
+                pageSize);
         TableDataDTO<Map<String, RepairFormationUnitEquipmentStaffDTO>> equipmentStaffDTO =
-                buildEquipmentStaffDTO(repairFormationUnitList,
-                                       typesWithSubTypes,
-                                       repairFormationUnitEquipmentStaff);
+                buildEquipmentStaffDTO(repairFormationUnitCombinedData);
         return ResponseEntity.ok(equipmentStaffDTO);
     }
 
@@ -174,21 +222,19 @@ public class RepairFormationUnitController {
     }
 
     private TableDataDTO<Map<String, RepairFormationUnitEquipmentStaffDTO>> buildEquipmentStaffDTO(
-            List<RepairFormationUnit> repairFormationUnitList,
-            Map<EquipmentType, List<EquipmentSubType>> equipmentTypeListMap,
-            Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> repairFormationUnitMap) {
+            RepairFormationUnitCombinedData repairFormationUnitCombinedData) {
         List<EquipmentSubType> columns =
-                equipmentTypeListMap
-                        .values()
-                        .stream()
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList());
+                repairFormationUnitCombinedData.getTypesWithSubTypes()
+                                               .values()
+                                               .stream()
+                                               .flatMap(List::stream)
+                                               .collect(Collectors.toList());
         List<NestedColumnsDTO> nestedColumnsTotal =
-                equipmentTypeListMap
-                        .entrySet()
-                        .stream()
-                        .flatMap(this::getEquipmentStaffNestedColumnsDTO)
-                        .collect(Collectors.toList());
+                repairFormationUnitCombinedData.getTypesWithSubTypes()
+                                               .entrySet()
+                                               .stream()
+                                               .flatMap(this::getEquipmentStaffNestedColumnsDTO)
+                                               .collect(Collectors.toList());
         //TODO: вернуть старую иерархию столбцов при необходимости
 //        List<NestedColumnsDTO> nestedColumnsTotal =
 //                STAFF_KEYS_AND_TEXT
@@ -202,9 +248,12 @@ public class RepairFormationUnitController {
 //                                                                                                  staffKeyEntry.getKey()))
 //                                             .collect(Collectors.toList())))
 //                        .collect(Collectors.toList());
-        List<RowData<Map<String, RepairFormationUnitEquipmentStaffDTO>>> rows = repairFormationUnitList
+        List<RowData<Map<String, RepairFormationUnitEquipmentStaffDTO>>> rows = repairFormationUnitCombinedData
+                .getRepairFormationUnitList()
                 .stream()
-                .map(rs -> getEquipmentStaffRow(repairFormationUnitMap, columns, rs))
+                .map(rs -> getEquipmentStaffRow(repairFormationUnitCombinedData.getRepairFormationUnitEquipmentStaff(),
+                                                columns,
+                                                rs))
                 .collect(Collectors.toList());
         return new TableDataDTO<>(nestedColumnsTotal, rows);
     }

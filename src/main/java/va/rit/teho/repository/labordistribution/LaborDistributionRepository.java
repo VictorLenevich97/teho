@@ -55,30 +55,6 @@ public interface LaborDistributionRepository
         return result;
     }
 
-    @Query(value = "select equipment.name, sum(amount) as amount, sum(labor_distribution.count) as c " +
-            "from labor_distribution left join equipment_per_base " +
-            "on labor_distribution.equipment_id = equipment_per_formation.equipment_id and labor_distribution.formation_id = equipment_per_formation.formation_id " +
-            "inner join workhours_distribution_interval on labor_distribution.workhours_distribution_interval_id = workhours_distribution_interval.id " +
-            "inner join equipment on labor_distribution.equipment_id = equipment.id " +
-            "group by equipment.name", nativeQuery = true)
-    List<List<Object>> findAllGroupedByEquipmentName();
-
-    @Query(value = "select " +
-            "(select coalesce(sum(labor_distribution.count), 0) from labor_distribution " +
-            "inner join workhours_distribution_interval on labor_distribution.workhours_distribution_interval_id = workhours_distribution_interval.id " +
-            "inner join equipment on labor_distribution.equipment_id = equipment.id " +
-            "where workhours_distribution_interval.restoration_type_id = 1 and equipment.name = ?1" +
-            ") as tactical, " +
-            "(select coalesce(sum(labor_distribution.count), 0) from labor_distribution " +
-            "inner join workhours_distribution_interval on labor_distribution.workhours_distribution_interval_id = workhours_distribution_interval.id " +
-            "inner join equipment on labor_distribution.equipment_id = equipment.id " +
-            "where workhours_distribution_interval.restoration_type_id = 2 and equipment.name = ?1) as operational, " +
-            "(select coalesce(sum(labor_distribution.count), 0) from labor_distribution " +
-            "inner join workhours_distribution_interval on labor_distribution.workhours_distribution_interval_id = workhours_distribution_interval.id " +
-            "inner join equipment on labor_distribution.equipment_id = equipment.id " +
-            " where workhours_distribution_interval.restoration_type_id = 3 and equipment.name = ?1) as stratigic", nativeQuery = true)
-    List<List<Object>> sumEquipmentByRestorationLevelTypes(String equipmentName);
-
     @Query(value = "SELECT new va.rit.teho.entity.labordistribution.LaborDistributionAggregatedData(ld.equipment, ld.formation, ld.workhoursDistributionInterval, sum(ld.count), avg(ld.avgLaborInput)) FROM LaborDistribution ld WHERE ld.formation.id = :formationId AND ld.tehoSession.id = :sessionId GROUP BY ld.equipment, ld.formation, ld.workhoursDistributionInterval")
     List<LaborDistributionAggregatedData> selectLaborDistributionAggregatedData(Long formationId, UUID sessionId);
 
