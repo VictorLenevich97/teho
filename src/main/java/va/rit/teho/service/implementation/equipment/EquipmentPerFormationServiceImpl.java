@@ -45,7 +45,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public void updateEquipmentInFormation(Long formationId, Long equipmentId, int amount) {
+    public EquipmentPerFormation updateEquipmentInFormation(Long formationId, Long equipmentId, int amount) {
         formationService.get(formationId);
         equipmentService.get(equipmentId);
         EquipmentPerFormation epb =
@@ -53,7 +53,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                         .findById(new EquipmentPerFormationPK(formationId, equipmentId))
                         .orElseThrow(() -> new NotFoundException("ВЧ (id = " + formationId + ") не содержит ВВСТ (id = " + equipmentId + ")!"));
         epb.setAmount(amount);
-        equipmentPerFormationRepository.save(epb);
+        return equipmentPerFormationRepository.save(epb);
     }
 
     @Override

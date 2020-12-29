@@ -21,7 +21,7 @@ public interface EquipmentPerFormationService {
 
     void addEquipmentToFormation(Long formationId, List<Long> equipmentId, int amount);
 
-    void updateEquipmentInFormation(Long formationId, Long equipmentId, int amount);
+    EquipmentPerFormation updateEquipmentInFormation(Long formationId, Long equipmentId, int amount);
 
     void setEquipmentPerFormationFailureIntensity(UUID sessionId,
                                                   Long formationId,

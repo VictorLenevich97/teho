@@ -13,11 +13,14 @@ public class RestorationType {
 
     private String name;
 
+    private int weight;
+
     @OneToMany(mappedBy = "restorationType")
     private Set<WorkhoursDistributionInterval> workhoursDistributionIntervals;
 
-    public RestorationType(String name) {
+    public RestorationType(String name, int weight) {
         this.name = name;
+        this.weight = weight;
     }
 
     public RestorationType() {
@@ -43,17 +46,20 @@ public class RestorationType {
         return workhoursDistributionIntervals;
     }
 
+    public int getWeight() {
+        return weight;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RestorationType that = (RestorationType) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name);
+        return weight == that.weight && Objects.equals(id, that.id) && Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(id, name, weight);
     }
 }

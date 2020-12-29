@@ -32,7 +32,7 @@ public class RepairFormationController {
         return ResponseEntity.ok(repairFormationService
                                          .list(formationId)
                                          .stream()
-                                         .map(rf -> RepairFormationDTO.from(rf, false))
+                                         .map(rf -> RepairFormationDTO.from(rf, true))
                                          .collect(Collectors.toList()));
     }
 
@@ -42,8 +42,14 @@ public class RepairFormationController {
         return ResponseEntity.ok(repairFormationService
                                          .list()
                                          .stream()
-                                         .map(rf -> RepairFormationDTO.from(rf, false))
+                                         .map(rf -> RepairFormationDTO.from(rf, true))
                                          .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/formation/repair-formation/{repairFormationId}")
+    @ResponseBody
+    public ResponseEntity<RepairFormationDTO> getRepairFormationDetails(@PathVariable Long repairFormationId) {
+        return ResponseEntity.ok(RepairFormationDTO.from(repairFormationService.get(repairFormationId), true));
     }
 
     @PostMapping(path = "/formation/{formationId}/repair-formation", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -53,7 +59,7 @@ public class RepairFormationController {
         RepairFormation repairFormation = repairFormationService.add(repairFormationDTO.getName(),
                                                                      repairFormationDTO.getType().getId(),
                                                                      formationId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(RepairFormationDTO.from(repairFormation, false));
+        return ResponseEntity.status(HttpStatus.CREATED).body(RepairFormationDTO.from(repairFormation, true));
     }
 
     @PutMapping(path = "/formation/{formationId}/repair-formation/{repairFormationId}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -65,6 +71,6 @@ public class RepairFormationController {
                                                                         repairFormationDTO.getName(),
                                                                         repairFormationDTO.getType().getId(),
                                                                         formationId);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(RepairFormationDTO.from(repairFormation, false));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(RepairFormationDTO.from(repairFormation, true));
     }
 }

@@ -6,6 +6,7 @@ import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.session.SessionRepository;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
+import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.repairformation.RepairCapabilitiesService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
@@ -24,17 +25,20 @@ public class SessionServiceImpl implements SessionService {
     private final RepairFormationUnitService repairFormationUnitService;
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final LaborInputDistributionService laborInputDistributionService;
+    private final EquipmentRFUDistributionService equipmentRFUDistributionService;
 
     public SessionServiceImpl(SessionRepository sessionRepository,
                               EquipmentPerFormationService equipmentPerFormationService,
                               RepairFormationUnitService repairFormationUnitService,
                               RepairCapabilitiesService repairCapabilitiesService,
-                              LaborInputDistributionService laborInputDistributionService) {
+                              LaborInputDistributionService laborInputDistributionService,
+                              EquipmentRFUDistributionService equipmentRFUDistributionService) {
         this.sessionRepository = sessionRepository;
         this.equipmentPerFormationService = equipmentPerFormationService;
         this.repairFormationUnitService = repairFormationUnitService;
         this.repairCapabilitiesService = repairCapabilitiesService;
         this.laborInputDistributionService = laborInputDistributionService;
+        this.equipmentRFUDistributionService = equipmentRFUDistributionService;
     }
 
     @Override
@@ -62,6 +66,7 @@ public class SessionServiceImpl implements SessionService {
         repairFormationUnitService.copyEquipmentStaff(sessionId, newSession.getId());
         repairCapabilitiesService.copyRepairCapabilities(sessionId, newSession.getId());
         laborInputDistributionService.copyLaborInputDistributionData(sessionId, newSession.getId());
+        equipmentRFUDistributionService.copy(sessionId, newSession.getId());
         return newSession;
     }
 

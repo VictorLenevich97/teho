@@ -76,31 +76,35 @@ public class EquipmentPerFormationController {
 
     @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить ВВСТ в Формировании")
-    public ResponseEntity<Object> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
+    public ResponseEntity<EquipmentPerFormationDTO> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
                                                              @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
                                                              @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody
                                                                      EquipmentPerFormationSaveDTO equipmentPerFormationSaveDTO) {
-        equipmentPerFormationService.updateEquipmentInFormation(formationId,
-                                                                equipmentId,
-                                                                equipmentPerFormationSaveDTO.getAmount());
-        equipmentPerFormationSaveDTO.getData().forEach((stageId, repairTypeIntensityMap) ->
-                                                               repairTypeIntensityMap
-                                                                       .forEach((repairTypeId, intensity) ->
-                                                                                        equipmentPerFormationService
-                                                                                                .setEquipmentPerFormationFailureIntensity(
-                                                                                                        tehoSession
-                                                                                                                .getSessionId(),
-                                                                                                        formationId,
-                                                                                                        equipmentId,
-                                                                                                        repairTypeId,
-                                                                                                        stageId,
-                                                                                                        intensity)));
-        return ResponseEntity.accepted().build();
+        EquipmentPerFormation equipmentPerFormation = equipmentPerFormationService.updateEquipmentInFormation(
+                formationId,
+                equipmentId,
+                equipmentPerFormationSaveDTO.getAmount());
+        if (equipmentPerFormationSaveDTO.getData() != null) {
+            equipmentPerFormationSaveDTO.getData().forEach((stageId, repairTypeIntensityMap) ->
+                                                                   repairTypeIntensityMap
+                                                                           .forEach((repairTypeId, intensity) ->
+                                                                                            equipmentPerFormationService
+                                                                                                    .setEquipmentPerFormationFailureIntensity(
+                                                                                                            tehoSession
+                                                                                                                    .getSessionId(),
+                                                                                                            formationId,
+                                                                                                            equipmentId,
+                                                                                                            repairTypeId,
+                                                                                                            stageId,
+                                                                                                            intensity)));
+        }
+
+        return ResponseEntity.accepted().body(EquipmentPerFormationDTO.from(equipmentPerFormation));
     }
 
     @GetMapping("/formation/{formationId}/equipment")
     @ResponseBody
-    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях (в табличном виде)")
+    @ApiOperation(value = "Получить список ВВСТ в Формированиях")
     public ResponseEntity<List<EquipmentPerFormationDTO>> getEquipmentPerFormationData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId) {
         return ResponseEntity.ok(equipmentPerFormationService
