@@ -13,9 +13,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class AbstractReportService<T, R> implements ReportService<T> {
+public abstract class AbstractExcelReportService<T, R> implements ReportService<T> {
+
+    private final CellStyle rowStyle;
 
     private static final Workbook wb = new HSSFWorkbook();
+
+    public AbstractExcelReportService() {
+        this.rowStyle = wb.createCellStyle();
+        this.rowStyle.setWrapText(true);
+    }
 
     protected abstract List<Function<R, ReportCell>> populateCellFunctions();
 
@@ -74,8 +81,6 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
     }
 
     private int writeHeader(Sheet sheet, Header header, int cRow, int cCol, int lowestLevel) {
-        CellStyle cellStyle = wb.createCellStyle();
-        cellStyle.setWrapText(true);
         int levelCount = 1;
         if (header.hasChildren()) {
             int hLengthSum = 0;
@@ -90,7 +95,7 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
         }
         Row row = sheet.getRow(cRow) == null ? sheet.createRow(cRow) : sheet.getRow(cRow);
         row.setHeight((short) -1);
-        row.setRowStyle(cellStyle);
+        row.setRowStyle(rowStyle);
         Cell cell = row.createCell(cCol);
         cell.setCellValue(header.getName());
         if (header.isCentered()) {
@@ -105,14 +110,12 @@ public abstract class AbstractReportService<T, R> implements ReportService<T> {
     protected void writeRows(Sheet sheet,
                              int rowStartIndex,
                              Collection<R> data) {
-        CellStyle cellStyle = wb.createCellStyle();
-        cellStyle.setWrapText(true);
         List<Function<R, ReportCell>> populateCellFunctions = populateCellFunctions();
         int i = 0;
         for (R item : data) {
             Row row = sheet.createRow(rowStartIndex + i);
             row.setHeight((short) -1);
-            row.setRowStyle(cellStyle);
+            row.setRowStyle(rowStyle);
             for (int j = 0; j < populateCellFunctions.size(); j++) {
                 Cell cell = row.createCell(j);
                 ReportCell reportCell = populateCellFunctions.get(j).apply(item);

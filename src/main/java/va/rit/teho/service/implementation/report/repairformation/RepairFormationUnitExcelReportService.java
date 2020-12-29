@@ -9,7 +9,7 @@ import va.rit.teho.entity.repairformation.RepairFormationUnitCombinedData;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.report.Header;
 import va.rit.teho.report.ReportCell;
-import va.rit.teho.service.implementation.report.AbstractReportService;
+import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,9 +19,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class RepairFormationUnitReportService
-        extends AbstractReportService<RepairFormationUnitCombinedData, RepairFormationUnit> {
+public class RepairFormationUnitExcelReportService
+        extends AbstractExcelReportService<RepairFormationUnitCombinedData, RepairFormationUnit> {
 
+    //TODO: Обдумать способ избавиться от хранения состояния
     private final ThreadLocal<RepairFormationUnitCombinedData> data = new ThreadLocal<>();
 
     @Override
@@ -39,16 +40,18 @@ public class RepairFormationUnitReportService
         List<EquipmentSubType> subTypes = data.get().getTypesWithSubTypes().entrySet().stream().flatMap(e -> e
                 .getValue()
                 .stream()).collect(Collectors.toList());
-        populateCellFunctions.addAll(subTypes
-                                             .stream()
-                                             .flatMap(st -> Stream.of(getStaff(st,
-                                                                               RepairFormationUnitEquipmentStaff::getTotalStaff)))
-                                             .collect(Collectors.toList()));
-        populateCellFunctions.addAll(subTypes
-                                             .stream()
-                                             .flatMap(st -> Stream.of(getStaff(st,
-                                                                               RepairFormationUnitEquipmentStaff::getAvailableStaff)))
-                                             .collect(Collectors.toList()));
+        populateCellFunctions
+                .addAll(subTypes
+                                .stream()
+                                .flatMap(st -> Stream.of(getStaff(st,
+                                                                  RepairFormationUnitEquipmentStaff::getTotalStaff)))
+                                .collect(Collectors.toList()));
+        populateCellFunctions
+                .addAll(subTypes
+                                .stream()
+                                .flatMap(st -> Stream.of(getStaff(st,
+                                                                  RepairFormationUnitEquipmentStaff::getAvailableStaff)))
+                                .collect(Collectors.toList()));
         return populateCellFunctions;
     }
 
@@ -106,5 +109,12 @@ public class RepairFormationUnitReportService
     @Override
     protected void writeData(RepairFormationUnitCombinedData data, Sheet sheet, int[] lastRow) {
         writeRows(sheet, lastRow[0], data.getRepairFormationUnitList());
+    }
+
+    @Override
+    protected byte[] writeSheet(Sheet sheet) {
+        byte[] result = super.writeSheet(sheet);
+        this.data.remove();
+        return result;
     }
 }

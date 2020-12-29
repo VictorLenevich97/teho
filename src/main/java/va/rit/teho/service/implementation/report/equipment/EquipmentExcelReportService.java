@@ -12,7 +12,7 @@ import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.report.Header;
 import va.rit.teho.report.ReportCell;
 import va.rit.teho.service.common.RepairTypeService;
-import va.rit.teho.service.implementation.report.AbstractReportService;
+import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,13 +22,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class EquipmentReportService
-        extends AbstractReportService<Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>>, Equipment> {
+public class EquipmentExcelReportService
+        extends AbstractExcelReportService<Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>>, Equipment> {
 
     private final RepairTypeService repairTypeService;
     private final List<RepairType> repairTypes;
 
-    public EquipmentReportService(RepairTypeService repairTypeService) {
+    public EquipmentExcelReportService(RepairTypeService repairTypeService) {
         this.repairTypeService = repairTypeService;
         this.repairTypes = repairTypeService.list(true);
     }
