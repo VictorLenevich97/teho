@@ -89,7 +89,9 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
                 hLengthSum += headerLength;
             }
             levelCount = hLengthSum;
-            mergeCells(sheet, cRow, cRow, cCol, cCol + levelCount - 1);
+            if (levelCount != 1) {
+                mergeCells(sheet, cRow, cRow, cCol, cCol + levelCount - 1);
+            }
         } else if (lowestLevel > cRow) {
             mergeCells(sheet, cRow, lowestLevel, cCol, cCol);
         }
