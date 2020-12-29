@@ -23,7 +23,7 @@ public class RepairStationController {
         this.repairStationService = repairStationService;
     }
 
-    @GetMapping(path = "/type", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/type")
     @ResponseBody
     public ResponseEntity<List<IdAndNameDTO>> listRepairStationTypes() {
         return ResponseEntity.ok(repairStationService
