@@ -62,4 +62,8 @@ public class WorkhoursDistributionInterval {
     public int hashCode() {
         return Objects.hash(restorationType, id, lowerBound, upperBound);
     }
+
+    public RestorationType getRestorationType() {
+        return restorationType;
+    }
 }

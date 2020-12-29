@@ -33,6 +33,7 @@ public class LaborInputDistributionController {
 
     private final EquipmentPerFormationService equipmentPerFormationService;
     private final LaborInputDistributionService laborInputDistributionService;
+
     @Resource
     private TehoSessionData tehoSession;
 
@@ -115,5 +116,7 @@ public class LaborInputDistributionController {
         laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId());
         return ResponseEntity.accepted().build();
     }
+
+
 
 }
