@@ -5,12 +5,14 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.entity.repairformation.RepairStationType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
+import va.rit.teho.repository.repairformation.RepairFormationRepository;
 import va.rit.teho.repository.repairformation.RepairFormationUnitEquipmentStaffRepository;
 import va.rit.teho.repository.repairformation.RepairFormationUnitRepository;
 import va.rit.teho.repository.repairformation.RepairStationTypeRepository;
@@ -30,6 +32,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     private final RepairFormationUnitEquipmentStaffRepository repairFormationUnitEquipmentStaffRepository;
     private final RepairFormationUnitRepository repairFormationUnitRepository;
     private final RepairStationTypeRepository repairStationTypeRepository;
+    private final RepairFormationRepository repairFormationRepository;
 
     private final EquipmentTypeService equipmentTypeService;
 
@@ -37,10 +40,12 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
             RepairFormationUnitEquipmentStaffRepository repairFormationUnitEquipmentStaffRepository,
             RepairFormationUnitRepository repairFormationUnitRepository,
             RepairStationTypeRepository repairStationTypeRepository,
+            RepairFormationRepository repairFormationRepository,
             EquipmentTypeService equipmentTypeService) {
         this.repairFormationUnitEquipmentStaffRepository = repairFormationUnitEquipmentStaffRepository;
         this.repairFormationUnitRepository = repairFormationUnitRepository;
         this.repairStationTypeRepository = repairStationTypeRepository;
+        this.repairFormationRepository = repairFormationRepository;
         this.equipmentTypeService = equipmentTypeService;
     }
 
@@ -62,7 +67,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     @Override
     public Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(Long repairFormationUntId,
                                                                                            UUID sessionId) {
-        return Pair.of(getRepairStationOrThrow(repairFormationUntId),
+        return Pair.of(getRepairFormationUnitOrThrow(repairFormationUntId),
                        repairFormationUnitEquipmentStaffRepository.findAllByRepairFormationUnitIdAndTehoSessionId(
                                repairFormationUntId, sessionId));
     }
@@ -71,7 +76,10 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     public RepairFormationUnit add(String name, Long repairFormationId, Long stationTypeId, int amount) {
         RepairStationType repairStationType = repairStationTypeRepository
                 .findById(stationTypeId)
-                .orElseThrow(() -> new NotFoundException(""));
+                .orElseThrow(() -> new NotFoundException("Тип мастерской не найден!"));
+        RepairFormation repairFormation = repairFormationRepository
+                .findById(repairFormationId)
+                .orElseThrow(() -> new NotFoundException("Ремонтное формирование не найдено!"));
         repairStationTypeRepository.findByName(name).ifPresent(repairStation -> {
             throw new AlreadyExistsException("РВО", "название", name);
         });
@@ -79,13 +87,17 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
         RepairFormationUnit repairFormationUnit = new RepairFormationUnit(newId,
                                                                           name,
                                                                           repairStationType,
-                                                                          amount);
+                                                                          amount,
+                                                                          repairFormation);
         return repairFormationUnitRepository.save(repairFormationUnit);
     }
 
     @Override
     public RepairFormationUnit update(Long id, String name, Long repairFormationId, Long stationTypeId, int amount) {
-        RepairFormationUnit repairFormationUnit = getRepairStationOrThrow(id);
+        RepairFormationUnit repairFormationUnit = getRepairFormationUnitOrThrow(id);
+        RepairFormation repairFormation = repairFormationRepository
+                .findById(repairFormationId)
+                .orElseThrow(() -> new NotFoundException("Ремонтное формирование не найдено!"));
         RepairStationType repairStationType = repairStationTypeRepository
                 .findById(stationTypeId)
                 .orElseThrow(() -> new NotFoundException(""));
@@ -93,20 +105,21 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
         repairFormationUnit.setRepairStationType(repairStationType);
         repairFormationUnit.setName(name);
         repairFormationUnit.setStationAmount(amount);
+        repairFormationUnit.setRepairFormation(repairFormation);
 
         return repairFormationUnitRepository.save(repairFormationUnit);
     }
 
-    private RepairFormationUnit getRepairStationOrThrow(Long id) {
+    private RepairFormationUnit getRepairFormationUnitOrThrow(Long id) {
         return repairFormationUnitRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("РВО с id = " + id + " не найден!"));
     }
 
     private void checkEquipmentStaffPreconditions(RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff) {
-        getRepairStationOrThrow(repairFormationUnitEquipmentStaff
-                                        .getEquipmentPerRepairFormationUnit()
-                                        .getRepairFormationUnitId());
+        getRepairFormationUnitOrThrow(repairFormationUnitEquipmentStaff
+                                              .getEquipmentPerRepairFormationUnit()
+                                              .getRepairFormationUnitId());
         equipmentTypeService.getSubType(repairFormationUnitEquipmentStaff
                                                 .getEquipmentPerRepairFormationUnit()
                                                 .getEquipmentSubTypeId()); //Проверка на существование

@@ -11,7 +11,7 @@ public class RepairFormationUnit {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "repair_station_type_id", referencedColumnName = "id")
+    @JoinColumn(name = "repair_station_type_id", referencedColumnName = "id", nullable = false)
     private RepairStationType repairStationType;
 
     private String name;
@@ -19,9 +19,8 @@ public class RepairFormationUnit {
     private int stationAmount;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "repair_formation_id", referencedColumnName = "id")
+    @JoinColumn(name = "repair_formation_id", referencedColumnName = "id", nullable = false)
     private RepairFormation repairFormation;
-
 
     public Set<RepairFormationUnitRepairCapability> getRepairCapabilities() {
         return repairCapabilities;
@@ -37,22 +36,16 @@ public class RepairFormationUnit {
     public RepairFormationUnit(Long id,
                                String name,
                                RepairStationType repairStationType,
-                               int stationAmount) {
-        this.id = id;
-        this.name = name;
-        this.repairStationType = repairStationType;
-        this.stationAmount = stationAmount;
-    }
-
-    public RepairFormationUnit(Long id,
-                               String name,
-                               RepairStationType repairStationType,
                                int stationAmount,
                                RepairFormation repairFormation) {
         this.id = id;
         this.name = name;
         this.repairStationType = repairStationType;
         this.stationAmount = stationAmount;
+        this.repairFormation = repairFormation;
+    }
+
+    public void setRepairFormation(RepairFormation repairFormation) {
         this.repairFormation = repairFormation;
     }
 
