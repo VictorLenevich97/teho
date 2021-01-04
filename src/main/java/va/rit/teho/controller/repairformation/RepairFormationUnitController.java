@@ -71,9 +71,7 @@ public class RepairFormationUnitController {
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
         List<RepairFormationUnitDTO> repairFormationUnitDTOList =
-                repairFormationUnitService.list(Optional.ofNullable(ids).orElse(Collections.emptyList()),
-                                                pageNum,
-                                                pageSize)
+                repairFormationUnitService.list(ids, pageNum, pageSize)
                                           .stream()
                                           .map(RepairFormationUnitDTO::from)
                                           .collect(Collectors.toList());
