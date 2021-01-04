@@ -1,19 +1,18 @@
 package va.rit.teho.service.implementation.equipment;
 
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.*;
+import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.equipment.EquipmentPerFormationFailureIntensityRepository;
 import va.rit.teho.repository.equipment.EquipmentPerFormationRepository;
-import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.common.CalculationService;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.equipment.EquipmentService;
+import va.rit.teho.service.formation.FormationService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +68,11 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
 
         EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
                 new EquipmentPerFormationFailureIntensity(
-                        new EquipmentPerFormationFailureIntensityPK(formationId, equipmentId, stageId, repairTypeId, sessionId),
+                        new EquipmentPerFormationFailureIntensityPK(formationId,
+                                                                    equipmentId,
+                                                                    stageId,
+                                                                    repairTypeId,
+                                                                    sessionId),
                         intensity,
                         null);
         equipmentPerFormationFailureIntensityRepository.save(equipmentPerFormationFailureIntensity);
@@ -81,8 +84,12 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public List<EquipmentPerFormation> getTotalEquipmentInFormations(List<Long> equipmentIds) {
-        return equipmentPerFormationRepository.findTotal(equipmentIds);
+    public Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalEquipmentInFormations(List<Long> equipmentIds) {
+        return equipmentPerFormationRepository
+                .findTotal(equipmentIds)
+                .stream()
+                .collect(Collectors.groupingBy(EquipmentPerFormation::getFormation,
+                                               Collectors.groupingBy(epf -> epf.getEquipment().getEquipmentSubType())));
     }
 
     @Override
@@ -111,14 +118,15 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getTotalFailureIntensityData(
+    public Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> getTotalFailureIntensityData(
             UUID sessionId) {
         List<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensityList =
                 equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionId(sessionId);
-        Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> result = new HashMap<>();
+        Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> result = new HashMap<>();
 
         for (EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity : equipmentPerFormationFailureIntensityList) {
             Map<Stage, EquipmentPerFormationFailureIntensity> map = result
+                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getFormation(), (e) -> new HashMap<>())
                     .computeIfAbsent(equipmentPerFormationFailureIntensity.getEquipment(), (e) -> new HashMap<>())
                     .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), (e) -> new HashMap<>());
             EquipmentPerFormationFailureIntensity existing = map.getOrDefault(equipmentPerFormationFailureIntensity.getStage(),
@@ -142,9 +150,13 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     public void addEquipmentToFormation(Long formationId, Long equipmentId, Long amount) {
         formationService.get(formationId);
         equipmentService.get(equipmentId);
-        equipmentPerFormationRepository.findById(new EquipmentPerFormationPK(formationId, equipmentId)).ifPresent(epb -> {
-            throw new AlreadyExistsException("ВВСТ в ВЧ", "(id ВЧ, id ВВСТ)", "(" + formationId + ", " + equipmentId + ")");
-        });
+        equipmentPerFormationRepository
+                .findById(new EquipmentPerFormationPK(formationId, equipmentId))
+                .ifPresent(epb -> {
+                    throw new AlreadyExistsException("ВВСТ в ВЧ",
+                                                     "(id ВЧ, id ВВСТ)",
+                                                     "(" + formationId + ", " + equipmentId + ")");
+                });
 
         this.equipmentPerFormationRepository.save(new EquipmentPerFormation(formationId, equipmentId, amount));
     }
@@ -160,7 +172,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public Map<Pair<Formation, Equipment>, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getFailureIntensityData(
+    public Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getFailureIntensityData(
             UUID sessionId,
             Long formationId,
             List<Long> equipmentIds) {
@@ -168,12 +180,11 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                 equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionIdAndformationId(sessionId,
                                                                                                      formationId,
                                                                                                      equipmentIds);
-        Map<Pair<Formation, Equipment>, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> result = new HashMap<>();
+        Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> result = new HashMap<>();
 
         for (EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity : equipmentPerFormationFailureIntensityList) {
             result
-                    .computeIfAbsent(Pair.of(equipmentPerFormationFailureIntensity.getFormation(),
-                                             equipmentPerFormationFailureIntensity.getEquipment()), (e) -> new HashMap<>())
+                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getEquipment(), (e) -> new HashMap<>())
                     .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), (e) -> new HashMap<>())
                     .put(equipmentPerFormationFailureIntensity.getStage(), equipmentPerFormationFailureIntensity);
         }
@@ -192,7 +203,8 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                 equipmentPerFormationFailureIntensityRepository
                         .findAllByTehoSessionId(originalSessionId)
                         .stream()
-                        .map(equipmentPerFormationFailureIntensity -> equipmentPerFormationFailureIntensity.copy(newSessionId))
+                        .map(equipmentPerFormationFailureIntensity ->
+                                     equipmentPerFormationFailureIntensity.copy(newSessionId))
                         .collect(Collectors.toList());
 
         equipmentPerFormationFailureIntensityRepository.saveAll(equipmentPerFormationFailureIntensities);

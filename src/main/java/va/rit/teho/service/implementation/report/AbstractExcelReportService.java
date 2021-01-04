@@ -1,5 +1,6 @@
 package va.rit.teho.service.implementation.report;
 
+import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -54,6 +55,16 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         writeData(data, sheet, lastRow);
 
         return writeSheet(sheet);
+    }
+
+    protected Cell setBoldFont(Cell c) {
+        CellStyle style = c.getCellStyle() == null ? wb.createCellStyle() : c.getCellStyle();
+        Font font = wb.createFont();
+        font.setFontName(HSSFFont.FONT_ARIAL);
+        font.setFontHeightInPoints((short) 10);
+        font.setBold(true);
+        style.setFont(font);
+        return c;
     }
 
     protected abstract void writeData(T data, Sheet sheet, int[] lastRow);

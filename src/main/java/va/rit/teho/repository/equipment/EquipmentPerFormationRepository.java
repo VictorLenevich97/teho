@@ -12,10 +12,10 @@ import java.util.List;
 @Repository
 public interface EquipmentPerFormationRepository extends CrudRepository<EquipmentPerFormation, EquipmentPerFormationPK> {
 
-    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentPerFormation(epb.equipment, SUM(epb.amount)) " +
+    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentPerFormation(epb.equipment, epb.formation, SUM(epb.amount)) " +
             "FROM EquipmentPerFormation epb " +
             "WHERE (coalesce(:equipmentIds, null) IS NULL OR epb.equipment.id IN (:equipmentIds)) " +
-            "GROUP BY epb.equipment.id")
+            "GROUP BY epb.formation.id, epb.equipment.id")
     List<EquipmentPerFormation> findTotal(List<Long> equipmentIds);
 
     @Query("SELECT epb " +

@@ -1,13 +1,9 @@
 package va.rit.teho.service.equipment;
 
-import org.springframework.data.util.Pair;
-import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
-import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentPerFormation;
-import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
-import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput;
+import va.rit.teho.entity.equipment.*;
+import va.rit.teho.entity.formation.Formation;
 
 import java.util.List;
 import java.util.Map;
@@ -32,13 +28,14 @@ public interface EquipmentPerFormationService {
 
     List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, List<Long> equipmentIds);
 
-    List<EquipmentPerFormation> getTotalEquipmentInFormations(List<Long> equipmentIds);
+    Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalEquipmentInFormations(List<Long> equipmentIds);
 
     void updateAvgDailyFailureData(UUID sessionId, double coefficient);
 
-    Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getTotalFailureIntensityData(UUID sessionId);
+    Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> getTotalFailureIntensityData(
+            UUID sessionId);
 
-    Map<Pair<Formation, Equipment>, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getFailureIntensityData(
+    Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getFailureIntensityData(
             UUID sessionId,
             Long formationId,
             List<Long> equipmentIds);
