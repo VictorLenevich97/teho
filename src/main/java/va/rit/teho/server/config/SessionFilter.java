@@ -62,7 +62,7 @@ public class SessionFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         List<String> filterPaths = Arrays.asList("/formation/repair-formation/unit/capabilities", "/labor-distribution", "/equipment-per-base");
         String path = request.getServletPath();
-        boolean rfuStaffPath = path.contains("/formation/repair-formation/unit") && !path.contains("staff");
+        boolean rfuStaffPath = !(path.contains("/formation/repair-formation/unit") && path.contains("staff"));
         boolean equipmentPerFormationPath = !(path.contains("/formation") && path.contains("/equipment") && (path.contains(
                 "/table") || path.contains("/daily-failure")));
         return filterPaths
