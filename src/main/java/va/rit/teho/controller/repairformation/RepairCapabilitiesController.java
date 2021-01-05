@@ -3,6 +3,7 @@ package va.rit.teho.controller.repairformation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,12 +16,16 @@ import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
+import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityCombinedData;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.repairformation.RepairCapabilitiesService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
+import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,14 +39,17 @@ public class RepairCapabilitiesController {
     private final RepairCapabilitiesService repairCapabilitiesService;
     private final EquipmentService equipmentService;
     private final RepairFormationUnitService repairFormationUnitService;
+    private final ReportService<RepairFormationUnitRepairCapabilityCombinedData> reportService;
 
     public RepairCapabilitiesController(
             RepairCapabilitiesService repairCapabilitiesService,
             EquipmentService equipmentService,
-            RepairFormationUnitService repairFormationUnitService) {
+            RepairFormationUnitService repairFormationUnitService,
+            ReportService<RepairFormationUnitRepairCapabilityCombinedData> reportService) {
         this.repairCapabilitiesService = repairCapabilitiesService;
         this.equipmentService = equipmentService;
         this.repairFormationUnitService = repairFormationUnitService;
+        this.reportService = reportService;
     }
 
     @Resource
@@ -101,27 +109,27 @@ public class RepairCapabilitiesController {
                                   .collect(Collectors.toList()));
     }
 
-    private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(List<RepairFormationUnit> repairFormationUnitList,
-                                                                         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped,
-                                                                         Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities) {
+    private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(RepairFormationUnitRepairCapabilityCombinedData combinedData) {
         List<Equipment> columns =
-                grouped
-                        .values()
-                        .stream()
-                        .flatMap(l -> l.values().stream())
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList());
+                combinedData.getGroupedEquipmentData()
+                            .values()
+                            .stream()
+                            .flatMap(l -> l.values().stream())
+                            .flatMap(List::stream)
+                            .collect(Collectors.toList());
         List<NestedColumnsDTO> equipmentPerTypeDTOList =
-                grouped
-                        .entrySet()
-                        .stream()
-                        .map(this::getRepairCapabilitiesNestedColumnsDTO)
-                        .collect(Collectors.toList());
+                combinedData.getGroupedEquipmentData()
+                            .entrySet()
+                            .stream()
+                            .map(this::getRepairCapabilitiesNestedColumnsDTO)
+                            .collect(Collectors.toList());
         List<RowData<Map<String, String>>> data =
-                repairFormationUnitList
-                        .stream()
-                        .map(rs -> getRepairCapabilitiesRow(calculatedRepairCapabilities, columns, rs))
-                        .collect(Collectors.toList());
+                combinedData.getRepairFormationUnitList()
+                            .stream()
+                            .map(rs -> getRepairCapabilitiesRow(combinedData.getCalculatedRepairCapabilities(),
+                                                                columns,
+                                                                rs))
+                            .collect(Collectors.toList());
         return new TableDataDTO<>(equipmentPerTypeDTOList, data);
     }
 
@@ -153,6 +161,54 @@ public class RepairCapabilitiesController {
             @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
+        RepairFormationUnitRepairCapabilityCombinedData combinedData = getCapabilityCombinedData(
+                repairTypeId,
+                repairFormationUnitId,
+                equipmentId,
+                equipmentTypeId,
+                equipmentSubTypeId,
+                pageNum,
+                pageSize);
+        TableDataDTO<Map<String, String>> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(combinedData);
+        return ResponseEntity.ok(repairCapabilitiesFullDTO);
+    }
+
+    @GetMapping("/capabilities/repair-type/{id}/report")
+    @ResponseBody
+    @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
+    public ResponseEntity<byte[]> getCalculatedRepairCapabilitiesReport(
+            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
+            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
+            @ApiParam(value = "Ключи ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentId,
+            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
+            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId,
+            @RequestParam(required = false, defaultValue = "1") int pageNum,
+            @RequestParam(required = false, defaultValue = "100") int pageSize) throws UnsupportedEncodingException {
+        RepairFormationUnitRepairCapabilityCombinedData combinedData = getCapabilityCombinedData(
+                repairTypeId,
+                repairFormationUnitId,
+                equipmentId,
+                equipmentTypeId,
+                equipmentSubTypeId,
+                pageNum,
+                pageSize);
+        byte[] bytes = reportService.generateReport(combinedData);
+        String encode = URLEncoder.encode("Производственные возможности.xls",
+                                          "UTF-8");
+        return ResponseEntity.ok().contentLength(bytes.length)
+                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                             .cacheControl(CacheControl.noCache())
+                             .header("Content-Disposition", "attachment; filename=" + encode)
+                             .body(bytes);
+    }
+
+    private RepairFormationUnitRepairCapabilityCombinedData getCapabilityCombinedData(Long repairTypeId,
+                                                                                      List<Long> repairFormationUnitId,
+                                                                                      List<Long> equipmentId,
+                                                                                      List<Long> equipmentTypeId,
+                                                                                      List<Long> equipmentSubTypeId,
+                                                                                      int pageNum,
+                                                                                      int pageSize) {
         List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(repairFormationUnitId,
                                                                                             pageNum,
                                                                                             pageSize);
@@ -167,10 +223,10 @@ public class RepairCapabilitiesController {
                                                                           equipmentId,
                                                                           equipmentSubTypeId,
                                                                           equipmentTypeId);
-        TableDataDTO<Map<String, String>> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(repairFormationUnitList,
-                                                                                                 grouped,
-                                                                                                 calculatedRepairCapabilities);
-        return ResponseEntity.ok(repairCapabilitiesFullDTO);
+        return new RepairFormationUnitRepairCapabilityCombinedData(
+                repairFormationUnitList,
+                grouped,
+                calculatedRepairCapabilities);
     }
 
 }
