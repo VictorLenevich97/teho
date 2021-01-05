@@ -1,6 +1,5 @@
 package va.rit.teho.service.implementation.report.equipment;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.equipment.EquipmentFailureIntensityCombinedData;
@@ -30,11 +29,12 @@ public class EquipmentFailureIntensityReportService
                         .get()
                         .getStages()
                         .stream()
-                        .flatMap(s -> this.data
-                                .get()
-                                .getRepairTypes()
-                                .stream()
-                                .map(rt -> getAvgDailyFailureFunction(s, rt)))
+                        .flatMap(s ->
+                                         this.data
+                                                 .get()
+                                                 .getRepairTypes()
+                                                 .stream()
+                                                 .map(rt -> getAvgDailyFailureFunction(s, rt)))
                         .collect(Collectors.toList());
         cellFunctions.addAll(avgDailyFailureFunctions);
         return cellFunctions;
@@ -86,16 +86,10 @@ public class EquipmentFailureIntensityReportService
         int colSize = this.data.get().getStages().size() * this.data.get().getRepairTypes().size() + 1;
 
         data.getEquipmentPerFormations().forEach((formation, equipmentSubTypeMap) -> {
-            Cell formationCell = sheet.createRow(lastRow[0]).createCell(0);
-            setBoldFont(alignCellCenter(formationCell)).setCellValue(formation.getFullName());
-
-            mergeCells(sheet, lastRow[0], lastRow[0], 0, colSize);
+            createRowWideCell(sheet, lastRow[0], colSize, formation.getFullName(), true, true);
 
             equipmentSubTypeMap.forEach((equipmentSubType, equipmentPerFormations) -> {
-                Cell eqSubTypeCell = sheet.createRow(lastRow[0] + 1).createCell(0);
-                setBoldFont(eqSubTypeCell).setCellValue(equipmentSubType.getFullName());
-
-                mergeCells(sheet, lastRow[0] + 1, lastRow[0] + 1, 0, colSize);
+                createRowWideCell(sheet, lastRow[0] + 1, colSize, equipmentSubType.getFullName(), true, false);
 
                 writeRows(sheet, lastRow[0] + 2, equipmentPerFormations);
 

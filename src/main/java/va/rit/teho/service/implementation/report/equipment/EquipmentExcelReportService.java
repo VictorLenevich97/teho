@@ -1,6 +1,5 @@
 package va.rit.teho.service.implementation.report.equipment;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
@@ -53,9 +52,7 @@ public class EquipmentExcelReportService
         data.forEach((eqType, subTypeListMap) -> {
             int lastRowIndex = lastRow[0];
 
-            Cell eqTypeCell = sheet.createRow(lastRowIndex).createCell(0);
-            alignCellCenter(eqTypeCell).setCellValue(eqType.getShortName());
-            mergeCells(sheet, lastRowIndex, lastRowIndex, 0, repairTypes.size() + 1);
+            createRowWideCell(sheet, lastRowIndex, repairTypes.size() + 1, eqType.getShortName(), false, true);
 
             List<Equipment> equipmentList =
                     subTypeListMap.entrySet().stream().flatMap(e -> e.getValue().stream()).collect(Collectors.toList());

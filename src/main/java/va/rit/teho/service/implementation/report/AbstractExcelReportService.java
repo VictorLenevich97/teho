@@ -44,6 +44,22 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         c.getCellStyle().setRotation((short) 90);
     }
 
+    protected void createRowWideCell(Sheet sheet, int index, int colSize, String data, boolean bold, boolean centered) {
+        Cell formationCell = sheet.createRow(index).createCell(0);
+
+        if (centered) {
+            alignCellCenter(formationCell);
+        }
+
+        if (bold) {
+            setBoldFont(formationCell);
+        }
+
+        formationCell.setCellValue(data);
+
+        mergeCells(sheet, index, index, 0, colSize);
+    }
+
     protected abstract List<ReportHeader> buildHeader();
 
     @Override
