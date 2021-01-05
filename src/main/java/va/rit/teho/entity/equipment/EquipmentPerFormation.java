@@ -31,7 +31,8 @@ public class EquipmentPerFormation {
         this.amount = amount.intValue();
     }
 
-    public EquipmentPerFormation(Equipment equipment, Long amount) {
+    public EquipmentPerFormation(Equipment equipment, Formation formation, Long amount) {
+        this.formation = formation;
         this.equipment = equipment;
         this.amount = amount.intValue();
     }
