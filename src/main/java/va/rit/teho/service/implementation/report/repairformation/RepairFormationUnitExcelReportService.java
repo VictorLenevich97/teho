@@ -34,9 +34,9 @@ public class RepairFormationUnitExcelReportService
     @Override
     protected List<Function<RepairFormationUnit, ReportCell>> populateCellFunctions() {
         List<Function<RepairFormationUnit, ReportCell>> populateCellFunctions =
-                new ArrayList<>(Arrays.asList(rfu -> new ReportCell(rfu.getName(), HorizontalAlignment.LEFT),
+                new ArrayList<>(Arrays.asList(rfu -> new ReportCell(rfu.getName(), ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
                                               rfu -> new ReportCell(rfu.getRepairStationType().getName()),
-                                              rfu -> new ReportCell("" + rfu.getStationAmount())));
+                                              rfu -> new ReportCell(rfu.getStationAmount(), ReportCell.CellType.NUMERIC)));
         List<EquipmentSubType> subTypes = data.get().getTypesWithSubTypes().entrySet().stream().flatMap(e -> e
                 .getValue()
                 .stream()).collect(Collectors.toList());
@@ -107,8 +107,9 @@ public class RepairFormationUnitExcelReportService
     }
 
     @Override
-    protected void writeData(RepairFormationUnitCombinedData data, Sheet sheet, int[] lastRow) {
+    protected int writeData(RepairFormationUnitCombinedData data, Sheet sheet, int[] lastRow) {
         writeRows(sheet, lastRow[0], data.getRepairFormationUnitList());
+        return lastRow[0] + data.getRepairFormationUnitList().size();
     }
 
     @Override
