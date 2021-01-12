@@ -46,7 +46,7 @@ public class EquipmentExcelReportService
     }
 
     @Override
-    protected void writeData(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data,
+    protected int writeData(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data,
                              Sheet sheet,
                              int[] lastRow) {
         data.forEach((eqType, subTypeListMap) -> {
@@ -61,6 +61,7 @@ public class EquipmentExcelReportService
 
             lastRow[0] += subTypeListMap.size() + 1;
         });
+        return lastRow[0];
     }
 
     private Function<Equipment, ReportCell> equipmentLaborInputFunction(RepairType rt) {
@@ -76,7 +77,8 @@ public class EquipmentExcelReportService
     protected List<Function<Equipment, ReportCell>> populateCellFunctions() {
         List<RepairType> repairTypes = repairTypeService.list(true);
         List<Function<Equipment, ReportCell>> populateCellFunctions =
-                new ArrayList<>(Arrays.asList(e -> new ReportCell(e.getName(), HorizontalAlignment.LEFT),
+                new ArrayList<>(Arrays.asList(e -> new ReportCell(e.getName(),
+                                                                  ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
                                               (e) -> new ReportCell(e.getEquipmentSubType().getShortName())));
         List<Function<Equipment, ReportCell>> rtFunctions = repairTypes
                 .stream()

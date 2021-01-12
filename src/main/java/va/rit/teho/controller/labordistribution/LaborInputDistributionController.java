@@ -3,6 +3,7 @@ package va.rit.teho.controller.labordistribution;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,11 +18,16 @@ import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
+import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
+import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
+import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,14 +39,45 @@ public class LaborInputDistributionController {
 
     private final EquipmentPerFormationService equipmentPerFormationService;
     private final LaborInputDistributionService laborInputDistributionService;
+    private final ReportService<LaborInputDistributionCombinedData> reportService;
 
     @Resource
     private TehoSessionData tehoSession;
 
     public LaborInputDistributionController(EquipmentPerFormationService equipmentPerFormationService,
-                                            LaborInputDistributionService laborInputDistributionService) {
+                                            LaborInputDistributionService laborInputDistributionService,
+                                            ReportService<LaborInputDistributionCombinedData> reportService) {
         this.equipmentPerFormationService = equipmentPerFormationService;
         this.laborInputDistributionService = laborInputDistributionService;
+        this.reportService = reportService;
+    }
+
+    @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}/report")
+    @ResponseBody
+    @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта (в табличном формате)")
+    public ResponseEntity<byte[]> getDistributionDataReport(
+            @ApiParam(value = "Ключ этапа", required = true) @PathVariable Long stageId,
+            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable Long repairTypeId,
+            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) throws
+            UnsupportedEncodingException {
+        Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
+                laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(),
+                                                                        repairTypeId,
+                                                                        stageId,
+                                                                        equipmentTypeId);
+        List<WorkhoursDistributionInterval> distributionIntervals = laborInputDistributionService
+                .getDistributionIntervals();
+
+        byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(laborInputDistribution, distributionIntervals));
+        String encode = URLEncoder.encode("Распределение производственного фонда.xls",
+                                          "UTF-8");
+        return ResponseEntity.ok()
+                             .contentLength(bytes.length)
+                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                             .cacheControl(CacheControl.noCache())
+                             .header("Content-Disposition", "attachment; filename=" + encode)
+                             .body(bytes);
+
     }
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}")

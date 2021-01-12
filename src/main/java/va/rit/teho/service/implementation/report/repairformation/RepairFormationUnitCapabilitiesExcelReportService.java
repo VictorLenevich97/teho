@@ -27,6 +27,7 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
     protected List<Function<RepairFormationUnit, ReportCell>> populateCellFunctions() {
         List<Function<RepairFormationUnit, ReportCell>> functions = new ArrayList<>(Collections.singletonList((rfu) -> new ReportCell(
                 rfu.getName(),
+                ReportCell.CellType.TEXT,
                 HorizontalAlignment.LEFT)));
         List<Equipment> equipmentList =
                 this
@@ -47,11 +48,12 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
     }
 
     private Function<RepairFormationUnit, ReportCell> getCapabilitiesFunction(Equipment e) {
-        return (RepairFormationUnit rfu) -> new ReportCell("" + this.data
-                .get()
-                .getCalculatedRepairCapabilities()
-                .get(rfu)
-                .get(e));
+        return (RepairFormationUnit rfu) -> new ReportCell(this.data
+                                                                   .get()
+                                                                   .getCalculatedRepairCapabilities()
+                                                                   .getOrDefault(rfu, Collections.emptyMap())
+                                                                   .getOrDefault(e, 0.0),
+                                                           ReportCell.CellType.NUMERIC);
     }
 
     @Override
@@ -91,8 +93,9 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
     }
 
     @Override
-    protected void writeData(RepairFormationUnitRepairCapabilityCombinedData data, Sheet sheet, int[] lastRow) {
+    protected int writeData(RepairFormationUnitRepairCapabilityCombinedData data, Sheet sheet, int[] lastRow) {
         writeRows(sheet, lastRow[0], data.getRepairFormationUnitList());
+        return lastRow[0] + data.getRepairFormationUnitList().size();
     }
 
     @Override

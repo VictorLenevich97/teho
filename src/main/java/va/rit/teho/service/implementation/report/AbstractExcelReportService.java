@@ -18,11 +18,18 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
 
     private final CellStyle rowStyle;
 
+    private final Font font;
+
     private static final Workbook wb = new HSSFWorkbook();
 
     public AbstractExcelReportService() {
         this.rowStyle = wb.createCellStyle();
         this.rowStyle.setWrapText(true);
+
+        this.font = wb.createFont();
+        font.setFontName(HSSFFont.FONT_ARIAL);
+        font.setFontHeightInPoints((short) 10);
+        font.setBold(true);
     }
 
     protected abstract List<Function<R, ReportCell>> populateCellFunctions();
@@ -35,6 +42,8 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
 
     protected Cell alignCellCenter(Cell c) {
         alignCell(c, HorizontalAlignment.CENTER);
+        c.getCellStyle().setWrapText(true);
+        c.getCellStyle().setShrinkToFit(true);
         return c;
     }
 
@@ -54,7 +63,6 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         if (bold) {
             setBoldFont(formationCell);
         }
-
         formationCell.setCellValue(data);
 
         mergeCells(sheet, index, index, 0, colSize);
@@ -68,22 +76,18 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
 
         final int[] lastRow = {writeHeader(sheet, buildHeader()) + 1};
 
-        writeData(data, sheet, lastRow);
+        int rowCount = writeData(data, sheet, lastRow);
 
         return writeSheet(sheet);
     }
 
     protected Cell setBoldFont(Cell c) {
         CellStyle style = c.getCellStyle() == null ? wb.createCellStyle() : c.getCellStyle();
-        Font font = wb.createFont();
-        font.setFontName(HSSFFont.FONT_ARIAL);
-        font.setFontHeightInPoints((short) 10);
-        font.setBold(true);
         style.setFont(font);
         return c;
     }
 
-    protected abstract void writeData(T data, Sheet sheet, int[] lastRow);
+    protected abstract int writeData(T data, Sheet sheet, int[] lastRow);
 
     private void alignCell(Cell c, HorizontalAlignment horizontalAlignment) {
         CellStyle cellStyle = wb.createCellStyle();
@@ -144,7 +148,6 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         for (R item : data) {
             Row row = sheet.createRow(rowStartIndex + i);
             row.setHeight((short) -1);
-            row.setRowStyle(rowStyle);
             for (int j = 0; j < populateCellFunctions.size(); j++) {
                 Cell cell = row.createCell(j);
                 ReportCell reportCell = populateCellFunctions.get(j).apply(item);
