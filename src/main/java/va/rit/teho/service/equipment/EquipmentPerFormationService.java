@@ -26,6 +26,13 @@ public interface EquipmentPerFormationService {
                                                   Long stageId,
                                                   Integer intensity);
 
+    void setEquipmentPerFormationDailyFailure(UUID sessionId,
+                                              Long formationId,
+                                              Long equipmentId,
+                                              Long repairTypeId,
+                                              Long stageId,
+                                              Double dailyFailure);
+
     List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, List<Long> equipmentIds);
 
     Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalEquipmentInFormations(List<Long> equipmentIds);
