@@ -2,6 +2,7 @@ package va.rit.teho.repository.equipment;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndAmount;
@@ -27,6 +28,14 @@ public interface EquipmentPerFormationFailureIntensityRepository
 
     @Query("SELECT epbfi from EquipmentPerFormationFailureIntensity epbfi WHERE epbfi.tehoSession.id = :sessionId AND epbfi.formation.id = :formationId AND " +
             "(coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds))")
-    List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionIdAndformationId(UUID sessionId, Long formationId, List<Long> equipmentIds);
+    List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionIdAndFormationId(UUID sessionId, Long formationId, List<Long> equipmentIds);
 
+    @Nullable
+    @Query("SELECT epbfi from EquipmentPerFormationFailureIntensity epbfi WHERE " +
+            "epbfi.tehoSession.id = :sessionId AND " +
+            "epbfi.formation.id = :formationId AND " +
+            "epbfi.equipment.id = :equipmentId AND " +
+            "epbfi.stage.id = :stageId AND " +
+            "epbfi.repairType.id = :repairTypeId")
+    EquipmentPerFormationFailureIntensity getFailureIntensityEntry(UUID sessionId, Long formationId, Long equipmentId, Long stageId, Long repairTypeId);
 }

@@ -82,8 +82,11 @@ public class EquipmentPerFormationController {
     @ApiOperation(value = "Обновить ВВСТ в Формировании")
     public ResponseEntity<EquipmentPerFormationDTO> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
                                                                                @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                                               @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody
-                                                                                       EquipmentPerFormationSaveDTO equipmentPerFormationSaveDTO) {
+                                                                               @ApiParam(
+                                                                                       value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт (data в виде {'ключ этапа': {'ключ типа ремонта': 'значение'}})",
+                                                                                       required = true,
+                                                                                       example = "{'amount': '5', 'data': {'1': {'1': '12', '2': '7'}}}")
+                                                                               @RequestBody EquipmentPerFormationSaveDTO equipmentPerFormationSaveDTO) {
         EquipmentPerFormation equipmentPerFormation = equipmentPerFormationService.updateEquipmentInFormation(
                 formationId,
                 equipmentId,
@@ -250,6 +253,28 @@ public class EquipmentPerFormationController {
                                         va.rit.teho.controller.helper.Formatter::formatDouble,
                                         equipmentIds);
     }
+
+    @PutMapping("/formation/{formationId}/equipment/{equipmentId}/daily-failure")
+    @ResponseBody
+    @ApiOperation(value = "Обновить данные о выходе ВВСТ в ремонт в ед.")
+    public ResponseEntity<Object> updateEquipmentPerFormationFailureData(@ApiParam(value = "Ключ формирования", required = true, example = "1") @PathVariable Long formationId,
+                                                                         @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
+                                                                         @ApiParam(value = "Данные о выходе ВВСТ в ремонт ({'ключ этапа': {'ключ типа ремонта': 'значение'}})", required = true, example = "{'1': {'1': '1.2', '2': '4.3'}}")
+                                                                         @RequestBody Map<Long, Map<Long, Double>> data) {
+        data.forEach((stageId, repairTypeIntensityMap) ->
+                             repairTypeIntensityMap
+                                     .forEach((repairTypeId, dailyFailure) ->
+                                                      equipmentPerFormationService
+                                                              .setEquipmentPerFormationDailyFailure(
+                                                                      tehoSession.getSessionId(),
+                                                                      formationId,
+                                                                      equipmentId,
+                                                                      repairTypeId,
+                                                                      stageId,
+                                                                      dailyFailure)));
+        return ResponseEntity.ok().build();
+    }
+
 
     private <K, T> EquipmentFailureIntensityRowData<String> getEquipmentFailureIntensityRowData(Map<Formation, Map<K, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
                                                                                                 Function<EquipmentPerFormation, K> keyGetter,

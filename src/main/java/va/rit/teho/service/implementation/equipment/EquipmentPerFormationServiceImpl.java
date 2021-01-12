@@ -14,10 +14,7 @@ import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.formation.FormationService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,6 +72,40 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                                     sessionId),
                         intensity,
                         null);
+
+        equipmentPerFormationFailureIntensityRepository.save(equipmentPerFormationFailureIntensity);
+    }
+
+    @Override
+    public void setEquipmentPerFormationDailyFailure(UUID sessionId,
+                                                     Long formationId,
+                                                     Long equipmentId,
+                                                     Long repairTypeId,
+                                                     Long stageId,
+                                                     Double dailyFailure) {
+        formationService.get(formationId);
+        equipmentService.get(equipmentId);
+
+        Integer intensity =
+                Optional.ofNullable(equipmentPerFormationFailureIntensityRepository
+                                            .getFailureIntensityEntry(sessionId,
+                                                                      formationId,
+                                                                      equipmentId,
+                                                                      stageId,
+                                                                      repairTypeId))
+                        .map(EquipmentPerFormationFailureIntensity::getIntensityPercentage)
+                        .orElse(0);
+
+        EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
+                new EquipmentPerFormationFailureIntensity(
+                        new EquipmentPerFormationFailureIntensityPK(formationId,
+                                                                    equipmentId,
+                                                                    stageId,
+                                                                    repairTypeId,
+                                                                    sessionId),
+                        intensity,
+                        dailyFailure);
+
         equipmentPerFormationFailureIntensityRepository.save(equipmentPerFormationFailureIntensity);
     }
 
@@ -177,7 +208,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
             Long formationId,
             List<Long> equipmentIds) {
         List<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensityList =
-                equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionIdAndformationId(sessionId,
+                equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionIdAndFormationId(sessionId,
                                                                                                      formationId,
                                                                                                      equipmentIds);
         Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> result = new HashMap<>();
