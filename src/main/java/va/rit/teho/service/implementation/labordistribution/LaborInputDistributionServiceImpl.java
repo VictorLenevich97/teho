@@ -3,23 +3,15 @@ package va.rit.teho.service.implementation.labordistribution;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
-import va.rit.teho.entity.common.Tree;
-import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
-import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.labordistribution.*;
-import va.rit.teho.entity.repairformation.RepairFormation;
-import va.rit.teho.entity.repairformation.RepairFormationUnit;
-import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
-import va.rit.teho.repository.labordistribution.EquipmentRFUDistributionRepository;
 import va.rit.teho.repository.labordistribution.LaborDistributionRepository;
 import va.rit.teho.repository.labordistribution.WorkhoursDistributionIntervalRepository;
 import va.rit.teho.service.common.CalculationService;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
-import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 
 import java.util.*;
@@ -178,6 +170,11 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     public List<LaborDistributionAggregatedData> getAggregatedDataForSessionAndFormation(Long formationId,
                                                                                          UUID sessionId) {
         return laborDistributionRepository.selectLaborDistributionAggregatedData(formationId, sessionId);
+    }
+
+    @Override
+    public void deleteDistributionData(Long formationId, Long equipmentId) {
+        laborDistributionRepository.deleteByFormationIdAndEquipmentId(formationId, equipmentId);
     }
 
 }

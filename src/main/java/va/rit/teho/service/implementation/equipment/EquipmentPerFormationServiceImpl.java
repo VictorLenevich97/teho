@@ -1,6 +1,7 @@
 package va.rit.teho.service.implementation.equipment;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.*;
@@ -239,6 +240,16 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                         .collect(Collectors.toList());
 
         equipmentPerFormationFailureIntensityRepository.saveAll(equipmentPerFormationFailureIntensities);
+    }
+
+    @Override
+    @Transactional
+    public void deleteEquipmentFromFormation(Long formationId, Long equipmentId) {
+        EquipmentPerFormationPK id = new EquipmentPerFormationPK(formationId, equipmentId);
+        if(equipmentPerFormationRepository.existsById(id)) {
+            equipmentPerFormationRepository.deleteById(id);
+            equipmentPerFormationFailureIntensityRepository.deleteByFormationIdAndEquipmentId(formationId, equipmentId);
+        }
     }
 
 

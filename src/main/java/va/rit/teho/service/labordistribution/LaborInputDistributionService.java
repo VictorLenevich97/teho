@@ -36,4 +36,6 @@ public interface LaborInputDistributionService {
 
     List<LaborDistributionAggregatedData> getAggregatedDataForSessionAndFormation(Long formationId, UUID sessionId);
 
+    void deleteDistributionData(Long formationId, Long equipmentId);
+
 }

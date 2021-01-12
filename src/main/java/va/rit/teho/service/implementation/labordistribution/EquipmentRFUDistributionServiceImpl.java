@@ -92,6 +92,11 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                                                                                               sessionId);
     }
 
+    @Override
+    public void deleteDistribution(Long formationId, Long equipmentId) {
+        equipmentRFUDistributionRepository.deleteByFormationIdAndEquipmentId(formationId, equipmentId);
+    }
+
 
     private List<EquipmentRFUDistribution> distributeEquipmentPerRFU(UUID sessionId,
                                                                      Set<RepairFormation> repFormations,

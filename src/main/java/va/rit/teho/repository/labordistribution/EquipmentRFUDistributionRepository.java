@@ -13,4 +13,6 @@ public interface EquipmentRFUDistributionRepository
     List<EquipmentRFUDistribution> findByTehoSessionId(UUID sessionId);
 
     List<EquipmentRFUDistribution> findByRepairFormationUnitIdAndTehoSessionId(Long repairFormationUnitId, UUID sessionId);
+
+    void deleteByFormationIdAndEquipmentId(Long formationId, Long equipmentId);
 }

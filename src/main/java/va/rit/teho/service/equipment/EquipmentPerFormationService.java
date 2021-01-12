@@ -52,4 +52,6 @@ public interface EquipmentPerFormationService {
 
     void copyEquipmentPerFormationData(UUID originalSessionId, UUID newSessionId);
 
+    void deleteEquipmentFromFormation(Long formationId, Long equipmentId);
+
 }

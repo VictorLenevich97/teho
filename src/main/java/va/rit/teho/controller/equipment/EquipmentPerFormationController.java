@@ -7,10 +7,10 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
 import va.rit.teho.dto.equipment.EquipmentPerFormationDTO;
-import va.rit.teho.dto.equipment.EquipmentPerFormationSaveDTO;
 import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
@@ -22,6 +22,8 @@ import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.common.StageService;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
+import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
+import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
@@ -39,6 +41,8 @@ public class EquipmentPerFormationController {
     private final StageService stageService;
     private final RepairTypeService repairTypeService;
     private final EquipmentPerFormationService equipmentPerFormationService;
+    private final LaborInputDistributionService laborInputDistributionService;
+    private final EquipmentRFUDistributionService equipmentRFUDistributionService;
     private final ReportService<EquipmentFailureIntensityCombinedData> reportService;
 
     @Resource
@@ -47,10 +51,14 @@ public class EquipmentPerFormationController {
     public EquipmentPerFormationController(StageService stageService,
                                            RepairTypeService repairTypeService,
                                            EquipmentPerFormationService equipmentPerFormationService,
+                                           LaborInputDistributionService laborInputDistributionService,
+                                           EquipmentRFUDistributionService equipmentRFUDistributionService,
                                            ReportService<EquipmentFailureIntensityCombinedData> reportService) {
         this.stageService = stageService;
         this.repairTypeService = repairTypeService;
         this.equipmentPerFormationService = equipmentPerFormationService;
+        this.laborInputDistributionService = laborInputDistributionService;
+        this.equipmentRFUDistributionService = equipmentRFUDistributionService;
         this.reportService = reportService;
     }
 
@@ -59,54 +67,46 @@ public class EquipmentPerFormationController {
     @ApiOperation(value = "Добавить ВВСТ в Формирование")
     public ResponseEntity<Object> addEquipmentToFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
                                                           @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                          @ApiParam(value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт", required = true) @RequestBody IntensityAndAmountDTO intensityAndAmount) {
+                                                          @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @RequestBody IntensityAndAmountDTO amount) {
         equipmentPerFormationService.addEquipmentToFormation(formationId,
                                                              equipmentId,
-                                                             (long) intensityAndAmount.getAmount());
-        if (intensityAndAmount.getIntensity() != null) {
-            intensityAndAmount
-                    .getIntensity()
-                    .forEach(intensityPerRepairTypeAndStageDTO ->
-                                     equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
-                                             tehoSession.getSessionId(),
-                                             formationId,
-                                             equipmentId,
-                                             intensityPerRepairTypeAndStageDTO.getRepairTypeId(),
-                                             intensityPerRepairTypeAndStageDTO.getStageId(),
-                                             intensityPerRepairTypeAndStageDTO.getIntensity()));
-        }
+                                                             (long) amount.getAmount());
         return ResponseEntity.accepted().build();
     }
 
     @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Обновить ВВСТ в Формировании")
-    public ResponseEntity<EquipmentPerFormationDTO> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
-                                                                               @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                                               @ApiParam(
-                                                                                       value = "Количество ВВСТ в ВЧ и интенсивность выхода в ремонт (data в виде {'ключ этапа': {'ключ типа ремонта': 'значение'}})",
-                                                                                       required = true,
-                                                                                       example = "{'amount': '5', 'data': {'1': {'1': '12', '2': '7'}}}")
-                                                                               @RequestBody EquipmentPerFormationSaveDTO equipmentPerFormationSaveDTO) {
+    @ApiOperation(value = "Обновить ВВСТ в Формировании (количество)")
+    public ResponseEntity<EquipmentPerFormationDTO> updateEquipmentInFormationAmount(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
+                                                                                     @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
+                                                                                     @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @RequestBody IntensityAndAmountDTO amount) {
         EquipmentPerFormation equipmentPerFormation = equipmentPerFormationService.updateEquipmentInFormation(
                 formationId,
                 equipmentId,
-                equipmentPerFormationSaveDTO.getAmount());
-        if (equipmentPerFormationSaveDTO.getData() != null) {
-            equipmentPerFormationSaveDTO.getData().forEach((stageId, repairTypeIntensityMap) ->
-                                                                   repairTypeIntensityMap
-                                                                           .forEach((repairTypeId, intensity) ->
-                                                                                            equipmentPerFormationService
-                                                                                                    .setEquipmentPerFormationFailureIntensity(
-                                                                                                            tehoSession
-                                                                                                                    .getSessionId(),
-                                                                                                            formationId,
-                                                                                                            equipmentId,
-                                                                                                            repairTypeId,
-                                                                                                            stageId,
-                                                                                                            intensity)));
-        }
+                amount.getAmount());
 
         return ResponseEntity.accepted().body(EquipmentPerFormationDTO.from(equipmentPerFormation));
+    }
+
+    @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}/intensity", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Обновить данные о выходе ВВСТ в ремонт в %")
+    public ResponseEntity<Object> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
+                                                             @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
+                                                             @ApiParam(value = "Данные о выходе ВВСТ в ремонт (%) ({'ключ этапа': {'ключ типа ремонта': 'значение'}})", required = true, example = "{'1': {'1': '21', '2': '15'}}")
+                                                             @RequestBody Map<Long, Map<Long, Integer>> data) {
+
+        data.forEach((stageId, repairTypeIntensityMap) ->
+                             repairTypeIntensityMap
+                                     .forEach((repairTypeId, intensity) ->
+                                                      equipmentPerFormationService
+                                                              .setEquipmentPerFormationFailureIntensity(
+                                                                      tehoSession
+                                                                              .getSessionId(),
+                                                                      formationId,
+                                                                      equipmentId,
+                                                                      repairTypeId,
+                                                                      stageId,
+                                                                      intensity)));
+        return ResponseEntity.accepted().build();
     }
 
     @GetMapping("/formation/{formationId}/equipment")
@@ -122,9 +122,9 @@ public class EquipmentPerFormationController {
     }
 
 
-    @GetMapping("/formation/{formationId}/equipment/table")
+    @GetMapping("/formation/{formationId}/equipment/intensity")
     @ResponseBody
-    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях (в табличном виде)")
+    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях с интенсивностью выхода в ремонт в % (в табличном виде)")
     public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerFormationTableData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1")
             @PathVariable Long formationId,
@@ -272,7 +272,7 @@ public class EquipmentPerFormationController {
                                                                       repairTypeId,
                                                                       stageId,
                                                                       dailyFailure)));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.accepted().build();
     }
 
 
@@ -315,6 +315,15 @@ public class EquipmentPerFormationController {
                                                       epb.getEquipment().getName(),
                                                       epb.getAmount(),
                                                       data);
+    }
+
+    @DeleteMapping("/formation/{formationId}/equipment/{equipmentId}")
+    @Transactional
+    public ResponseEntity<Object> deleteEquipmentFromFormation(@PathVariable Long formationId, @PathVariable Long equipmentId) {
+        equipmentPerFormationService.deleteEquipmentFromFormation(formationId, equipmentId);
+        laborInputDistributionService.deleteDistributionData(formationId, equipmentId);
+        equipmentRFUDistributionService.deleteDistribution(formationId, equipmentId);
+        return ResponseEntity.noContent().build();
     }
 
 }
