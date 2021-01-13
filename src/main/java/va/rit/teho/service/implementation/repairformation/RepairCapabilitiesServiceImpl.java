@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentLaborInputPerType;
-import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
-import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityPK;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
+import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
+import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityPK;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.repairformation.RepairFormationUnitRepairCapabilityRepository;
 import va.rit.teho.service.common.CalculationService;
@@ -54,7 +54,11 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
             double calculatedCapabilities =
                     calculationService.calculateRepairCapabilities(
                             rsec.getTotalStaff() * rsec.getRepairFormationUnit().getStationAmount(),
-                            rsec.getRepairFormationUnit().getRepairFormation().getRepairFormationType().getWorkingHoursMax(),
+                            rsec
+                                    .getRepairFormationUnit()
+                                    .getRepairFormation()
+                                    .getRepairFormationType()
+                                    .getWorkingHoursMax(),
                             laborInputPerType.getAmount());
 
             RepairFormationUnitRepairCapabilityPK stationWithRepairType =
@@ -80,7 +84,8 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
 
     @Override
     public void calculateAndUpdateRepairCapabilities(UUID sessionId, Long repairTypeId) {
-        List<RepairFormationUnitEquipmentStaff> repairFormationStaff = repairFormationUnitService.listEquipmentStaff(sessionId);
+        List<RepairFormationUnitEquipmentStaff> repairFormationStaff = repairFormationUnitService.listEquipmentStaff(
+                sessionId);
         calculateAndUpdateRepairCapabilities(sessionId, repairFormationStaff, repairTypeId);
     }
 
@@ -112,6 +117,27 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     }
 
     @Override
+    public void updateRepairCapabilities(UUID sessionId,
+                                         Long repairFormationUnitId,
+                                         Long repairTypeId,
+                                         Map<Long, Double> capabilitiesMap) {
+        List<RepairFormationUnitRepairCapability> repairFormationUnitRepairCapabilities =
+                capabilitiesMap.entrySet().stream().map(
+                        equipmentIdCapabilityEntry -> {
+                            Long equipmentId = equipmentIdCapabilityEntry.getKey();
+                            Double capability = equipmentIdCapabilityEntry.getValue();
+
+                            return new RepairFormationUnitRepairCapability(new RepairFormationUnitRepairCapabilityPK(
+                                    repairFormationUnitId,
+                                    equipmentId,
+                                    repairTypeId,
+                                    sessionId), capability);
+                        }).collect(Collectors.toList());
+
+        calculatedRepairCapabilitiesPerDayRepository.saveAll(repairFormationUnitRepairCapabilities);
+    }
+
+    @Override
     public Map<RepairFormationUnit, Map<Equipment, Double>> getCalculatedRepairCapabilities(
             UUID sessionId,
             Long repairTypeId,
@@ -122,7 +148,6 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
         return internalGetCalculatedRepairCapabilities(
                 sessionId, repairTypeId, repairFormationUnitIds, equipmentIds, equipmentSubTypeIds, equipmentTypeIds);
     }
-
 
 
     private Map<RepairFormationUnit, Map<Equipment, Double>> internalGetCalculatedRepairCapabilities(UUID sessionId,

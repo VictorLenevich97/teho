@@ -91,6 +91,18 @@ public class RepairCapabilitiesController {
         return ResponseEntity.accepted().body(repairCapabilitiesDTO);
     }
 
+    @PutMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Ручное обновление производственных возможностей РВО по ремонту (для указанного РВО)")
+    public ResponseEntity<Object> updateRepairCapabilities(@PathVariable Long repairFormationUnitId,
+                                                           @PathVariable("id") Long repairTypeId,
+                                                           @RequestBody Map<Long, Double> data) {
+        repairCapabilitiesService.updateRepairCapabilities(tehoSession.getSessionId(),
+                                                           repairFormationUnitId,
+                                                           repairTypeId,
+                                                           data);
+        return ResponseEntity.accepted().build();
+    }
+
     private NestedColumnsDTO getRepairCapabilitiesNestedColumnsDTO(Map.Entry<EquipmentType, Map<EquipmentSubType, List<Equipment>>> equipmentTypeEntry) {
         return new NestedColumnsDTO(
                 equipmentTypeEntry.getKey().getShortName(),

@@ -7,10 +7,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import va.rit.teho.dto.formation.FormationDTO;
 import va.rit.teho.dto.repairformation.RepairFormationDTO;
 import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.service.repairformation.RepairFormationService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,12 +40,18 @@ public class RepairFormationController {
 
     @GetMapping("/formation/repair-formation")
     @ResponseBody
-    public ResponseEntity<List<RepairFormationDTO>> listRepairFormations() {
-        return ResponseEntity.ok(repairFormationService
-                                         .list()
-                                         .stream()
-                                         .map(rf -> RepairFormationDTO.from(rf, true))
-                                         .collect(Collectors.toList()));
+    public ResponseEntity<List<FormationDTO>> listRepairFormations() {
+        List<FormationDTO> formationDTOList = repairFormationService
+                .list()
+                .stream()
+                .collect(Collectors.groupingBy(RepairFormation::getFormation))
+                .entrySet()
+                .stream()
+                .map(formationListEntry -> FormationDTO.from(formationListEntry.getKey(),
+                                                             formationListEntry.getValue()))
+                .sorted(Comparator.comparing(FormationDTO::getId))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(formationDTOList);
     }
 
     @GetMapping("/formation/repair-formation/{repairFormationId}")
