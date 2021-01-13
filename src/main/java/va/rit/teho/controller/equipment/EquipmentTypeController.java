@@ -68,7 +68,7 @@ public class EquipmentTypeController {
                         .listTypesWithSubTypes(typeIds, subTypeIds)
                         .entrySet()
                         .stream()
-                        .map(typeEntry -> EquipmentSubTypePerTypeDTO.from(typeEntry.getKey(), typeEntry.getValue()))
+                        .flatMap(typeEntry -> EquipmentSubTypePerTypeDTO.from(typeEntry.getKey(), typeEntry.getValue()))
                         .collect(Collectors.toList());
         return ResponseEntity.ok(equipmentSubTypePerTypeDTOList);
     }
@@ -78,8 +78,11 @@ public class EquipmentTypeController {
     @ApiOperation(value = "Получить данные о типе ВВСТ (со списком подтипов)")
     public ResponseEntity<EquipmentSubTypePerTypeDTO> getEquipmentTypeById(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId) {
         Pair<EquipmentType, List<EquipmentSubType>> typeWithSubTypes = equipmentTypeService.getTypeWithSubTypes(typeId);
-        return ResponseEntity.ok(EquipmentSubTypePerTypeDTO.from(typeWithSubTypes.getFirst(),
-                                                                 typeWithSubTypes.getSecond()));
+        return ResponseEntity.ok(EquipmentSubTypePerTypeDTO
+                                         .from(typeWithSubTypes.getFirst(),
+                                               typeWithSubTypes.getSecond())
+                                         .collect(Collectors.toList())
+                                         .get(0));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

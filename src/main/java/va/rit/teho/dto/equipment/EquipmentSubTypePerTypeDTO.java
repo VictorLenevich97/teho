@@ -4,8 +4,10 @@ import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EquipmentSubTypePerTypeDTO {
     private final EquipmentTypeDTO type;
@@ -16,10 +18,18 @@ public class EquipmentSubTypePerTypeDTO {
         this.subTypes = subTypes;
     }
 
-    public static EquipmentSubTypePerTypeDTO from(EquipmentType type, Collection<EquipmentSubType> subTypes) {
-        List<EquipmentSubTypeDTO> equipmentSubTypeDTOListdtoList =
+    public static Stream<EquipmentSubTypePerTypeDTO> from(EquipmentType type, Collection<EquipmentSubType> subTypes) {
+        List<EquipmentSubTypeDTO> equipmentSubTypeDTOList =
                 subTypes.stream().map(EquipmentSubTypeDTO::from).collect(Collectors.toList());
-        return new EquipmentSubTypePerTypeDTO(EquipmentTypeDTO.from(type), equipmentSubTypeDTOListdtoList);
+        if (type == null) {
+            return equipmentSubTypeDTOList
+                    .stream()
+                    .map(equipmentSubTypeDTO -> new EquipmentSubTypePerTypeDTO(new EquipmentTypeDTO(equipmentSubTypeDTO.getId(),
+                                                                                                    equipmentSubTypeDTO.getShortName(),
+                                                                                                    equipmentSubTypeDTO.getFullName()),
+                                                                               Collections.emptyList()));
+        }
+        return Stream.of(new EquipmentSubTypePerTypeDTO(EquipmentTypeDTO.from(type), equipmentSubTypeDTOList));
     }
 
     public EquipmentTypeDTO getType() {
