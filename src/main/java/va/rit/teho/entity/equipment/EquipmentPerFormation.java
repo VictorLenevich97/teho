@@ -32,6 +32,7 @@ public class EquipmentPerFormation {
     }
 
     public EquipmentPerFormation(Equipment equipment, Formation formation, Long amount) {
+        this.id = new EquipmentPerFormationPK(formation.getId(), equipment.getId());
         this.formation = formation;
         this.equipment = equipment;
         this.amount = amount.intValue();

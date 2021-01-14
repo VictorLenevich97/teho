@@ -179,9 +179,9 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public void addEquipmentToFormation(Long formationId, Long equipmentId, Long amount) {
-        formationService.get(formationId);
-        equipmentService.get(equipmentId);
+    public EquipmentPerFormation addEquipmentToFormation(Long formationId, Long equipmentId, Long amount) {
+        Formation formation = formationService.get(formationId);
+        Equipment equipment = equipmentService.get(equipmentId);
         equipmentPerFormationRepository
                 .findById(new EquipmentPerFormationPK(formationId, equipmentId))
                 .ifPresent(epb -> {
@@ -190,7 +190,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                      "(" + formationId + ", " + equipmentId + ")");
                 });
 
-        this.equipmentPerFormationRepository.save(new EquipmentPerFormation(formationId, equipmentId, amount));
+        return this.equipmentPerFormationRepository.save(new EquipmentPerFormation(equipment, formation, amount));
     }
 
     @Override
