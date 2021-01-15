@@ -38,9 +38,9 @@ public class RepairFormationController {
                                          .collect(Collectors.toList()));
     }
 
-    @GetMapping("/formation/repair-formation")
+    @GetMapping("/formation/repair-formation/grouped")
     @ResponseBody
-    public ResponseEntity<List<FormationDTO>> listRepairFormations() {
+    public ResponseEntity<List<FormationDTO>> listRepairFormationsGroupedByFormation() {
         List<FormationDTO> formationDTOList = repairFormationService
                 .list()
                 .stream()
@@ -52,6 +52,19 @@ public class RepairFormationController {
                 .sorted(Comparator.comparing(FormationDTO::getId))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(formationDTOList);
+    }
+
+
+    @GetMapping("/formation/repair-formation")
+    @ResponseBody
+    public ResponseEntity<List<RepairFormationDTO>> listRepairFormations() {
+        List<RepairFormationDTO> repairFormationDTOList = repairFormationService
+                .list()
+                .stream()
+                .map(rf -> RepairFormationDTO.from(rf, true))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(repairFormationDTOList);
     }
 
     @GetMapping("/formation/repair-formation/{repairFormationId}")

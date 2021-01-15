@@ -10,6 +10,9 @@ import java.util.UUID;
 @Entity
 public class RepairFormationUnitEquipmentStaff {
 
+    public static final RepairFormationUnitEquipmentStaff EMPTY =
+            new RepairFormationUnitEquipmentStaff(null, 0, 0);
+
     @EmbeddedId
     RepairFormationUnitPK equipmentPerRepairFormationUnit;
 

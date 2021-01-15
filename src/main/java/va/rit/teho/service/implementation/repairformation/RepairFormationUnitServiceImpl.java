@@ -19,10 +19,7 @@ import va.rit.teho.repository.repairformation.RepairStationTypeRepository;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -138,7 +135,20 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> getWithEquipmentStaffGrouped(
+    public Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> getEquipmentStaffPerSubType(UUID sessionId,
+                                                                                                Long repairFormationUnitId,
+                                                                                                List<Long> equipmentTypeIds,
+                                                                                                List<Long> equipmentSubTypeIds) {
+        RepairFormationUnit repairFormationUnit = getRepairFormationUnitOrThrow(repairFormationUnitId);
+        return listEquipmentStaffPerSubType(sessionId,
+                                            Collections.singletonList(repairFormationUnitId),
+                                            equipmentTypeIds,
+                                            equipmentSubTypeIds).getOrDefault(repairFormationUnit,
+                                                                               Collections.emptyMap());
+    }
+
+    @Override
+    public Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> listEquipmentStaffPerSubType(
             UUID sessionId,
             List<Long> repairFormationUnitIds,
             List<Long> equipmentTypeIds,
