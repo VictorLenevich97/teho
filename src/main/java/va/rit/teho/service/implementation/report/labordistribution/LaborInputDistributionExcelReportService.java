@@ -3,18 +3,17 @@ package va.rit.teho.service.implementation.report.labordistribution;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 import va.rit.teho.report.ReportCell;
+import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,47 +21,51 @@ import java.util.stream.Stream;
 public class LaborInputDistributionExcelReportService
         extends AbstractExcelReportService<LaborInputDistributionCombinedData, EquipmentLaborInputDistribution> {
 
-    private final ThreadLocal<LaborInputDistributionCombinedData> data = new ThreadLocal<>();
-
-    private static Stream<Function<EquipmentLaborInputDistribution, ReportCell>> getCountAndLaborInputFunctions(
+    private static Stream<ReportCellFunction<EquipmentLaborInputDistribution>> getCountAndLaborInputFunctions(
             WorkhoursDistributionInterval wdi) {
-        return Stream.of(
-                (EquipmentLaborInputDistribution elid) -> new ReportCell(elid
-                                                                                 .getIntervalCountAndLaborInputMap()
-                                                                                 .get(wdi.getId())
-                                                                                 .getCount(),
-                                                                         ReportCell.CellType.NUMERIC),
-                (EquipmentLaborInputDistribution elid) -> new ReportCell(elid
-                                                                                 .getIntervalCountAndLaborInputMap()
-                                                                                 .get(wdi.getId())
-                                                                                 .getLaborInput(),
-                                                                         ReportCell.CellType.NUMERIC));
+        return
+                Stream.of(
+                        ReportCellFunction.of(elid -> elid
+                                                      .getIntervalCountAndLaborInputMap()
+                                                      .get(wdi.getId())
+                                                      .getCount(),
+                                              ReportCell.CellType.NUMERIC),
+                        ReportCellFunction.of(elid -> elid
+                                                      .getIntervalCountAndLaborInputMap()
+                                                      .get(wdi.getId())
+                                                      .getLaborInput(),
+                                              ReportCell.CellType.NUMERIC));
     }
 
     @Override
-    protected List<Function<EquipmentLaborInputDistribution, ReportCell>> populateCellFunctions() {
-        Function<EquipmentLaborInputDistribution, ReportCell> formationNameFunction = (elid) -> new ReportCell(elid.getFormationName(),
-                                                                                                               ReportCell.CellType.TEXT,
-                                                                                                               HorizontalAlignment.LEFT);
-        Function<EquipmentLaborInputDistribution, ReportCell> equipmentNameFunction = (elid) -> new ReportCell(elid.getEquipmentName(),
-                                                                                                               ReportCell.CellType.TEXT,
-                                                                                                               HorizontalAlignment.LEFT);
-        Function<EquipmentLaborInputDistribution, ReportCell> avgDailyFailureFunction = (elid) -> new ReportCell(elid.getAvgDailyFailure(),
-                                                                                                                 ReportCell.CellType.NUMERIC);
-        Function<EquipmentLaborInputDistribution, ReportCell> standardLaborInputFunction = (elid) -> new ReportCell(elid.getStandardLaborInput(),
-                                                                                                                    ReportCell.CellType.NUMERIC);
+    protected List<ReportCellFunction<EquipmentLaborInputDistribution>> populateCellFunctions(
+            LaborInputDistributionCombinedData data) {
+        ReportCellFunction<EquipmentLaborInputDistribution> formationNameFunction =
+                ReportCellFunction.of(EquipmentLaborInputDistribution::getFormationName,
+                                      ReportCell.CellType.TEXT,
+                                      HorizontalAlignment.LEFT);
+        ReportCellFunction<EquipmentLaborInputDistribution> equipmentNameFunction =
+                ReportCellFunction.of(EquipmentLaborInputDistribution::getEquipmentName,
+                                      ReportCell.CellType.TEXT,
+                                      HorizontalAlignment.LEFT);
+        ReportCellFunction<EquipmentLaborInputDistribution> avgDailyFailureFunction =
+                ReportCellFunction.of(EquipmentLaborInputDistribution::getAvgDailyFailure, ReportCell.CellType.NUMERIC);
+        ReportCellFunction<EquipmentLaborInputDistribution> standardLaborInputFunction =
+                ReportCellFunction.of(EquipmentLaborInputDistribution::getStandardLaborInput,
+                                      ReportCell.CellType.NUMERIC);
 
-        List<Function<EquipmentLaborInputDistribution, ReportCell>> intervalFunctions = this.data
-                .get()
-                .getWorkhoursDistributionIntervals()
-                .stream()
-                .flatMap(LaborInputDistributionExcelReportService::getCountAndLaborInputFunctions)
-                .collect(Collectors.toList());
+        List<ReportCellFunction<EquipmentLaborInputDistribution>> intervalFunctions =
+                data
+                        .getWorkhoursDistributionIntervals()
+                        .stream()
+                        .flatMap(LaborInputDistributionExcelReportService::getCountAndLaborInputFunctions)
+                        .collect(Collectors.toList());
 
-        Function<EquipmentLaborInputDistribution, ReportCell> totalLaborInputFunction = (elid) -> new ReportCell(elid.getTotalRepairComplexity(),
-                                                                                                                 ReportCell.CellType.NUMERIC);
+        ReportCellFunction<EquipmentLaborInputDistribution> totalLaborInputFunction =
+                ReportCellFunction.of(EquipmentLaborInputDistribution::getTotalRepairComplexity,
+                                      ReportCell.CellType.NUMERIC);
 
-        List<Function<EquipmentLaborInputDistribution, ReportCell>> functionsList = new ArrayList<>(Arrays.asList(
+        List<ReportCellFunction<EquipmentLaborInputDistribution>> functionsList = new ArrayList<>(Arrays.asList(
                 formationNameFunction,
                 equipmentNameFunction,
                 avgDailyFailureFunction,
@@ -80,31 +83,30 @@ public class LaborInputDistributionExcelReportService
     }
 
     @Override
-    protected List<ReportHeader> buildHeader() {
-        ReportHeader formationHeader = new ReportHeader("Воинская часть (подразделение)", true, false);
-        ReportHeader equipmentNameHeader = new ReportHeader("Наименование ВВСТ", true, false);
-        ReportHeader avgDailyFailureHeader = new ReportHeader("Среднесуточный выход в ремонт, ед.", true, true);
-        ReportHeader standardLaborInputHeader = new ReportHeader("Нормативная трудоемкость ремонта, чел.-час.",
-                                                                 true,
-                                                                 true);
+    protected List<ReportHeader> buildHeader(LaborInputDistributionCombinedData data) {
+        ReportHeader formationHeader = header("Воинская часть (подразделение)");
+        ReportHeader equipmentNameHeader = header("Наименование ВВСТ");
+        ReportHeader avgDailyFailureHeader = header("Среднесуточный выход в ремонт, ед.", true, true);
+        ReportHeader standardLaborInputHeader =
+                header("Нормативная трудоемкость ремонта, чел.-час.", true, true);
 
-        ReportHeader distributionTopHeader = new ReportHeader("Распределение ремонтного фонда по трудоемкости ремонта",
-                                                              true,
-                                                              false);
+        ReportHeader distributionTopHeader = header("Распределение ремонтного фонда по трудоемкости ремонта");
 
-        this.data
-                .get()
+        data
                 .getWorkhoursDistributionIntervals()
                 .sort(Comparator.comparing(WorkhoursDistributionInterval::getUpperBound));
-        this.data.get().getWorkhoursDistributionIntervals().forEach(wdi -> {
-            ReportHeader intervalHeader = new ReportHeader(((wdi.getLowerBound() == null ? "" : ("от " + wdi.getLowerBound())) + (wdi
-                    .getUpperBound() == null ? "" : " до " + wdi.getUpperBound()) + " чел.-час."), true, false);
-            intervalHeader.addSubHeader(new ReportHeader("Кол., ед.", true, false));
-            intervalHeader.addSubHeader(new ReportHeader("Qij, чел.-час.", true, false));
-            distributionTopHeader.addSubHeader(intervalHeader);
-        });
+        data
+                .getWorkhoursDistributionIntervals()
+                .forEach(wdi -> {
+                    ReportHeader intervalHeader = header(
+                            ((wdi.getLowerBound() == null ? "" : ("от " + wdi.getLowerBound())) +
+                                    (wdi.getUpperBound() == null ? "" : " до " + wdi.getUpperBound()) + " чел.-час."));
+                    intervalHeader.addSubHeader(header("Кол., ед."));
+                    intervalHeader.addSubHeader(header("Qij, чел.-час."));
+                    distributionTopHeader.addSubHeader(intervalHeader);
+                });
 
-        ReportHeader totalLaborInputHeader = new ReportHeader("Суммарная трудоемксоть ремонта, чел.-час.", true, true);
+        ReportHeader totalLaborInputHeader = header("Суммарная трудоемксоть ремонта, чел.-час.", true, true);
         return Arrays.asList(formationHeader,
                              equipmentNameHeader,
                              avgDailyFailureHeader,
@@ -114,30 +116,26 @@ public class LaborInputDistributionExcelReportService
     }
 
     @Override
-    protected int writeData(LaborInputDistributionCombinedData data, Sheet sheet, int[] lastRow) {
+    protected int writeData(LaborInputDistributionCombinedData data, Sheet sheet, int lastRowIndex) {
         int colSize = (data.getWorkhoursDistributionIntervals().size() * 2) + 4;
-        data.getLaborInputDistribution().forEach((equipmentType, equipmentSubTypeListMap) -> {
-            createRowWideCell(sheet, lastRow[0], colSize, equipmentType.getFullName(), true, false);
-            equipmentSubTypeListMap.forEach((equipmentSubType, equipmentLaborInputDistributions) -> {
+        for (Map.Entry<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> e : data
+                .getLaborInputDistribution()
+                .entrySet()) {
+            createRowWideCell(sheet, lastRowIndex, colSize, e.getKey().getFullName(), true, false);
+            for (Map.Entry<EquipmentSubType, List<EquipmentLaborInputDistribution>> entry : e.getValue().entrySet()) {
+                EquipmentSubType equipmentSubType = entry.getKey();
+                List<EquipmentLaborInputDistribution> equipmentLaborInputDistributions = entry.getValue();
                 createRowWideCell(sheet,
-                                  lastRow[0] + 1,
+                                  lastRowIndex + 1,
                                   colSize,
                                   "Итого " + equipmentSubType.getFullName(),
                                   true,
                                   false);
-                writeRows(sheet, lastRow[0] + 2, equipmentLaborInputDistributions);
+                writeRows(sheet, lastRowIndex + 2, data, equipmentLaborInputDistributions);
 
-                lastRow[0] += equipmentLaborInputDistributions.size() + 1;
-            });
-        });
-        return lastRow[0];
-    }
-
-    @Override
-    public byte[] generateReport(LaborInputDistributionCombinedData data) {
-        this.data.set(data);
-        byte[] bytes = super.generateReport(data);
-        this.data.remove();
-        return bytes;
+                lastRowIndex += equipmentLaborInputDistributions.size() + 1;
+            }
+        }
+        return lastRowIndex;
     }
 }

@@ -4,10 +4,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
-import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
-import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndAmount;
-import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput;
-import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityPK;
+import va.rit.teho.entity.equipment.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +25,9 @@ public interface EquipmentPerFormationFailureIntensityRepository
 
     @Query("SELECT epbfi from EquipmentPerFormationFailureIntensity epbfi WHERE epbfi.tehoSession.id = :sessionId AND epbfi.formation.id = :formationId AND " +
             "(coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds))")
-    List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionIdAndFormationId(UUID sessionId, Long formationId, List<Long> equipmentIds);
+    List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionIdAndFormationId(UUID sessionId,
+                                                                                     Long formationId,
+                                                                                     List<Long> equipmentIds);
 
     @Nullable
     @Query("SELECT epbfi from EquipmentPerFormationFailureIntensity epbfi WHERE " +
@@ -37,7 +36,16 @@ public interface EquipmentPerFormationFailureIntensityRepository
             "epbfi.equipment.id = :equipmentId AND " +
             "epbfi.stage.id = :stageId AND " +
             "epbfi.repairType.id = :repairTypeId")
-    EquipmentPerFormationFailureIntensity getFailureIntensityEntry(UUID sessionId, Long formationId, Long equipmentId, Long stageId, Long repairTypeId);
+    EquipmentPerFormationFailureIntensity getFailureIntensityEntry(UUID sessionId,
+                                                                   Long formationId,
+                                                                   Long equipmentId,
+                                                                   Long stageId,
+                                                                   Long repairTypeId);
 
     void deleteByFormationIdAndEquipmentId(Long formationId, Long equipmentId);
+
+    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount(epffi.equipment, epffi.repairType, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
+            "WHERE epffi.tehoSession.id = :sessionId AND epffi.formation.id = :formationId " +
+            "GROUP BY epffi.tehoSession.id, epffi.equipment.id, epffi.repairType.id")
+    List<EquipmentFailurePerRepairTypeAmount> listFailureDataPerRepairType(UUID sessionId, Long formationId);
 }

@@ -7,53 +7,41 @@ import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityCombinedData;
 import va.rit.teho.report.ReportCell;
+import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class RepairFormationUnitCapabilitiesExcelReportService extends
         AbstractExcelReportService<RepairFormationUnitRepairCapabilityCombinedData, RepairFormationUnit> {
 
-    private final ThreadLocal<RepairFormationUnitRepairCapabilityCombinedData> data = new ThreadLocal<>();
-
     @Override
-    protected List<Function<RepairFormationUnit, ReportCell>> populateCellFunctions() {
-        List<Function<RepairFormationUnit, ReportCell>> functions = new ArrayList<>(Collections.singletonList((rfu) -> new ReportCell(
-                rfu.getName(),
-                ReportCell.CellType.TEXT,
-                HorizontalAlignment.LEFT)));
+    protected List<ReportCellFunction<RepairFormationUnit>> populateCellFunctions(
+            RepairFormationUnitRepairCapabilityCombinedData data) {
+        List<ReportCellFunction<RepairFormationUnit>> functions =
+                new ArrayList<>(Collections.singletonList(ReportCellFunction.of(RepairFormationUnit::getName,
+                                                                                ReportCell.CellType.TEXT,
+                                                                                HorizontalAlignment.LEFT)));
         List<Equipment> equipmentList =
-                this
-                        .data
-                        .get()
+                data
                         .getGroupedEquipmentData()
                         .values()
                         .stream()
                         .flatMap(subTypeListMap -> subTypeListMap.values().stream())
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
-        List<Function<RepairFormationUnit, ReportCell>> capabilityFunctions = equipmentList
+        List<ReportCellFunction<RepairFormationUnit>> capabilityFunctions = equipmentList
                 .stream()
-                .map(this::getCapabilitiesFunction)
+                .map(e -> ReportCellFunction.of((RepairFormationUnit rfu) -> data
+                        .getCalculatedRepairCapabilities()
+                        .getOrDefault(rfu, Collections.emptyMap())
+                        .getOrDefault(e, 0.0)))
                 .collect(Collectors.toList());
         functions.addAll(capabilityFunctions);
         return functions;
-    }
-
-    private Function<RepairFormationUnit, ReportCell> getCapabilitiesFunction(Equipment e) {
-        return (RepairFormationUnit rfu) -> new ReportCell(this.data
-                                                                   .get()
-                                                                   .getCalculatedRepairCapabilities()
-                                                                   .getOrDefault(rfu, Collections.emptyMap())
-                                                                   .getOrDefault(e, 0.0),
-                                                           ReportCell.CellType.NUMERIC);
     }
 
     @Override
@@ -62,30 +50,18 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
     }
 
     @Override
-    public byte[] generateReport(RepairFormationUnitRepairCapabilityCombinedData data) {
-        this.data.set(data);
-        return super.generateReport(data);
-    }
-
-    @Override
-    protected List<ReportHeader> buildHeader() {
-        ReportHeader nameHeader = new ReportHeader("Наименование ремонтного органа формирования", true, true);
-        ReportHeader topHeader = new ReportHeader("Производственные возможности по ремонту ВВСТ, ед./сут.",
-                                                  true,
-                                                  false);
-        data.get().getGroupedEquipmentData().forEach(((equipmentType, subTypeListMap) -> {
-            ReportHeader eqTypeHeader = equipmentType == null ? null : new ReportHeader(equipmentType.getShortName(),
-                                                                                        true,
-                                                                                        false);
+    protected List<ReportHeader> buildHeader(RepairFormationUnitRepairCapabilityCombinedData data) {
+        ReportHeader nameHeader = header("Наименование ремонтного органа формирования", true, true);
+        ReportHeader topHeader = header("Производственные возможности по ремонту ВВСТ, ед./сут.");
+        data.getGroupedEquipmentData().forEach(((equipmentType, subTypeListMap) -> {
+            ReportHeader eqTypeHeader =
+                    Optional.ofNullable(equipmentType).map(et -> header(et.getShortName())).orElse(topHeader);
             subTypeListMap.forEach(((equipmentSubType, equipment) -> {
-                ReportHeader eqSubTypeHeader = new ReportHeader(equipmentSubType.getShortName(), true, true);
-                equipment
-                        .stream()
-                        .map(e -> new ReportHeader(e.getName(), true, true))
-                        .forEach(eqSubTypeHeader::addSubHeader);
-                (eqTypeHeader == null ? topHeader : eqTypeHeader).addSubHeader(eqSubTypeHeader);
+                ReportHeader eqSubTypeHeader = header(equipmentSubType.getShortName(), true, true);
+                equipment.stream().map(e -> header(e.getName(), true, true)).forEach(eqSubTypeHeader::addSubHeader);
+                eqTypeHeader.addSubHeader(eqSubTypeHeader);
             }));
-            if (eqTypeHeader != null) {
+            if (equipmentType == null) {
                 topHeader.addSubHeader(eqTypeHeader);
             }
         }));
@@ -93,15 +69,9 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
     }
 
     @Override
-    protected int writeData(RepairFormationUnitRepairCapabilityCombinedData data, Sheet sheet, int[] lastRow) {
-        writeRows(sheet, lastRow[0], data.getRepairFormationUnitList());
-        return lastRow[0] + data.getRepairFormationUnitList().size();
+    protected int writeData(RepairFormationUnitRepairCapabilityCombinedData data, Sheet sheet, int lastRowIndex) {
+        writeRows(sheet, lastRowIndex, data, data.getRepairFormationUnitList());
+        return lastRowIndex + data.getRepairFormationUnitList().size();
     }
 
-    @Override
-    protected byte[] writeSheet(Sheet sheet) {
-        byte[] result = super.writeSheet(sheet);
-        this.data.remove();
-        return result;
-    }
 }

@@ -15,13 +15,19 @@ import va.rit.teho.dto.labordistribution.LaborDistributionRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.RowData;
 import va.rit.teho.dto.table.TableDataDTO;
+import va.rit.teho.entity.labordistribution.EquipmentDistributionCombinedData;
+import va.rit.teho.entity.labordistribution.EquipmentPerFormationDistributionData;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
+import va.rit.teho.entity.labordistribution.RestorationType;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
+import va.rit.teho.repository.labordistribution.RestorationTypeRepository;
 import va.rit.teho.server.config.TehoSessionData;
+import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
+import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.report.ReportService;
 
@@ -38,18 +44,33 @@ import java.util.stream.Collectors;
 public class LaborInputDistributionController {
 
     private final EquipmentPerFormationService equipmentPerFormationService;
+    private final EquipmentRFUDistributionService equipmentRFUDistributionService;
     private final LaborInputDistributionService laborInputDistributionService;
+
+    private final RepairTypeService repairTypeService;
+    private final RestorationTypeRepository restorationTypeRepository;
+
     private final ReportService<LaborInputDistributionCombinedData> reportService;
+
+    private final ReportService<EquipmentDistributionCombinedData> distributionReportService;
 
     @Resource
     private TehoSessionData tehoSession;
 
     public LaborInputDistributionController(EquipmentPerFormationService equipmentPerFormationService,
+                                            EquipmentRFUDistributionService equipmentRFUDistributionService,
                                             LaborInputDistributionService laborInputDistributionService,
-                                            ReportService<LaborInputDistributionCombinedData> reportService) {
+                                            RepairTypeService repairTypeService,
+                                            RestorationTypeRepository restorationTypeRepository,
+                                            ReportService<LaborInputDistributionCombinedData> reportService,
+                                            ReportService<EquipmentDistributionCombinedData> distributionReportService) {
         this.equipmentPerFormationService = equipmentPerFormationService;
+        this.equipmentRFUDistributionService = equipmentRFUDistributionService;
         this.laborInputDistributionService = laborInputDistributionService;
+        this.repairTypeService = repairTypeService;
+        this.restorationTypeRepository = restorationTypeRepository;
         this.reportService = reportService;
+        this.distributionReportService = distributionReportService;
     }
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}/report")
@@ -68,7 +89,8 @@ public class LaborInputDistributionController {
         List<WorkhoursDistributionInterval> distributionIntervals = laborInputDistributionService
                 .getDistributionIntervals();
 
-        byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(laborInputDistribution, distributionIntervals));
+        byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(laborInputDistribution,
+                                                                                           distributionIntervals));
         String encode = URLEncoder.encode("Распределение производственного фонда.xls",
                                           "UTF-8");
         return ResponseEntity.ok()
@@ -154,6 +176,23 @@ public class LaborInputDistributionController {
         return ResponseEntity.accepted().build();
     }
 
-
+    @GetMapping("/{formationId}")
+    public ResponseEntity<byte[]> get(@PathVariable Long formationId) throws UnsupportedEncodingException {
+        equipmentRFUDistributionService.distribute(tehoSession.getSessionId());
+        List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData = equipmentRFUDistributionService
+                .listDistributionDataForFormation(tehoSession.getSessionId(), formationId);
+        byte[] bytes = distributionReportService.generateReport(new EquipmentDistributionCombinedData(repairTypeService.list(true),
+                                                                                                      (List<RestorationType>) restorationTypeRepository
+                                                                                                              .findAll(),
+                                                                                                      equipmentPerFormationDistributionData));
+        String encode = URLEncoder.encode("Результаты решения задачи.xls",
+                                          "UTF-8");
+        return ResponseEntity.ok()
+                             .contentLength(bytes.length)
+                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                             .cacheControl(CacheControl.noCache())
+                             .header("Content-Disposition", "attachment; filename=" + encode)
+                             .body(bytes);
+    }
 
 }

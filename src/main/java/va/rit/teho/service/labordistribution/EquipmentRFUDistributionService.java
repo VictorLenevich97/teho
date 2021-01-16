@@ -1,5 +1,6 @@
 package va.rit.teho.service.labordistribution;
 
+import va.rit.teho.entity.labordistribution.EquipmentPerFormationDistributionData;
 import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
 
 import java.util.List;
@@ -14,5 +15,7 @@ public interface EquipmentRFUDistributionService {
     List<EquipmentRFUDistribution> listRFUDistributedEquipment(Long repairFormationUnitId, UUID sessionId);
 
     void deleteDistribution(Long formationId, Long equipmentId);
+
+    List<EquipmentPerFormationDistributionData> listDistributionDataForFormation(UUID sessionId, Long formationId);
 
 }

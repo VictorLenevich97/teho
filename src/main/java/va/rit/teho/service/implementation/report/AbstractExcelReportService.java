@@ -5,6 +5,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import va.rit.teho.report.ReportCell;
+import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.report.ReportService;
 
@@ -12,7 +13,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 public abstract class AbstractExcelReportService<T, R> implements ReportService<T> {
 
@@ -32,7 +32,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         font.setBold(true);
     }
 
-    protected abstract List<Function<R, ReportCell>> populateCellFunctions();
+    protected abstract List<ReportCellFunction<R>> populateCellFunctions(T combinedData);
 
     protected abstract String reportName();
 
@@ -53,6 +53,18 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         c.getCellStyle().setRotation((short) 90);
     }
 
+    protected ReportHeader header(String name) {
+        return new ReportHeader(name, true, false);
+    }
+
+    protected ReportHeader header(String name, boolean centered) {
+        return new ReportHeader(name, centered, false);
+    }
+
+    protected ReportHeader header(String name, boolean centered, boolean vertical) {
+        return new ReportHeader(name, centered, vertical);
+    }
+
     protected void createRowWideCell(Sheet sheet, int index, int colSize, String data, boolean bold, boolean centered) {
         Cell formationCell = sheet.createRow(index).createCell(0);
 
@@ -63,22 +75,23 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         if (bold) {
             setBoldFont(formationCell);
         }
+
         formationCell.setCellValue(data);
 
         mergeCells(sheet, index, index, 0, colSize);
     }
 
-    protected abstract List<ReportHeader> buildHeader();
+    protected abstract List<ReportHeader> buildHeader(T combinedData);
 
     @Override
     public byte[] generateReport(T data) {
         Sheet sheet = createSheet(reportName());
 
-        final int[] lastRow = {writeHeader(sheet, buildHeader()) + 1};
+        final int[] lastRow = writeHeader(sheet, buildHeader(data));
 
-        int rowCount = writeData(data, sheet, lastRow);
+        writeData(data, sheet, lastRow[0]);
 
-        return writeSheet(sheet);
+        return writeSheet(sheet, lastRow[1]);
     }
 
     protected Cell setBoldFont(Cell c) {
@@ -87,7 +100,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         return c;
     }
 
-    protected abstract int writeData(T data, Sheet sheet, int[] lastRow);
+    protected abstract int writeData(T data, Sheet sheet, int lastRowIndex);
 
     private void alignCell(Cell c, HorizontalAlignment horizontalAlignment) {
         CellStyle cellStyle = wb.createCellStyle();
@@ -96,8 +109,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         c.setCellStyle(cellStyle);
     }
 
-    protected byte[] writeSheet(Sheet sheet) {
-        int columnCount = populateCellFunctions().size();
+    protected byte[] writeSheet(Sheet sheet, int columnCount) {
         for (int i = 0; i < columnCount; i++) {
             sheet.autoSizeColumn(i, true);
         }
@@ -142,8 +154,9 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
 
     protected void writeRows(Sheet sheet,
                              int rowStartIndex,
+                             T combinedData,
                              Collection<R> data) {
-        List<Function<R, ReportCell>> populateCellFunctions = populateCellFunctions();
+        List<ReportCellFunction<R>> populateCellFunctions = populateCellFunctions(combinedData);
         int i = 0;
         for (R item : data) {
             Row row = sheet.createRow(rowStartIndex + i);
@@ -162,7 +175,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         }
     }
 
-    protected int writeHeader(Sheet sheet, List<ReportHeader> reportHeaderList) {
+    protected int[] writeHeader(Sheet sheet, List<ReportHeader> reportHeaderList) {
         int cCol = 0;
         int lowestLevel = reportHeaderList
                 .stream()
@@ -173,7 +186,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         for (ReportHeader reportHeader : reportHeaderList) {
             cCol += writeHeader(sheet, reportHeader, 0, cCol, lowestLevel);
         }
-        return lowestLevel;
+        return new int[]{lowestLevel + 1, cCol + 1};
     }
 
     protected void mergeCells(Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
