@@ -3,37 +3,30 @@ package va.rit.teho.controller.labordistribution;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
+import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.labordistribution.CountAndLaborInputDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionNestedColumnsDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.RowData;
 import va.rit.teho.dto.table.TableDataDTO;
-import va.rit.teho.entity.labordistribution.EquipmentDistributionCombinedData;
-import va.rit.teho.entity.labordistribution.EquipmentPerFormationDistributionData;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
-import va.rit.teho.entity.labordistribution.RestorationType;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
-import va.rit.teho.repository.labordistribution.RestorationTypeRepository;
 import va.rit.teho.server.config.TehoSessionData;
-import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
-import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,33 +37,21 @@ import java.util.stream.Collectors;
 public class LaborInputDistributionController {
 
     private final EquipmentPerFormationService equipmentPerFormationService;
-    private final EquipmentRFUDistributionService equipmentRFUDistributionService;
     private final LaborInputDistributionService laborInputDistributionService;
 
-    private final RepairTypeService repairTypeService;
-    private final RestorationTypeRepository restorationTypeRepository;
 
     private final ReportService<LaborInputDistributionCombinedData> reportService;
 
-    private final ReportService<EquipmentDistributionCombinedData> distributionReportService;
 
     @Resource
     private TehoSessionData tehoSession;
 
     public LaborInputDistributionController(EquipmentPerFormationService equipmentPerFormationService,
-                                            EquipmentRFUDistributionService equipmentRFUDistributionService,
                                             LaborInputDistributionService laborInputDistributionService,
-                                            RepairTypeService repairTypeService,
-                                            RestorationTypeRepository restorationTypeRepository,
-                                            ReportService<LaborInputDistributionCombinedData> reportService,
-                                            ReportService<EquipmentDistributionCombinedData> distributionReportService) {
+                                            ReportService<LaborInputDistributionCombinedData> reportService) {
         this.equipmentPerFormationService = equipmentPerFormationService;
-        this.equipmentRFUDistributionService = equipmentRFUDistributionService;
         this.laborInputDistributionService = laborInputDistributionService;
-        this.repairTypeService = repairTypeService;
-        this.restorationTypeRepository = restorationTypeRepository;
         this.reportService = reportService;
-        this.distributionReportService = distributionReportService;
     }
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}/report")
@@ -86,20 +67,13 @@ public class LaborInputDistributionController {
                                                                         repairTypeId,
                                                                         stageId,
                                                                         equipmentTypeId);
-        List<WorkhoursDistributionInterval> distributionIntervals = laborInputDistributionService
-                .getDistributionIntervals();
+        List<WorkhoursDistributionInterval> distributionIntervals =
+                laborInputDistributionService.listDistributionIntervals();
 
         byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(laborInputDistribution,
                                                                                            distributionIntervals));
-        String encode = URLEncoder.encode("Распределение производственного фонда.xls",
-                                          "UTF-8");
-        return ResponseEntity.ok()
-                             .contentLength(bytes.length)
-                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                             .cacheControl(CacheControl.noCache())
-                             .header("Content-Disposition", "attachment; filename=" + encode)
-                             .body(bytes);
 
+        return ReportResponseEntity.ok("Распределение производственного фонда", bytes);
     }
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}")
@@ -116,7 +90,7 @@ public class LaborInputDistributionController {
                                                                         equipmentTypeId);
         List<NestedColumnsDTO> columns =
                 laborInputDistributionService
-                        .getDistributionIntervals()
+                        .listDistributionIntervals()
                         .stream()
                         .map(wdi -> new LaborDistributionNestedColumnsDTO(wdi.getId(),
                                                                           wdi.getLowerBound(),
@@ -174,25 +148,6 @@ public class LaborInputDistributionController {
         equipmentPerFormationService.updateAvgDailyFailureData(tehoSession.getSessionId(), coefficient);
         laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId());
         return ResponseEntity.accepted().build();
-    }
-
-    @GetMapping("/{formationId}")
-    public ResponseEntity<byte[]> get(@PathVariable Long formationId) throws UnsupportedEncodingException {
-        equipmentRFUDistributionService.distribute(tehoSession.getSessionId());
-        List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData = equipmentRFUDistributionService
-                .listDistributionDataForFormation(tehoSession.getSessionId(), formationId);
-        byte[] bytes = distributionReportService.generateReport(new EquipmentDistributionCombinedData(repairTypeService.list(true),
-                                                                                                      (List<RestorationType>) restorationTypeRepository
-                                                                                                              .findAll(),
-                                                                                                      equipmentPerFormationDistributionData));
-        String encode = URLEncoder.encode("Результаты решения задачи.xls",
-                                          "UTF-8");
-        return ResponseEntity.ok()
-                             .contentLength(bytes.length)
-                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                             .cacheControl(CacheControl.noCache())
-                             .header("Content-Disposition", "attachment; filename=" + encode)
-                             .body(bytes);
     }
 
 }

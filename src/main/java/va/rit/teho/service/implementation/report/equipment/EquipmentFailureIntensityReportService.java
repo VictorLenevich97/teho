@@ -71,7 +71,7 @@ public class EquipmentFailureIntensityReportService
     }
 
     @Override
-    protected int writeData(EquipmentFailureIntensityCombinedData data, Sheet sheet, int lastRowIndex) {
+    protected void writeData(EquipmentFailureIntensityCombinedData data, Sheet sheet, int lastRowIndex) {
         int colSize = data.getStages().size() * data.getRepairTypes().size() + 1;
 
         for (Map.Entry<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> entry : data
@@ -93,6 +93,5 @@ public class EquipmentFailureIntensityReportService
                 lastRowIndex += equipmentPerFormations.size() + 2;
             }
         }
-        return lastRowIndex;
     }
 }

@@ -51,17 +51,17 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
 
     @Override
     protected List<ReportHeader> buildHeader(RepairFormationUnitRepairCapabilityCombinedData data) {
-        ReportHeader nameHeader = header("Наименование ремонтного органа формирования", true, true);
+        ReportHeader nameHeader = header("Наименование ремонтного органа формирования", true);
         ReportHeader topHeader = header("Производственные возможности по ремонту ВВСТ, ед./сут.");
         data.getGroupedEquipmentData().forEach(((equipmentType, subTypeListMap) -> {
             ReportHeader eqTypeHeader =
                     Optional.ofNullable(equipmentType).map(et -> header(et.getShortName())).orElse(topHeader);
             subTypeListMap.forEach(((equipmentSubType, equipment) -> {
-                ReportHeader eqSubTypeHeader = header(equipmentSubType.getShortName(), true, true);
-                equipment.stream().map(e -> header(e.getName(), true, true)).forEach(eqSubTypeHeader::addSubHeader);
+                ReportHeader eqSubTypeHeader = header(equipmentSubType.getShortName(), true);
+                equipment.stream().map(e -> header(e.getName(), true)).forEach(eqSubTypeHeader::addSubHeader);
                 eqTypeHeader.addSubHeader(eqSubTypeHeader);
             }));
-            if (equipmentType == null) {
+            if (equipmentType != null) {
                 topHeader.addSubHeader(eqTypeHeader);
             }
         }));
@@ -69,9 +69,8 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
     }
 
     @Override
-    protected int writeData(RepairFormationUnitRepairCapabilityCombinedData data, Sheet sheet, int lastRowIndex) {
+    protected void writeData(RepairFormationUnitRepairCapabilityCombinedData data, Sheet sheet, int lastRowIndex) {
         writeRows(sheet, lastRowIndex, data, data.getRepairFormationUnitList());
-        return lastRowIndex + data.getRepairFormationUnitList().size();
     }
 
 }

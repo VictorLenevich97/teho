@@ -36,11 +36,11 @@ public interface EquipmentPerFormationFailureIntensityRepository
             "epbfi.equipment.id = :equipmentId AND " +
             "epbfi.stage.id = :stageId AND " +
             "epbfi.repairType.id = :repairTypeId")
-    EquipmentPerFormationFailureIntensity getFailureIntensityEntry(UUID sessionId,
-                                                                   Long formationId,
-                                                                   Long equipmentId,
-                                                                   Long stageId,
-                                                                   Long repairTypeId);
+    EquipmentPerFormationFailureIntensity get(UUID sessionId,
+                                              Long formationId,
+                                              Long equipmentId,
+                                              Long stageId,
+                                              Long repairTypeId);
 
     void deleteByFormationIdAndEquipmentId(Long formationId, Long equipmentId);
 

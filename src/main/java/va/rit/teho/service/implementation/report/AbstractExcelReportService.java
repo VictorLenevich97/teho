@@ -16,20 +16,60 @@ import java.util.List;
 
 public abstract class AbstractExcelReportService<T, R> implements ReportService<T> {
 
+    private static final Workbook wb = new HSSFWorkbook();
+
     private final CellStyle rowStyle;
 
-    private final Font font;
-
-    private static final Workbook wb = new HSSFWorkbook();
+    //Из-за ограничения Excel на количество стилей пришлось создать 5 разных
+    private final CellStyle baseCellStyle;
+    private final CellStyle boldCellStyle;
+    private final CellStyle centeredCellStyle;
+    private final CellStyle centeredRotatedCellStyle;
+    private final CellStyle centeredBoldCellStyle;
 
     public AbstractExcelReportService() {
         this.rowStyle = wb.createCellStyle();
         this.rowStyle.setWrapText(true);
+        this.rowStyle.setShrinkToFit(true);
 
-        this.font = wb.createFont();
-        font.setFontName(HSSFFont.FONT_ARIAL);
-        font.setFontHeightInPoints((short) 10);
-        font.setBold(true);
+        Font defaultFont = wb.createFont();
+        defaultFont.setFontName(HSSFFont.FONT_ARIAL);
+        defaultFont.setFontHeightInPoints((short) 10);
+        this.rowStyle.setFont(defaultFont);
+
+        Font boldFont = wb.createFont();
+        boldFont.setFontName(HSSFFont.FONT_ARIAL);
+        boldFont.setFontHeightInPoints((short) 10);
+        boldFont.setBold(true);
+
+        this.baseCellStyle = createCellStyle();
+        this.baseCellStyle.setFont(defaultFont);
+
+        this.boldCellStyle = createCellStyle();
+        this.boldCellStyle.setFont(boldFont);
+
+        this.centeredCellStyle = centerCellStyle(createCellStyle());
+
+        this.centeredBoldCellStyle = centerCellStyle(createCellStyle());
+        this.centeredBoldCellStyle.setFont(boldFont);
+
+        this.centeredRotatedCellStyle = centerCellStyle(createCellStyle());
+        this.centeredRotatedCellStyle.setRotation((short) 90);
+    }
+
+    private CellStyle centerCellStyle(CellStyle c) {
+        c.setAlignment(HorizontalAlignment.CENTER);
+        c.setVerticalAlignment(VerticalAlignment.CENTER);
+        return c;
+    }
+
+    private CellStyle createCellStyle() {
+        CellStyle c = wb.createCellStyle();
+        c.setBorderTop(BorderStyle.THIN);
+        c.setBorderLeft(BorderStyle.THIN);
+        c.setBorderRight(BorderStyle.THIN);
+        c.setBorderBottom(BorderStyle.THIN);
+        return c;
     }
 
     protected abstract List<ReportCellFunction<R>> populateCellFunctions(T combinedData);
@@ -40,43 +80,39 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         return wb.createSheet(name);
     }
 
-    protected Cell alignCellCenter(Cell c) {
-        alignCell(c, HorizontalAlignment.CENTER);
-        c.getCellStyle().setWrapText(true);
-        c.getCellStyle().setShrinkToFit(true);
-        return c;
+    protected void alignCenterAndSetBold(Cell c) {
+        c.setCellStyle(centeredBoldCellStyle);
+    }
+
+    protected void alignCellCenter(Cell c) {
+        c.setCellStyle(centeredCellStyle);
     }
 
     protected void rotateCell(Cell c) {
-        c.getCellStyle().setWrapText(true);
-        c.getCellStyle().setShrinkToFit(true);
-        c.getCellStyle().setRotation((short) 90);
+        c.setCellStyle(centeredRotatedCellStyle);
     }
 
     protected ReportHeader header(String name) {
-        return new ReportHeader(name, true, false);
+        return header(name, false);
     }
 
-    protected ReportHeader header(String name, boolean centered) {
-        return new ReportHeader(name, centered, false);
-    }
-
-    protected ReportHeader header(String name, boolean centered, boolean vertical) {
-        return new ReportHeader(name, centered, vertical);
+    protected ReportHeader header(String name, boolean vertical) {
+        return new ReportHeader(name, vertical);
     }
 
     protected void createRowWideCell(Sheet sheet, int index, int colSize, String data, boolean bold, boolean centered) {
-        Cell formationCell = sheet.createRow(index).createCell(0);
+        Row row = sheet.createRow(index);
+        Cell rowWideCell = row.createCell(0);
 
-        if (centered) {
-            alignCellCenter(formationCell);
+        if (centered && bold) {
+            alignCenterAndSetBold(rowWideCell);
+        } else if (centered) {
+            alignCellCenter(rowWideCell);
+        } else if (bold) {
+            setBoldFont(rowWideCell);
         }
 
-        if (bold) {
-            setBoldFont(formationCell);
-        }
-
-        formationCell.setCellValue(data);
+        rowWideCell.setCellValue(data);
 
         mergeCells(sheet, index, index, 0, colSize);
     }
@@ -94,20 +130,11 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         return writeSheet(sheet, lastRow[1]);
     }
 
-    protected Cell setBoldFont(Cell c) {
-        CellStyle style = c.getCellStyle() == null ? wb.createCellStyle() : c.getCellStyle();
-        style.setFont(font);
-        return c;
+    protected void setBoldFont(Cell c) {
+        c.setCellStyle(boldCellStyle);
     }
 
-    protected abstract int writeData(T data, Sheet sheet, int lastRowIndex);
-
-    private void alignCell(Cell c, HorizontalAlignment horizontalAlignment) {
-        CellStyle cellStyle = wb.createCellStyle();
-        cellStyle.setAlignment(horizontalAlignment);
-        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        c.setCellStyle(cellStyle);
-    }
+    protected abstract void writeData(T data, Sheet sheet, int lastRowIndex);
 
     protected byte[] writeSheet(Sheet sheet, int columnCount) {
         for (int i = 0; i < columnCount; i++) {
@@ -138,17 +165,21 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         } else if (lowestLevel > cRow) {
             mergeCells(sheet, cRow, lowestLevel, cCol, cCol);
         }
+
         Row row = sheet.getRow(cRow) == null ? sheet.createRow(cRow) : sheet.getRow(cRow);
+        //Авто-выравнивание высоты строки
         row.setHeight((short) -1);
+        //Применение общего стиля (перенос текста)
         row.setRowStyle(rowStyle);
+
         Cell cell = row.createCell(cCol);
         cell.setCellValue(reportHeader.getName());
-        if (reportHeader.isCentered()) {
-            alignCellCenter(cell);
-        }
+        alignCellCenter(cell);
+
         if (reportHeader.isVertical()) {
             rotateCell(cell);
         }
+
         return levelCount;
     }
 
@@ -167,8 +198,9 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
                 cell.setCellValue(reportCell.getValue());
                 if (reportCell.getAlignment().equals(HorizontalAlignment.CENTER)) {
                     alignCellCenter(cell);
-                } else {
-                    alignCell(cell, reportCell.getAlignment());
+                }
+                if (cell.getCellStyle().getBorderBottom().equals(BorderStyle.NONE)) {
+                    cell.setCellStyle(baseCellStyle);
                 }
             }
             i++;
@@ -190,6 +222,16 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
     }
 
     protected void mergeCells(Sheet sheet, int firstRow, int lastRow, int firstCol, int lastCol) {
+        //Применяем базовый стиль на все ячейки, чтобы у области была видимая граница
+        for (int i = firstRow; i <= lastRow; i++) {
+            Row row = sheet.getRow(i) == null ? sheet.createRow(i) : sheet.getRow(i);
+            for (int j = firstCol; j <= lastCol; j++) {
+                if (row.getCell(j) == null) {
+                    row.createCell(j).setCellStyle(this.baseCellStyle);
+                }
+            }
+        }
+
         sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
     }
 

@@ -44,9 +44,9 @@ public class EquipmentExcelReportService
     }
 
     @Override
-    protected int writeData(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data,
-                            Sheet sheet,
-                            int lastRowIndex) {
+    protected void writeData(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data,
+                             Sheet sheet,
+                             int lastRowIndex) {
         for (Map.Entry<EquipmentType, Map<EquipmentSubType, List<Equipment>>> entry : data.entrySet()) {
             EquipmentType eqType = entry.getKey();
             Map<EquipmentSubType, List<Equipment>> subTypeListMap = entry.getValue();
@@ -60,7 +60,6 @@ public class EquipmentExcelReportService
 
             lastRowIndex += subTypeListMap.size() + 1;
         }
-        return lastRowIndex;
     }
 
     @Override

@@ -4,12 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.data.util.Pair;
-import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.repairformation.RepairFormationUnitDTO;
 import va.rit.teho.dto.repairformation.RepairFormationUnitEquipmentStaffDTO;
 import va.rit.teho.dto.repairformation.RepairFormationUnitEquipmentStaffRowData;
@@ -28,7 +28,6 @@ import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -92,15 +91,9 @@ public class RepairFormationUnitController {
                 equipmentSubTypeId,
                 pageNum,
                 pageSize);
-        byte[] bytes = reportService.generateReport(repairFormationUnitCombinedData);
-        String encode = URLEncoder.encode("Состав и штатная численность РВО.xls",
-                                          "UTF-8");
-        return ResponseEntity.ok().contentLength(bytes.length)
-                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                             .cacheControl(CacheControl.noCache())
-                             .header("Content-Disposition", "attachment; filename=" + encode)
-                             .body(bytes);
 
+        return ReportResponseEntity.ok("Состав и штатная численность РВО",
+                                       reportService.generateReport(repairFormationUnitCombinedData));
     }
 
     private RepairFormationUnitCombinedData getRepairFormationUnitCombinedData(List<Long> repairFormationUnitId,

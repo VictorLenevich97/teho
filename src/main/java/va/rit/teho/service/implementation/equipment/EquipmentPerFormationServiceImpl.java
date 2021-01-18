@@ -89,11 +89,11 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
 
         Integer intensity =
                 Optional.ofNullable(equipmentPerFormationFailureIntensityRepository
-                                            .getFailureIntensityEntry(sessionId,
-                                                                      formationId,
-                                                                      equipmentId,
-                                                                      stageId,
-                                                                      repairTypeId))
+                                            .get(sessionId,
+                                                 formationId,
+                                                 equipmentId,
+                                                 stageId,
+                                                 repairTypeId))
                         .map(EquipmentPerFormationFailureIntensity::getIntensityPercentage)
                         .orElse(0);
 

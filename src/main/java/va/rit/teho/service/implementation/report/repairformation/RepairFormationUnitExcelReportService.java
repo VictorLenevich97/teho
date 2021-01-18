@@ -12,10 +12,7 @@ import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,7 +52,11 @@ public class RepairFormationUnitExcelReportService
                                                                      EquipmentSubType st,
                                                                      Function<RepairFormationUnitEquipmentStaff, Integer> f) {
         return Stream.of(
-                ReportCellFunction.of(rfu -> f.apply(data.getRepairFormationUnitEquipmentStaff().get(rfu).get(st))));
+                ReportCellFunction.of(
+                        rfu -> f.apply(data
+                                               .getRepairFormationUnitEquipmentStaff()
+                                               .getOrDefault(rfu, Collections.emptyMap())
+                                               .getOrDefault(st, RepairFormationUnitEquipmentStaff.EMPTY))));
     }
 
     @Override
@@ -65,9 +66,9 @@ public class RepairFormationUnitExcelReportService
 
     @Override
     protected List<ReportHeader> buildHeader(RepairFormationUnitCombinedData data) {
-        ReportHeader nameReportHeader = header("Наименование ремонтного органа формирования", true, true);
-        ReportHeader repairStationTypeReportHeader = header("Тип мастерской", true, true);
-        ReportHeader rstCountReportHeader = header("Кол-во", true, true);
+        ReportHeader nameReportHeader = header("Наименование ремонтного органа формирования", true);
+        ReportHeader repairStationTypeReportHeader = header("Тип мастерской", true);
+        ReportHeader rstCountReportHeader = header("Кол-во", true);
         return Arrays.asList(nameReportHeader,
                              repairStationTypeReportHeader,
                              rstCountReportHeader,
@@ -83,20 +84,18 @@ public class RepairFormationUnitExcelReportService
                 .flatMap(e -> Optional.ofNullable(e.getKey())
                                       .map(key -> Stream.of(
                                               new ReportHeader(key.getShortName(),
-                                                               true,
                                                                e.getValue()
                                                                 .stream()
-                                                                .map(est -> header(est.getShortName(), true, true))
+                                                                .map(est -> header(est.getShortName(), true))
                                                                 .collect(Collectors.toList()))))
-                                      .orElse(e.getValue().stream().map(est -> header(est.getShortName(), true, true))))
+                                      .orElse(e.getValue().stream().map(est -> header(est.getShortName(), true))))
                 .collect(Collectors.toList());
-        return new ReportHeader(topHeader, true, subReportHeaders);
+        return new ReportHeader(topHeader, subReportHeaders);
     }
 
     @Override
-    protected int writeData(RepairFormationUnitCombinedData data, Sheet sheet, int lastRowIndex) {
+    protected void writeData(RepairFormationUnitCombinedData data, Sheet sheet, int lastRowIndex) {
         writeRows(sheet, lastRowIndex, data, data.getRepairFormationUnitList());
-        return lastRowIndex + data.getRepairFormationUnitList().size();
     }
 
 }

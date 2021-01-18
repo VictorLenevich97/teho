@@ -86,9 +86,9 @@ public class LaborInputDistributionExcelReportService
     protected List<ReportHeader> buildHeader(LaborInputDistributionCombinedData data) {
         ReportHeader formationHeader = header("Воинская часть (подразделение)");
         ReportHeader equipmentNameHeader = header("Наименование ВВСТ");
-        ReportHeader avgDailyFailureHeader = header("Среднесуточный выход в ремонт, ед.", true, true);
+        ReportHeader avgDailyFailureHeader = header("Среднесуточный выход в ремонт, ед.", true);
         ReportHeader standardLaborInputHeader =
-                header("Нормативная трудоемкость ремонта, чел.-час.", true, true);
+                header("Нормативная трудоемкость ремонта, чел.-час.", true);
 
         ReportHeader distributionTopHeader = header("Распределение ремонтного фонда по трудоемкости ремонта");
 
@@ -106,7 +106,7 @@ public class LaborInputDistributionExcelReportService
                     distributionTopHeader.addSubHeader(intervalHeader);
                 });
 
-        ReportHeader totalLaborInputHeader = header("Суммарная трудоемксоть ремонта, чел.-час.", true, true);
+        ReportHeader totalLaborInputHeader = header("Суммарная трудоемксоть ремонта, чел.-час.", true);
         return Arrays.asList(formationHeader,
                              equipmentNameHeader,
                              avgDailyFailureHeader,
@@ -116,7 +116,7 @@ public class LaborInputDistributionExcelReportService
     }
 
     @Override
-    protected int writeData(LaborInputDistributionCombinedData data, Sheet sheet, int lastRowIndex) {
+    protected void writeData(LaborInputDistributionCombinedData data, Sheet sheet, int lastRowIndex) {
         int colSize = (data.getWorkhoursDistributionIntervals().size() * 2) + 4;
         for (Map.Entry<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> e : data
                 .getLaborInputDistribution()
@@ -136,6 +136,5 @@ public class LaborInputDistributionExcelReportService
                 lastRowIndex += equipmentLaborInputDistributions.size() + 1;
             }
         }
-        return lastRowIndex;
     }
 }
