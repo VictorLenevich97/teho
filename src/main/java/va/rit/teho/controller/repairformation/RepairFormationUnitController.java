@@ -10,9 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.ReportResponseEntity;
-import va.rit.teho.dto.repairformation.RepairFormationUnitDTO;
-import va.rit.teho.dto.repairformation.RepairFormationUnitEquipmentStaffDTO;
-import va.rit.teho.dto.repairformation.RepairFormationUnitEquipmentStaffRowData;
+import va.rit.teho.dto.repairformation.*;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.RowData;
 import va.rit.teho.dto.table.TableDataDTO;
@@ -108,7 +106,7 @@ public class RepairFormationUnitController {
                 equipmentTypeService.listTypesWithSubTypes(equipmentTypeId,
                                                            equipmentSubTypeId);
         Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff =
-                repairFormationUnitService.getWithEquipmentStaffGrouped(tehoSession.getSessionId(),
+                repairFormationUnitService.listEquipmentStaffPerSubType(tehoSession.getSessionId(),
                                                                         repairFormationUnitId,
                                                                         equipmentTypeId,
                                                                         equipmentSubTypeId);
@@ -135,6 +133,51 @@ public class RepairFormationUnitController {
                 buildEquipmentStaffDTO(repairFormationUnitCombinedData);
         return ResponseEntity.ok(equipmentStaffDTO);
     }
+
+    @GetMapping("/formation/repair-formation/unit/{repairFormationUnitId}/staff")
+    @ApiOperation(value = "Получение состава, штатной численности и укомплектованности конкретного РВО (в виде списка)")
+    public ResponseEntity<List<EquipmentTypeStaffData>> getEquipmentStaffPerType(
+            @ApiParam(value = "Ключ РВО") @PathVariable Long repairFormationUnitId,
+            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
+            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId) {
+        Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes =
+                equipmentTypeService.listTypesWithSubTypes(equipmentTypeId,
+                                                           equipmentSubTypeId);
+        Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> equipmentStaff =
+                repairFormationUnitService.getEquipmentStaffPerSubType(tehoSession.getSessionId(),
+                                                                       repairFormationUnitId,
+                                                                       equipmentTypeId,
+                                                                       equipmentSubTypeId);
+
+        List<EquipmentTypeStaffData> typeStaffData = typesWithSubTypes
+                .entrySet()
+                .stream()
+                .map(equipmentTypeListEntry -> {
+                    List<EquipmentStaffPerSubType> subTypes = equipmentTypeListEntry
+                            .getValue()
+                            .stream()
+                            .map(est ->
+                                         new EquipmentStaffPerSubType(
+                                                 est.getId(),
+                                                 est.getFullName(),
+                                                 equipmentStaff
+                                                         .getOrDefault(est, RepairFormationUnitEquipmentStaff.EMPTY)
+                                                         .getTotalStaff(),
+                                                 equipmentStaff
+                                                         .getOrDefault(est, RepairFormationUnitEquipmentStaff.EMPTY)
+                                                         .getAvailableStaff()))
+                            .collect(Collectors.toList());
+                    EquipmentType equipmentType = equipmentTypeListEntry.getKey();
+                    if (equipmentType != null) {
+                        return new EquipmentTypeStaffData(equipmentType.getId(), equipmentType.getFullName(), subTypes);
+                    } else {
+                        return new EquipmentTypeStaffData(-1L, subTypes);
+                    }
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(typeStaffData);
+    }
+
 
     @GetMapping("/formation/repair-formation/unit/{repairFormationUnitId}")
     @ResponseBody
@@ -283,13 +326,11 @@ public class RepairFormationUnitController {
         Map<String, RepairFormationUnitEquipmentStaffDTO> dataMap = new HashMap<>();
         for (EquipmentSubType est : columns) {
             RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff =
-                    repairFormationUnitMap.getOrDefault(rs, Collections.emptyMap()).get(est);
-            boolean emptyStaff = repairFormationUnitEquipmentStaff == null;
-            int totalStaff = emptyStaff || repairFormationUnitEquipmentStaff.getTotalStaff() == null ? 0 : repairFormationUnitEquipmentStaff
-                    .getTotalStaff();
-            int availableStaff = emptyStaff || repairFormationUnitEquipmentStaff.getAvailableStaff() == null ? 0 : repairFormationUnitEquipmentStaff
-                    .getAvailableStaff();
-            dataMap.put(est.getId().toString(), new RepairFormationUnitEquipmentStaffDTO(totalStaff, availableStaff));
+                    repairFormationUnitMap.getOrDefault(rs, Collections.emptyMap()).getOrDefault(est,
+                                                                                                 RepairFormationUnitEquipmentStaff.EMPTY);
+            dataMap.put(est.getId().toString(),
+                        new RepairFormationUnitEquipmentStaffDTO(repairFormationUnitEquipmentStaff.getTotalStaff(),
+                                                                 repairFormationUnitEquipmentStaff.getAvailableStaff()));
         }
         return new RepairFormationUnitEquipmentStaffRowData(rs.getId(),
                                                             rs.getName(),

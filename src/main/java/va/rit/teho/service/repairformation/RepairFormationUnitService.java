@@ -24,10 +24,16 @@ public interface RepairFormationUnitService {
 
     void updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList);
 
-    Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> getWithEquipmentStaffGrouped(UUID sessionId,
-                                                                                                                    List<Long> repairFormationUnitIds,
-                                                                                                                    List<Long> equipmentTypeIds,
-                                                                                                                    List<Long> equipmentSubTypeIds);
+    Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> getEquipmentStaffPerSubType(UUID sessionId,
+                                                                                         Long repairFormationUnitId,
+                                                                                         List<Long> equipmentTypeIds,
+                                                                                         List<Long> equipmentSubTypeIds);
+
+    Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> listEquipmentStaffPerSubType(
+            UUID sessionId,
+            List<Long> repairFormationUnitIds,
+            List<Long> equipmentTypeIds,
+            List<Long> equipmentSubTypeIds);
 
     List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(Long repairFormationUnitId, UUID sessionId);
 

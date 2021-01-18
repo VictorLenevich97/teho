@@ -13,7 +13,7 @@ public interface EquipmentPerFormationService {
 
     List<EquipmentPerFormation> list(Long formationId);
 
-    void addEquipmentToFormation(Long formationId, Long equipmentId, Long amount);
+    EquipmentPerFormation addEquipmentToFormation(Long formationId, Long equipmentId, Long amount);
 
     void addEquipmentToFormation(Long formationId, List<Long> equipmentId, int amount);
 

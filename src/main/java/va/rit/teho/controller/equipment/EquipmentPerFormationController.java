@@ -67,10 +67,11 @@ public class EquipmentPerFormationController {
     public ResponseEntity<Object> addEquipmentToFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
                                                           @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
                                                           @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @RequestBody IntensityAndAmountDTO amount) {
-        equipmentPerFormationService.addEquipmentToFormation(formationId,
-                                                             equipmentId,
-                                                             (long) amount.getAmount());
-        return ResponseEntity.accepted().build();
+        EquipmentPerFormation equipmentPerFormation = equipmentPerFormationService.addEquipmentToFormation(formationId,
+                                                                                                           equipmentId,
+                                                                                                           (long) amount
+                                                                                                                   .getAmount());
+        return ResponseEntity.ok().body(EquipmentPerFormationDTO.from(equipmentPerFormation));
     }
 
     @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
