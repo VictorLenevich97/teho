@@ -7,7 +7,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "formation")
@@ -16,8 +15,10 @@ public class Formation implements Serializable {
     @Id
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String shortName;
 
+    @Column(unique = true, nullable = false)
     private String fullName;
 
     @ManyToOne

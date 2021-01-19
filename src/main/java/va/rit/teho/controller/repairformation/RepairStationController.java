@@ -4,10 +4,9 @@ import io.swagger.annotations.Api;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.common.IdAndNameDTO;
+import va.rit.teho.entity.repairformation.RepairStationType;
 import va.rit.teho.service.repairformation.RepairStationService;
 
 import java.util.List;
@@ -27,11 +26,25 @@ public class RepairStationController {
     @ResponseBody
     public ResponseEntity<List<IdAndNameDTO>> listRepairStationTypes() {
         return ResponseEntity.ok(repairStationService
-                                         .listRepairStationTypes()
+                                         .listTypes()
                                          .stream()
                                          .map(repairStationType -> new IdAndNameDTO(
                                                  repairStationType.getId(),
                                                  repairStationType.getName()))
                                          .collect(Collectors.toList()));
+    }
+
+    @PostMapping(path = "/type")
+    @ResponseBody
+    public ResponseEntity<IdAndNameDTO> addRepairStationType(@RequestBody IdAndNameDTO idAndNameDTO) {
+        RepairStationType rst = repairStationService.addType(idAndNameDTO.getName());
+        return ResponseEntity.ok(new IdAndNameDTO(rst.getId(), rst.getName()));
+    }
+
+    @PutMapping(path = "/type")
+    @ResponseBody
+    public ResponseEntity<IdAndNameDTO> updateRepairStationType(@RequestBody IdAndNameDTO idAndNameDTO) {
+        RepairStationType rst = repairStationService.updateType(idAndNameDTO.getId(), idAndNameDTO.getName());
+        return ResponseEntity.ok(new IdAndNameDTO(rst.getId(), rst.getName()));
     }
 }

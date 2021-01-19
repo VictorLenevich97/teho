@@ -14,6 +14,7 @@ public class RepairFormationUnit {
     @JoinColumn(name = "repair_station_type_id", referencedColumnName = "id", nullable = false)
     private RepairStationType repairStationType;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
     private int stationAmount;

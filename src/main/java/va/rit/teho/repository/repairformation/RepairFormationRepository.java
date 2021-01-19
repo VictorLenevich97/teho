@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import va.rit.teho.entity.repairformation.RepairFormation;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RepairFormationRepository extends CrudRepository<RepairFormation, Long> {
@@ -14,5 +15,7 @@ public interface RepairFormationRepository extends CrudRepository<RepairFormatio
     Long getMaxId();
 
     List<RepairFormation> findAllByFormationId(Long formationId);
+
+    Optional<RepairFormation> findByNameIgnoreCase(String name);
 
 }

@@ -77,7 +77,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
         RepairFormation repairFormation = repairFormationRepository
                 .findById(repairFormationId)
                 .orElseThrow(() -> new NotFoundException("Ремонтное формирование не найдено!"));
-        repairStationTypeRepository.findByName(name).ifPresent(repairStation -> {
+        repairFormationRepository.findByNameIgnoreCase(name).ifPresent(rfu -> {
             throw new AlreadyExistsException("РВО", "название", name);
         });
         long newId = repairFormationUnitRepository.getMaxId() + 1;

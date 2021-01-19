@@ -15,6 +15,7 @@ public class Equipment implements Serializable {
     @Id
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
     @OneToOne(cascade = CascadeType.ALL)
