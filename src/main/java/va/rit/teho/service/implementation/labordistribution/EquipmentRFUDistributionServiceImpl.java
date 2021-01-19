@@ -2,17 +2,20 @@ package va.rit.teho.service.implementation.labordistribution;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Tree;
 import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount;
+import va.rit.teho.entity.equipment.EquipmentPerFormation;
+import va.rit.teho.entity.equipment.EquipmentPerRestorationTypeAmount;
 import va.rit.teho.entity.formation.Formation;
-import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
-import va.rit.teho.entity.labordistribution.EquipmentRFUDistributionPK;
-import va.rit.teho.entity.labordistribution.LaborDistributionAggregatedData;
-import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
+import va.rit.teho.entity.labordistribution.*;
 import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
+import va.rit.teho.repository.equipment.EquipmentPerFormationFailureIntensityRepository;
 import va.rit.teho.repository.labordistribution.EquipmentRFUDistributionRepository;
+import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
@@ -26,13 +29,20 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
     private final FormationService formationService;
     private final LaborInputDistributionService laborInputDistributionService;
 
+    private final EquipmentPerFormationService equipmentPerFormationService;
+    private final EquipmentPerFormationFailureIntensityRepository equipmentPerFormationFailureIntensityRepository;
+
     private final EquipmentRFUDistributionRepository equipmentRFUDistributionRepository;
 
     public EquipmentRFUDistributionServiceImpl(FormationService formationService,
                                                LaborInputDistributionService laborInputDistributionService,
+                                               EquipmentPerFormationService equipmentPerFormationService,
+                                               EquipmentPerFormationFailureIntensityRepository equipmentPerFormationFailureIntensityRepository,
                                                EquipmentRFUDistributionRepository equipmentRFUDistributionRepository) {
         this.formationService = formationService;
         this.laborInputDistributionService = laborInputDistributionService;
+        this.equipmentPerFormationService = equipmentPerFormationService;
+        this.equipmentPerFormationFailureIntensityRepository = equipmentPerFormationFailureIntensityRepository;
         this.equipmentRFUDistributionRepository = equipmentRFUDistributionRepository;
     }
 
@@ -50,10 +60,10 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                     Set<RepairFormation> repFormations = formationNode.getData().getRepairFormations();
                     //Get formation's equipment requiring repair
                     List<LaborDistributionAggregatedData> aggregatedDataForSession =
-                            laborInputDistributionService.getAggregatedDataForSessionAndFormation(formationNode
-                                                                                                          .getData()
-                                                                                                          .getId(),
-                                                                                                  sessionId);
+                            laborInputDistributionService.listAggregatedDataForSessionAndFormation(formationNode
+                                                                                                           .getData()
+                                                                                                           .getId(),
+                                                                                                   sessionId);
 
                     //Include data from previous level (unrepaired equipment)
                     aggregatedDataForSession.addAll(sentUpper.getOrDefault(currentLevel + 1, Collections.emptySet()));
@@ -95,6 +105,63 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
     @Override
     public void deleteDistribution(Long formationId, Long equipmentId) {
         equipmentRFUDistributionRepository.deleteByFormationIdAndEquipmentId(formationId, equipmentId);
+    }
+
+    @Override
+    public List<EquipmentPerFormationDistributionData> listDistributionDataForFormation(UUID sessionId,
+                                                                                        Long formationId) {
+        List<EquipmentPerFormation> list = equipmentPerFormationService.list(formationId);
+        Map<Equipment, Map<RepairType, Double>> equipmentFailurePerRepairTypes =
+                getEquipmentFailurePerRepairTypeMap(sessionId, formationId);
+
+        Map<Equipment, Map<RestorationType, Double>> equipmentInRepairPerRestorationType =
+                getEquipmentInRepairPerRestorationTypeMap(sessionId, formationId);
+
+        return list
+                .stream()
+                .map(epf -> getEquipmentPerFormationDistributionData(epf,
+                                                                     equipmentFailurePerRepairTypes,
+                                                                     equipmentInRepairPerRestorationType))
+                .collect(Collectors.toList());
+    }
+
+    private EquipmentPerFormationDistributionData getEquipmentPerFormationDistributionData(
+            EquipmentPerFormation epf,
+            Map<Equipment, Map<RepairType, Double>> equipmentFailurePerRepairTypes,
+            Map<Equipment, Map<RestorationType, Double>> equipmentInRepairPerRestorationType) {
+        Map<RepairType, Double> repairTypeMap =
+                equipmentFailurePerRepairTypes.getOrDefault(epf.getEquipment(), Collections.emptyMap());
+
+        return new EquipmentPerFormationDistributionData(
+                epf.getEquipment(),
+                epf.getAmount(),
+                repairTypeMap.values().stream().mapToDouble(Double::doubleValue).sum(),
+                repairTypeMap,
+                equipmentInRepairPerRestorationType.getOrDefault(epf.getEquipment(), Collections.emptyMap()));
+    }
+
+    private Map<Equipment, Map<RestorationType, Double>> getEquipmentInRepairPerRestorationTypeMap(UUID sessionId,
+                                                                                                   Long formationId) {
+        return equipmentRFUDistributionRepository
+                .listRepairingAmountPerRestorationType(sessionId, formationId)
+                .stream()
+                .collect(Collectors.groupingBy(EquipmentPerRestorationTypeAmount::getEquipment,
+                                               Collectors.groupingBy(EquipmentPerRestorationTypeAmount::getRestorationType,
+                                                                     Collectors.mapping(
+                                                                             EquipmentPerRestorationTypeAmount::getAmount,
+                                                                             Collectors.averagingDouble(Double::doubleValue)))));
+    }
+
+    private Map<Equipment, Map<RepairType, Double>> getEquipmentFailurePerRepairTypeMap(UUID sessionId,
+                                                                                        Long formationId) {
+        return equipmentPerFormationFailureIntensityRepository
+                .listFailureDataPerRepairType(sessionId, formationId)
+                .stream()
+                .collect(Collectors.groupingBy(EquipmentFailurePerRepairTypeAmount::getEquipment,
+                                               Collectors.groupingBy(EquipmentFailurePerRepairTypeAmount::getRepairType,
+                                                                     Collectors.mapping(
+                                                                             EquipmentFailurePerRepairTypeAmount::getAmount,
+                                                                             Collectors.averagingDouble(Double::doubleValue)))));
     }
 
 

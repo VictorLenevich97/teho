@@ -3,12 +3,12 @@ package va.rit.teho.controller.equipment;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
 import va.rit.teho.dto.equipment.EquipmentPerFormationDTO;
 import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
@@ -28,7 +28,6 @@ import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -232,14 +231,8 @@ public class EquipmentPerFormationController {
                                                                                               repairTypes,
                                                                                               totalEquipmentInFormations,
                                                                                               failureIntensityData));
-        String encode = URLEncoder.encode("Среднесуточный выход ВВСТ в ремонт.xls",
-                                          "UTF-8");
-        return ResponseEntity.ok()
-                             .contentLength(bytes.length)
-                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                             .cacheControl(CacheControl.noCache())
-                             .header("Content-Disposition", "attachment; filename=" + encode)
-                             .body(bytes);
+
+        return ReportResponseEntity.ok("Среднесуточный выход ВВСТ в ремонт", bytes);
     }
 
     @GetMapping("/formation/{formationId}/equipment/daily-failure")

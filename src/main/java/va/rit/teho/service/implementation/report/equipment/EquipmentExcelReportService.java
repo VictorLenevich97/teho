@@ -5,10 +5,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentLaborInputPerType;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
-import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.report.ReportCell;
+import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,56 +33,52 @@ public class EquipmentExcelReportService
     }
 
     @Override
-    protected List<ReportHeader> buildHeader() {
-        List<ReportHeader> result = new ArrayList<>();
-        result.add(new ReportHeader("Тип ВВСТ, марка техники", true, false));
-        result.add(new ReportHeader("Вид", true, false));
-        ReportHeader repairTypeReportHeader = new ReportHeader("Вид ремонта", true, false);
-        repairTypes.forEach(repairType -> repairTypeReportHeader.addSubHeader(new ReportHeader(repairType.getFullName(),
-                                                                                               true,
-                                                                                               false)));
+    protected List<ReportHeader> buildHeader(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data) {
+        List<ReportHeader> result = new ArrayList<>(Arrays.asList(header("Тип ВВСТ, марка техники"), header("Вид")));
+
+        ReportHeader repairTypeReportHeader = header("Вид ремонта");
+        repairTypes.forEach(repairType -> repairTypeReportHeader.addSubHeader(header(repairType.getFullName())));
+
         result.add(repairTypeReportHeader);
         return result;
     }
 
     @Override
-    protected int writeData(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data,
+    protected void writeData(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data,
                              Sheet sheet,
-                             int[] lastRow) {
-        data.forEach((eqType, subTypeListMap) -> {
-            int lastRowIndex = lastRow[0];
+                             int lastRowIndex) {
+        for (Map.Entry<EquipmentType, Map<EquipmentSubType, List<Equipment>>> entry : data.entrySet()) {
+            EquipmentType eqType = entry.getKey();
+            Map<EquipmentSubType, List<Equipment>> subTypeListMap = entry.getValue();
 
             createRowWideCell(sheet, lastRowIndex, repairTypes.size() + 1, eqType.getShortName(), false, true);
 
             List<Equipment> equipmentList =
                     subTypeListMap.entrySet().stream().flatMap(e -> e.getValue().stream()).collect(Collectors.toList());
 
-            writeRows(sheet, lastRowIndex + 1, equipmentList);
+            writeRows(sheet, lastRowIndex + 1, data, equipmentList);
 
-            lastRow[0] += subTypeListMap.size() + 1;
-        });
-        return lastRow[0];
-    }
-
-    private Function<Equipment, ReportCell> equipmentLaborInputFunction(RepairType rt) {
-        return ((Equipment e) -> new ReportCell("" + e.getLaborInputPerTypes()
-                                                      .stream()
-                                                      .filter(elipt -> elipt.getRepairType().equals(rt))
-                                                      .findFirst()
-                                                      .orElseThrow(() -> new NotFoundException("Тип ремонта не найден"))
-                                                      .getAmount()));
+            lastRowIndex += subTypeListMap.size() + 1;
+        }
     }
 
     @Override
-    protected List<Function<Equipment, ReportCell>> populateCellFunctions() {
+    protected List<ReportCellFunction<Equipment>> populateCellFunctions(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data) {
         List<RepairType> repairTypes = repairTypeService.list(true);
-        List<Function<Equipment, ReportCell>> populateCellFunctions =
-                new ArrayList<>(Arrays.asList(e -> new ReportCell(e.getName(),
-                                                                  ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
-                                              (e) -> new ReportCell(e.getEquipmentSubType().getShortName())));
-        List<Function<Equipment, ReportCell>> rtFunctions = repairTypes
+
+        List<ReportCellFunction<Equipment>> populateCellFunctions =
+                new ArrayList<>(Arrays.asList(
+                        ReportCellFunction.of(Equipment::getName, ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
+                        ReportCellFunction.of(e -> e.getEquipmentSubType().getShortName())));
+
+        List<ReportCellFunction<Equipment>> rtFunctions = repairTypes
                 .stream()
-                .map(this::equipmentLaborInputFunction)
+                .map(rt -> ReportCellFunction.of((Equipment e) -> e.getLaborInputPerTypes()
+                                                                   .stream()
+                                                                   .filter(elipt -> elipt.getRepairType().equals(rt))
+                                                                   .findFirst()
+                                                                   .map(EquipmentLaborInputPerType::getAmount)
+                                                                   .orElse(0)))
                 .collect(Collectors.toList());
         populateCellFunctions.addAll(rtFunctions);
         return populateCellFunctions;

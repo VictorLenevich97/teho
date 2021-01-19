@@ -163,12 +163,12 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     }
 
     @Override
-    public List<WorkhoursDistributionInterval> getDistributionIntervals() {
+    public List<WorkhoursDistributionInterval> listDistributionIntervals() {
         return (List<WorkhoursDistributionInterval>) workhoursDistributionIntervalRepository.findAll();
     }
 
-    public List<LaborDistributionAggregatedData> getAggregatedDataForSessionAndFormation(Long formationId,
-                                                                                         UUID sessionId) {
+    public List<LaborDistributionAggregatedData> listAggregatedDataForSessionAndFormation(Long formationId,
+                                                                                          UUID sessionId) {
         return laborDistributionRepository.selectLaborDistributionAggregatedData(formationId, sessionId);
     }
 

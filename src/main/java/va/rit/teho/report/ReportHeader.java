@@ -5,13 +5,11 @@ import java.util.List;
 
 public class ReportHeader {
     private final String name;
-    private final boolean centered;
     private final boolean vertical;
     private final List<ReportHeader> subHeaders;
 
-    public ReportHeader(String name, boolean centered, boolean vertical) {
+    public ReportHeader(String name, boolean vertical) {
         this.name = name;
-        this.centered = centered;
         this.vertical = vertical;
         this.subHeaders = new ArrayList<>();
     }
@@ -20,18 +18,6 @@ public class ReportHeader {
         this.name = name;
         this.subHeaders = subHeaders;
         this.vertical = false;
-        this.centered = false;
-    }
-
-    public ReportHeader(String name, boolean centered, List<ReportHeader> subHeaders) {
-        this.name = name;
-        this.subHeaders = subHeaders;
-        this.vertical = false;
-        this.centered = centered;
-    }
-
-    public boolean isCentered() {
-        return centered;
     }
 
     public String getName() {
@@ -46,9 +32,8 @@ public class ReportHeader {
         return !subHeaders.isEmpty();
     }
 
-    public ReportHeader addSubHeader(ReportHeader children) {
+    public void addSubHeader(ReportHeader children) {
         this.subHeaders.add(children);
-        return this;
     }
 
     public int depth() {

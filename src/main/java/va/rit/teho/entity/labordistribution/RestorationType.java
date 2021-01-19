@@ -26,6 +26,12 @@ public class RestorationType {
     public RestorationType() {
     }
 
+    public RestorationType(Long id, String name, int weight) {
+        this.id = id;
+        this.name = name;
+        this.weight = weight;
+    }
+
     public Long getId() {
         return id;
     }

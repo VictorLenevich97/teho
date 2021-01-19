@@ -8,12 +8,11 @@ import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitCombinedData;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.report.ReportCell;
+import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,46 +21,42 @@ import java.util.stream.Stream;
 public class RepairFormationUnitExcelReportService
         extends AbstractExcelReportService<RepairFormationUnitCombinedData, RepairFormationUnit> {
 
-    //TODO: Обдумать способ избавиться от хранения состояния
-    private final ThreadLocal<RepairFormationUnitCombinedData> data = new ThreadLocal<>();
-
     @Override
-    public byte[] generateReport(RepairFormationUnitCombinedData data) {
-        this.data.set(data);
-        return super.generateReport(data);
-    }
-
-    @Override
-    protected List<Function<RepairFormationUnit, ReportCell>> populateCellFunctions() {
-        List<Function<RepairFormationUnit, ReportCell>> populateCellFunctions =
-                new ArrayList<>(Arrays.asList(rfu -> new ReportCell(rfu.getName(), ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
-                                              rfu -> new ReportCell(rfu.getRepairStationType().getName()),
-                                              rfu -> new ReportCell(rfu.getStationAmount(), ReportCell.CellType.NUMERIC)));
-        List<EquipmentSubType> subTypes = data.get().getTypesWithSubTypes().entrySet().stream().flatMap(e -> e
-                .getValue()
-                .stream()).collect(Collectors.toList());
+    protected List<ReportCellFunction<RepairFormationUnit>> populateCellFunctions(RepairFormationUnitCombinedData data) {
+        List<ReportCellFunction<RepairFormationUnit>> populateCellFunctions =
+                new ArrayList<>(Arrays.asList(
+                        ReportCellFunction.of(RepairFormationUnit::getName,
+                                              ReportCell.CellType.TEXT,
+                                              HorizontalAlignment.LEFT),
+                        ReportCellFunction.of(rfu -> rfu.getRepairStationType().getName()),
+                        ReportCellFunction.of(RepairFormationUnit::getStationAmount, ReportCell.CellType.NUMERIC)));
+        List<EquipmentSubType> subTypes =
+                data
+                        .getTypesWithSubTypes()
+                        .entrySet()
+                        .stream()
+                        .flatMap(e -> e.getValue().stream())
+                        .collect(Collectors.toList());
         populateCellFunctions
-                .addAll(subTypes
-                                .stream()
-                                .flatMap(st -> Stream.of(getStaff(st,
-                                                                  RepairFormationUnitEquipmentStaff::getTotalStaff)))
+                .addAll(subTypes.stream()
+                                .flatMap(st -> getStaff(data, st, RepairFormationUnitEquipmentStaff::getTotalStaff))
                                 .collect(Collectors.toList()));
         populateCellFunctions
-                .addAll(subTypes
-                                .stream()
-                                .flatMap(st -> Stream.of(getStaff(st,
-                                                                  RepairFormationUnitEquipmentStaff::getAvailableStaff)))
+                .addAll(subTypes.stream()
+                                .flatMap(st -> getStaff(data, st, RepairFormationUnitEquipmentStaff::getAvailableStaff))
                                 .collect(Collectors.toList()));
         return populateCellFunctions;
     }
 
-    private Function<RepairFormationUnit, ReportCell> getStaff(EquipmentSubType st,
-                                                               Function<RepairFormationUnitEquipmentStaff, Integer> f) {
-        return (RepairFormationUnit rfu) -> new ReportCell("" + f.apply(data
-                                                                                .get()
-                                                                                .getRepairFormationUnitEquipmentStaff()
-                                                                                .get(rfu)
-                                                                                .get(st)));
+    private Stream<ReportCellFunction<RepairFormationUnit>> getStaff(RepairFormationUnitCombinedData data,
+                                                                     EquipmentSubType st,
+                                                                     Function<RepairFormationUnitEquipmentStaff, Integer> f) {
+        return Stream.of(
+                ReportCellFunction.of(
+                        rfu -> f.apply(data
+                                               .getRepairFormationUnitEquipmentStaff()
+                                               .getOrDefault(rfu, Collections.emptyMap())
+                                               .getOrDefault(st, RepairFormationUnitEquipmentStaff.EMPTY))));
     }
 
     @Override
@@ -70,52 +65,37 @@ public class RepairFormationUnitExcelReportService
     }
 
     @Override
-    protected List<ReportHeader> buildHeader() {
-        ReportHeader nameReportHeader = new ReportHeader("Наименование ремонтного органа формирования", true, true);
-        ReportHeader repairStationTypeReportHeader = new ReportHeader("Тип мастерской", true, true);
-        ReportHeader rstCountReportHeader = new ReportHeader("Кол-во", true, true);
+    protected List<ReportHeader> buildHeader(RepairFormationUnitCombinedData data) {
+        ReportHeader nameReportHeader = header("Наименование ремонтного органа формирования", true);
+        ReportHeader repairStationTypeReportHeader = header("Тип мастерской", true);
+        ReportHeader rstCountReportHeader = header("Кол-во", true);
         return Arrays.asList(nameReportHeader,
                              repairStationTypeReportHeader,
                              rstCountReportHeader,
-                             getSubHeaders("По штату, чел."),
-                             getSubHeaders("В наличии, чел."));
+                             getSubHeaders("По штату, чел.", data),
+                             getSubHeaders("В наличии, чел.", data));
     }
 
-    private ReportHeader getSubHeaders(String topHeader) {
+    private ReportHeader getSubHeaders(String topHeader, RepairFormationUnitCombinedData data) {
         List<ReportHeader> subReportHeaders = data
-                .get()
                 .getTypesWithSubTypes()
                 .entrySet()
                 .stream()
-                .flatMap(e -> {
-                    if (e.getKey() == null) {
-                        return e
-                                .getValue()
-                                .stream()
-                                .map(est -> new ReportHeader(est.getShortName(), true, true));
-                    } else {
-                        return Stream.of(new ReportHeader(e.getKey().getShortName(),
-                                                          true,
-                                                          e.getValue()
-                                                           .stream()
-                                                           .map(est -> new ReportHeader(est.getShortName(), true, true))
-                                                           .collect(Collectors.toList())));
-                    }
-                })
+                .flatMap(e -> Optional.ofNullable(e.getKey())
+                                      .map(key -> Stream.of(
+                                              new ReportHeader(key.getShortName(),
+                                                               e.getValue()
+                                                                .stream()
+                                                                .map(est -> header(est.getShortName(), true))
+                                                                .collect(Collectors.toList()))))
+                                      .orElse(e.getValue().stream().map(est -> header(est.getShortName(), true))))
                 .collect(Collectors.toList());
-        return new ReportHeader(topHeader, true, subReportHeaders);
+        return new ReportHeader(topHeader, subReportHeaders);
     }
 
     @Override
-    protected int writeData(RepairFormationUnitCombinedData data, Sheet sheet, int[] lastRow) {
-        writeRows(sheet, lastRow[0], data.getRepairFormationUnitList());
-        return lastRow[0] + data.getRepairFormationUnitList().size();
+    protected void writeData(RepairFormationUnitCombinedData data, Sheet sheet, int lastRowIndex) {
+        writeRows(sheet, lastRowIndex, data, data.getRepairFormationUnitList());
     }
 
-    @Override
-    protected byte[] writeSheet(Sheet sheet) {
-        byte[] result = super.writeSheet(sheet);
-        this.data.remove();
-        return result;
-    }
 }

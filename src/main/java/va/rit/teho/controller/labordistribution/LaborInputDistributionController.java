@@ -3,12 +3,12 @@ package va.rit.teho.controller.labordistribution;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
+import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.labordistribution.CountAndLaborInputDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionNestedColumnsDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionRowData;
@@ -27,7 +27,6 @@ import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,7 +38,10 @@ public class LaborInputDistributionController {
 
     private final EquipmentPerFormationService equipmentPerFormationService;
     private final LaborInputDistributionService laborInputDistributionService;
+
+
     private final ReportService<LaborInputDistributionCombinedData> reportService;
+
 
     @Resource
     private TehoSessionData tehoSession;
@@ -65,19 +67,13 @@ public class LaborInputDistributionController {
                                                                         repairTypeId,
                                                                         stageId,
                                                                         equipmentTypeId);
-        List<WorkhoursDistributionInterval> distributionIntervals = laborInputDistributionService
-                .getDistributionIntervals();
+        List<WorkhoursDistributionInterval> distributionIntervals =
+                laborInputDistributionService.listDistributionIntervals();
 
-        byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(laborInputDistribution, distributionIntervals));
-        String encode = URLEncoder.encode("Распределение производственного фонда.xls",
-                                          "UTF-8");
-        return ResponseEntity.ok()
-                             .contentLength(bytes.length)
-                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                             .cacheControl(CacheControl.noCache())
-                             .header("Content-Disposition", "attachment; filename=" + encode)
-                             .body(bytes);
+        byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(laborInputDistribution,
+                                                                                           distributionIntervals));
 
+        return ReportResponseEntity.ok("Распределение производственного фонда", bytes);
     }
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}")
@@ -94,7 +90,7 @@ public class LaborInputDistributionController {
                                                                         equipmentTypeId);
         List<NestedColumnsDTO> columns =
                 laborInputDistributionService
-                        .getDistributionIntervals()
+                        .listDistributionIntervals()
                         .stream()
                         .map(wdi -> new LaborDistributionNestedColumnsDTO(wdi.getId(),
                                                                           wdi.getLowerBound(),
@@ -153,7 +149,5 @@ public class LaborInputDistributionController {
         laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId());
         return ResponseEntity.accepted().build();
     }
-
-
 
 }

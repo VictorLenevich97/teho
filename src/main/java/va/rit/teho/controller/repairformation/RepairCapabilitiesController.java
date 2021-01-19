@@ -3,12 +3,12 @@ package va.rit.teho.controller.repairformation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
+import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.RowData;
 import va.rit.teho.dto.table.TableDataDTO;
@@ -25,7 +25,6 @@ import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,8 @@ public class RepairCapabilitiesController {
     private final EquipmentService equipmentService;
     private final RepairFormationUnitService repairFormationUnitService;
     private final ReportService<RepairFormationUnitRepairCapabilityCombinedData> reportService;
+    @Resource
+    private TehoSessionData tehoSession;
 
     public RepairCapabilitiesController(
             RepairCapabilitiesService repairCapabilitiesService,
@@ -51,9 +52,6 @@ public class RepairCapabilitiesController {
         this.repairFormationUnitService = repairFormationUnitService;
         this.reportService = reportService;
     }
-
-    @Resource
-    private TehoSessionData tehoSession;
 
     /**
      * Расчет производственных возможностей РВО по ремонту (сразу для всех РВО по всем ВВСТ).
@@ -204,14 +202,8 @@ public class RepairCapabilitiesController {
                 equipmentSubTypeId,
                 pageNum,
                 pageSize);
-        byte[] bytes = reportService.generateReport(combinedData);
-        String encode = URLEncoder.encode("Производственные возможности.xls",
-                                          "UTF-8");
-        return ResponseEntity.ok().contentLength(bytes.length)
-                             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                             .cacheControl(CacheControl.noCache())
-                             .header("Content-Disposition", "attachment; filename=" + encode)
-                             .body(bytes);
+
+        return ReportResponseEntity.ok("Производственные возможности", reportService.generateReport(combinedData));
     }
 
     private RepairFormationUnitRepairCapabilityCombinedData getCapabilityCombinedData(Long repairTypeId,
