@@ -3,6 +3,7 @@ package va.rit.teho.service.implementation.common;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
+import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.common.RepairTypeRepository;
 import va.rit.teho.service.common.RepairTypeService;
 
@@ -26,5 +27,14 @@ public class RepairTypeServiceImpl implements RepairTypeService {
     @Override
     public List<RepairType> list() {
         return (List<RepairType>) repairTypeRepository.findAll();
+    }
+
+    @Override
+    public RepairType switchCalculatableFlag(Long id) {
+        return repairTypeRepository.findById(id).map(rt -> repairTypeRepository.save(new RepairType(rt.getId(),
+                                                                                                    rt.getFullName(),
+                                                                                                    rt.getShortName(),
+                                                                                                    !rt.isCalculatable())))
+                                   .orElseThrow(() -> new NotFoundException("Тип ремонта с id = " + id + " не существует!"));
     }
 }

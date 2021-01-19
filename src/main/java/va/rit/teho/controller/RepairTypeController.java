@@ -6,9 +6,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.common.RepairTypeDTO;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.service.common.RepairTypeService;
@@ -30,6 +28,7 @@ public class RepairTypeController {
 
     @GetMapping
     @ApiOperation(value = "Получить список типов ремонта")
+    @ResponseBody
     public ResponseEntity<List<RepairTypeDTO>> listRepairTypes(
             @ApiParam(value = "Фильтр по индикатору, определяющему используется ли тип ремонта в расчетах. В случае, когда параметр не указан, возвращаются все типы ремонта.",
                     example = "true") @RequestParam(required = false) Boolean repairable) {
@@ -44,5 +43,11 @@ public class RepairTypeController {
                                          .map(RepairTypeDTO::from)
                                          .sorted(Comparator.comparing(RepairTypeDTO::getId))
                                          .collect(Collectors.toList()));
+    }
+
+    @PutMapping("/{id}")
+    @ApiOperation(value = "Обновление типа ремонта (смена флага, определяющего использование в отчетах)")
+    public ResponseEntity<RepairTypeDTO> updateRepairType(@PathVariable Long id) {
+        return ResponseEntity.ok(RepairTypeDTO.from(repairTypeService.switchCalculatableFlag(id)));
     }
 }

@@ -10,4 +10,5 @@ public interface RepairTypeService {
 
     List<RepairType> list();
 
+    RepairType switchCalculatableFlag(Long id);
 }

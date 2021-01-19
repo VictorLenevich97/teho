@@ -27,6 +27,13 @@ public class RepairType implements Serializable {
     public RepairType() {
     }
 
+    public RepairType(Long id, String fullName, String shortName, boolean calculatable) {
+        this.id = id;
+        this.fullName = fullName;
+        this.shortName = shortName;
+        this.calculatable = calculatable;
+    }
+
     public RepairType(Long id) {
         this.id = id;
     }
