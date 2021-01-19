@@ -5,7 +5,6 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import va.rit.teho.report.ReportCell;
-import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.report.ReportService;
 
@@ -72,7 +71,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         return c;
     }
 
-    protected abstract List<ReportCellFunction<R>> populateCellFunctions(T combinedData);
+    protected abstract List<ReportCell> populatedRowCells(T combinedData, R row);
 
     protected abstract String reportName();
 
@@ -187,14 +186,14 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
                              int rowStartIndex,
                              T combinedData,
                              Collection<R> data) {
-        List<ReportCellFunction<R>> populateCellFunctions = populateCellFunctions(combinedData);
         int i = 0;
         for (R item : data) {
+            List<ReportCell> reportCells = populatedRowCells(combinedData, item);
             Row row = sheet.createRow(rowStartIndex + i);
             row.setHeight((short) -1);
-            for (int j = 0; j < populateCellFunctions.size(); j++) {
+            for (int j = 0; j < reportCells.size(); j++) {
                 Cell cell = row.createCell(j);
-                ReportCell reportCell = populateCellFunctions.get(j).apply(item);
+                ReportCell reportCell = reportCells.get(j);
                 cell.setCellValue(reportCell.getValue());
                 if (reportCell.getAlignment().equals(HorizontalAlignment.CENTER)) {
                     alignCellCenter(cell);

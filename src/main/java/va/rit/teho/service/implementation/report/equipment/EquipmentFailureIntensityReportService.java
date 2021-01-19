@@ -10,7 +10,6 @@ import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.report.ReportCell;
-import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
@@ -22,34 +21,38 @@ public class EquipmentFailureIntensityReportService
         extends AbstractExcelReportService<EquipmentFailureIntensityCombinedData, EquipmentPerFormation> {
 
     @Override
-    protected List<ReportCellFunction<EquipmentPerFormation>> populateCellFunctions(
-            EquipmentFailureIntensityCombinedData data) {
-        List<ReportCellFunction<EquipmentPerFormation>> cellFunctions =
-                new ArrayList<>(Arrays.asList(ReportCellFunction.of(epf -> epf.getEquipment().getName()),
-                                              ReportCellFunction.of(EquipmentPerFormation::getAmount)));
-        List<ReportCellFunction<EquipmentPerFormation>> avgDailyFailureFunctions =
+    protected List<ReportCell> populatedRowCells(
+            EquipmentFailureIntensityCombinedData data,
+            EquipmentPerFormation epf) {
+        List<ReportCell> cellFunctions =
+                new ArrayList<>(Arrays.asList(new ReportCell(epf.getEquipment().getName()),
+                                              new ReportCell(epf.getAmount())));
+        List<ReportCell> avgDailyFailureFunctions =
                 data
                         .getStages()
                         .stream()
-                        .flatMap(s -> data.getRepairTypes().stream().map(rt -> getAvgDailyFailureFunction(data, s, rt)))
-                        .collect(Collectors.toList());
+                        .flatMap(s -> data
+                                .getRepairTypes()
+                                .stream()
+                                .map(rt -> getAvgDailyFailureFunction(epf, data, s, rt))).collect(
+                        Collectors.toList());
         cellFunctions.addAll(avgDailyFailureFunctions);
         return cellFunctions;
     }
 
-    private ReportCellFunction<EquipmentPerFormation> getAvgDailyFailureFunction(EquipmentFailureIntensityCombinedData data,
-                                                                                 Stage s,
-                                                                                 RepairType rt) {
-        return ReportCellFunction.of(
-                epf -> Optional.ofNullable(data
-                                                   .getFailureIntensityData()
-                                                   .getOrDefault(epf.getFormation(), Collections.emptyMap())
-                                                   .getOrDefault(epf.getEquipment(), Collections.emptyMap())
-                                                   .getOrDefault(rt, Collections.emptyMap())
-                                                   .getOrDefault(s, null))
-                               .map(EquipmentPerFormationFailureIntensity::getAvgDailyFailure)
-                               .orElse(0.0),
-                ReportCell.CellType.NUMERIC);
+    private ReportCell getAvgDailyFailureFunction(EquipmentPerFormation epf,
+                                                  EquipmentFailureIntensityCombinedData data,
+                                                  Stage s,
+                                                  RepairType rt) {
+        return new ReportCell(Optional.ofNullable(data
+                                                          .getFailureIntensityData()
+                                                          .getOrDefault(epf.getFormation(), Collections.emptyMap())
+                                                          .getOrDefault(epf.getEquipment(), Collections.emptyMap())
+                                                          .getOrDefault(rt, Collections.emptyMap())
+                                                          .getOrDefault(s, null))
+                                      .map(EquipmentPerFormationFailureIntensity::getAvgDailyFailure)
+                                      .orElse(0.0),
+                              ReportCell.CellType.NUMERIC);
     }
 
     @Override

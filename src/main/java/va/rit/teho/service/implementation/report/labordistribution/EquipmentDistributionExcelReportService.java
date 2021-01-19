@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import va.rit.teho.entity.labordistribution.EquipmentDistributionCombinedData;
 import va.rit.teho.entity.labordistribution.EquipmentPerFormationDistributionData;
 import va.rit.teho.report.ReportCell;
-import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
@@ -19,35 +18,31 @@ public class EquipmentDistributionExcelReportService
         extends AbstractExcelReportService<EquipmentDistributionCombinedData, EquipmentPerFormationDistributionData> {
 
     @Override
-    protected List<ReportCellFunction<EquipmentPerFormationDistributionData>> populateCellFunctions(
-            EquipmentDistributionCombinedData data) {
-        ReportCellFunction<EquipmentPerFormationDistributionData> eqNameF =
-                ReportCellFunction.of(epfdd -> epfdd.getEquipment().getName());
-        ReportCellFunction<EquipmentPerFormationDistributionData> eqCountF =
-                ReportCellFunction.of(EquipmentPerFormationDistributionData::getAmount);
-        ReportCellFunction<EquipmentPerFormationDistributionData> failureCountF =
-                ReportCellFunction.of(EquipmentPerFormationDistributionData::getAvgDailyFailure);
-        List<ReportCellFunction<EquipmentPerFormationDistributionData>> repairTypeFunctions =
+    protected List<ReportCell> populatedRowCells(
+            EquipmentDistributionCombinedData data,
+            EquipmentPerFormationDistributionData epfdd) {
+        ReportCell eqNameCell = new ReportCell(epfdd.getEquipment().getName());
+        ReportCell eqCountCell = new ReportCell(epfdd.getAmount());
+        ReportCell failureCountCell = new ReportCell(epfdd.getAvgDailyFailure());
+        List<ReportCell> repairTypeCells =
                 data
                         .getRepairTypeList()
                         .stream()
-                        .map(rt -> ReportCellFunction.of((EquipmentPerFormationDistributionData epfdd) ->
-                                                                 epfdd.getAmountPerRepairType().getOrDefault(rt, 0.0),
-                                                         ReportCell.CellType.NUMERIC))
+                        .map(rt -> new ReportCell(epfdd.getAmountPerRepairType().getOrDefault(rt, 0.0),
+                                                  ReportCell.CellType.NUMERIC))
                         .collect(Collectors.toList());
-        List<ReportCellFunction<EquipmentPerFormationDistributionData>> restorationTypeFunctions = data
+        List<ReportCell> restorationTypeCells = data
                 .getRestorationTypeList()
                 .stream()
-                .map(rt -> ReportCellFunction.of((EquipmentPerFormationDistributionData epfdd) ->
-                                                         epfdd.getAmountPerRestorationType().getOrDefault(rt, 0.0),
-                                                 ReportCell.CellType.NUMERIC))
+                .map(rt -> new ReportCell(epfdd.getAmountPerRestorationType().getOrDefault(rt, 0.0),
+                                          ReportCell.CellType.NUMERIC))
                 .collect(Collectors.toList());
 
-        List<ReportCellFunction<EquipmentPerFormationDistributionData>> functions =
-                new ArrayList<>(Arrays.asList(eqNameF, eqCountF, failureCountF));
-        functions.addAll(repairTypeFunctions);
-        functions.addAll(restorationTypeFunctions);
-        return functions;
+        List<ReportCell> cells =
+                new ArrayList<>(Arrays.asList(eqNameCell, eqCountCell, failureCountCell));
+        cells.addAll(repairTypeCells);
+        cells.addAll(restorationTypeCells);
+        return cells;
     }
 
     @Override

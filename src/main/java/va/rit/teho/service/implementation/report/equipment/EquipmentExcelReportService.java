@@ -9,7 +9,6 @@ import va.rit.teho.entity.equipment.EquipmentLaborInputPerType;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.report.ReportCell;
-import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
@@ -63,25 +62,26 @@ public class EquipmentExcelReportService
     }
 
     @Override
-    protected List<ReportCellFunction<Equipment>> populateCellFunctions(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data) {
+    protected List<ReportCell> populatedRowCells(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data,
+                                                 Equipment equipment) {
         List<RepairType> repairTypes = repairTypeService.list(true);
 
-        List<ReportCellFunction<Equipment>> populateCellFunctions =
+        List<ReportCell> reportCells =
                 new ArrayList<>(Arrays.asList(
-                        ReportCellFunction.of(Equipment::getName, ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
-                        ReportCellFunction.of(e -> e.getEquipmentSubType().getShortName())));
+                        new ReportCell(equipment.getName(), ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
+                        new ReportCell(equipment.getEquipmentSubType().getShortName())));
 
-        List<ReportCellFunction<Equipment>> rtFunctions = repairTypes
+        List<ReportCell> repairTypeCells = repairTypes
                 .stream()
-                .map(rt -> ReportCellFunction.of((Equipment e) -> e.getLaborInputPerTypes()
-                                                                   .stream()
-                                                                   .filter(elipt -> elipt.getRepairType().equals(rt))
-                                                                   .findFirst()
-                                                                   .map(EquipmentLaborInputPerType::getAmount)
-                                                                   .orElse(0)))
+                .map(rt -> new ReportCell(equipment.getLaborInputPerTypes()
+                                                   .stream()
+                                                   .filter(elipt -> elipt.getRepairType().equals(rt))
+                                                   .findFirst()
+                                                   .map(EquipmentLaborInputPerType::getAmount)
+                                                   .orElse(0)))
                 .collect(Collectors.toList());
-        populateCellFunctions.addAll(rtFunctions);
-        return populateCellFunctions;
+        reportCells.addAll(repairTypeCells);
+        return reportCells;
     }
 
     @Override

@@ -8,7 +8,6 @@ import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitCombinedData;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.report.ReportCell;
-import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
@@ -22,14 +21,12 @@ public class RepairFormationUnitExcelReportService
         extends AbstractExcelReportService<RepairFormationUnitCombinedData, RepairFormationUnit> {
 
     @Override
-    protected List<ReportCellFunction<RepairFormationUnit>> populateCellFunctions(RepairFormationUnitCombinedData data) {
-        List<ReportCellFunction<RepairFormationUnit>> populateCellFunctions =
+    protected List<ReportCell> populatedRowCells(RepairFormationUnitCombinedData data, RepairFormationUnit rfu) {
+        List<ReportCell> populateCellFunctions =
                 new ArrayList<>(Arrays.asList(
-                        ReportCellFunction.of(RepairFormationUnit::getName,
-                                              ReportCell.CellType.TEXT,
-                                              HorizontalAlignment.LEFT),
-                        ReportCellFunction.of(rfu -> rfu.getRepairStationType().getName()),
-                        ReportCellFunction.of(RepairFormationUnit::getStationAmount, ReportCell.CellType.NUMERIC)));
+                        new ReportCell(rfu.getName(), ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
+                        new ReportCell(rfu.getRepairStationType().getName()),
+                        new ReportCell(rfu.getStationAmount(), ReportCell.CellType.NUMERIC)));
         List<EquipmentSubType> subTypes =
                 data
                         .getTypesWithSubTypes()
@@ -39,24 +36,29 @@ public class RepairFormationUnitExcelReportService
                         .collect(Collectors.toList());
         populateCellFunctions
                 .addAll(subTypes.stream()
-                                .flatMap(st -> getStaff(data, st, RepairFormationUnitEquipmentStaff::getTotalStaff))
+                                .flatMap(st -> getStaff(rfu,
+                                                        data,
+                                                        st,
+                                                        RepairFormationUnitEquipmentStaff::getTotalStaff))
                                 .collect(Collectors.toList()));
         populateCellFunctions
                 .addAll(subTypes.stream()
-                                .flatMap(st -> getStaff(data, st, RepairFormationUnitEquipmentStaff::getAvailableStaff))
+                                .flatMap(st -> getStaff(rfu,
+                                                        data,
+                                                        st,
+                                                        RepairFormationUnitEquipmentStaff::getAvailableStaff))
                                 .collect(Collectors.toList()));
         return populateCellFunctions;
     }
 
-    private Stream<ReportCellFunction<RepairFormationUnit>> getStaff(RepairFormationUnitCombinedData data,
-                                                                     EquipmentSubType st,
-                                                                     Function<RepairFormationUnitEquipmentStaff, Integer> f) {
-        return Stream.of(
-                ReportCellFunction.of(
-                        rfu -> f.apply(data
-                                               .getRepairFormationUnitEquipmentStaff()
-                                               .getOrDefault(rfu, Collections.emptyMap())
-                                               .getOrDefault(st, RepairFormationUnitEquipmentStaff.EMPTY))));
+    private Stream<ReportCell> getStaff(RepairFormationUnit rfu,
+                                        RepairFormationUnitCombinedData data,
+                                        EquipmentSubType st,
+                                        Function<RepairFormationUnitEquipmentStaff, Integer> f) {
+        return Stream.of(new ReportCell(f.apply(data
+                                                        .getRepairFormationUnitEquipmentStaff()
+                                                        .getOrDefault(rfu, Collections.emptyMap())
+                                                        .getOrDefault(st, RepairFormationUnitEquipmentStaff.EMPTY))));
     }
 
     @Override

@@ -7,7 +7,6 @@ import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityCombinedData;
 import va.rit.teho.report.ReportCell;
-import va.rit.teho.report.ReportCellFunction;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
@@ -19,12 +18,13 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
         AbstractExcelReportService<RepairFormationUnitRepairCapabilityCombinedData, RepairFormationUnit> {
 
     @Override
-    protected List<ReportCellFunction<RepairFormationUnit>> populateCellFunctions(
-            RepairFormationUnitRepairCapabilityCombinedData data) {
-        List<ReportCellFunction<RepairFormationUnit>> functions =
-                new ArrayList<>(Collections.singletonList(ReportCellFunction.of(RepairFormationUnit::getName,
-                                                                                ReportCell.CellType.TEXT,
-                                                                                HorizontalAlignment.LEFT)));
+    protected List<ReportCell> populatedRowCells(
+            RepairFormationUnitRepairCapabilityCombinedData data,
+            RepairFormationUnit rfu) {
+        List<ReportCell> functions =
+                new ArrayList<>(Collections.singletonList(new ReportCell(rfu.getName(),
+                                                                         ReportCell.CellType.TEXT,
+                                                                         HorizontalAlignment.LEFT)));
         List<Equipment> equipmentList =
                 data
                         .getGroupedEquipmentData()
@@ -33,12 +33,12 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
                         .flatMap(subTypeListMap -> subTypeListMap.values().stream())
                         .flatMap(List::stream)
                         .collect(Collectors.toList());
-        List<ReportCellFunction<RepairFormationUnit>> capabilityFunctions = equipmentList
+        List<ReportCell> capabilityFunctions = equipmentList
                 .stream()
-                .map(e -> ReportCellFunction.of((RepairFormationUnit rfu) -> data
-                        .getCalculatedRepairCapabilities()
-                        .getOrDefault(rfu, Collections.emptyMap())
-                        .getOrDefault(e, 0.0)))
+                .map(e -> new ReportCell(data
+                                                 .getCalculatedRepairCapabilities()
+                                                 .getOrDefault(rfu, Collections.emptyMap())
+                                                 .getOrDefault(e, 0.0)))
                 .collect(Collectors.toList());
         functions.addAll(capabilityFunctions);
         return functions;
