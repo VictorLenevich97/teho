@@ -136,6 +136,34 @@ public class EquipmentPerFormationController {
                                         equipmentIds);
     }
 
+    @GetMapping("/formation/{formationId}/equipment/intensity/report")
+    @ResponseBody
+    public ResponseEntity<byte[]> getEquipmentFailureIntensityDataReport(@ApiParam(value = "Ключ ВЧ", required = true, example = "1")
+                                                                         @PathVariable Long formationId,
+                                                                         @RequestParam(required = false) List<Long> equipmentIds) throws
+            UnsupportedEncodingException {
+        Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> failureIntensityData =
+                equipmentPerFormationService.getFailureIntensityData(tehoSession.getSessionId(),
+                                                                     formationId,
+                                                                     equipmentIds);
+        List<Stage> stages = stageService.list();
+        List<RepairType> repairTypes = repairTypeService.list(true);
+        Map<EquipmentSubType, List<EquipmentPerFormation>> totalEquipmentInFormations =
+                equipmentPerFormationService.getGroupedEquipmentInFormation(formationId, equipmentIds);
+        byte[] bytes = reportService.generateReport(new EquipmentFailureIntensityCombinedData(stages,
+                                                                                              repairTypes,
+                                                                                              Collections.singletonMap(
+                                                                                                      null,
+                                                                                                      totalEquipmentInFormations),
+                                                                                              Collections.singletonMap(
+                                                                                                      null,
+                                                                                                      failureIntensityData),
+                                                                                              EquipmentPerFormationFailureIntensity::getIntensityPercentage,
+                                                                                              "%"));
+
+        return ReportResponseEntity.ok("Среднесуточный выход ВВСТ в ремонт", bytes);
+    }
+
     private <T> TableDataDTO<Map<String, Map<String, String>>> getEquipmentRowData(Long formationId,
                                                                                    Function<EquipmentPerFormationFailureIntensity, T> getter,
                                                                                    T defaultValue,
@@ -179,7 +207,7 @@ public class EquipmentPerFormationController {
 
         List<EquipmentFailureIntensityRowData<String>> rowData =
                 (formationId == null ? equipmentPerFormationService
-                        .getTotalEquipmentInFormations(equipmentIds)
+                        .getTotalGroupedEquipmentInFormations(equipmentIds)
                         .values()
                         .stream()
                         .flatMap(m -> m.values()
@@ -226,11 +254,39 @@ public class EquipmentPerFormationController {
         List<Stage> stages = stageService.list();
         List<RepairType> repairTypes = repairTypeService.list(true);
         Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> totalEquipmentInFormations =
-                equipmentPerFormationService.getTotalEquipmentInFormations(equipmentIds);
+                equipmentPerFormationService.getTotalGroupedEquipmentInFormations(equipmentIds);
         byte[] bytes = reportService.generateReport(new EquipmentFailureIntensityCombinedData(stages,
                                                                                               repairTypes,
                                                                                               totalEquipmentInFormations,
-                                                                                              failureIntensityData));
+                                                                                              failureIntensityData,
+                                                                                              EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
+                                                                                              "ед."));
+
+        return ReportResponseEntity.ok("Среднесуточный выход ВВСТ в ремонт", bytes);
+    }
+
+    @GetMapping("/formation/{formationId}/equipment/daily-failure/report")
+    @ResponseBody
+    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях c интенсивностью выхода в ремонт в ед. (в табличном виде)")
+    public ResponseEntity<byte[]> getEquipmentPerFormationDailyFailureDataReport(
+            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
+            @RequestParam(required = false) List<Long> equipmentIds) throws UnsupportedEncodingException {
+        Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> failureIntensityData =
+                equipmentPerFormationService.getFailureIntensityData(tehoSession.getSessionId(),
+                                                                     formationId,
+                                                                     equipmentIds);
+        List<Stage> stages = stageService.list();
+        List<RepairType> repairTypes = repairTypeService.list(true);
+        Map<EquipmentSubType, List<EquipmentPerFormation>> totalEquipmentInFormations =
+                equipmentPerFormationService.getGroupedEquipmentInFormation(formationId, equipmentIds);
+        byte[] bytes = reportService.generateReport(new EquipmentFailureIntensityCombinedData(stages,
+                                                                                              repairTypes,
+                                                                                              Collections.singletonMap(null, totalEquipmentInFormations),
+                                                                                              Collections.singletonMap(
+                                                                                                      null,
+                                                                                                      failureIntensityData),
+                                                                                              EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
+                                                                                              "ед."));
 
         return ReportResponseEntity.ok("Среднесуточный выход ВВСТ в ремонт", bytes);
     }

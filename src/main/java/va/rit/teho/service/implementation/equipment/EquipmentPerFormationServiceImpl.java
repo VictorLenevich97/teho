@@ -117,7 +117,16 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalEquipmentInFormations(List<Long> equipmentIds) {
+    public Map<EquipmentSubType, List<EquipmentPerFormation>> getGroupedEquipmentInFormation(Long formationId,
+                                                                                             List<Long> equipmentIds) {
+        return equipmentPerFormationRepository
+                .findAllByFormationId(formationId, equipmentIds)
+                .stream()
+                .collect(Collectors.groupingBy(epf -> epf.getEquipment().getEquipmentSubType()));
+    }
+
+    @Override
+    public Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalGroupedEquipmentInFormations(List<Long> equipmentIds) {
         return equipmentPerFormationRepository
                 .findTotal(equipmentIds)
                 .stream()

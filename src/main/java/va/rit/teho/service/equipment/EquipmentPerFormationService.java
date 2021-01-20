@@ -35,7 +35,9 @@ public interface EquipmentPerFormationService {
 
     List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, List<Long> equipmentIds);
 
-    Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalEquipmentInFormations(List<Long> equipmentIds);
+    Map<EquipmentSubType, List<EquipmentPerFormation>> getGroupedEquipmentInFormation(Long formationId, List<Long> equipmentIds);
+
+    Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalGroupedEquipmentInFormations(List<Long> equipmentIds);
 
     List<EquipmentPerFormationFailureIntensity> updateAvgDailyFailureData(UUID sessionId, Long formationId, double coefficient);
 

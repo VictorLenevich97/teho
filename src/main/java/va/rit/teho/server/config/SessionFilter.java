@@ -33,7 +33,7 @@ public class SessionFilter extends OncePerRequestFilter {
                                     HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
         final String sessionId = httpServletRequest.getHeader("Session-Id");
-        if (sessionId == null) {
+        if (sessionId == null || sessionId.equals("null")) {
             prepareBadRequestResponse(httpServletResponse, "Missing Session-Id header!");
         } else {
             UUID sessionUUID = UUID.fromString(sessionId);

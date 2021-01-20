@@ -6,21 +6,28 @@ import va.rit.teho.entity.formation.Formation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class EquipmentFailureIntensityCombinedData {
-    List<Stage> stages;
-    List<RepairType> repairTypes;
-    Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> equipmentPerFormations;
-    Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData;
+    private final List<Stage> stages;
+    private final List<RepairType> repairTypes;
+    private final Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> equipmentPerFormations;
+    private final Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData;
+    private final Function<EquipmentPerFormationFailureIntensity, Number> intensityFunction;
+    private final String unitIndicator;
 
     public EquipmentFailureIntensityCombinedData(List<Stage> stages,
                                                  List<RepairType> repairTypes,
                                                  Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> equipmentPerFormations,
-                                                 Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData) {
+                                                 Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
+                                                 Function<EquipmentPerFormationFailureIntensity, Number> intensityFunction,
+                                                 String unitIndicator) {
         this.stages = stages;
         this.repairTypes = repairTypes;
         this.equipmentPerFormations = equipmentPerFormations;
         this.failureIntensityData = failureIntensityData;
+        this.intensityFunction = intensityFunction;
+        this.unitIndicator = unitIndicator;
     }
 
     public List<Stage> getStages() {
@@ -37,5 +44,13 @@ public class EquipmentFailureIntensityCombinedData {
 
     public Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> getFailureIntensityData() {
         return failureIntensityData;
+    }
+
+    public Function<EquipmentPerFormationFailureIntensity, Number> getIntensityFunction() {
+        return intensityFunction;
+    }
+
+    public String getUnitIndicator() {
+        return unitIndicator;
     }
 }
