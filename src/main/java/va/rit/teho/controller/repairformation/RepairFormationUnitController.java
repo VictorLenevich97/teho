@@ -252,6 +252,7 @@ public class RepairFormationUnitController {
                     new RepairFormationUnitPK(repairFormationUnitId, sd.getSubTypeId(), tehoSession.getSessionId()),
                     sd.getTotal(),
                     sd.getAvailable());
+            formationUnitEquipmentStaff.setEquipmentSubType(equipmentTypeService.getSubType(sd.getSubTypeId()));
             list.add(formationUnitEquipmentStaff);
         }
 

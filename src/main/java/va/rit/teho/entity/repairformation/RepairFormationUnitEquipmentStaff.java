@@ -108,4 +108,8 @@ public class RepairFormationUnitEquipmentStaff {
                 getTotalStaff(),
                 getAvailableStaff());
     }
+
+    public void setEquipmentSubType(EquipmentSubType equipmentSubType) {
+        this.equipmentSubType = equipmentSubType;
+    }
 }
