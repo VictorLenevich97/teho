@@ -22,7 +22,7 @@ public interface RepairFormationUnitService {
 
     RepairFormationUnit update(Long id, String name, Long repairFormationId, Long stationTypeId, int amount);
 
-    void updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList);
+    List<RepairFormationUnitEquipmentStaff> updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList);
 
     Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> getEquipmentStaffPerSubType(UUID sessionId,
                                                                                          Long repairFormationUnitId,

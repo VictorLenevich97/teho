@@ -21,6 +21,7 @@ import va.rit.teho.service.repairformation.RepairFormationUnitService;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -128,10 +129,14 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public void updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList) {
+    public List<RepairFormationUnitEquipmentStaff> updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList) {
         repairFormationUnitEquipmentStaffList.forEach(this::checkEquipmentStaffPreconditions);
 
-        repairFormationUnitEquipmentStaffRepository.saveAll(repairFormationUnitEquipmentStaffList);
+        Iterable<RepairFormationUnitEquipmentStaff> updatedEepairFormationUnitEquipmentStaff =
+                repairFormationUnitEquipmentStaffRepository.saveAll(repairFormationUnitEquipmentStaffList);
+        return StreamSupport
+                .stream(updatedEepairFormationUnitEquipmentStaff.spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     @Override

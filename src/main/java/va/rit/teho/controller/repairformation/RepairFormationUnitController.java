@@ -19,6 +19,7 @@ import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitCombinedData;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
+import va.rit.teho.entity.repairformation.RepairFormationUnitPK;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
@@ -153,26 +154,27 @@ public class RepairFormationUnitController {
                 .entrySet()
                 .stream()
                 .map(equipmentTypeListEntry -> {
-                    List<EquipmentStaffPerSubType> subTypes = equipmentTypeListEntry
-                            .getValue()
-                            .stream()
-                            .map(est ->
-                                         new EquipmentStaffPerSubType(
-                                                 est.getId(),
-                                                 est.getFullName(),
-                                                 equipmentStaff
-                                                         .getOrDefault(est, RepairFormationUnitEquipmentStaff.EMPTY)
-                                                         .getTotalStaff(),
-                                                 equipmentStaff
-                                                         .getOrDefault(est, RepairFormationUnitEquipmentStaff.EMPTY)
-                                                         .getAvailableStaff()))
-                            .collect(Collectors.toList());
-                    EquipmentType equipmentType = equipmentTypeListEntry.getKey();
-                    if (equipmentType != null) {
-                        return new EquipmentTypeStaffData(equipmentType.getId(), equipmentType.getFullName(), subTypes);
-                    } else {
-                        return new EquipmentTypeStaffData(-1L, subTypes);
-                    }
+                    List<EquipmentStaffPerSubType> subTypes =
+                            equipmentTypeListEntry
+                                    .getValue()
+                                    .stream()
+                                    .map(est ->
+                                                 new EquipmentStaffPerSubType(
+                                                         est.getId(),
+                                                         est.getFullName(),
+                                                         equipmentStaff
+                                                                 .getOrDefault(est,
+                                                                               RepairFormationUnitEquipmentStaff.EMPTY)
+                                                                 .getTotalStaff(),
+                                                         equipmentStaff
+                                                                 .getOrDefault(est,
+                                                                               RepairFormationUnitEquipmentStaff.EMPTY)
+                                                                 .getAvailableStaff()))
+                                    .collect(Collectors.toList());
+                    return Optional
+                            .ofNullable(equipmentTypeListEntry.getKey())
+                            .map(et -> new EquipmentTypeStaffData(et.getId(), et.getFullName(), subTypes))
+                            .orElse(new EquipmentTypeStaffData(-1L, subTypes));
                 })
                 .collect(Collectors.toList());
         return ResponseEntity.ok(typeStaffData);
@@ -241,18 +243,24 @@ public class RepairFormationUnitController {
 
     @PutMapping(path = "/formation/repair-formation/unit/{repairFormationUnitId}/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление информации по личному составу РВО")
-    public ResponseEntity<Object> updateRepairFormationUnitEquipmentStaff(
+    public ResponseEntity<List<EquipmentStaffPerSubType>> updateRepairFormationUnitEquipmentStaff(
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
-            @ApiParam(value = "Данные по численности л/с", required = true) @RequestBody Map<Long, RepairFormationUnitEquipmentStaffDTO> staff) {
-        repairFormationUnitService.updateEquipmentStaff(
-                staff
-                        .entrySet()
+            @ApiParam(value = "Данные по численности л/с", required = true) @RequestBody List<EquipmentStaffPerSubType> staffData) {
+        List<RepairFormationUnitEquipmentStaff> list = new ArrayList<>();
+        for (EquipmentStaffPerSubType sd : staffData) {
+            RepairFormationUnitEquipmentStaff formationUnitEquipmentStaff = new RepairFormationUnitEquipmentStaff(
+                    new RepairFormationUnitPK(repairFormationUnitId, sd.getSubTypeId(), tehoSession.getSessionId()),
+                    sd.getTotal(),
+                    sd.getAvailable());
+            list.add(formationUnitEquipmentStaff);
+        }
+
+        return ResponseEntity.accepted().body(
+                repairFormationUnitService
+                        .updateEquipmentStaff(list)
                         .stream()
-                        .map(staffDTOEntry -> staffDTOEntry.getValue().toEntity(tehoSession.getSessionId(),
-                                                                                staffDTOEntry.getKey(),
-                                                                                repairFormationUnitId))
+                        .map(EquipmentStaffPerSubType::from)
                         .collect(Collectors.toList()));
-        return ResponseEntity.accepted().build();
     }
 
     private TableDataDTO<Map<String, RepairFormationUnitEquipmentStaffDTO>> buildEquipmentStaffDTO(

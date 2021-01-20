@@ -17,6 +17,7 @@ import va.rit.teho.service.formation.FormationService;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationService {
@@ -125,10 +126,12 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public void updateAvgDailyFailureData(UUID sessionId, double coefficient) {
+    public List<EquipmentPerFormationFailureIntensity> updateAvgDailyFailureData(UUID sessionId,
+                                                                                 Long formationId,
+                                                                                 double coefficient) {
         List<EquipmentPerFormationFailureIntensity> updatedWithAvgDailyFailureData =
                 equipmentPerFormationFailureIntensityRepository
-                        .findAllWithIntensityAndAmount(sessionId)
+                        .findAllWithIntensityAndAmount(sessionId, formationId)
                         .stream()
                         .map(equipmentPerFormationFailureIntensity -> {
                             double avgDailyFailure =
@@ -146,7 +149,11 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                     avgDailyFailure);
                         })
                         .collect(Collectors.toList());
-        equipmentPerFormationFailureIntensityRepository.saveAll(updatedWithAvgDailyFailureData);
+        Iterable<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensities =
+                equipmentPerFormationFailureIntensityRepository.saveAll(updatedWithAvgDailyFailureData);
+        return StreamSupport
+                .stream(equipmentPerFormationFailureIntensities.spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     @Override

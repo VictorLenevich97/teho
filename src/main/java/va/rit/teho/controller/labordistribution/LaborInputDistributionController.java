@@ -21,7 +21,6 @@ import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 import va.rit.teho.server.config.TehoSessionData;
-import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.report.ReportService;
 
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 @Api(tags = "Распределение ремонтного фонда")
 public class LaborInputDistributionController {
 
-    private final EquipmentPerFormationService equipmentPerFormationService;
     private final LaborInputDistributionService laborInputDistributionService;
 
 
@@ -46,10 +44,8 @@ public class LaborInputDistributionController {
     @Resource
     private TehoSessionData tehoSession;
 
-    public LaborInputDistributionController(EquipmentPerFormationService equipmentPerFormationService,
-                                            LaborInputDistributionService laborInputDistributionService,
+    public LaborInputDistributionController(LaborInputDistributionService laborInputDistributionService,
                                             ReportService<LaborInputDistributionCombinedData> reportService) {
-        this.equipmentPerFormationService = equipmentPerFormationService;
         this.laborInputDistributionService = laborInputDistributionService;
         this.reportService = reportService;
     }
@@ -142,10 +138,9 @@ public class LaborInputDistributionController {
                                             Formatter.formatDouble(elid.getTotalRepairComplexity()));
     }
 
-    @PostMapping(path = "/{coefficient}")
+    @PostMapping
     @ApiOperation(value = "Обновить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта")
-    public ResponseEntity<Object> updateDistributionData(@ApiParam(value = "Коэффициент (k), используемый в расчетах", required = true) @PathVariable Double coefficient) {
-        equipmentPerFormationService.updateAvgDailyFailureData(tehoSession.getSessionId(), coefficient);
+    public ResponseEntity<Object> updateDistributionData() {
         laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId());
         return ResponseEntity.accepted().build();
     }

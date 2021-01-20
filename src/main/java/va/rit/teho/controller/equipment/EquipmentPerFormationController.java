@@ -238,14 +238,26 @@ public class EquipmentPerFormationController {
     @GetMapping("/formation/{formationId}/equipment/daily-failure")
     @ResponseBody
     @ApiOperation(value = "Получить данные о ВВСТ в Формированиях c интенсивностью выхода в ремонт в ед. (в табличном виде)")
-    public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerFormationDailyFailureData(
+    public ResponseEntity<TableDataDTO<Map<String, Map<String, String>>>> getEquipmentPerFormationDailyFailureData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) {
-        return this.getEquipmentRowData(formationId,
-                                        EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
-                                        0.0,
-                                        va.rit.teho.controller.helper.Formatter::formatDouble,
-                                        equipmentIds);
+        return ResponseEntity.ok(this.getEquipmentRowData(formationId,
+                                                          EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
+                                                          0.0,
+                                                          va.rit.teho.controller.helper.Formatter::formatDouble,
+                                                          equipmentIds));
+    }
+
+    @PostMapping("/formation/{formationId}/equipment/daily-failure/{coefficient}")
+    @ApiOperation(value = "Обновить данные о выходе ВВСТ из строя на основе интенсивности (%)")
+    public ResponseEntity<TableDataDTO<Map<String, Map<String, String>>>> updateAvgDailyFailureData(
+            @ApiParam(value = "Ключ формирования", required = true, example = "1") @PathVariable Long formationId,
+            @ApiParam(value = "Коэффициент (k), используемый в расчетах", required = true) @PathVariable Double coefficient) {
+
+        equipmentPerFormationService.updateAvgDailyFailureData(tehoSession.getSessionId(),
+                                                               formationId,
+                                                               coefficient);
+        return getEquipmentPerFormationDailyFailureData(formationId, Collections.emptyList());
     }
 
     @PutMapping("/formation/{formationId}/equipment/{equipmentId}/daily-failure")

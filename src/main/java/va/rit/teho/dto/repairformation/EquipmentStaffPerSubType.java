@@ -1,5 +1,7 @@
 package va.rit.teho.dto.repairformation;
 
+import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
+
 public class EquipmentStaffPerSubType {
     private final Long subTypeId;
     private final String name;
@@ -27,5 +29,12 @@ public class EquipmentStaffPerSubType {
 
     public Integer getAvailable() {
         return available;
+    }
+
+    public static EquipmentStaffPerSubType from(RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff) {
+        return new EquipmentStaffPerSubType(repairFormationUnitEquipmentStaff.getEquipmentSubType().getId(),
+                                            repairFormationUnitEquipmentStaff.getEquipmentSubType().getFullName(),
+                                            repairFormationUnitEquipmentStaff.getTotalStaff(),
+                                            repairFormationUnitEquipmentStaff.getAvailableStaff());
     }
 }

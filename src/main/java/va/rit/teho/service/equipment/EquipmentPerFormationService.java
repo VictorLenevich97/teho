@@ -37,7 +37,7 @@ public interface EquipmentPerFormationService {
 
     Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalEquipmentInFormations(List<Long> equipmentIds);
 
-    void updateAvgDailyFailureData(UUID sessionId, double coefficient);
+    List<EquipmentPerFormationFailureIntensity> updateAvgDailyFailureData(UUID sessionId, Long formationId, double coefficient);
 
     Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> getTotalFailureIntensityData(
             UUID sessionId);
