@@ -63,6 +63,11 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
+    public RepairFormationUnit get(Long id) {
+        return repairFormationUnitRepository.findById(id).orElseThrow(() -> new NotFoundException("РВО не найдено!"));
+    }
+
+    @Override
     public Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(Long repairFormationUntId,
                                                                                            UUID sessionId) {
         return Pair.of(getRepairFormationUnitOrThrow(repairFormationUntId),

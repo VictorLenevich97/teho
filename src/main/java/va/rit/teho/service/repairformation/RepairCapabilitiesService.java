@@ -20,6 +20,16 @@ public interface RepairCapabilitiesService {
 
     void updateRepairCapabilities(UUID sessionId, Long repairFormationUnitId, Long repairTypeId, Map<Long, Double> capabilitiesMap);
 
+    void updateRepairCapabilities(UUID sessionId, Long repairFormationUnitId, Long repairTypeId, Long equipmentId, Double capability);
+
+    Map<Equipment, Double> getCalculatedRepairCapabilities(
+            Long repairFormationUnitId,
+            UUID sessionId,
+            Long repairTypeId,
+            List<Long> equipmentIds,
+            List<Long> equipmentSubTypeIds,
+            List<Long> equipmentTypeIds);
+
     Map<RepairFormationUnit, Map<Equipment, Double>> getCalculatedRepairCapabilities(
             UUID sessionId,
             Long repairTypeId,

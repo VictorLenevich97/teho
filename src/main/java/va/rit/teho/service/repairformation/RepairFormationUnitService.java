@@ -15,6 +15,8 @@ public interface RepairFormationUnitService {
 
     List<RepairFormationUnit> list(Long repairFormationId, List<Long> filterIds, Integer pageNum, Integer pageSize);
 
+    RepairFormationUnit get(Long id);
+
     Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(Long repairFormationUntId,
                                                                                     UUID sessionId);
 

@@ -14,10 +14,7 @@ import va.rit.teho.service.common.CalculationService;
 import va.rit.teho.service.repairformation.RepairCapabilitiesService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -135,6 +132,35 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                         }).collect(Collectors.toList());
 
         calculatedRepairCapabilitiesPerDayRepository.saveAll(repairFormationUnitRepairCapabilities);
+    }
+
+    @Override
+    public void updateRepairCapabilities(UUID sessionId,
+                                         Long repairFormationUnitId,
+                                         Long repairTypeId,
+                                         Long equipmentId,
+                                         Double capability) {
+        calculatedRepairCapabilitiesPerDayRepository.save(
+                new RepairFormationUnitRepairCapability(
+                        new RepairFormationUnitRepairCapabilityPK(repairFormationUnitId,
+                                                                  equipmentId,
+                                                                  repairTypeId,
+                                                                  sessionId),
+                        capability));
+    }
+
+    @Override
+    public Map<Equipment, Double> getCalculatedRepairCapabilities(Long repairFormationUnitId,
+                                                                  UUID sessionId,
+                                                                  Long repairTypeId,
+                                                                  List<Long> equipmentIds,
+                                                                  List<Long> equipmentSubTypeIds,
+                                                                  List<Long> equipmentTypeIds) {
+        RepairFormationUnit repairFormationUnit = repairFormationUnitService.get(repairFormationUnitId);
+        Map<RepairFormationUnit, Map<Equipment, Double>> result = internalGetCalculatedRepairCapabilities(
+                sessionId, repairTypeId,
+                Collections.singletonList(repairFormationUnitId), equipmentIds, equipmentSubTypeIds, equipmentTypeIds);
+        return result.getOrDefault(repairFormationUnit, Collections.emptyMap());
     }
 
     @Override

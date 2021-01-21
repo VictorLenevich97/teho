@@ -9,6 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
+import va.rit.teho.dto.repairformation.EquipmentStaffPerSubType;
+import va.rit.teho.dto.repairformation.EquipmentTypeStaffData;
+import va.rit.teho.dto.repairformation.RepairCapabilityPerEquipment;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.RowData;
 import va.rit.teho.dto.table.TableDataDTO;
@@ -16,6 +19,7 @@ import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
+import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityCombinedData;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentService;
@@ -28,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -39,6 +44,7 @@ public class RepairCapabilitiesController {
     private final EquipmentService equipmentService;
     private final RepairFormationUnitService repairFormationUnitService;
     private final ReportService<RepairFormationUnitRepairCapabilityCombinedData> reportService;
+
     @Resource
     private TehoSessionData tehoSession;
 
@@ -89,15 +95,28 @@ public class RepairCapabilitiesController {
         return ResponseEntity.accepted().body(repairCapabilitiesDTO);
     }
 
-    @PutMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Ручное обновление производственных возможностей РВО по ремонту (для указанного РВО)")
-    public ResponseEntity<Object> updateRepairCapabilities(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
-                                                           @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
-                                                           @ApiParam(value = "Данные в виде {'ключ ВВСТ': 'произв. возможности (ед./сут.)'}", required = true, example = "{'1': '2.15', '2': '3.14'}") @RequestBody Map<Long, Double> data) {
+    @PutMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}/batch", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Ручное обновление производственных возможностей РВО по ремонту (для указанного РВО), сразу для многих ВВСТ")
+    public ResponseEntity<Object> updateRepairCapabilitiesBatch(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
+                                                                @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
+                                                                @ApiParam(value = "Данные в виде {'ключ ВВСТ': 'произв. возможности (ед./сут.)'}", required = true, example = "{'1': '2.15', '2': '3.14'}") @RequestBody Map<Long, Double> data) {
         repairCapabilitiesService.updateRepairCapabilities(tehoSession.getSessionId(),
                                                            repairFormationUnitId,
                                                            repairTypeId,
                                                            data);
+        return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Ручное обновление производственных возможностей РВО по ремонту (для указанного РВО)")
+    public ResponseEntity<Object> updateRepairCapabilities(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
+                                                           @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
+                                                           @ApiParam(value = "Данные по произв. возможностям", required = true) @RequestBody RepairCapabilityPerEquipment repairCapabilityPerEquipment) {
+        repairCapabilitiesService.updateRepairCapabilities(tehoSession.getSessionId(),
+                                                           repairFormationUnitId,
+                                                           repairTypeId,
+                                                           repairCapabilityPerEquipment.getId(),
+                                                           repairCapabilityPerEquipment.getCapability());
         return ResponseEntity.accepted().build();
     }
 
@@ -158,6 +177,69 @@ public class RepairCapabilitiesController {
                                                                                                                        .emptyMap())
                                                                                                  .getOrDefault(equipment,
                                                                                                                0.0)))));
+    }
+
+    @GetMapping("/{repairFormationUnitId}/capabilities/repair-type/{repairTypeId}")
+    @ResponseBody
+    public ResponseEntity<List<EquipmentTypeStaffData>> getCalculatedRepairCapabilitiesForUnit(
+            @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
+            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable Long repairTypeId,
+            @ApiParam(value = "Ключи ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentId,
+            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
+            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId) {
+        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped =
+                equipmentService.listGroupedByTypes(equipmentId,
+                                                    equipmentSubTypeId,
+                                                    equipmentTypeId);
+        Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> equipmentStaff =
+                repairFormationUnitService.getEquipmentStaffPerSubType(tehoSession.getSessionId(),
+                                                                       repairFormationUnitId,
+                                                                       equipmentTypeId,
+                                                                       equipmentSubTypeId);
+        Map<Equipment, Double> calculatedRepairCapabilities =
+                repairCapabilitiesService.getCalculatedRepairCapabilities(repairFormationUnitId,
+                                                                          tehoSession.getSessionId(),
+                                                                          repairTypeId,
+                                                                          equipmentId,
+                                                                          equipmentSubTypeId,
+                                                                          equipmentTypeId);
+        List<EquipmentTypeStaffData> result = grouped
+                .entrySet()
+                .stream()
+                .map(equipmentTypeListEntry -> {
+                    List<EquipmentStaffPerSubType> subTypes =
+                            equipmentTypeListEntry
+                                    .getValue()
+                                    .entrySet()
+                                    .stream()
+                                    .map(est -> getEquipmentStaffPerSubType(equipmentStaff,
+                                                                            calculatedRepairCapabilities,
+                                                                            est))
+                                    .collect(Collectors.toList());
+                    return Optional
+                            .ofNullable(equipmentTypeListEntry.getKey())
+                            .map(et -> new EquipmentTypeStaffData(et.getId(), et.getFullName(), subTypes))
+                            .orElse(new EquipmentTypeStaffData(-1L, subTypes));
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
+    }
+
+    private EquipmentStaffPerSubType getEquipmentStaffPerSubType(Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> equipmentStaff,
+                                                                 Map<Equipment, Double> calculatedRepairCapabilities,
+                                                                 Map.Entry<EquipmentSubType, List<Equipment>> est) {
+        return new EquipmentStaffPerSubType(
+                est.getKey().getId(),
+                est.getKey().getFullName(),
+                equipmentStaff.getOrDefault(est.getKey(), RepairFormationUnitEquipmentStaff.EMPTY).getTotalStaff(),
+                equipmentStaff.getOrDefault(est.getKey(), RepairFormationUnitEquipmentStaff.EMPTY).getAvailableStaff(),
+                est
+                        .getValue()
+                        .stream()
+                        .map(e -> new RepairCapabilityPerEquipment(e.getId(),
+                                                                   e.getName(),
+                                                                   calculatedRepairCapabilities.getOrDefault(e, 0.0)))
+                        .collect(Collectors.toList()));
     }
 
     @GetMapping("/capabilities/repair-type/{id}")

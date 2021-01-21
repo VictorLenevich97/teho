@@ -106,6 +106,7 @@ public class EquipmentController {
                         .stream()
                         .map(equipmentMapEntry ->
                                      new EquipmentLaborInputPerTypeRowData(
+                                             equipmentMapEntry.getKey().getId(),
                                              equipmentMapEntry.getKey().getName(),
                                              equipmentMapEntry.getKey().getEquipmentSubType().getId(),
                                              equipmentMapEntry.getKey().getEquipmentSubType().getShortName(),

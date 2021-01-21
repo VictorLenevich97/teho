@@ -8,8 +8,8 @@ public class EquipmentLaborInputPerTypeRowData extends RowData<Map<String, Integ
     private final Long subTypeId;
     private final String subTypeName;
 
-    public EquipmentLaborInputPerTypeRowData(String name, Long subTypeId, String subTypeName, Map<String, Integer> data) {
-        super(name, data);
+    public EquipmentLaborInputPerTypeRowData(Long id, String name, Long subTypeId, String subTypeName, Map<String, Integer> data) {
+        super(id, name, data);
         this.subTypeId = subTypeId;
         this.subTypeName = subTypeName;
     }
