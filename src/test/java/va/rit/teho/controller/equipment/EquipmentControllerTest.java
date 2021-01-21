@@ -80,6 +80,7 @@ public class EquipmentControllerTest extends ControllerTest {
 
         verify(equipmentService).update(equipmentDTO.getId(),
                                         equipmentDTO.getName(),
-                                        equipmentDTO.getSubType().getId());
+                                        equipmentDTO.getSubType().getId(),
+                                        Collections.emptyMap());
     }
 }

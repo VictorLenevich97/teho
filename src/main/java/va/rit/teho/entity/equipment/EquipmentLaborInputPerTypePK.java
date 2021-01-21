@@ -12,6 +12,14 @@ public class EquipmentLaborInputPerTypePK implements Serializable {
     @Column(name = "repair_type_id")
     private Long repairTypeId;
 
+    public EquipmentLaborInputPerTypePK() {
+    }
+
+    public EquipmentLaborInputPerTypePK(Long equipmentId, Long repairTypeId) {
+        this.equipmentId = equipmentId;
+        this.repairTypeId = repairTypeId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

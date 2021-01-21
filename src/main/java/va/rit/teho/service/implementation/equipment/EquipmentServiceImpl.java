@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -62,7 +63,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Long add(String name, Long subTypeId) {
+    public Equipment add(String name, Long subTypeId) {
         String logLine = String.format("Добавление ВВСТ \"%s\", subTypeId = %d", name, subTypeId);
         LOGGER.debug(logLine);
         EquipmentSubType equipmentSubType = equipmentTypeService.getSubType(subTypeId);
@@ -70,20 +71,48 @@ public class EquipmentServiceImpl implements EquipmentService {
             throw new AlreadyExistsException("ВВСТ", "имя", name);
         }
         long newId = equipmentRepository.getMaxId() + 1;
-        equipmentRepository.save(new Equipment(newId, name, equipmentSubType));
-        return newId;
+        return equipmentRepository.save(new Equipment(newId, name, equipmentSubType));
     }
 
     @Override
-    public void update(Long id, String name, Long subTypeId) {
+    @Transactional
+    public Equipment add(String name,
+                         Long subTypeId,
+                         Map<Long, Integer> repairTypeIdLaborInputMap) {
+        Equipment equipment = add(name, subTypeId);
+        updateLaborInputData(repairTypeIdLaborInputMap, equipment);
+        return equipment;
+    }
+
+    private void updateLaborInputData(Map<Long, Integer> repairTypeIdLaborInputMap, Equipment equipment) {
+        List<EquipmentLaborInputPerType> equipmentLaborInputPerTypes = repairTypeIdLaborInputMap
+                .entrySet()
+                .stream()
+                .map(repairTypeIdLaborInputEntry ->
+                             new EquipmentLaborInputPerType(equipment.getId(),
+                                                            repairTypeIdLaborInputEntry.getKey(),
+                                                            repairTypeIdLaborInputEntry.getValue()))
+                .collect(Collectors.toList());
+        equipmentLaborInputPerTypeRepository.saveAll(equipmentLaborInputPerTypes);
+    }
+
+    @Override
+    public Equipment update(Long id, String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap) {
         String logLine = String.format("Обновление ВВСТ (id = %d) \"%s\", subTypeId = %d", id, name, subTypeId);
         LOGGER.debug(logLine);
+        equipmentRepository.findByName(name).ifPresent(e -> {
+            if (!e.getId().equals(id)) {
+                throw new AlreadyExistsException("ВВСТ", "имя", name);
+            }
+        });
         EquipmentSubType equipmentSubType = equipmentTypeService.getSubType(subTypeId);
         Equipment equipment = get(id);
         equipment.setName(name);
         equipment.setEquipmentSubType(equipmentSubType);
 
         equipmentRepository.save(equipment);
+        updateLaborInputData(repairTypeIdLaborInputMap, equipment);
+        return equipment;
     }
 
 

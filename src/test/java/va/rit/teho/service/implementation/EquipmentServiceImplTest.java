@@ -78,7 +78,10 @@ public class EquipmentServiceImplTest {
         when(equipmentRepository.findById(addedEquipment.getId())).thenReturn(Optional.of(addedEquipment));
         when(equipmentRepository.save(equipmentToAdd)).thenReturn(addedEquipment);
 
-        equipmentService.update(addedEquipment.getId(), equipmentToAdd.getName(), equipmentSubTypeId);
+        equipmentService.update(addedEquipment.getId(),
+                                equipmentToAdd.getName(),
+                                equipmentSubTypeId,
+                                Collections.emptyMap());
     }
 
     @Test

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentDTO;
@@ -21,6 +22,7 @@ import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.report.ReportService;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,16 +64,31 @@ public class EquipmentController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить ВВСТ")
-    public ResponseEntity<Object> addNewEquipment(@ApiParam(value = "Данные о ВВСТ", required = true) @RequestBody EquipmentDTO equipmentDTO) {
-        equipmentService.add(equipmentDTO.getName(), equipmentDTO.getSubType().getId());
+    @Transactional
+    public ResponseEntity<Object> addNewEquipment(@ApiParam(value = "Данные о ВВСТ и трудоемкости ремонта", required = true)
+                                                  @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
+        Map<Long, Integer> repairTypeIdLaborInputMap = mapStringKeysToLong(equipmentData.getData());
+        equipmentService.add(equipmentData.getName(), equipmentData.getSubTypeId(), repairTypeIdLaborInputMap);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    private Map<Long, Integer> mapStringKeysToLong(Map<String, Integer> equipmentData) {
+        Map<Long, Integer> repairTypeIdLaborInputMap = new HashMap<>();
+        for (Map.Entry<String, Integer> typeIdLaborInputEntry : equipmentData.entrySet()) {
+            repairTypeIdLaborInputMap.put(Long.valueOf(typeIdLaborInputEntry.getKey()),
+                                          typeIdLaborInputEntry.getValue());
+        }
+        return repairTypeIdLaborInputMap;
     }
 
     @PutMapping(path = "/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить ВВСТ")
     public ResponseEntity<Object> updateEquipment(@ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                  @ApiParam(value = "Данные о ВВСТ", required = true) @RequestBody EquipmentDTO equipmentDTO) {
-        equipmentService.update(equipmentId, equipmentDTO.getName(), equipmentDTO.getSubType().getId());
+                                                  @ApiParam(value = "Данные о ВВСТ", required = true) @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
+        equipmentService.update(equipmentId,
+                                equipmentData.getName(),
+                                equipmentData.getSubTypeId(),
+                                mapStringKeysToLong(equipmentData.getData()));
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 

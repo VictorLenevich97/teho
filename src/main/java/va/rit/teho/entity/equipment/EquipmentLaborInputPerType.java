@@ -26,6 +26,11 @@ public class EquipmentLaborInputPerType {
         //Пустой конструктор для автоматической инициализации
     }
 
+    public EquipmentLaborInputPerType(Long equipmentId, Long repairTypeId, int amount) {
+        this.equipmentLaborInputPerTypeAmount = new EquipmentLaborInputPerTypePK(equipmentId, repairTypeId);
+        this.amount = amount;
+    }
+
     public EquipmentLaborInputPerType(RepairType repairType, int amount) {
         this.repairType = repairType;
         this.amount = amount;

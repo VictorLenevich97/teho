@@ -16,9 +16,11 @@ public interface EquipmentService {
 
     Equipment get(Long equipmentId);
 
-    Long add(String name, Long subTypeId);
+    Equipment add(String name, Long subTypeId);
 
-    void update(Long id, String name, Long subTypeId);
+    Equipment add(String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap);
+
+    Equipment update(Long id, String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap);
 
 
     Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
