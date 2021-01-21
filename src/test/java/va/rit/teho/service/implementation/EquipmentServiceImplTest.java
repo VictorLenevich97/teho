@@ -58,12 +58,13 @@ public class EquipmentServiceImplTest {
     public void testAdd() {
         Long equipmentSubTypeId = 2L;
         EquipmentSubType equipmentSubType = new EquipmentSubType("short", "full", new EquipmentType("", ""));
-        Equipment equipmentToAdd = new Equipment(0L,"eqName", equipmentSubType);
+        Equipment equipmentToAdd = new Equipment(1L, "eqName", equipmentSubType);
         Equipment addedEquipment = new Equipment(15L, equipmentToAdd.getName(), equipmentToAdd.getEquipmentSubType());
+        when(equipmentRepository.getMaxId()).thenReturn(0L);
         when(equipmentTypeService.getSubType(equipmentSubTypeId)).thenReturn(equipmentSubType);
         when(equipmentRepository.save(equipmentToAdd)).thenReturn(addedEquipment);
         Assertions.assertEquals(addedEquipment.getId(),
-                                equipmentService.add(equipmentToAdd.getName(), equipmentSubTypeId));
+                                equipmentService.add(equipmentToAdd.getName(), equipmentSubTypeId).getId());
 
         verify(equipmentRepository).save(equipmentToAdd);
     }
@@ -86,16 +87,16 @@ public class EquipmentServiceImplTest {
 
     @Test
     public void testListGroupedByTypes() {
-        EquipmentType equipmentType = new EquipmentType("short", "full");
-        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
-        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> result = Collections.singletonMap(equipmentType,
+        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> result = Collections.singletonMap(EQUIPMENT
+                                                                                                             .getEquipmentSubType()
+                                                                                                             .getEquipmentType(),
                                                                                                      Collections.singletonMap(
-                                                                                                             equipmentSubType,
+                                                                                                             EQUIPMENT.getEquipmentSubType(),
                                                                                                              Collections
                                                                                                                      .singletonList(
                                                                                                                              EQUIPMENT)));
 
-        when(equipmentRepository.getEquipmentGroupedByType(null, null, null)).thenReturn(result);
+        when(equipmentRepository.findFiltered(null, null, null)).thenReturn(Collections.singletonList(EQUIPMENT));
 
         Assertions.assertEquals(result, equipmentService.listGroupedByTypes(null, null, null));
     }

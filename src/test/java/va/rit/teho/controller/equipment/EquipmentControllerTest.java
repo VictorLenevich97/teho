@@ -6,8 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.TestRunner;
 import va.rit.teho.controller.ControllerTest;
-import va.rit.teho.dto.equipment.EquipmentDTO;
-import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
+import va.rit.teho.dto.equipment.EquipmentLaborInputPerTypeRowData;
 import va.rit.teho.entity.equipment.Equipment;
 
 import java.util.Collections;
@@ -56,31 +55,32 @@ public class EquipmentControllerTest extends ControllerTest {
 
     @Test
     public void testAddNewEquipment() throws Exception {
-        EquipmentDTO equipmentDTO = new EquipmentDTO("equipmentName");
-        equipmentDTO.setId(3L);
-        equipmentDTO.setSubType(new EquipmentSubTypeDTO(2L, "", ""));
-
-        mockMvc.perform(post("/equipment").contentType(MediaType.APPLICATION_JSON)
-                                          .content(objectMapper.writeValueAsString(equipmentDTO)))
+        EquipmentLaborInputPerTypeRowData equipmentLaborInputPerTypeRowData =
+                new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, "", Collections.singletonMap("1", 1));
+        mockMvc.perform(post("/equipment")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(equipmentLaborInputPerTypeRowData)))
                .andExpect(status().isCreated());
 
-        verify(equipmentService).add(equipmentDTO.getName(), equipmentDTO.getSubType().getId());
+        verify(equipmentService).add(equipmentLaborInputPerTypeRowData.getName(),
+                                     equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                     Collections.singletonMap(1L, 1));
     }
 
     @Test
     public void testUpdateEquipment() throws Exception {
-        EquipmentDTO equipmentDTO = new EquipmentDTO("equipmentName");
-        equipmentDTO.setId(3L);
-        equipmentDTO.setSubType(new EquipmentSubTypeDTO(2L, "", ""));
+        EquipmentLaborInputPerTypeRowData equipmentLaborInputPerTypeRowData =
+                new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, "", Collections.singletonMap("1", 1));
 
-        mockMvc.perform(put("/equipment/{id}", equipmentDTO.getId()).contentType(MediaType.APPLICATION_JSON)
-                                                                    .content(objectMapper.writeValueAsString(
-                                                                            equipmentDTO)))
+        mockMvc.perform(put("/equipment/{id}", equipmentLaborInputPerTypeRowData.getId())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(
+                                        equipmentLaborInputPerTypeRowData)))
                .andExpect(status().isAccepted());
 
-        verify(equipmentService).update(equipmentDTO.getId(),
-                                        equipmentDTO.getName(),
-                                        equipmentDTO.getSubType().getId(),
-                                        Collections.emptyMap());
+        verify(equipmentService).update(equipmentLaborInputPerTypeRowData.getId(),
+                                        equipmentLaborInputPerTypeRowData.getName(),
+                                        equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                        Collections.singletonMap(1L, 1));
     }
 }

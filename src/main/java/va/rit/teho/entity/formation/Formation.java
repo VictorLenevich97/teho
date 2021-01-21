@@ -100,6 +100,10 @@ public class Formation implements Serializable {
                 Objects.equals(fullName, formation.fullName);
     }
 
+    public void setEquipmentPerFormations(Set<EquipmentPerFormation> equipmentPerFormations) {
+        this.equipmentPerFormations = equipmentPerFormations;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, shortName, fullName);

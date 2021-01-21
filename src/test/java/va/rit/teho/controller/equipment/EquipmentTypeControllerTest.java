@@ -12,11 +12,9 @@ import va.rit.teho.dto.equipment.EquipmentTypeDTO;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.verify;
@@ -82,47 +80,35 @@ public class EquipmentTypeControllerTest extends ControllerTest {
 
     @Test
     public void testGetEquipmentSubTypes() throws Exception {
-        EquipmentType eqType = new EquipmentType("s", "f");
         List<EquipmentSubType> equipmentSubTypes = Collections.singletonList(new EquipmentSubType(
                 "s",
                 "f",
                 new EquipmentType("s",
                                   "f")));
-        Map<EquipmentType, List<EquipmentSubType>> result = Collections.singletonMap(eqType,
-                                                                                     equipmentSubTypes);
-        when(equipmentTypeService.listTypesWithSubTypes(null, null)).thenReturn(result);
+        when(equipmentTypeService.listSubTypes(null)).thenReturn(equipmentSubTypes);
 
         mockMvc.perform(get("/equipment-type/subtype"))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.size()", is(result.size())))
-               .andExpect(jsonPath("$[0].type.shortName", is(eqType.getShortName())))
-               .andExpect(jsonPath("$[0].type.fullName", is(eqType.getFullName())))
-               .andExpect(jsonPath("$[0].subTypes.size()", is(equipmentSubTypes.size())))
-               .andExpect(jsonPath("$[0].subTypes[0].shortName", is(equipmentSubTypes.get(0).getShortName())))
-               .andExpect(jsonPath("$[0].subTypes[0].fullName", is(equipmentSubTypes.get(0).getFullName())));
+               .andExpect(jsonPath("$.size()", is(equipmentSubTypes.size())))
+               .andExpect(jsonPath("$[0].shortName", is(equipmentSubTypes.get(0).getShortName())))
+               .andExpect(jsonPath("$[0].fullName", is(equipmentSubTypes.get(0).getFullName())));
     }
 
     @Test
     public void testGetEquipmentSubTypesWithFilters() throws Exception {
-        EquipmentType eqType = new EquipmentType("s", "f");
+
         List<EquipmentSubType> equipmentSubTypes = Collections.singletonList(new EquipmentSubType(
                 "s",
                 "f",
                 new EquipmentType("s",
                                   "f")));
-        Map<EquipmentType, List<EquipmentSubType>> result = Collections.singletonMap(eqType,
-                                                                                     equipmentSubTypes);
-        when(equipmentTypeService.listTypesWithSubTypes(Arrays.asList(2L, 3L),
-                                                        Collections.singletonList(1L))).thenReturn(result);
+        when(equipmentTypeService.listSubTypes(Arrays.asList(2L, 3L))).thenReturn(equipmentSubTypes);
 
-        mockMvc.perform(get("/equipment-type/subtype?id=1&typeId=2,3"))
+        mockMvc.perform(get("/equipment-type/subtype?typeId=2,3"))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.size()", is(result.size())))
-               .andExpect(jsonPath("$[0].type.shortName", is(eqType.getShortName())))
-               .andExpect(jsonPath("$[0].type.fullName", is(eqType.getFullName())))
-               .andExpect(jsonPath("$[0].subTypes.size()", is(equipmentSubTypes.size())))
-               .andExpect(jsonPath("$[0].subTypes[0].shortName", is(equipmentSubTypes.get(0).getShortName())))
-               .andExpect(jsonPath("$[0].subTypes[0].fullName", is(equipmentSubTypes.get(0).getFullName())));
+               .andExpect(jsonPath("$.size()", is(equipmentSubTypes.size())))
+               .andExpect(jsonPath("$[0].shortName", is(equipmentSubTypes.get(0).getShortName())))
+               .andExpect(jsonPath("$[0].fullName", is(equipmentSubTypes.get(0).getFullName())));
     }
 
     @Test

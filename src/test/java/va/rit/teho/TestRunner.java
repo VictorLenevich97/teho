@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @ComponentScan("va.rit.teho.controller")
 @ComponentScan("va.rit.teho.service")
-@ComponentScan("va.rit.teho.server.GlobalControllerExceptionHandler")
+@ComponentScan("va.rit.teho.server.config.GlobalControllerExceptionHandler")
 public class TestRunner {
 
     public static void main(String[] args) {

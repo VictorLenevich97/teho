@@ -10,14 +10,18 @@ import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairStationType;
+import va.rit.teho.server.config.TehoSessionData;
+import va.rit.teho.service.common.StageService;
+import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.implementation.common.RepairTypeServiceImpl;
+import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
-import va.rit.teho.service.repairformation.RepairCapabilitiesService;
-import va.rit.teho.service.repairformation.RepairFormationTypeService;
-import va.rit.teho.service.repairformation.RepairFormationUnitService;
+import va.rit.teho.service.labordistribution.RestorationTypeService;
+import va.rit.teho.service.repairformation.*;
+import va.rit.teho.service.session.SessionService;
 
 public abstract class ControllerTest {
 
@@ -49,6 +53,30 @@ public abstract class ControllerTest {
 
     @MockBean
     protected EquipmentTypeService equipmentTypeService;
+
+    @MockBean
+    protected EquipmentPerFormationService equipmentPerFormationService;
+
+    @MockBean
+    protected SessionService sessionService;
+
+    @MockBean
+    protected TehoSessionData tehoSessionData;
+
+    @MockBean
+    protected RestorationTypeService restorationTypeService;
+
+    @MockBean
+    protected StageService stageService;
+
+    @MockBean
+    protected EquipmentRFUDistributionService equipmentRFUDistributionService;
+
+    @MockBean
+    protected RepairFormationService repairFormationService;
+
+    @MockBean
+    protected RepairStationService repairStationService;
 
     protected Formation base(Long id, String name) {
         return new Formation(id, "short" + name, "full" + name);

@@ -6,8 +6,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.TestRunner;
 import va.rit.teho.controller.repairformation.RepairFormationTypeController;
+import va.rit.teho.dto.common.IdAndNameDTO;
 import va.rit.teho.dto.repairformation.RepairFormationTypeDTO;
-import va.rit.teho.entity.repairformation.RepairStationType;
+import va.rit.teho.entity.labordistribution.RestorationType;
+import va.rit.teho.entity.repairformation.RepairFormationType;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,41 +26,56 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RepairFormationTypeControllerTest extends ControllerTest {
 
     @Test
-    public void testListRepairStationTypes() throws Exception {
-        RepairStationType repairStationType = new RepairStationType("stationType");
-        List<RepairStationType> repairStationTypes = Collections.singletonList(repairStationType);
-        when(repairFormationTypeService.listTypes()).thenReturn(null);
+    public void testListRepairFormationTypes() throws Exception {
+        List<RepairFormationType> repairFormationTypes = Collections.singletonList(new RepairFormationType(null,
+                                                                                                           "",
+                                                                                                           new RestorationType(
+                                                                                                                   1L,
+                                                                                                                   "",
+                                                                                                                   1),
+                                                                                                           0,
+                                                                                                           0));
+        when(repairFormationTypeService.listTypes()).thenReturn(repairFormationTypes);
 
-        mockMvc.perform(get("/repair-station/type"))
+        mockMvc.perform(get("/formation/repair-formation/type"))
                .andExpect(status().isOk())
-               .andExpect(jsonPath("$.size()", is(repairStationTypes.size())));
+               .andExpect(jsonPath("$.size()", is(repairFormationTypes.size())));
     }
 
     @Test
-    public void testAddRepairStationType() throws Exception {
-        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(null, "name", null, 2, 22);
+    public void testAddRepairFormationType() throws Exception {
+        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(null,
+                                                                                   "name",
+                                                                                   new IdAndNameDTO(2L, ""),
+                                                                                   2,
+                                                                                   22);
 
         when(repairFormationTypeService
                      .addType(repairFormationTypeDTO.getName(),
-                              null,
+                              2L,
                               repairFormationTypeDTO.getWorkingHoursMin(),
                               repairFormationTypeDTO.getWorkingHoursMax())).thenReturn(2L);
 
-        mockMvc.perform(post("/repair-station/type").contentType(MediaType.APPLICATION_JSON)
-                                                    .content(objectMapper.writeValueAsString(repairFormationTypeDTO)))
+        mockMvc.perform(post("/formation/repair-formation/type").contentType(MediaType.APPLICATION_JSON)
+                                                                .content(objectMapper.writeValueAsString(
+                                                                        repairFormationTypeDTO)))
                .andExpect(status().isCreated());
         verify(repairFormationTypeService).addType(repairFormationTypeDTO.getName(),
-                                                   null,
+                                                   2L,
                                                    repairFormationTypeDTO.getWorkingHoursMin(),
                                                    repairFormationTypeDTO.getWorkingHoursMax());
     }
 
     @Test
-    public void testUpdateRepairStationType() throws Exception {
-        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(2L, "name", null, 2, 22);
+    public void testUpdateRepairFormationType() throws Exception {
+        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(2L,
+                                                                                   "name",
+                                                                                   new IdAndNameDTO(3L, ""),
+                                                                                   2,
+                                                                                   22);
 
 
-        mockMvc.perform(put("/repair-station/type/{id}",
+        mockMvc.perform(put("/formation/repair-formation/type/{id}",
                             repairFormationTypeDTO.getId().intValue()).contentType(MediaType.APPLICATION_JSON)
                                                                       .content(objectMapper.writeValueAsString(
                                                                               repairFormationTypeDTO)))

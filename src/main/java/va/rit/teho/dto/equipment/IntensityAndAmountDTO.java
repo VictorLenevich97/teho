@@ -14,7 +14,11 @@ public class IntensityAndAmountDTO {
     public IntensityAndAmountDTO() {
     }
 
-    public List<IntensityPerRepairTypeAndStageDTO> getIntensity() {
+    public void setIntensities(List<IntensityPerRepairTypeAndStageDTO> intensities) {
+        this.intensities = intensities;
+    }
+
+    public List<IntensityPerRepairTypeAndStageDTO> getIntensities() {
         return intensities;
     }
 

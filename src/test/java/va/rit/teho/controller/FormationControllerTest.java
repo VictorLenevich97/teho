@@ -6,7 +6,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import va.rit.teho.TestRunner;
 import va.rit.teho.controller.formation.FormationController;
+import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
 import va.rit.teho.dto.formation.FormationDTO;
+import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentPerFormation;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.exception.FormationNotFoundException;
 
@@ -38,6 +41,7 @@ public class FormationControllerTest extends ControllerTest {
         Long formationId = 1L;
         Formation formation = new Formation(1L, "s", "f");
         formation.setId(formationId);
+        formation.setEquipmentPerFormations(Collections.emptySet());
         when(formationService.get(formationId)).thenReturn(formation);
 
         mockMvc.perform(get("/formation/{id}", formationId))
@@ -78,8 +82,10 @@ public class FormationControllerTest extends ControllerTest {
         Formation formation = new Formation();
         Long formationId = 1L;
         formation.setId(formationId);
+        formation.setShortName("short");
+        formation.setFullName("full");
         FormationDTO base = new FormationDTO(formationId, "short", "full", null, Collections.emptyList());
-        when(formationService.add(base.getShortName(), base.getFullName())).thenReturn(formation);
+        when(formationService.update(formationId, base.getShortName(), base.getFullName())).thenReturn(formation);
 
         mockMvc.perform(
                 put("/formation/{id}", formationId).contentType(MediaType.APPLICATION_JSON)
@@ -88,46 +94,55 @@ public class FormationControllerTest extends ControllerTest {
 
         verify(formationService).update(formationId, base.getShortName(), base.getFullName());
     }
-//
-//    @Test
-//    public void testAddEquipmentToBase() throws Exception {
-//        Long formationId = 1L;
-//        Long equipmentId = 2L;
-//        IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(Collections.singletonList(new IntensityAndAmountDTO.IntensityPerRepairTypeAndStageDTO(
-//                1L,
-//                1L,
-//                1)), 10);
-//
-//        mockMvc
-//                .perform(post("/formation/{formationId}/equipment/{equipmentId}", formationId, equipmentId)
-//                                 .contentType(MediaType.APPLICATION_JSON)
-//                                 .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
-//                .andExpect(status().isAccepted());
-//
-//        verify(baseService).addEquipmentToBase(formationId,
-//                                               equipmentId,
-//                                               intensityAndAmountDTO.getAmount());
-//    }
-//
-//    @Test
-//    public void testUpdateEquipmentToBase() throws Exception {
-//        Long formationId = 1L;
-//        Long equipmentId = 2L;
-//        IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(Collections.singletonList(new IntensityAndAmountDTO.IntensityPerRepairTypeAndStageDTO(
-//                1L,
-//                1L,
-//                1)), 10);
-//
-//        mockMvc
-//                .perform(put("/formation/{formationId}/equipment/{equipmentId}", formationId, equipmentId)
-//                                 .contentType(MediaType.APPLICATION_JSON)
-//                                 .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
-//                .andExpect(status().isAccepted());
-//
-//        verify(baseService).updateEquipmentInBase(formationId,
-//                                                  equipmentId,
-//                                                  intensityAndAmountDTO.getAmount());
-//    }
+
+    @Test
+    public void testAddEquipmentToBase() throws Exception {
+        Long formationId = 1L;
+        Long equipmentId = 2L;
+        IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(Collections.emptyList(), 10);
+
+        when(equipmentPerFormationService.addEquipmentToFormation(formationId,
+                                                                  equipmentId,
+                                                                  Long.valueOf(intensityAndAmountDTO.getAmount()))).thenReturn(
+                new EquipmentPerFormation(new Equipment(equipmentId, "", null),
+                                          new Formation(formationId, "", ""),
+                                          Long.valueOf(intensityAndAmountDTO.getAmount())));
+
+        mockMvc
+                .perform(post("/formation/{formationId}/equipment/{equipmentId}", formationId, equipmentId)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
+                .andExpect(status().isOk());
+
+        verify(equipmentPerFormationService).addEquipmentToFormation(formationId,
+                                                                     equipmentId,
+                                                                     Long.valueOf(intensityAndAmountDTO.getAmount()));
+    }
+
+    @Test
+    public void testUpdateEquipmentInBase() throws Exception {
+        Long formationId = 1L;
+        Long equipmentId = 2L;
+        IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(Collections.singletonList(new IntensityAndAmountDTO.IntensityPerRepairTypeAndStageDTO(
+                1L,
+                1L,
+                1)), 10);
+        when(equipmentPerFormationService.updateEquipmentInFormation(formationId,
+                                                                     equipmentId,
+                                                                     intensityAndAmountDTO.getAmount())).thenReturn(
+                new EquipmentPerFormation(new Equipment(equipmentId, "", null),
+                                          new Formation(formationId, "", ""),
+                                          Long.valueOf(intensityAndAmountDTO.getAmount())));
+        mockMvc
+                .perform(put("/formation/{formationId}/equipment/{equipmentId}", formationId, equipmentId)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
+                .andExpect(status().isAccepted());
+
+        verify(equipmentPerFormationService).updateEquipmentInFormation(formationId,
+                                                                        equipmentId,
+                                                                        intensityAndAmountDTO.getAmount());
+    }
 
 
 }

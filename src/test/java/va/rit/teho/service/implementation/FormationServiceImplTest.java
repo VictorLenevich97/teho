@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import va.rit.teho.entity.formation.Formation;
-import va.rit.teho.exception.FormationNotFoundException;
 import va.rit.teho.exception.EmptyFieldException;
-import va.rit.teho.repository.formation.FormationRepository;
+import va.rit.teho.exception.FormationNotFoundException;
 import va.rit.teho.repository.equipment.EquipmentPerFormationRepository;
 import va.rit.teho.repository.equipment.EquipmentRepository;
+import va.rit.teho.repository.formation.FormationRepository;
 import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.implementation.formation.FormationServiceImpl;
 
@@ -39,7 +39,8 @@ public class FormationServiceImplTest {
         when(formationRepository.getMaxId()).thenReturn(1L);
         when(formationRepository.save(any())).thenReturn(FORMATION);
 
-        Assertions.assertEquals(service.add(FORMATION.getShortName(), FORMATION.getFullName()), FORMATION.getId());
+        Assertions.assertEquals(service.add(FORMATION.getShortName(), FORMATION.getFullName()).getId(),
+                                FORMATION.getId());
 
         verify(formationRepository).save(new Formation(2L, FORMATION.getShortName(), FORMATION.getFullName()));
     }
