@@ -90,6 +90,7 @@ public class EquipmentController {
                         .map(equipmentMapEntry ->
                                      new EquipmentLaborInputPerTypeRowData(
                                              equipmentMapEntry.getKey().getName(),
+                                             equipmentMapEntry.getKey().getEquipmentSubType().getId(),
                                              equipmentMapEntry.getKey().getEquipmentSubType().getShortName(),
                                              equipmentMapEntry
                                                      .getValue()
