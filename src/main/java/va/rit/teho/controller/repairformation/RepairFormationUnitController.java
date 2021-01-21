@@ -278,19 +278,6 @@ public class RepairFormationUnitController {
                                                .stream()
                                                .flatMap(this::getEquipmentStaffNestedColumnsDTO)
                                                .collect(Collectors.toList());
-        //TODO: вернуть старую иерархию столбцов при необходимости
-//        List<NestedColumnsDTO> nestedColumnsTotal =
-//                STAFF_KEYS_AND_TEXT
-//                        .entrySet()
-//                        .stream()
-//                        .map(staffKeyEntry ->
-//                                     new NestedColumnsDTO(staffKeyEntry.getValue(), equipmentTypeListMap
-//                                             .entrySet()
-//                                             .stream()
-//                                             .map(entry -> this.getEquipmentStaffNestedColumnsDTO(entry,
-//                                                                                                  staffKeyEntry.getKey()))
-//                                             .collect(Collectors.toList())))
-//                        .collect(Collectors.toList());
         List<RowData<Map<String, RepairFormationUnitEquipmentStaffDTO>>> rows = repairFormationUnitCombinedData
                 .getRepairFormationUnitList()
                 .stream()
