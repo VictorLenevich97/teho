@@ -8,6 +8,8 @@ import va.rit.teho.TestRunner;
 import va.rit.teho.controller.ControllerTest;
 import va.rit.teho.dto.equipment.EquipmentLaborInputPerTypeRowData;
 import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 
 import java.util.Collections;
 
@@ -21,6 +23,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = EquipmentController.class)
 @ContextConfiguration(classes = TestRunner.class)
 public class EquipmentControllerTest extends ControllerTest {
+
+    private final static Equipment EQUIPMENT =
+            new Equipment(
+                    1L,
+                    "equipment",
+                    new EquipmentSubType("s", "f", new EquipmentType("s", "f")));
 
     @Test
     public void testGetEquipmentList() throws Exception {
@@ -57,6 +65,9 @@ public class EquipmentControllerTest extends ControllerTest {
     public void testAddNewEquipment() throws Exception {
         EquipmentLaborInputPerTypeRowData equipmentLaborInputPerTypeRowData =
                 new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, "", Collections.singletonMap("1", 1));
+        when(equipmentService.add(equipmentLaborInputPerTypeRowData.getName(),
+                                  equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                  Collections.singletonMap(1L, 1))).thenReturn(EQUIPMENT);
         mockMvc.perform(post("/equipment")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(equipmentLaborInputPerTypeRowData)))
@@ -71,6 +82,11 @@ public class EquipmentControllerTest extends ControllerTest {
     public void testUpdateEquipment() throws Exception {
         EquipmentLaborInputPerTypeRowData equipmentLaborInputPerTypeRowData =
                 new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, "", Collections.singletonMap("1", 1));
+
+        when(equipmentService.update(equipmentLaborInputPerTypeRowData.getId(),
+                                     equipmentLaborInputPerTypeRowData.getName(),
+                                     equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                     Collections.singletonMap(1L, 1))).thenReturn(EQUIPMENT);
 
         mockMvc.perform(put("/equipment/{id}", equipmentLaborInputPerTypeRowData.getId())
                                 .contentType(MediaType.APPLICATION_JSON)

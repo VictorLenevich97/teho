@@ -65,11 +65,19 @@ public class EquipmentController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить ВВСТ")
     @Transactional
-    public ResponseEntity<Object> addNewEquipment(@ApiParam(value = "Данные о ВВСТ и трудоемкости ремонта", required = true)
-                                                  @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
+    public ResponseEntity<EquipmentLaborInputPerTypeRowData> addNewEquipment(@ApiParam(value = "Данные о ВВСТ и трудоемкости ремонта", required = true)
+                                                                             @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
         Map<Long, Integer> repairTypeIdLaborInputMap = mapStringKeysToLong(equipmentData.getData());
-        equipmentService.add(equipmentData.getName(), equipmentData.getSubTypeId(), repairTypeIdLaborInputMap);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        Equipment added = equipmentService.add(equipmentData.getName(),
+                                               equipmentData.getSubTypeId(),
+                                               repairTypeIdLaborInputMap);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new EquipmentLaborInputPerTypeRowData(added.getId(),
+                                                            added.getName(),
+                                                            added.getEquipmentSubType().getId(),
+                                                            added.getEquipmentSubType().getFullName(),
+                                                            equipmentData.getData()));
     }
 
     private Map<Long, Integer> mapStringKeysToLong(Map<String, Integer> equipmentData) {
@@ -83,13 +91,19 @@ public class EquipmentController {
 
     @PutMapping(path = "/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить ВВСТ")
-    public ResponseEntity<Object> updateEquipment(@ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                  @ApiParam(value = "Данные о ВВСТ", required = true) @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
-        equipmentService.update(equipmentId,
-                                equipmentData.getName(),
-                                equipmentData.getSubTypeId(),
-                                mapStringKeysToLong(equipmentData.getData()));
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    public ResponseEntity<EquipmentLaborInputPerTypeRowData> updateEquipment(@ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
+                                                                             @ApiParam(value = "Данные о ВВСТ", required = true) @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
+        Equipment updatedEquipment = equipmentService.update(equipmentId,
+                                                             equipmentData.getName(),
+                                                             equipmentData.getSubTypeId(),
+                                                             mapStringKeysToLong(equipmentData.getData()));
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(new EquipmentLaborInputPerTypeRowData(updatedEquipment.getId(),
+                                                            updatedEquipment.getName(),
+                                                            updatedEquipment.getEquipmentSubType().getId(),
+                                                            updatedEquipment.getEquipmentSubType().getFullName(),
+                                                            equipmentData.getData()));
     }
 
     @GetMapping("/labor-input")
