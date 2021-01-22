@@ -17,9 +17,15 @@ public class CalculationServiceImpl implements CalculationService {
             Integer lowerBound,
             Double avgDailyFailure,
             int standardLaborInput) {
-        return avgDailyFailure == null ? 0.0 : Math.abs(avgDailyFailure *
-                                                                (Math.sin((Math.PI * (upperBound == null ? 1000 : upperBound)) / (2 * standardLaborInput)) -
-                                                                        Math.sin((Math.PI * (lowerBound == null ? 0 : lowerBound)) / (2 * standardLaborInput))));
+        if (avgDailyFailure == null) {
+            return 0.0;
+        } else {
+            int upper = upperBound == null ? 1000 : upperBound;
+            int lower = lowerBound == null ? 0 : lowerBound;
+            return Math.abs(avgDailyFailure *
+                                    (Math.sin((Math.PI * upper) / (2 * standardLaborInput)) -
+                                            Math.sin((Math.PI * lower) / (2 * standardLaborInput))));
+        }
     }
 
     @Override

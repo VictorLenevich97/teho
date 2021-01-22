@@ -15,6 +15,7 @@ public class Stage implements Serializable {
     private Integer stageNum;
 
     public Stage() {
+        //Для инициализации
     }
 
     public Long getId() {

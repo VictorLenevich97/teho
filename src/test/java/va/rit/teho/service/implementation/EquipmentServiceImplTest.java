@@ -79,10 +79,12 @@ public class EquipmentServiceImplTest {
         when(equipmentRepository.findById(addedEquipment.getId())).thenReturn(Optional.of(addedEquipment));
         when(equipmentRepository.save(equipmentToAdd)).thenReturn(addedEquipment);
 
-        equipmentService.update(addedEquipment.getId(),
-                                equipmentToAdd.getName(),
-                                equipmentSubTypeId,
-                                Collections.emptyMap());
+        Equipment update = equipmentService.update(addedEquipment.getId(),
+                                                   equipmentToAdd.getName(),
+                                                   equipmentSubTypeId,
+                                                   Collections.emptyMap());
+        Assertions.assertEquals(update.getId(), addedEquipment.getId());
+        Assertions.assertEquals(update.getName(), equipmentToAdd.getName());
     }
 
     @Test

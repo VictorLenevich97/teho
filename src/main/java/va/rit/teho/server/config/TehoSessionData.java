@@ -18,7 +18,7 @@ public class TehoSessionData implements Serializable {
     private static final String SESSION_ID_FIELD = "session-id";
 
     @Resource
-    private HttpSession httpSession;
+    private transient HttpSession httpSession;
 
     public void saveSessionId(UUID sessionUUID) {
         httpSession.setAttribute(SESSION_ID_FIELD, sessionUUID);

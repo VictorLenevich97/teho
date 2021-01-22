@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 @Api(tags = "ВВСТ в Формированиях")
 public class EquipmentPerFormationController {
 
+    private static final String REPORT_NAME = "Среднесуточный выход ВВСТ в ремонт";
+
     private final StageService stageService;
     private final RepairTypeService repairTypeService;
     private final EquipmentPerFormationService equipmentPerFormationService;
@@ -161,7 +163,7 @@ public class EquipmentPerFormationController {
                                                                                               EquipmentPerFormationFailureIntensity::getIntensityPercentage,
                                                                                               "%"));
 
-        return ReportResponseEntity.ok("Среднесуточный выход ВВСТ в ремонт", bytes);
+        return ReportResponseEntity.ok(REPORT_NAME, bytes);
     }
 
     private <T> TableDataDTO<Map<String, Map<String, String>>> getEquipmentRowData(Long formationId,
@@ -262,7 +264,7 @@ public class EquipmentPerFormationController {
                                                                                               EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
                                                                                               "ед."));
 
-        return ReportResponseEntity.ok("Среднесуточный выход ВВСТ в ремонт", bytes);
+        return ReportResponseEntity.ok(REPORT_NAME, bytes);
     }
 
     @GetMapping("/formation/{formationId}/equipment/daily-failure/report")
@@ -288,7 +290,7 @@ public class EquipmentPerFormationController {
                                                                                               EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
                                                                                               "ед."));
 
-        return ReportResponseEntity.ok("Среднесуточный выход ВВСТ в ремонт", bytes);
+        return ReportResponseEntity.ok(REPORT_NAME, bytes);
     }
 
     @GetMapping("/formation/{formationId}/equipment/daily-failure")
@@ -364,10 +366,10 @@ public class EquipmentPerFormationController {
 
                 data.computeIfAbsent(s.getId().toString(), (e) -> new HashMap<>())
                     .put(rt.getId().toString(),
-                         formatter
-                                 .apply(equipmentPerFormationFailureIntensity == null ?
-                                                defaultValue : getter.apply(equipmentPerFormationFailureIntensity) == null ?
-                                         defaultValue : getter.apply(equipmentPerFormationFailureIntensity)));
+                         formatter.apply(Optional
+                                                 .ofNullable(equipmentPerFormationFailureIntensity)
+                                                 .map(getter)
+                                                 .orElse(defaultValue)));
             }
         }
         return new EquipmentFailureIntensityRowData<>(epb.getEquipment().getId(),

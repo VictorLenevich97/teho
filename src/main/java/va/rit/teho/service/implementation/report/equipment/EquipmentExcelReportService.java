@@ -23,11 +23,9 @@ import java.util.stream.Collectors;
 public class EquipmentExcelReportService
         extends AbstractExcelReportService<Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>>, Equipment> {
 
-    private final RepairTypeService repairTypeService;
     private final List<RepairType> repairTypes;
 
     public EquipmentExcelReportService(RepairTypeService repairTypeService) {
-        this.repairTypeService = repairTypeService;
         this.repairTypes = repairTypeService.list(true);
     }
 
@@ -64,22 +62,22 @@ public class EquipmentExcelReportService
     @Override
     protected List<ReportCell> populatedRowCells(Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> data,
                                                  Equipment equipment) {
-        List<RepairType> repairTypes = repairTypeService.list(true);
 
         List<ReportCell> reportCells =
                 new ArrayList<>(Arrays.asList(
                         new ReportCell(equipment.getName(), ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
                         new ReportCell(equipment.getEquipmentSubType().getShortName())));
 
-        List<ReportCell> repairTypeCells = repairTypes
-                .stream()
-                .map(rt -> new ReportCell(equipment.getLaborInputPerTypes()
-                                                   .stream()
-                                                   .filter(elipt -> elipt.getRepairType().equals(rt))
-                                                   .findFirst()
-                                                   .map(EquipmentLaborInputPerType::getAmount)
-                                                   .orElse(0)))
-                .collect(Collectors.toList());
+        List<ReportCell> repairTypeCells =
+                repairTypes
+                        .stream()
+                        .map(rt -> new ReportCell(equipment.getLaborInputPerTypes()
+                                                           .stream()
+                                                           .filter(elipt -> elipt.getRepairType().equals(rt))
+                                                           .findFirst()
+                                                           .map(EquipmentLaborInputPerType::getAmount)
+                                                           .orElse(0)))
+                        .collect(Collectors.toList());
         reportCells.addAll(repairTypeCells);
         return reportCells;
     }

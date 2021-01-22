@@ -98,9 +98,8 @@ public class FormationServiceImpl implements FormationService {
     private void populateTree(Tree.Node<Formation> node, Set<Formation> formations) {
         for (Formation formation : formations) {
             Tree.Node<Formation> childrenFormationNode = node.addChildren(formation);
-            Set<Formation> childFormations = formation.getChildFormations();
-            if (!childFormations.isEmpty()) {
-                populateTree(childrenFormationNode, childFormations);
+            if (!formation.getChildFormations().isEmpty()) {
+                populateTree(childrenFormationNode, formation.getChildFormations());
             }
         }
     }

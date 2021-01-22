@@ -61,9 +61,9 @@ public class Tree<T> {
         }
 
         public Node<T> addChildren(T data) {
-            Node<T> children = new Node<>(data, this);
-            this.children.add(children);
-            return children;
+            Node<T> child = new Node<>(data, this);
+            this.children.add(child);
+            return child;
         }
 
         public T getData() {

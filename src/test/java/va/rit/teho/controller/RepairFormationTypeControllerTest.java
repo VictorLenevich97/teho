@@ -78,12 +78,26 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
 
     @Test
     public void testUpdateRepairFormationType() throws Exception {
-        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(2L,
-                                                                                   "name",
-                                                                                   new IdAndNameDTO(3L, ""),
-                                                                                   2,
-                                                                                   22);
-
+        RepairFormationType repairFormationType = new RepairFormationType(2L,
+                                                                          "name",
+                                                                          new RestorationType(1L, "", 1),
+                                                                          2,
+                                                                          22);
+        RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(repairFormationType.getId(),
+                                                                                   repairFormationType.getName(),
+                                                                                   new IdAndNameDTO(repairFormationType
+                                                                                                            .getRestorationType()
+                                                                                                            .getId(),
+                                                                                                    repairFormationType
+                                                                                                            .getRestorationType()
+                                                                                                            .getName()),
+                                                                                   repairFormationType.getWorkingHoursMin(),
+                                                                                   repairFormationType.getWorkingHoursMax());
+        when(repairFormationTypeService.updateType(repairFormationTypeDTO.getId(),
+                                                   repairFormationTypeDTO.getName(),
+                                                   repairFormationTypeDTO.getWorkingHoursMin(),
+                                                   repairFormationTypeDTO.getWorkingHoursMax())).thenReturn(
+                repairFormationType);
 
         mockMvc.perform(put("/formation/repair-formation/type/{id}",
                             repairFormationTypeDTO.getId().intValue()).contentType(MediaType.APPLICATION_JSON)

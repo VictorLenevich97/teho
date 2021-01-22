@@ -9,7 +9,6 @@ import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
-
 import va.rit.teho.repository.equipment.EquipmentSubTypeRepository;
 import va.rit.teho.repository.equipment.EquipmentTypeRepository;
 import va.rit.teho.service.equipment.EquipmentTypeService;
@@ -176,6 +175,9 @@ public class EquipmentTypeServiceImplTest {
                                            equipmentType.getId(),
                                            equipmentSubType.getShortName(),
                                            equipmentSubType.getFullName());
+
+        verify(equipmentTypeRepository).findById(equipmentType.getId());
+        verify(equipmentSubTypeRepository).findById(addedEquipmentSubType.getId());
     }
 
     @Test
