@@ -98,6 +98,14 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
     }
 
     @Override
+    public Map<RepairFormationUnit, List<EquipmentRFUDistribution>> listDistributedEquipment(UUID sessionId) {
+        return equipmentRFUDistributionRepository
+                .findWithCombinedRestorationTypeData(sessionId)
+                .stream()
+                .collect(Collectors.groupingBy(EquipmentRFUDistribution::getRepairFormationUnit));
+    }
+
+    @Override
     public List<EquipmentRFUDistribution> listRFUDistributedEquipment(Long repairFormationUnitId, UUID sessionId) {
         return equipmentRFUDistributionRepository.findByRepairFormationUnitIdAndTehoSessionId(repairFormationUnitId,
                                                                                               sessionId);
