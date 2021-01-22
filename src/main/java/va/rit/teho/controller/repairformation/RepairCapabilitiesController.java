@@ -121,8 +121,10 @@ public class RepairCapabilitiesController {
                         repairCapabilityPerEquipment.getId(),
                         repairCapabilityPerEquipment.getCapability());
         return ResponseEntity.accepted().body(
-                new RepairCapabilityPerEquipment(repairFormationUnitRepairCapability.getEquipment().getId(),
-                                                 repairFormationUnitRepairCapability.getEquipment().getName(),
+                new RepairCapabilityPerEquipment(repairFormationUnitRepairCapability
+                                                         .getEquipmentPerRepairFormationUnitPK()
+                                                         .getEquipmentId(),
+                                                 repairCapabilityPerEquipment.getName(),
                                                  repairFormationUnitRepairCapability.getCapability()));
     }
 
