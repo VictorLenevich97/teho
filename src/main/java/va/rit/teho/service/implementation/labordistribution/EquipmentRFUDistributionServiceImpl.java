@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistributionService {
 
     private final FormationService formationService;
@@ -100,11 +101,6 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
     public List<EquipmentRFUDistribution> listRFUDistributedEquipment(Long repairFormationUnitId, UUID sessionId) {
         return equipmentRFUDistributionRepository.findByRepairFormationUnitIdAndTehoSessionId(repairFormationUnitId,
                                                                                               sessionId);
-    }
-
-    @Override
-    public void deleteDistribution(Long formationId, Long equipmentId) {
-        equipmentRFUDistributionRepository.deleteByFormationIdAndEquipmentId(formationId, equipmentId);
     }
 
     @Override

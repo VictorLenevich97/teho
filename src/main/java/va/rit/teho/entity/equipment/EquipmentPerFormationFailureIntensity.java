@@ -1,8 +1,8 @@
 package va.rit.teho.entity.equipment;
 
-import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
+import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.session.TehoSession;
 
 import javax.persistence.*;
@@ -13,7 +13,7 @@ import java.util.UUID;
 public class EquipmentPerFormationFailureIntensity implements Serializable {
 
     @EmbeddedId
-    EquipmentPerFormationFailureIntensityPK equipmentPerFormationWithStageAndRepairType;
+    private EquipmentPerFormationFailureIntensityPK id;
 
     @ManyToOne
     @MapsId("formation_id")
@@ -28,26 +28,26 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
     @ManyToOne
     @MapsId("stage_id")
     @JoinColumn(name = "stage_id")
-    Stage stage;
+    private Stage stage;
 
     @ManyToOne
     @MapsId("repair_type_id")
     @JoinColumn(name = "repair_type_id")
-    RepairType repairType;
+    private RepairType repairType;
 
     @ManyToOne
     @MapsId("session_id")
     @JoinColumn(name = "session_id")
-    TehoSession tehoSession;
+    private TehoSession tehoSession;
 
     int intensityPercentage;
 
     Double avgDailyFailure;
 
-    public EquipmentPerFormationFailureIntensity(EquipmentPerFormationFailureIntensityPK equipmentPerFormationWithStageAndRepairType,
+    public EquipmentPerFormationFailureIntensity(EquipmentPerFormationFailureIntensityPK id,
                                                  int intensity,
                                                  Double avgDailyFailure) {
-        this.equipmentPerFormationWithStageAndRepairType = equipmentPerFormationWithStageAndRepairType;
+        this.id = id;
         this.intensityPercentage = intensity;
         this.avgDailyFailure = avgDailyFailure;
     }
@@ -56,7 +56,7 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
     }
 
     public EquipmentPerFormationFailureIntensityPK getEquipmentPerFormationWithRepairTypeId() {
-        return equipmentPerFormationWithStageAndRepairType;
+        return id;
     }
 
     public Formation getFormation() {
@@ -87,6 +87,12 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
         return avgDailyFailure;
     }
 
+    public EquipmentPerFormationFailureIntensity copy() {
+        return new EquipmentPerFormationFailureIntensity(getEquipmentPerFormationWithRepairTypeId(),
+                                                         intensityPercentage,
+                                                         avgDailyFailure);
+    }
+
     public EquipmentPerFormationFailureIntensity copy(UUID newSessionId) {
         return new EquipmentPerFormationFailureIntensity(getEquipmentPerFormationWithRepairTypeId().copy(newSessionId),
                                                          intensityPercentage,
@@ -96,7 +102,7 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
     @Override
     public String toString() {
         return "EquipmentPerBaseFailureIntensity{" +
-                "equipmentPerBaseWithStageAndRepairType=" + equipmentPerFormationWithStageAndRepairType +
+                "id=" + id +
                 ", base=" + formation +
                 ", equipment=" + equipment +
                 ", stage=" + stage +
@@ -107,7 +113,8 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
                 '}';
     }
 
-    public void setAvgDailyFailure(Double avgDailyFailure) {
+    public EquipmentPerFormationFailureIntensity setAvgDailyFailure(Double avgDailyFailure) {
         this.avgDailyFailure = avgDailyFailure;
+        return this;
     }
 }

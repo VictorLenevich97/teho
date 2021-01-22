@@ -6,11 +6,6 @@ import java.util.Objects;
 @Entity
 public class WorkhoursDistributionInterval {
 
-    @ManyToOne
-    @MapsId("restoration_type_id")
-    @JoinColumn(name = "restoration_type_id")
-    RestorationType restorationType;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +13,11 @@ public class WorkhoursDistributionInterval {
     private Integer lowerBound;
 
     private Integer upperBound;
+
+    @ManyToOne
+    @MapsId("restoration_type_id")
+    @JoinColumn(name = "restoration_type_id")
+    private RestorationType restorationType;
 
     public WorkhoursDistributionInterval(Integer lowerBound,
                                          Integer upperBound,

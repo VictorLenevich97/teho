@@ -23,4 +23,5 @@ public interface EquipmentPerFormationRepository extends CrudRepository<Equipmen
             "WHERE epb.formation.id = :formationId AND (" +
             "coalesce(:equipmentIds, null) IS NULL OR epb.equipment.id IN (:equipmentIds))")
     List<EquipmentPerFormation> findAllByFormationId(Long formationId, List<Long> equipmentIds);
+
 }

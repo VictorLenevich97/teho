@@ -13,10 +13,6 @@ import java.util.UUID;
 public interface EquipmentPerFormationFailureIntensityRepository
         extends CrudRepository<EquipmentPerFormationFailureIntensity, EquipmentPerFormationFailureIntensityPK> {
 
-    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndAmount(epbfi.formation.id, epbfi.equipment.id, epbfi.stage.id, epbfi.repairType.id, epbfi.intensityPercentage, epb.amount) FROM " +
-            "EquipmentPerFormationFailureIntensity epbfi INNER JOIN EquipmentPerFormation epb ON epbfi.formation.id = epb.formation.id AND epbfi.equipment.id = epb.equipment.id WHERE epbfi.tehoSession.id = :sessionId AND epbfi.formation.id = :formationId")
-    List<EquipmentPerFormationFailureIntensityAndAmount> findAllWithIntensityAndAmount(UUID sessionId, Long formationId);
-
     @Query("SELECT new va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput(epbfi.formation.id, epbfi.equipment.id, epbfi.stage.id, elipt.repairType.id, epbfi.intensityPercentage, epbfi.avgDailyFailure, elipt.amount) FROM " +
             "EquipmentPerFormationFailureIntensity epbfi INNER JOIN EquipmentLaborInputPerType elipt ON elipt.repairType.id = epbfi.repairType.id AND epbfi.equipment.id = elipt.equipment.id WHERE epbfi.tehoSession.id = :sessionId AND elipt.repairType.id = :repairTypeId AND epbfi.avgDailyFailure IS NOT NULL")
     List<EquipmentPerFormationFailureIntensityAndLaborInput> findAllWithLaborInput(UUID sessionId, Long repairTypeId);
@@ -41,8 +37,6 @@ public interface EquipmentPerFormationFailureIntensityRepository
                                               Long equipmentId,
                                               Long stageId,
                                               Long repairTypeId);
-
-    void deleteByFormationIdAndEquipmentId(Long formationId, Long equipmentId);
 
     @Query("SELECT new va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount(epffi.equipment, epffi.repairType, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
             "WHERE epffi.tehoSession.id = :sessionId AND epffi.formation.id = :formationId " +

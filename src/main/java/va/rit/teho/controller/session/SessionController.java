@@ -51,6 +51,7 @@ public class SessionController {
     @DeleteMapping("/{sessionId}")
     @ApiOperation(value = "Удалить сессию и все связанные с ней данные")
     public ResponseEntity<Object> deleteSession(@ApiParam(value = "Ключ сессии", required = true) @PathVariable UUID sessionId) {
+        sessionService.get(sessionId);
         sessionService.delete(sessionId);
         return ResponseEntity.noContent().build();
     }

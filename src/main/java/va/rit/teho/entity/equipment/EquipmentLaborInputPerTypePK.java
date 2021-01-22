@@ -7,8 +7,10 @@ import java.util.Objects;
 
 @Embeddable
 public class EquipmentLaborInputPerTypePK implements Serializable {
+
     @Column(name = "equipment_id")
     private Long equipmentId;
+
     @Column(name = "repair_type_id")
     private Long repairTypeId;
 

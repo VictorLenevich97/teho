@@ -96,6 +96,14 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     @Override
+    public void deleteType(Long id) {
+        if (!getTypeWithSubTypes(id).getSecond().isEmpty()) {
+            throw new IncorrectParamException("У типа ВВСТ существуют подтипы, удаление невозможно!");
+        }
+        equipmentTypeRepository.deleteById(id);
+    }
+
+    @Override
     public Long addSubType(Long typeId, String shortName, String fullName) {
         if (!equipmentTypeRepository.findById(typeId).isPresent()) {
             throw new IncorrectParamException("typeId", typeId);
@@ -127,5 +135,10 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
         equipmentSubType.setShortName(shortName);
         equipmentSubType.setFullName(fullName);
         equipmentSubTypeRepository.save(equipmentSubType);
+    }
+
+    @Override
+    public void deleteSubType(Long id) {
+        equipmentSubTypeRepository.deleteById(id);
     }
 }

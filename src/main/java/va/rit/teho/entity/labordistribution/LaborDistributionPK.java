@@ -1,23 +1,31 @@
 package va.rit.teho.entity.labordistribution;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import va.rit.teho.entity.equipment.EquipmentPerFormation;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 @Embeddable
 public class LaborDistributionPK implements Serializable {
-    @Column(name = "formation_id")
-    private Long formationId;
-    @Column(name = "equipment_id")
-    private Long equipmentId;
+
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "equipment_id"),
+            @JoinColumn(name = "formation_id")
+    })
+    private EquipmentPerFormation equipmentPerFormation;
+
     @Column(name = "workhours_distribution_interval_id")
     private Long workhoursDistributionIntervalId;
+
     @Column(name = "stage_id")
     private Long stageId;
+
     @Column(name = "repair_type_id")
     private Long repairTypeId;
+
     @Column(name = "session_id")
     private UUID sessionId;
 
@@ -31,8 +39,7 @@ public class LaborDistributionPK implements Serializable {
                                Long stageId,
                                Long repairTypeId,
                                UUID sessionId) {
-        this.formationId = formationId;
-        this.equipmentId = equipmentId;
+        this.equipmentPerFormation = new EquipmentPerFormation(formationId, equipmentId);
         this.workhoursDistributionIntervalId = workhoursDistributionIntervalId;
         this.stageId = stageId;
         this.repairTypeId = repairTypeId;
@@ -43,15 +50,20 @@ public class LaborDistributionPK implements Serializable {
     }
 
     public Long getFormationId() {
-        return formationId;
+        return equipmentPerFormation.getId().getFormationId();
     }
 
     public Long getEquipmentId() {
-        return equipmentId;
+        return equipmentPerFormation.getId().getEquipmentId();
     }
 
     public LaborDistributionPK copy(UUID sessionId) {
-        return new LaborDistributionPK(formationId, equipmentId, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId);
+        return new LaborDistributionPK(getFormationId(),
+                                       getEquipmentId(),
+                                       workhoursDistributionIntervalId,
+                                       stageId,
+                                       repairTypeId,
+                                       sessionId);
     }
 
     public Long getWorkhoursDistributionIntervalId() {
@@ -71,8 +83,7 @@ public class LaborDistributionPK implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LaborDistributionPK that = (LaborDistributionPK) o;
-        return Objects.equals(formationId, that.formationId) &&
-                Objects.equals(equipmentId, that.equipmentId) &&
+        return Objects.equals(equipmentPerFormation, that.equipmentPerFormation) &&
                 Objects.equals(workhoursDistributionIntervalId, that.workhoursDistributionIntervalId) &&
                 Objects.equals(stageId, that.stageId) &&
                 Objects.equals(repairTypeId, that.repairTypeId) &&
@@ -81,6 +92,6 @@ public class LaborDistributionPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(formationId, equipmentId, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId);
+        return Objects.hash(equipmentPerFormation, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId);
     }
 }

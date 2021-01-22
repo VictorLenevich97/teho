@@ -105,12 +105,12 @@ public class EquipmentRepositoryTest {
 
     @Test
     public void testGetEquipmentGroupedByTypeFilterByTypeId() {
-        Equipment equipment = new Equipment(0L,
+        Equipment equipment = new Equipment(1L,
                                             "equipment",
                                             new EquipmentSubType("short",
                                                                  "full",
                                                                  new EquipmentType("shortType", "fullType")));
-        Equipment equipment2 = new Equipment(0L,
+        Equipment equipment2 = new Equipment(2L,
                                              "equipment2",
                                              new EquipmentSubType("short2",
                                                                   "full2",

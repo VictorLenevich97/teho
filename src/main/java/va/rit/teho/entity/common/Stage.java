@@ -1,20 +1,35 @@
 package va.rit.teho.entity.common;
 
+import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
+import va.rit.teho.entity.labordistribution.LaborDistribution;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "stage")
 public class Stage implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private Integer stageNum;
 
+    @OneToMany(mappedBy = "stage", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<EquipmentPerFormationFailureIntensity> failureIntensitySet;
+
+    @OneToMany(mappedBy = "stage", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<LaborDistribution> laborDistributionSet;
+
     public Stage() {
+    }
+
+    public Stage(Long id, Integer stageNum) {
+        this.id = id;
+        this.stageNum = stageNum;
     }
 
     public Long getId() {

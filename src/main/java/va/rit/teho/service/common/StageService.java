@@ -8,4 +8,10 @@ public interface StageService {
 
     List<Stage> list();
 
+    Stage get(Long id);
+
+    Stage add(int stageNum);
+
+    void delete(Long id);
+
 }

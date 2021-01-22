@@ -21,10 +21,14 @@ public interface EquipmentTypeService {
 
     void updateType(Long id, String shortName, String fullName);
 
+    void deleteType(Long id);
+
     Long addSubType(Long typeId, String shortName, String fullName);
 
     EquipmentSubType getSubType(Long subTypeId);
 
     void updateSubType(Long id, Long typeId, String shortName, String fullName);
+
+    void deleteSubType(Long id);
 
 }

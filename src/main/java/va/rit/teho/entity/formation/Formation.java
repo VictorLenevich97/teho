@@ -1,6 +1,8 @@
 package va.rit.teho.entity.formation;
 
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
+import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
+import va.rit.teho.entity.labordistribution.LaborDistribution;
 import va.rit.teho.entity.repairformation.RepairFormation;
 
 import javax.persistence.*;
@@ -25,10 +27,10 @@ public class Formation implements Serializable {
     @JoinColumn(name = "parent_formation_id")
     private Formation parentFormation;
 
-    @OneToMany(mappedBy = "equipment")
+    @OneToMany(mappedBy = "formation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<EquipmentPerFormation> equipmentPerFormations;
 
-    @OneToMany(mappedBy = "formation")
+    @OneToMany(mappedBy = "formation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<RepairFormation> repairFormations;
 
     public Set<RepairFormation> getRepairFormations() {

@@ -16,4 +16,6 @@ public interface RepairFormationService {
 
     RepairFormation update(Long id, String name, Long typeId, Long formationId);
 
+    void delete(Long id);
+
 }

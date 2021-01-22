@@ -3,8 +3,8 @@ package va.rit.teho.controller;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.common.StageDTO;
 import va.rit.teho.service.common.StageService;
 
@@ -24,5 +24,20 @@ public class StageController {
     @GetMapping
     public ResponseEntity<List<StageDTO>> listStages() {
         return ResponseEntity.ok(stageService.list().stream().map(StageDTO::from).collect(Collectors.toList()));
+    }
+
+    @PostMapping
+    public ResponseEntity<StageDTO> addStage(@RequestBody StageDTO stageDTO) {
+        return ResponseEntity.accepted().body(StageDTO.from(stageService.add(stageDTO.getNum())));
+    }
+
+    @DeleteMapping("/{stageId}")
+    @Transactional
+    public ResponseEntity<Object> deleteStage(@PathVariable Long stageId) {
+        //Проверка на существование
+        stageService.get(stageId);
+
+        stageService.delete(stageId);
+        return ResponseEntity.noContent().build();
     }
 }

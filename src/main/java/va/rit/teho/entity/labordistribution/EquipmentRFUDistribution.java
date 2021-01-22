@@ -13,35 +13,36 @@ import java.util.UUID;
 public class EquipmentRFUDistribution {
 
     @EmbeddedId
-    EquipmentRFUDistributionPK equipmentRFUDistributionPK;
+    private EquipmentRFUDistributionPK equipmentRFUDistributionPK;
 
     @ManyToOne
     @MapsId("formation_id")
     @JoinColumn(name = "formation_id")
-    Formation formation;
+    private Formation formation;
 
     @ManyToOne
     @MapsId("equipment_id")
     @JoinColumn(name = "equipment_id")
-    Equipment equipment;
+    private Equipment equipment;
 
     @ManyToOne
     @MapsId("repair_formation_unit_id")
     @JoinColumn(name = "repair_formation_unit_id")
-    RepairFormationUnit repairFormationUnit;
+    private RepairFormationUnit repairFormationUnit;
 
     @ManyToOne
     @MapsId("session_id")
     @JoinColumn(name = "session_id")
-    TehoSession tehoSession;
+    private TehoSession tehoSession;
 
     @ManyToOne
     @MapsId("interval_id")
     @JoinColumn(name = "interval_id")
-    WorkhoursDistributionInterval workhoursDistributionInterval;
+    private WorkhoursDistributionInterval workhoursDistributionInterval;
 
-    Double repairing;
-    Double unable;
+    private Double repairing;
+
+    private Double unable;
 
     public EquipmentRFUDistribution() {
     }

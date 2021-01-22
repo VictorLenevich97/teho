@@ -51,11 +51,19 @@ public class RepairFormationTypeController {
     @PutMapping(path = "/{typeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление типа Ремонтных Формирований")
     public ResponseEntity<RepairFormationTypeDTO> updateRepairFormationType(@ApiParam(value = "Ключ типа Ремонтного Формирования", required = true) @PathVariable Long typeId,
-                                                                            @ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
+                                                            @ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
         RepairFormationType repairFormationType = repairFormationTypeService.updateType(typeId,
                                                                                         repairFormationTypeDTO.getName(),
                                                                                         repairFormationTypeDTO.getWorkingHoursMin(),
                                                                                         repairFormationTypeDTO.getWorkingHoursMax());
         return ResponseEntity.accepted().body(RepairFormationTypeDTO.from(repairFormationType));
     }
+
+    @DeleteMapping(path = "/{typeId}")
+    @ApiOperation(value = "Удаление типа Ремонтных Формирований")
+    public ResponseEntity<Object> deleteRepairFormationType(@ApiParam(value = "Ключ типа Ремонтного Формирования", required = true) @PathVariable Long typeId) {
+        repairFormationTypeService.deleteType(typeId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

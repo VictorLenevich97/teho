@@ -12,5 +12,7 @@ public interface RepairFormationTypeService {
 
     RepairFormationType updateType(Long id, String name, int workingHoursMin, int workingHoursMax);
 
+    void deleteType(Long id);
+
     List<RepairFormationType> listTypes();
 }

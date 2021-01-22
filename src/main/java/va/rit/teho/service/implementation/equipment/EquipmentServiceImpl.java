@@ -115,6 +115,11 @@ public class EquipmentServiceImpl implements EquipmentService {
         return equipment;
     }
 
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        equipmentRepository.deleteById(id);
+    }
 
     @Override
     public Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,

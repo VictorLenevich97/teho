@@ -1,5 +1,7 @@
 package va.rit.teho.entity.equipment;
 
+import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
@@ -16,12 +18,15 @@ public class EquipmentSubType implements Serializable {
 
     private String fullName;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "equipment_type_id", referencedColumnName = "id")
     private EquipmentType equipmentType;
 
-    @OneToMany(mappedBy = "equipmentSubType")
+    @OneToMany(mappedBy = "equipmentSubType", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Equipment> equipmentSet;
+
+    @OneToMany(mappedBy = "equipmentSubType", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffSet;
 
     public EquipmentSubType() {
     }

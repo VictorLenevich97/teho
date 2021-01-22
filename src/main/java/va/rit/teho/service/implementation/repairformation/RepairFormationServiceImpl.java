@@ -62,4 +62,9 @@ public class RepairFormationServiceImpl implements RepairFormationService {
                                                       repairFormationTypeService.get(typeId));
         return repairFormationRepository.save(updated);
     }
+
+    @Override
+    public void delete(Long id) {
+        repairFormationRepository.deleteById(id);
+    }
 }

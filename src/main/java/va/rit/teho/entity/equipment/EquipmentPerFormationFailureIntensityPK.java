@@ -1,7 +1,6 @@
 package va.rit.teho.entity.equipment;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -9,34 +8,38 @@ import java.util.UUID;
 @Embeddable
 public class EquipmentPerFormationFailureIntensityPK implements Serializable {
 
-    @Column(name = "formation_id")
-    Long formationId;
-    @Column(name = "equipment_id")
-    Long equipmentId;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "equipment_id"),
+            @JoinColumn(name = "formation_id")
+    })
+    private EquipmentPerFormation equipmentPerFormation;
+
     @Column(name = "stage_id")
-    Long stageId;
+    private Long stageId;
+
     @Column(name = "repair_type_id")
-    Long repairTypeId;
+    private Long repairTypeId;
+
     @Column(name = "session_id")
-    UUID sessionId;
+    private UUID sessionId;
 
     public EquipmentPerFormationFailureIntensityPK(Long formationId,
                                                    Long equipmentId,
                                                    Long stageId,
                                                    Long repairTypeId,
                                                    UUID sessionId) {
-        this.formationId = formationId;
-        this.equipmentId = equipmentId;
+        this.equipmentPerFormation = new EquipmentPerFormation(formationId, equipmentId);
         this.stageId = stageId;
         this.repairTypeId = repairTypeId;
         this.sessionId = sessionId;
     }
 
-    public EquipmentPerFormationFailureIntensityPK(EquipmentPerFormationFailureIntensityAndAmount epbfi, UUID sessionId) {
-        this(epbfi.getFormationId(), epbfi.getEquipmentId(), epbfi.getStageId(), epbfi.getRepairTypeId(), sessionId);
+    public EquipmentPerFormationFailureIntensityPK() {
     }
 
-    public EquipmentPerFormationFailureIntensityPK() {
+    public EquipmentPerFormation getEquipmentPerFormation() {
+        return equipmentPerFormation;
     }
 
     @Override
@@ -44,8 +47,7 @@ public class EquipmentPerFormationFailureIntensityPK implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EquipmentPerFormationFailureIntensityPK that = (EquipmentPerFormationFailureIntensityPK) o;
-        return Objects.equals(formationId, that.formationId) &&
-                Objects.equals(equipmentId, that.equipmentId) &&
+        return Objects.equals(equipmentPerFormation, that.equipmentPerFormation) &&
                 Objects.equals(stageId, that.stageId) &&
                 Objects.equals(repairTypeId, that.repairTypeId) &&
                 Objects.equals(sessionId, that.sessionId);
@@ -53,15 +55,15 @@ public class EquipmentPerFormationFailureIntensityPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(formationId, equipmentId, stageId, repairTypeId, sessionId);
+        return Objects.hash(equipmentPerFormation, stageId, repairTypeId, sessionId);
     }
 
     public Long getFormationId() {
-        return formationId;
+        return equipmentPerFormation.getId().getFormationId();
     }
 
     public Long getEquipmentId() {
-        return equipmentId;
+        return equipmentPerFormation.getId().getEquipmentId();
     }
 
     public Long getStageId() {
@@ -77,7 +79,11 @@ public class EquipmentPerFormationFailureIntensityPK implements Serializable {
     }
 
     public EquipmentPerFormationFailureIntensityPK copy(UUID newSessionId) {
-        return new EquipmentPerFormationFailureIntensityPK(formationId, equipmentId, stageId, repairTypeId, newSessionId);
+        return new EquipmentPerFormationFailureIntensityPK(getFormationId(),
+                                                           getEquipmentId(),
+                                                           stageId,
+                                                           repairTypeId,
+                                                           newSessionId);
     }
 }
 

@@ -43,4 +43,6 @@ public interface RepairFormationUnitService {
 
     void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId);
 
+    void delete(Long id);
+
 }

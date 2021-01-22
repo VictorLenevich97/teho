@@ -1,29 +1,45 @@
 package va.rit.teho.entity.equipment;
 
 import va.rit.teho.entity.formation.Formation;
+import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
+import va.rit.teho.entity.labordistribution.LaborDistribution;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class EquipmentPerFormation {
 
     @EmbeddedId
-    EquipmentPerFormationPK id;
+    private EquipmentPerFormationPK id;
 
     @ManyToOne
     @MapsId("formation_id")
     @JoinColumn(name = "formation_id")
-    Formation formation;
+    private Formation formation;
 
     @ManyToOne
     @MapsId("equipment_id")
     @JoinColumn(name = "equipment_id")
-    Equipment equipment;
+    private Equipment equipment;
 
-    int amount;
+    @OneToMany(mappedBy = "id.equipmentPerFormation", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensities;
+
+    @OneToMany(mappedBy = "laborDistributionId.equipmentPerFormation", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<LaborDistribution> laborDistributions;
+
+    @OneToMany(mappedBy = "equipmentRFUDistributionPK.equipmentPerFormation", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<EquipmentRFUDistribution> equipmentRFUDistributionSet;
+
+    private int amount;
 
     public EquipmentPerFormation() {
+    }
+
+    public EquipmentPerFormation(Long formationId, Long equipmentId) {
+        this.id = new EquipmentPerFormationPK(formationId, equipmentId);
     }
 
     public EquipmentPerFormation(Long formationId, Long equipmentId, Long amount) {

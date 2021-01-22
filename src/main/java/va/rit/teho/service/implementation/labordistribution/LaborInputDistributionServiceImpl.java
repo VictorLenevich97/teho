@@ -172,9 +172,4 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         return laborDistributionRepository.selectLaborDistributionAggregatedData(formationId, sessionId);
     }
 
-    @Override
-    public void deleteDistributionData(Long formationId, Long equipmentId) {
-        laborDistributionRepository.deleteByFormationIdAndEquipmentId(formationId, equipmentId);
-    }
-
 }

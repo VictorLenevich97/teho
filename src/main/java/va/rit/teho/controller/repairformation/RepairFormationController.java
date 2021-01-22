@@ -12,6 +12,7 @@ import va.rit.teho.dto.repairformation.RepairFormationDTO;
 import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.service.repairformation.RepairFormationService;
 
+import javax.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,5 +94,19 @@ public class RepairFormationController {
                                                                         repairFormationDTO.getType().getId(),
                                                                         formationId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(RepairFormationDTO.from(repairFormation, true));
+    }
+
+    @DeleteMapping(path = "/formation/{formationId}/repair-formation/{repairFormationId}")
+    @Transactional
+    public ResponseEntity<Object> deleteRepairFormation(
+            @ApiParam(value = "Ключ формирования", required = true) @PathVariable Long formationId,
+            @ApiParam(value = "Ключ обновляемого ремонтного формирования", required = true) @PathVariable Long repairFormationId) {
+        if (!repairFormationService.get(repairFormationId).getRepairFormationUnitSet().isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Удаление невозможно: у ремонтного формирования (id = " + repairFormationId + ") существуют РВО.");
+        }
+        repairFormationService.delete(repairFormationId);
+        return ResponseEntity.noContent().build();
     }
 }

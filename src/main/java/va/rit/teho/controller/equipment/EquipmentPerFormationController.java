@@ -22,8 +22,6 @@ import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.common.StageService;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
-import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
-import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
@@ -40,8 +38,6 @@ public class EquipmentPerFormationController {
     private final StageService stageService;
     private final RepairTypeService repairTypeService;
     private final EquipmentPerFormationService equipmentPerFormationService;
-    private final LaborInputDistributionService laborInputDistributionService;
-    private final EquipmentRFUDistributionService equipmentRFUDistributionService;
     private final ReportService<EquipmentFailureIntensityCombinedData> reportService;
 
     @Resource
@@ -50,14 +46,10 @@ public class EquipmentPerFormationController {
     public EquipmentPerFormationController(StageService stageService,
                                            RepairTypeService repairTypeService,
                                            EquipmentPerFormationService equipmentPerFormationService,
-                                           LaborInputDistributionService laborInputDistributionService,
-                                           EquipmentRFUDistributionService equipmentRFUDistributionService,
                                            ReportService<EquipmentFailureIntensityCombinedData> reportService) {
         this.stageService = stageService;
         this.repairTypeService = repairTypeService;
         this.equipmentPerFormationService = equipmentPerFormationService;
-        this.laborInputDistributionService = laborInputDistributionService;
-        this.equipmentRFUDistributionService = equipmentRFUDistributionService;
         this.reportService = reportService;
     }
 
@@ -319,10 +311,12 @@ public class EquipmentPerFormationController {
     @PutMapping("/formation/{formationId}/equipment/{equipmentId}/daily-failure")
     @ResponseBody
     @ApiOperation(value = "Обновить данные о выходе ВВСТ в ремонт в ед.")
-    public ResponseEntity<Object> updateEquipmentPerFormationFailureData(@ApiParam(value = "Ключ формирования", required = true, example = "1") @PathVariable Long formationId,
-                                                                         @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                                         @ApiParam(value = "Данные о выходе ВВСТ в ремонт ({'ключ этапа': {'ключ типа ремонта': 'значение'}})", required = true, example = "{'1': {'1': '1.2', '2': '4.3'}}")
-                                                                         @RequestBody Map<Long, Map<Long, Double>> data) {
+    public ResponseEntity<Object> updateEquipmentPerFormationFailureData(
+            @ApiParam(value = "Ключ формирования", required = true, example = "1") @PathVariable Long formationId,
+            @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
+            @ApiParam(value = "Данные о выходе ВВСТ в ремонт ({'ключ этапа': {'ключ типа ремонта': 'значение'}})",
+                    required = true,
+                    example = "{'1': {'1': '1.2', '2': '4.3'}}") @RequestBody Map<Long, Map<Long, Double>> data) {
         data.forEach((stageId, repairTypeIntensityMap) ->
                              repairTypeIntensityMap
                                      .forEach((repairTypeId, dailyFailure) ->
@@ -384,8 +378,6 @@ public class EquipmentPerFormationController {
     public ResponseEntity<Object> deleteEquipmentFromFormation(@PathVariable Long formationId,
                                                                @PathVariable Long equipmentId) {
         equipmentPerFormationService.deleteEquipmentFromFormation(formationId, equipmentId);
-        laborInputDistributionService.deleteDistributionData(formationId, equipmentId);
-        equipmentRFUDistributionService.deleteDistribution(formationId, equipmentId);
         return ResponseEntity.noContent().build();
     }
 

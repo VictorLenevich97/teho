@@ -9,9 +9,10 @@ import java.util.Objects;
 public class EquipmentPerFormationPK implements Serializable {
 
     @Column(name = "formation_id")
-    Long formationId;
+    private Long formationId;
+
     @Column(name = "equipment_id")
-    Long equipmentId;
+    private Long equipmentId;
 
     public EquipmentPerFormationPK() {
     }
