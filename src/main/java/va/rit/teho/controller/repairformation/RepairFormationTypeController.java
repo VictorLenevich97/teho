@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.repairformation.RepairFormationTypeDTO;
+import va.rit.teho.entity.repairformation.RepairFormationType;
 import va.rit.teho.service.repairformation.RepairFormationTypeService;
 
 import java.util.List;
@@ -37,22 +38,24 @@ public class RepairFormationTypeController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавление типа Ремонтных Формирований")
-    public ResponseEntity<Object> addRepairFormationType(@ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
-        repairFormationTypeService.addType(repairFormationTypeDTO.getName(),
-                                           repairFormationTypeDTO.getRestorationType().getId(),
-                                           repairFormationTypeDTO.getWorkingHoursMin(),
-                                           repairFormationTypeDTO.getWorkingHoursMax());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<RepairFormationTypeDTO> addRepairFormationType(@ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
+        RepairFormationType repairFormationType = repairFormationTypeService.addType(repairFormationTypeDTO.getName(),
+                                                                                     repairFormationTypeDTO
+                                                                                             .getRestorationType()
+                                                                                             .getId(),
+                                                                                     repairFormationTypeDTO.getWorkingHoursMin(),
+                                                                                     repairFormationTypeDTO.getWorkingHoursMax());
+        return ResponseEntity.status(HttpStatus.CREATED).body(RepairFormationTypeDTO.from(repairFormationType));
     }
 
     @PutMapping(path = "/{typeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление типа Ремонтных Формирований")
-    public ResponseEntity<Object> updateRepairFormationType(@ApiParam(value = "Ключ типа Ремонтного Формирования", required = true) @PathVariable Long typeId,
-                                                          @ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
-        repairFormationTypeService.updateType(typeId,
-                                              repairFormationTypeDTO.getName(),
-                                              repairFormationTypeDTO.getWorkingHoursMin(),
-                                              repairFormationTypeDTO.getWorkingHoursMax());
-        return ResponseEntity.accepted().build();
+    public ResponseEntity<RepairFormationTypeDTO> updateRepairFormationType(@ApiParam(value = "Ключ типа Ремонтного Формирования", required = true) @PathVariable Long typeId,
+                                                                            @ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
+        RepairFormationType repairFormationType = repairFormationTypeService.updateType(typeId,
+                                                                                        repairFormationTypeDTO.getName(),
+                                                                                        repairFormationTypeDTO.getWorkingHoursMin(),
+                                                                                        repairFormationTypeDTO.getWorkingHoursMax());
+        return ResponseEntity.accepted().body(RepairFormationTypeDTO.from(repairFormationType));
     }
 }

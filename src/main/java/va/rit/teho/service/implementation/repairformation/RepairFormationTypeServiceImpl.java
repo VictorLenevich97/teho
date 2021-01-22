@@ -32,7 +32,7 @@ public class RepairFormationTypeServiceImpl implements RepairFormationTypeServic
     }
 
     @Override
-    public Long addType(String name, Long restorationTypeId, int workingHoursMin, int workingHoursMax) {
+    public RepairFormationType addType(String name, Long restorationTypeId, int workingHoursMin, int workingHoursMax) {
         repairFormationTypeRepository.findByName(name).ifPresent(rst -> {
             throw new AlreadyExistsException("Тип РВО", "название", name);
         });
@@ -49,11 +49,11 @@ public class RepairFormationTypeServiceImpl implements RepairFormationTypeServic
                                                                           workingHoursMin,
                                                                           workingHoursMax);
 
-        return repairFormationTypeRepository.save(repairFormationType).getId();
+        return repairFormationTypeRepository.save(repairFormationType);
     }
 
     @Override
-    public void updateType(Long id, String name, int workingHoursMin, int workingHoursMax) {
+    public RepairFormationType updateType(Long id, String name, int workingHoursMin, int workingHoursMax) {
         RepairFormationType repairFormationType =
                 repairFormationTypeRepository
                         .findById(id)
@@ -64,7 +64,7 @@ public class RepairFormationTypeServiceImpl implements RepairFormationTypeServic
         repairFormationType.setName(name);
         repairFormationType.setWorkingHoursMax(workingHoursMax);
         repairFormationType.setWorkingHoursMin(workingHoursMin);
-        repairFormationTypeRepository.save(repairFormationType);
+        return repairFormationTypeRepository.save(repairFormationType);
     }
 
     @Override

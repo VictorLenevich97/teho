@@ -8,9 +8,9 @@ public interface RepairFormationTypeService {
 
     RepairFormationType get(Long id);
 
-    Long addType(String name, Long restorationTypeId, int workingHoursMin, int workingHoursMax);
+    RepairFormationType addType(String name, Long restorationTypeId, int workingHoursMin, int workingHoursMax);
 
-    void updateType(Long id, String name, int workingHoursMin, int workingHoursMax);
+    RepairFormationType updateType(Long id, String name, int workingHoursMin, int workingHoursMax);
 
     List<RepairFormationType> listTypes();
 }
