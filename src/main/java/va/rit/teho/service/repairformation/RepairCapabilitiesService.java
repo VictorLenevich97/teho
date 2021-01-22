@@ -2,6 +2,7 @@ package va.rit.teho.service.repairformation;
 
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
+import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public interface RepairCapabilitiesService {
 
     void updateRepairCapabilities(UUID sessionId, Long repairFormationUnitId, Long repairTypeId, Map<Long, Double> capabilitiesMap);
 
-    void updateRepairCapabilities(UUID sessionId, Long repairFormationUnitId, Long repairTypeId, Long equipmentId, Double capability);
+    RepairFormationUnitRepairCapability updateRepairCapabilities(UUID sessionId, Long repairFormationUnitId, Long repairTypeId, Long equipmentId, Double capability);
 
     Map<Equipment, Double> getCalculatedRepairCapabilities(
             Long repairFormationUnitId,

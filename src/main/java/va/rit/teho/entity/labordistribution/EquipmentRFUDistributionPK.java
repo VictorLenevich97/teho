@@ -4,6 +4,7 @@ import va.rit.teho.entity.equipment.EquipmentPerFormation;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 @Embeddable
@@ -66,5 +67,23 @@ public class EquipmentRFUDistributionPK implements Serializable {
                                               repairFormationUnitId,
                                               intervalId,
                                               newSessionId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(equipmentPerFormation, repairFormationUnitId, intervalId, sessionId);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquipmentRFUDistributionPK that = (EquipmentRFUDistributionPK) o;
+        return Objects.equals(equipmentPerFormation, that.equipmentPerFormation) && Objects.equals(
+                repairFormationUnitId,
+                that.repairFormationUnitId) && Objects.equals(intervalId,
+                                                              that.intervalId) && Objects.equals(
+                sessionId,
+                that.sessionId);
     }
 }

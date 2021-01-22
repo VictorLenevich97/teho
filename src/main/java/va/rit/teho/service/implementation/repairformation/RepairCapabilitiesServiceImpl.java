@@ -135,12 +135,12 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     }
 
     @Override
-    public void updateRepairCapabilities(UUID sessionId,
+    public RepairFormationUnitRepairCapability updateRepairCapabilities(UUID sessionId,
                                          Long repairFormationUnitId,
                                          Long repairTypeId,
                                          Long equipmentId,
                                          Double capability) {
-        calculatedRepairCapabilitiesPerDayRepository.save(
+        return calculatedRepairCapabilitiesPerDayRepository.save(
                 new RepairFormationUnitRepairCapability(
                         new RepairFormationUnitRepairCapabilityPK(repairFormationUnitId,
                                                                   equipmentId,

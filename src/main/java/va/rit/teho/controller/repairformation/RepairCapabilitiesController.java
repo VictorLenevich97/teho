@@ -20,6 +20,7 @@ import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
+import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityCombinedData;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentService;
@@ -112,12 +113,17 @@ public class RepairCapabilitiesController {
     public ResponseEntity<Object> updateRepairCapabilities(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
                                                            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
                                                            @ApiParam(value = "Данные по произв. возможностям", required = true) @RequestBody RepairCapabilityPerEquipment repairCapabilityPerEquipment) {
-        repairCapabilitiesService.updateRepairCapabilities(tehoSession.getSessionId(),
-                                                           repairFormationUnitId,
-                                                           repairTypeId,
-                                                           repairCapabilityPerEquipment.getId(),
-                                                           repairCapabilityPerEquipment.getCapability());
-        return ResponseEntity.accepted().build();
+        RepairFormationUnitRepairCapability repairFormationUnitRepairCapability =
+                repairCapabilitiesService.updateRepairCapabilities(
+                        tehoSession.getSessionId(),
+                        repairFormationUnitId,
+                        repairTypeId,
+                        repairCapabilityPerEquipment.getId(),
+                        repairCapabilityPerEquipment.getCapability());
+        return ResponseEntity.accepted().body(
+                new RepairCapabilityPerEquipment(repairFormationUnitRepairCapability.getEquipment().getId(),
+                                                 repairFormationUnitRepairCapability.getEquipment().getName(),
+                                                 repairFormationUnitRepairCapability.getCapability()));
     }
 
     private NestedColumnsDTO getRepairCapabilitiesNestedColumnsDTO(Map.Entry<EquipmentType, Map<EquipmentSubType, List<Equipment>>> equipmentTypeEntry) {

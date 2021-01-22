@@ -8,6 +8,7 @@ import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.repository.equipment.EquipmentLaborInputPerTypeRepository;
 import va.rit.teho.repository.equipment.EquipmentRepository;
+import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.implementation.equipment.EquipmentServiceImpl;
@@ -32,9 +33,11 @@ public class EquipmentServiceImplTest {
     private final EquipmentLaborInputPerTypeRepository equipmentLaborInputPerTypeRepository = Mockito.mock(
             EquipmentLaborInputPerTypeRepository.class);
     private final EquipmentTypeService equipmentTypeService = Mockito.mock(EquipmentTypeService.class);
+    private final RepairTypeService repairTypeService = Mockito.mock(RepairTypeService.class);
 
     private final EquipmentService equipmentService =
             new EquipmentServiceImpl(equipmentTypeService,
+                                     repairTypeService,
                                      equipmentRepository,
                                      equipmentLaborInputPerTypeRepository);
 

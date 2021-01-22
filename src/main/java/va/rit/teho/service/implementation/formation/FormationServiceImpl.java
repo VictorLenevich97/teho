@@ -52,12 +52,16 @@ public class FormationServiceImpl implements FormationService {
     @Override
     public Formation add(String shortName, String fullName, Long parentFormationId) {
         checkPreRequisites(shortName, fullName);
-        Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
-        if (!optionalFormation.isPresent()) {
-            throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
+        Formation parentFormation = null;
+        if (parentFormationId != null) {
+            Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
+            if (!optionalFormation.isPresent()) {
+                throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
+            }
+            parentFormation = optionalFormation.get();
         }
         long newId = formationRepository.getMaxId() + 1;
-        return formationRepository.save(new Formation(newId, shortName, fullName, optionalFormation.get()));
+        return formationRepository.save(new Formation(newId, shortName, fullName, parentFormation));
     }
 
     @Override
@@ -71,14 +75,18 @@ public class FormationServiceImpl implements FormationService {
     @Override
     public Formation update(Long formationId, String shortName, String fullName, Long parentFormationId) {
         Formation formation = getFormationOrThrow(formationId);
-        Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
-        if (!optionalFormation.isPresent()) {
-            throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
+        Formation parentFormation = null;
+        if (parentFormationId != null) {
+            Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
+            if (!optionalFormation.isPresent()) {
+                throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
+            }
+            parentFormation = optionalFormation.get();
         }
 
         formation.setFullName(fullName);
         formation.setShortName(shortName);
-        formation.setParentFormation(optionalFormation.get());
+        formation.setParentFormation(parentFormation);
         return formationRepository.save(formation);
     }
 

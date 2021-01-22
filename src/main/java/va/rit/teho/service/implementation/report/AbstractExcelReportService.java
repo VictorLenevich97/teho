@@ -72,6 +72,8 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         c.setBorderLeft(BorderStyle.THIN);
         c.setBorderRight(BorderStyle.THIN);
         c.setBorderBottom(BorderStyle.THIN);
+        c.setWrapText(true);
+        c.setShrinkToFit(true);
         return c;
     }
 

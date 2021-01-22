@@ -13,6 +13,7 @@ import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.EquipmentNotFoundException;
 import va.rit.teho.repository.equipment.EquipmentLaborInputPerTypeRepository;
 import va.rit.teho.repository.equipment.EquipmentRepository;
+import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 
@@ -29,14 +30,17 @@ public class EquipmentServiceImpl implements EquipmentService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentServiceImpl.class);
 
     private final EquipmentTypeService equipmentTypeService;
+    private final RepairTypeService repairTypeService;
 
     private final EquipmentRepository equipmentRepository;
     private final EquipmentLaborInputPerTypeRepository equipmentLaborInputPerTypeRepository;
 
     public EquipmentServiceImpl(EquipmentTypeService equipmentTypeService,
+                                RepairTypeService repairTypeService,
                                 EquipmentRepository equipmentRepository,
                                 EquipmentLaborInputPerTypeRepository equipmentLaborInputPerTypeRepository) {
         this.equipmentTypeService = equipmentTypeService;
+        this.repairTypeService = repairTypeService;
         this.equipmentRepository = equipmentRepository;
         this.equipmentLaborInputPerTypeRepository = equipmentLaborInputPerTypeRepository;
     }
@@ -47,12 +51,21 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType() {
+        //TODO: LEFT OUTER JOIN и дополнить
+        List<Equipment> equipmentList = list();
+        List<RepairType> repairTypes = repairTypeService.list(true);
         List<EquipmentLaborInputPerType> laborInputPerTypeList =
                 (List<EquipmentLaborInputPerType>) equipmentLaborInputPerTypeRepository.findAll();
-        Map<Equipment, Map<RepairType, Integer>> result = new HashMap<>();
+        Map<Equipment, Map<RepairType, Integer>> grouped = new HashMap<>();
         for (EquipmentLaborInputPerType equipmentLaborInputPerType : laborInputPerTypeList) {
-            result.computeIfAbsent(equipmentLaborInputPerType.getEquipment(), e -> new HashMap<>())
-                  .put(equipmentLaborInputPerType.getRepairType(), equipmentLaborInputPerType.getAmount());
+            grouped.computeIfAbsent(equipmentLaborInputPerType.getEquipment(), e -> new HashMap<>())
+                   .put(equipmentLaborInputPerType.getRepairType(), equipmentLaborInputPerType.getAmount());
+        }
+        Map<RepairType, Integer> defaultLaborInputData =
+                repairTypes.stream().collect(Collectors.groupingBy(rt -> rt, Collectors.summingInt(rt -> 0)));
+        Map<Equipment, Map<RepairType, Integer>> result = new HashMap<>();
+        for (Equipment equipment : equipmentList) {
+            result.put(equipment, grouped.getOrDefault(equipment, defaultLaborInputData));
         }
         return result;
     }

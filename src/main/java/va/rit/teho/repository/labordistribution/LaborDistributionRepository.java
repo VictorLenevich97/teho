@@ -30,7 +30,7 @@ public interface LaborDistributionRepository
             "ld.avgLaborInput, " +
             "epbfi.avgDailyFailure) FROM LaborDistribution ld " +
             "INNER JOIN EquipmentLaborInputPerType ipt ON ld.equipment.id = ipt.equipment.id " +
-            "INNER JOIN EquipmentPerFormationFailureIntensity epbfi on (ld.equipment.id = epbfi.id.equipmentPerFormation.equipment.id and ld.formation.id = epbfi.id.equipmentPerFormation.formation.id and ld.tehoSession.id = epbfi.tehoSession.id and ld.stage.id = epbfi.stage.id and ipt.repairType.id = epbfi.repairType.id) " +
+            "INNER JOIN EquipmentPerFormationFailureIntensity epbfi on (ld.equipment.id = epbfi.equipment.id and ld.formation.id = epbfi.formation.id and ld.tehoSession.id = epbfi.tehoSession.id and ld.stage.id = epbfi.stage.id and ipt.repairType.id = epbfi.repairType.id) " +
             "WHERE ipt.repairType.id = :repairTypeId AND ld.tehoSession.id = :sessionId AND" +
             "(coalesce(:equipmentTypeIds, null) is null or ld.equipment.equipmentSubType.equipmentType.id IN (:equipmentTypeIds)) " +
             "AND ld.stage.id = :stageId AND ld.repairType.id = :repairTypeId")
