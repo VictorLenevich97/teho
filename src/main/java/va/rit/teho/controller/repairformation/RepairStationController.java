@@ -41,10 +41,19 @@ public class RepairStationController {
         return ResponseEntity.ok(new IdAndNameDTO(rst.getId(), rst.getName()));
     }
 
-    @PutMapping(path = "/type")
+    @PutMapping(path = "/type/{typeId}")
     @ResponseBody
-    public ResponseEntity<IdAndNameDTO> updateRepairStationType(@RequestBody IdAndNameDTO idAndNameDTO) {
-        RepairStationType rst = repairStationService.updateType(idAndNameDTO.getId(), idAndNameDTO.getName());
-        return ResponseEntity.ok(new IdAndNameDTO(rst.getId(), rst.getName()));
+    public ResponseEntity<IdAndNameDTO> updateRepairStationType(
+            @PathVariable Long typeId,
+            @RequestBody IdAndNameDTO idAndNameDTO) {
+        RepairStationType rst = repairStationService.updateType(typeId, idAndNameDTO.getName());
+        return ResponseEntity.accepted().body(new IdAndNameDTO(rst.getId(), rst.getName()));
+    }
+
+    @DeleteMapping(path = "/type/{typeId}")
+    public ResponseEntity<Object> deleteRepairStationType(
+            @PathVariable Long typeId) {
+        repairStationService.deleteType(typeId);
+        return ResponseEntity.noContent().build();
     }
 }

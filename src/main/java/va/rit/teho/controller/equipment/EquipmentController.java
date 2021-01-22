@@ -106,6 +106,19 @@ public class EquipmentController {
                                                             equipmentData.getData()));
     }
 
+    @DeleteMapping(path = "/{equipmentId}")
+    @ApiOperation(value = "Удалить ВВСТ")
+    @Transactional
+    public ResponseEntity<Object> deleteEquipment(
+            @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId) {
+        //Проверка на существование
+        equipmentService.get(equipmentId);
+
+        equipmentService.delete(equipmentId);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/labor-input")
     @ApiOperation(value = "Получить список ВВСТ с нормативной трудоемкостью (в табличном виде)")
     public ResponseEntity<TableDataDTO<Map<String, Integer>>> listEquipmentWithLaborInputData() {

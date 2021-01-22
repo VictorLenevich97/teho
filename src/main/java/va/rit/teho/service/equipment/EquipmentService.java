@@ -22,10 +22,10 @@ public interface EquipmentService {
 
     Equipment update(Long id, String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap);
 
+    void delete(Long id);
 
     Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
                                                                                   List<Long> subTypeIds,
                                                                                   List<Long> typeIds);
-
 
 }

@@ -13,6 +13,14 @@ public class EquipmentStaffPerSubType {
     private final Integer available;
     private final List<RepairCapabilityPerEquipment> equipment;
 
+    public EquipmentStaffPerSubType() {
+        this.subTypeId = null;
+        this.name = null;
+        this.total = 0;
+        this.available = 0;
+        this.equipment = null;
+    }
+
     public EquipmentStaffPerSubType(Long subTypeId, String name, Integer total, Integer available) {
         this.subTypeId = subTypeId;
         this.name = name;

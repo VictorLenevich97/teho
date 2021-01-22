@@ -1,18 +1,20 @@
 package va.rit.teho.entity.labordistribution;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import va.rit.teho.entity.equipment.EquipmentPerFormation;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
 @Embeddable
 public class EquipmentRFUDistributionPK implements Serializable {
 
-    @Column(name = "formation_id")
-    private Long formationId;
-
-    @Column(name = "equipment_id")
-    private Long equipmentId;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "equipment_id"),
+            @JoinColumn(name = "formation_id")
+    })
+    private EquipmentPerFormation equipmentPerFormation;
 
     @Column(name = "repair_formation_unit_id")
     private Long repairFormationUnitId;
@@ -32,8 +34,7 @@ public class EquipmentRFUDistributionPK implements Serializable {
                                       Long repairFormationUnitId,
                                       Long intervalId,
                                       UUID sessionId) {
-        this.formationId = formationId;
-        this.equipmentId = equipmentId;
+        this.equipmentPerFormation = new EquipmentPerFormation(formationId, equipmentId);
         this.repairFormationUnitId = repairFormationUnitId;
         this.intervalId = intervalId;
         this.sessionId = sessionId;
@@ -44,11 +45,11 @@ public class EquipmentRFUDistributionPK implements Serializable {
     }
 
     public Long getFormationId() {
-        return formationId;
+        return equipmentPerFormation.getId().getFormationId();
     }
 
     public Long getEquipmentId() {
-        return equipmentId;
+        return equipmentPerFormation.getId().getEquipmentId();
     }
 
     public Long getRepairFormationUnitId() {
@@ -60,6 +61,10 @@ public class EquipmentRFUDistributionPK implements Serializable {
     }
 
     public EquipmentRFUDistributionPK copy(UUID newSessionId) {
-        return new EquipmentRFUDistributionPK(formationId, equipmentId, repairFormationUnitId, intervalId, newSessionId);
+        return new EquipmentRFUDistributionPK(getFormationId(),
+                                              getEquipmentId(),
+                                              repairFormationUnitId,
+                                              intervalId,
+                                              newSessionId);
     }
 }

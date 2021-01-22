@@ -4,7 +4,6 @@ import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborDistributionAggregatedData;
-import va.rit.teho.entity.labordistribution.RestorationType;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 
 import java.util.List;
@@ -36,7 +35,5 @@ public interface LaborInputDistributionService {
     List<WorkhoursDistributionInterval> listDistributionIntervals();
 
     List<LaborDistributionAggregatedData> listAggregatedDataForSessionAndFormation(Long formationId, UUID sessionId);
-
-    void deleteDistributionData(Long formationId, Long equipmentId);
 
 }

@@ -97,7 +97,14 @@ public class EquipmentTypeController {
     public ResponseEntity<Object> updateEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
                                                       @ApiParam(value = "Данные о типе ВВСТ", required = true) @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
         equipmentTypeService.updateType(typeId, equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.accepted().build();
+    }
+
+    @DeleteMapping(path = "/{typeId}")
+    @ApiOperation(value = "Удалить тип ВВСТ.")
+    public ResponseEntity<Object> deleteEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId) {
+        equipmentTypeService.deleteType(typeId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "/{typeId}/subtype", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -118,5 +125,13 @@ public class EquipmentTypeController {
                                            equipmentSubTypeDTO.getShortName(),
                                            equipmentSubTypeDTO.getFullName());
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+    @DeleteMapping(path = "/{typeId}/subtype/{subTypeId}")
+    @ApiOperation(value = "Удалить подтип ВВСТ.")
+    public ResponseEntity<Object> deleteEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
+                                                         @ApiParam(value = "Ключ подтипа ВВСТ", required = true) @PathVariable Long subTypeId) {
+        equipmentTypeService.deleteSubType(subTypeId);
+        return ResponseEntity.noContent().build();
     }
 }

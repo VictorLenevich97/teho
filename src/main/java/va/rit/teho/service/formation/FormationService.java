@@ -20,4 +20,6 @@ public interface FormationService {
     List<Formation> list();
 
     List<Tree<Formation>> listHierarchy();
+
+    void delete(Long formationId);
 }

@@ -1,7 +1,8 @@
 package va.rit.teho.entity.equipment;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.transaction.annotation.Transactional;
+import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
+import va.rit.teho.entity.labordistribution.LaborDistribution;
+import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,13 +19,18 @@ public class Equipment implements Serializable {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "equipment_sub_type_id", referencedColumnName = "id")
     private EquipmentSubType equipmentSubType;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "equipment", fetch=FetchType.EAGER)
+    @OneToMany(mappedBy = "equipment", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<EquipmentLaborInputPerType> laborInputPerTypes;
+
+    @OneToMany(mappedBy = "equipment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<EquipmentPerFormation> equipmentPerFormations;
+
+    @OneToMany(mappedBy = "equipment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<RepairFormationUnitRepairCapability> repairCapabilities;
 
     public Equipment() {
     }

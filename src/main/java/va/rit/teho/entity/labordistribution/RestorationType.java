@@ -7,6 +7,7 @@ import java.util.Set;
 @Entity
 @Table(name = "restoration_type")
 public class RestorationType {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

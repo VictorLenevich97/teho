@@ -10,7 +10,6 @@ import java.util.Optional;
 @Repository
 public interface RepairStationTypeRepository extends CrudRepository<RepairStationType, Long> {
 
-
     @Query("SELECT COALESCE(max(type.id), 0) FROM RepairStationType type")
     Long getMaxId();
 

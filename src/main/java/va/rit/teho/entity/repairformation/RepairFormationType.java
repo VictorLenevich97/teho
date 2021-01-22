@@ -2,10 +2,8 @@ package va.rit.teho.entity.repairformation;
 
 import va.rit.teho.entity.labordistribution.RestorationType;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class RepairFormationType {
@@ -18,6 +16,9 @@ public class RepairFormationType {
     @ManyToOne
     @JoinColumn(name = "restoration_type_id", nullable = false)
     private RestorationType restorationType;
+
+    @OneToMany(mappedBy = "repairFormationType", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<RepairFormation> repairFormations;
 
     private int workingHoursMin;
 

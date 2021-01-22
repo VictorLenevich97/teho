@@ -8,17 +8,17 @@ import javax.persistence.*;
 public class EquipmentLaborInputPerType {
 
     @EmbeddedId
-    EquipmentLaborInputPerTypePK equipmentLaborInputPerTypeAmount;
+    private EquipmentLaborInputPerTypePK equipmentLaborInputPerTypeAmount;
 
     @ManyToOne
     @MapsId("equipment_id")
     @JoinColumn(name = "equipment_id")
-    Equipment equipment;
+    private Equipment equipment;
 
     @ManyToOne
     @MapsId("repair_type_id")
     @JoinColumn(name = "repair_type_id")
-    RepairType repairType;
+    private RepairType repairType;
 
     int amount;
 

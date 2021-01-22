@@ -17,4 +17,6 @@ public interface FormationRepository extends CrudRepository<Formation, Long> {
     Optional<Formation> findByFullName(String fullName);
 
     List<Formation> findFormationByParentFormationIsNull();
+
+    List<Formation> findByParentFormationId(Long parentFormationId);
 }

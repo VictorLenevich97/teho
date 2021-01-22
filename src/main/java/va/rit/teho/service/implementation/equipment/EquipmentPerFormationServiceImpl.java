@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
+@Transactional
 public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationService {
 
     private final CalculationService calculationService;
@@ -140,22 +141,18 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                                                  double coefficient) {
         List<EquipmentPerFormationFailureIntensity> updatedWithAvgDailyFailureData =
                 equipmentPerFormationFailureIntensityRepository
-                        .findAllWithIntensityAndAmount(sessionId, formationId)
+                        .findAllByTehoSessionIdAndFormationId(sessionId, formationId, null)
                         .stream()
                         .map(equipmentPerFormationFailureIntensity -> {
                             double avgDailyFailure =
                                     calculationService.calculateAvgDailyFailure(
-                                            equipmentPerFormationFailureIntensity.getEquipmentAmount(),
-                                            equipmentPerFormationFailureIntensity.getFailureIntensity(),
+                                            equipmentPerFormationFailureIntensity
+                                                    .getEquipmentPerFormationWithRepairTypeId()
+                                                    .getEquipmentPerFormation()
+                                                    .getAmount(),
+                                            equipmentPerFormationFailureIntensity.getIntensityPercentage(),
                                             coefficient);
-                            return new EquipmentPerFormationFailureIntensity(
-                                    new EquipmentPerFormationFailureIntensityPK(equipmentPerFormationFailureIntensity.getFormationId(),
-                                                                                equipmentPerFormationFailureIntensity.getEquipmentId(),
-                                                                                equipmentPerFormationFailureIntensity.getStageId(),
-                                                                                equipmentPerFormationFailureIntensity.getRepairTypeId(),
-                                                                                sessionId),
-                                    equipmentPerFormationFailureIntensity.getFailureIntensity(),
-                                    avgDailyFailure);
+                            return equipmentPerFormationFailureIntensity.copy().setAvgDailyFailure(avgDailyFailure);
                         })
                         .collect(Collectors.toList());
         Iterable<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensities =
@@ -262,9 +259,8 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     @Transactional
     public void deleteEquipmentFromFormation(Long formationId, Long equipmentId) {
         EquipmentPerFormationPK id = new EquipmentPerFormationPK(formationId, equipmentId);
-        if(equipmentPerFormationRepository.existsById(id)) {
+        if (equipmentPerFormationRepository.existsById(id)) {
             equipmentPerFormationRepository.deleteById(id);
-            equipmentPerFormationFailureIntensityRepository.deleteByFormationIdAndEquipmentId(formationId, equipmentId);
         }
     }
 

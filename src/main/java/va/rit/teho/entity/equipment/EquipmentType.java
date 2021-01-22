@@ -3,6 +3,7 @@ package va.rit.teho.entity.equipment;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "equipment_type")
@@ -15,6 +16,9 @@ public class EquipmentType implements Serializable {
     private String shortName;
 
     private String fullName;
+
+    @OneToMany(mappedBy = "equipmentType", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<EquipmentSubType> equipmentSubTypes;
 
     public EquipmentType() {
     }

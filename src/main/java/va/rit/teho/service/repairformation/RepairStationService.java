@@ -10,4 +10,6 @@ public interface RepairStationService {
     RepairStationType addType(String name);
 
     RepairStationType updateType(Long id, String name);
+
+    void deleteType(Long id);
 }

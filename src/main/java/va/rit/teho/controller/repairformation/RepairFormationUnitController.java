@@ -26,6 +26,7 @@ import va.rit.teho.service.repairformation.RepairFormationUnitService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -335,5 +336,10 @@ public class RepairFormationUnitController {
                                                             rs.getStationAmount());
     }
 
-
+    @DeleteMapping(path = "/formation/repair-formation/unit/{repairFormationUnitId}")
+    @Transactional
+    public ResponseEntity<Object> deleteRepairFormationUnit(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId) {
+        repairFormationUnitService.delete(repairFormationUnitId);
+        return ResponseEntity.noContent().build();
+    }
 }

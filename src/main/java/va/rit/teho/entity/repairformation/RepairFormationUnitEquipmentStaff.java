@@ -14,23 +14,25 @@ public class RepairFormationUnitEquipmentStaff {
             new RepairFormationUnitEquipmentStaff(null, 0, 0);
 
     @EmbeddedId
-    RepairFormationUnitPK equipmentPerRepairFormationUnit;
+    private RepairFormationUnitPK equipmentPerRepairFormationUnit;
 
     @ManyToOne
     @MapsId("repair_formation_unit_id")
     @JoinColumn(name = "repair_formation_unit_id")
-    RepairFormationUnit repairFormationUnit;
+    private RepairFormationUnit repairFormationUnit;
+
     @ManyToOne
     @MapsId("equipment_sub_type_id")
     @JoinColumn(name = "equipment_sub_type_id")
-    EquipmentSubType equipmentSubType;
-    Integer totalStaff;
-    Integer availableStaff;
+    private EquipmentSubType equipmentSubType;
+
+    private Integer totalStaff;
+    private Integer availableStaff;
 
     @ManyToOne
     @MapsId("session_id")
     @JoinColumn(name = "session_id")
-    TehoSession tehoSession;
+    private TehoSession tehoSession;
 
     public RepairFormationUnitEquipmentStaff() {
     }

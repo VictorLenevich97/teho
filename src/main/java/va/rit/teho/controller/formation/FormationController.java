@@ -13,6 +13,7 @@ import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.formation.FormationService;
+import va.rit.teho.service.repairformation.RepairFormationService;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -26,13 +27,17 @@ public class FormationController {
 
     private final FormationService formationService;
     private final EquipmentService equipmentService;
+
+    private final RepairFormationService repairFormationService;
     private final EquipmentPerFormationService equipmentPerFormationService;
 
     public FormationController(FormationService formationService,
                                EquipmentService equipmentService,
+                               RepairFormationService repairFormationService,
                                EquipmentPerFormationService equipmentPerFormationService) {
         this.formationService = formationService;
         this.equipmentService = equipmentService;
+        this.repairFormationService = repairFormationService;
         this.equipmentPerFormationService = equipmentPerFormationService;
     }
 
@@ -82,5 +87,25 @@ public class FormationController {
     public ResponseEntity<FormationDTO> getFormation(@PathVariable Long formationId) {
         return ResponseEntity.ok(FormationDTO.from(formationService.get(formationId), true));
     }
+
+    @DeleteMapping("/{formationId}")
+    @Transactional
+    @ApiOperation(value = "Удаление формирования и всех связанных сущностей")
+    public ResponseEntity<Object> deleteFormation(@PathVariable Long formationId) {
+        if (!formationService.get(formationId).getChildFormations().isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Удаление невозможно: у формирования (id = " + formationId + ") существуют дочерние формирования.");
+        }
+
+        if(!repairFormationService.list(formationId).isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Удаление невозможно: у формирования (id = " + formationId + ") существуют ремонтные формирования.");
+        }
+        formationService.delete(formationId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

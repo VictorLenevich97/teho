@@ -1,9 +1,9 @@
 package va.rit.teho.entity.labordistribution;
 
-import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.session.TehoSession;
 
 import javax.persistence.*;
@@ -14,37 +14,37 @@ import java.util.UUID;
 public class LaborDistribution {
 
     @EmbeddedId
-    LaborDistributionPK laborDistributionId;
+    private LaborDistributionPK laborDistributionId;
 
     @ManyToOne
     @MapsId("formation_id")
     @JoinColumn(name = "formation_id")
-    Formation formation;
+    private Formation formation;
 
     @ManyToOne
     @MapsId("equipment_id")
     @JoinColumn(name = "equipment_id")
-    Equipment equipment;
+    private Equipment equipment;
 
     @ManyToOne
     @MapsId("workhours_distribution_interval_id")
     @JoinColumn(name = "workhours_distribution_interval_id")
-    WorkhoursDistributionInterval workhoursDistributionInterval;
+    private WorkhoursDistributionInterval workhoursDistributionInterval;
 
     @ManyToOne
     @MapsId("stage_id")
     @JoinColumn(name = "stage_id")
-    Stage stage;
+    private Stage stage;
 
     @ManyToOne
     @MapsId("repair_type_id")
     @JoinColumn(name = "repair_type_id")
-    RepairType repairType;
+    private RepairType repairType;
 
     @ManyToOne
     @MapsId("session_id")
     @JoinColumn(name = "session_id")
-    TehoSession tehoSession;
+    private TehoSession tehoSession;
 
     private double count;
     private double avgLaborInput;

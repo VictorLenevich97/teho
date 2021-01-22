@@ -2,15 +2,19 @@ package va.rit.teho.entity.repairformation;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class RepairStationType {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "repairStationType", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<RepairFormationUnit> repairFormationUnits;
 
     public RepairStationType(String name) {
         this.name = name;

@@ -15,7 +15,7 @@ public class RepairFormation {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "type_id", referencedColumnName = "id", nullable = false)
     private RepairFormationType repairFormationType;
 
@@ -23,7 +23,7 @@ public class RepairFormation {
     @JoinColumn(name = "formation_id", nullable = false)
     private Formation formation;
 
-    @OneToMany(mappedBy = "repairFormation")
+    @OneToMany(mappedBy = "repairFormation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<RepairFormationUnit> repairFormationUnits;
 
     public Set<RepairFormationUnit> getRepairFormationUnitSet() {

@@ -22,6 +22,7 @@ public class FormationServiceImpl implements FormationService {
 
     private final FormationRepository formationRepository;
 
+
     public FormationServiceImpl(FormationRepository formationRepository) {
         this.formationRepository = formationRepository;
     }
@@ -114,5 +115,10 @@ public class FormationServiceImpl implements FormationService {
             populateTree(formationTree.getRoot(), formation.getChildFormations());
         }
         return treeList;
+    }
+
+    @Override
+    public void delete(Long formationId) {
+        formationRepository.deleteById(formationId);
     }
 }

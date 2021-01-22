@@ -49,4 +49,9 @@ public class RepairStationServiceImpl implements RepairStationService {
         return repairStationTypeRepository.save(new RepairStationType(id, name));
     }
 
+    @Override
+    public void deleteType(Long id) {
+        repairStationTypeRepository.deleteById(id);
+    }
+
 }

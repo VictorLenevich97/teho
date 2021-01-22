@@ -1,5 +1,7 @@
 package va.rit.teho.entity.repairformation;
 
+import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
+
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
@@ -10,7 +12,7 @@ public class RepairFormationUnit {
     @Id
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "repair_station_type_id", referencedColumnName = "id", nullable = false)
     private RepairStationType repairStationType;
 
@@ -19,16 +21,22 @@ public class RepairFormationUnit {
 
     private int stationAmount;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "repair_formation_id", referencedColumnName = "id", nullable = false)
     private RepairFormation repairFormation;
+
+    @OneToMany(mappedBy = "repairFormationUnit", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffSet;
+
+    @OneToMany(mappedBy = "repairFormationUnit", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<RepairFormationUnitRepairCapability> repairCapabilities;
+
+    @OneToMany(mappedBy = "repairFormationUnit", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<EquipmentRFUDistribution> equipmentRFUDistributions;
 
     public Set<RepairFormationUnitRepairCapability> getRepairCapabilities() {
         return repairCapabilities;
     }
-
-    @OneToMany(mappedBy = "repairFormationUnit")
-    private Set<RepairFormationUnitRepairCapability> repairCapabilities;
 
     public RepairFormationUnit() {
         //Пустой конструктор для автоматической инициализации

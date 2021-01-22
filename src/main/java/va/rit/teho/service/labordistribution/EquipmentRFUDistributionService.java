@@ -14,8 +14,6 @@ public interface EquipmentRFUDistributionService {
 
     List<EquipmentRFUDistribution> listRFUDistributedEquipment(Long repairFormationUnitId, UUID sessionId);
 
-    void deleteDistribution(Long formationId, Long equipmentId);
-
     List<EquipmentPerFormationDistributionData> listDistributionDataForFormation(UUID sessionId, Long formationId);
 
 }

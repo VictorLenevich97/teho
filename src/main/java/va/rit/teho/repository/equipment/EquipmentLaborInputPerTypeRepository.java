@@ -8,5 +8,4 @@ import va.rit.teho.entity.equipment.EquipmentLaborInputPerTypePK;
 @Repository
 public interface EquipmentLaborInputPerTypeRepository
         extends CrudRepository<EquipmentLaborInputPerType, EquipmentLaborInputPerTypePK> {
-
 }

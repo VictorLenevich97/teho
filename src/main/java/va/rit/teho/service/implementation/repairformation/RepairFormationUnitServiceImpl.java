@@ -12,10 +12,7 @@ import va.rit.teho.entity.repairformation.RepairStationType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
-import va.rit.teho.repository.repairformation.RepairFormationRepository;
-import va.rit.teho.repository.repairformation.RepairFormationUnitEquipmentStaffRepository;
-import va.rit.teho.repository.repairformation.RepairFormationUnitRepository;
-import va.rit.teho.repository.repairformation.RepairStationTypeRepository;
+import va.rit.teho.repository.repairformation.*;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
 
@@ -29,6 +26,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
 
     private final RepairFormationUnitEquipmentStaffRepository repairFormationUnitEquipmentStaffRepository;
     private final RepairFormationUnitRepository repairFormationUnitRepository;
+    private final RepairFormationUnitRepairCapabilityRepository repairFormationUnitRepairCapabilityRepository;
     private final RepairStationTypeRepository repairStationTypeRepository;
     private final RepairFormationRepository repairFormationRepository;
 
@@ -37,11 +35,13 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     public RepairFormationUnitServiceImpl(
             RepairFormationUnitEquipmentStaffRepository repairFormationUnitEquipmentStaffRepository,
             RepairFormationUnitRepository repairFormationUnitRepository,
+            RepairFormationUnitRepairCapabilityRepository repairFormationUnitRepairCapabilityRepository,
             RepairStationTypeRepository repairStationTypeRepository,
             RepairFormationRepository repairFormationRepository,
             EquipmentTypeService equipmentTypeService) {
         this.repairFormationUnitEquipmentStaffRepository = repairFormationUnitEquipmentStaffRepository;
         this.repairFormationUnitRepository = repairFormationUnitRepository;
+        this.repairFormationUnitRepairCapabilityRepository = repairFormationUnitRepairCapabilityRepository;
         this.repairStationTypeRepository = repairStationTypeRepository;
         this.repairFormationRepository = repairFormationRepository;
         this.equipmentTypeService = equipmentTypeService;
@@ -202,6 +202,11 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
                 equipmentStaffList.stream().map(rses -> rses.copy(newSessionId)).collect(Collectors.toList());
 
         repairFormationUnitEquipmentStaffRepository.saveAll(updatedRepairFormationUnitEquipmentStaffList);
+    }
+
+    @Override
+    public void delete(Long id) {
+        repairFormationUnitRepository.deleteById(id);
     }
 
 }

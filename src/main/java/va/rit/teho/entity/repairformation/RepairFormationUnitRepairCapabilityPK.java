@@ -11,10 +11,13 @@ public class RepairFormationUnitRepairCapabilityPK implements Serializable {
 
     @Column(name = "repair_formation_unit_id")
     private Long repairFormationUnitId;
+
     @Column(name = "equipment_id")
     private Long equipmentId;
+
     @Column(name = "session_id")
     private UUID sessionId;
+
     @Column(name = "repair_type_id")
     private Long repairTypeId;
 

@@ -68,6 +68,11 @@ public class RepairFormationTypeServiceImpl implements RepairFormationTypeServic
     }
 
     @Override
+    public void deleteType(Long id) {
+        repairFormationTypeRepository.deleteById(id);
+    }
+
+    @Override
     public List<RepairFormationType> listTypes() {
         return (List<RepairFormationType>) this.repairFormationTypeRepository.findAll();
     }

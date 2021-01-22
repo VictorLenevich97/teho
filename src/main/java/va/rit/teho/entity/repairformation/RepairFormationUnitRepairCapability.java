@@ -12,29 +12,29 @@ import java.util.UUID;
 public class RepairFormationUnitRepairCapability {
 
     @EmbeddedId
-    RepairFormationUnitRepairCapabilityPK equipmentPerRepairFormationUnitWithRepairType;
+    private RepairFormationUnitRepairCapabilityPK equipmentPerRepairFormationUnitWithRepairType;
 
     @ManyToOne
     @MapsId("repair_formation_unit_id")
     @JoinColumn(name = "repair_formation_unit_id")
-    RepairFormationUnit repairFormationUnit;
+    private RepairFormationUnit repairFormationUnit;
 
     @ManyToOne
     @MapsId("equipment_id")
     @JoinColumn(name = "equipment_id")
-    Equipment equipment;
+    private Equipment equipment;
 
     @ManyToOne
     @MapsId("repair_type_id")
     @JoinColumn(name = "repair_type_id")
-    RepairType repairType;
+    private RepairType repairType;
 
     @ManyToOne
     @MapsId("session_id")
     @JoinColumn(name = "session_id")
-    TehoSession tehoSession;
+    private TehoSession tehoSession;
 
-    double capability;
+    private double capability;
 
     public RepairFormationUnitRepairCapability() {
     }

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class EquipmentFailureIntensityCombinedData {
+
     private final List<Stage> stages;
     private final List<RepairType> repairTypes;
     private final Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> equipmentPerFormations;

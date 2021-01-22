@@ -25,4 +25,5 @@ public interface RepairFormationUnitEquipmentStaffRepository
                                                          List<Long> repairFormationUnitIds,
                                                          List<Long> equipmentTypeIds,
                                                          List<Long> equipmentSubTypeIds);
+
 }
