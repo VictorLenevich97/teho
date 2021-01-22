@@ -358,7 +358,7 @@ public class EquipmentPerFormationController {
                                 .getOrDefault(rt, Collections.emptyMap())
                                 .get(s);
 
-                data.computeIfAbsent(s.getId().toString(), (e) -> new HashMap<>())
+                data.computeIfAbsent(s.getId().toString(), e -> new HashMap<>())
                     .put(rt.getId().toString(),
                          formatter.apply(Optional
                                                  .ofNullable(equipmentPerFormationFailureIntensity)

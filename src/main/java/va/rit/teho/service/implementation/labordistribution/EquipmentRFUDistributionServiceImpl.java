@@ -78,7 +78,7 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                                     .filter(ldad -> ldad.getCount() > 0)
                                     .collect(Collectors.toList());
 
-                    sentUpper.computeIfAbsent(currentLevel, (e) -> new HashSet<>()).addAll(undistributedData);
+                    sentUpper.computeIfAbsent(currentLevel, e -> new HashSet<>()).addAll(undistributedData);
 
                     equipmentRFUDistributionRepository.saveAll(distributed);
                 }
@@ -219,9 +219,9 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
         Double capability =
                 repairFormationUnitCapabilityMap
                         .computeIfAbsent(repairFormationUnitRepairCapability.getRepairFormationUnit(),
-                                         (rfu) -> new HashMap<>())
+                                         rfu -> new HashMap<>())
                         .computeIfAbsent(repairFormationUnitRepairCapability.getEquipment(),
-                                         (k) -> repairFormationUnitRepairCapability.getCapability());
+                                         k -> repairFormationUnitRepairCapability.getCapability());
         if (capability > 0 && distributionAggregatedData.getCount() > 0) {
             double repairing = distributionAggregatedData.getCount();
             double unable = 0.0;

@@ -171,9 +171,9 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
 
         for (EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity : equipmentPerFormationFailureIntensityList) {
             Map<Stage, EquipmentPerFormationFailureIntensity> map = result
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getFormation(), (e) -> new HashMap<>())
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getEquipment(), (e) -> new HashMap<>())
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), (e) -> new HashMap<>());
+                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getFormation(), e -> new HashMap<>())
+                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getEquipment(), e -> new HashMap<>())
+                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), e -> new HashMap<>());
             EquipmentPerFormationFailureIntensity existing = map.getOrDefault(equipmentPerFormationFailureIntensity.getStage(),
                                                                               null);
             if (existing != null) {
@@ -229,8 +229,8 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
 
         for (EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity : equipmentPerFormationFailureIntensityList) {
             result
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getEquipment(), (e) -> new HashMap<>())
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), (e) -> new HashMap<>())
+                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getEquipment(), e -> new HashMap<>())
+                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), e -> new HashMap<>())
                     .put(equipmentPerFormationFailureIntensity.getStage(), equipmentPerFormationFailureIntensity);
         }
         return result;

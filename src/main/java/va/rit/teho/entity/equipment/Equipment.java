@@ -1,7 +1,5 @@
 package va.rit.teho.entity.equipment;
 
-import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
-import va.rit.teho.entity.labordistribution.LaborDistribution;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
 
 import javax.persistence.*;

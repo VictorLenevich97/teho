@@ -39,7 +39,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     private Function<Equipment, RepairFormationUnitRepairCapability> getCalculatedRepairCapabilitesPerDay(UUID sessionId,
                                                                                                           Long repairTypeId,
                                                                                                           RepairFormationUnitEquipmentStaff rsec) {
-        return (equipment) -> {
+        return equipment -> {
             EquipmentLaborInputPerType laborInputPerType = equipment
                     .getLaborInputPerTypes()
                     .stream()

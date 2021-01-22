@@ -129,8 +129,8 @@ public class EquipmentServiceImpl implements EquipmentService {
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> result = new HashMap<>();
         for (Equipment equipment : equipmentList) {
             result
-                    .computeIfAbsent(equipment.getEquipmentSubType().getEquipmentType(), (k) -> new HashMap<>())
-                    .computeIfAbsent(equipment.getEquipmentSubType(), (k) -> new ArrayList<>())
+                    .computeIfAbsent(equipment.getEquipmentSubType().getEquipmentType(), k -> new HashMap<>())
+                    .computeIfAbsent(equipment.getEquipmentSubType(), k -> new ArrayList<>())
                     .add(equipment);
         }
         return result;
