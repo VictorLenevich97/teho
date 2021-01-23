@@ -3,6 +3,8 @@ package va.rit.teho.dto.equipment;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import va.rit.teho.entity.equipment.Equipment;
 
+import java.util.Optional;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentDTO {
     private Long id;
@@ -31,7 +33,8 @@ public class EquipmentDTO {
         equipmentDTO.setId(equipment.getId());
         equipmentDTO.setName(equipment.getName());
         equipmentDTO.setSubType(EquipmentSubTypeDTO.from(equipment.getEquipmentSubType()));
-        equipmentDTO.setType(EquipmentTypeDTO.from(equipment.getEquipmentSubType().getEquipmentType()));
+        Optional.ofNullable(equipment.getEquipmentSubType().getEquipmentType())
+                .ifPresent(et -> equipmentDTO.setType(EquipmentTypeDTO.from(et)));
         return equipmentDTO;
     }
 

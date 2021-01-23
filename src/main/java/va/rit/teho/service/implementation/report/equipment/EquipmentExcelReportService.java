@@ -48,14 +48,32 @@ public class EquipmentExcelReportService
             EquipmentType eqType = entry.getKey();
             Map<EquipmentSubType, List<Equipment>> subTypeListMap = entry.getValue();
 
-            createRowWideCell(sheet, lastRowIndex, repairTypes.size() + 1, eqType.getShortName(), false, true);
+            if (eqType != null) {
+                createRowWideCell(sheet, lastRowIndex, repairTypes.size() + 1, eqType.getShortName(), false, true);
 
-            List<Equipment> equipmentList =
-                    subTypeListMap.entrySet().stream().flatMap(e -> e.getValue().stream()).collect(Collectors.toList());
+                List<Equipment> equipmentList =
+                        subTypeListMap
+                                .entrySet()
+                                .stream()
+                                .flatMap(e -> e.getValue().stream())
+                                .collect(Collectors.toList());
 
-            writeRows(sheet, lastRowIndex + 1, data, equipmentList);
+                writeRows(sheet, lastRowIndex + 1, data, equipmentList);
 
-            lastRowIndex += subTypeListMap.size() + 1;
+                lastRowIndex += equipmentList.size() + 1;
+            } else {
+                for (Map.Entry<EquipmentSubType, List<Equipment>> e : subTypeListMap.entrySet()) {
+                    List<Equipment> equipmentList = e.getValue();
+                    createRowWideCell(sheet,
+                                      lastRowIndex,
+                                      repairTypes.size() + 1,
+                                      e.getKey().getShortName(),
+                                      false,
+                                      true);
+                    writeRows(sheet, lastRowIndex + 1, data, equipmentList);
+                    lastRowIndex += equipmentList.size() + 1;
+                }
+            }
         }
     }
 

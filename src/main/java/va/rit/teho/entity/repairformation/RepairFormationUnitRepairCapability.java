@@ -39,6 +39,19 @@ public class RepairFormationUnitRepairCapability {
     public RepairFormationUnitRepairCapability() {
     }
 
+    public RepairFormationUnitRepairCapability(Long repairFormationUnitId,
+                                               Long equipmentId,
+                                               Long repairTypeId,
+                                               UUID sessionId,
+                                               double capability) {
+        this.equipmentPerRepairFormationUnitWithRepairType = new RepairFormationUnitRepairCapabilityPK(
+                repairFormationUnitId,
+                equipmentId,
+                repairTypeId,
+                sessionId);
+        this.capability = capability;
+    }
+
     public RepairFormationUnitRepairCapability(RepairFormationUnitRepairCapabilityPK equipmentPerRepairFormationUnitWithRepairType,
                                                double capability) {
         this.equipmentPerRepairFormationUnitWithRepairType = equipmentPerRepairFormationUnitWithRepairType;

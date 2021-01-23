@@ -71,13 +71,8 @@ public class EquipmentController {
         Equipment added = equipmentService.add(equipmentData.getName(),
                                                equipmentData.getSubTypeId(),
                                                repairTypeIdLaborInputMap);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new EquipmentLaborInputPerTypeRowData(added.getId(),
-                                                            added.getName(),
-                                                            added.getEquipmentSubType().getId(),
-                                                            added.getEquipmentSubType().getFullName(),
-                                                            equipmentData.getData()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new EquipmentLaborInputPerTypeRowData(added,
+                                                                                                    equipmentData.getData()));
     }
 
     private Map<Long, Integer> mapStringKeysToLong(Map<String, Integer> equipmentData) {
@@ -99,11 +94,7 @@ public class EquipmentController {
                                                              mapStringKeysToLong(equipmentData.getData()));
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(new EquipmentLaborInputPerTypeRowData(updatedEquipment.getId(),
-                                                            updatedEquipment.getName(),
-                                                            updatedEquipment.getEquipmentSubType().getId(),
-                                                            updatedEquipment.getEquipmentSubType().getFullName(),
-                                                            equipmentData.getData()));
+                .body(new EquipmentLaborInputPerTypeRowData(updatedEquipment, equipmentData.getData()));
     }
 
     @DeleteMapping(path = "/{equipmentId}")
@@ -121,22 +112,23 @@ public class EquipmentController {
 
     @GetMapping("/labor-input")
     @ApiOperation(value = "Получить список ВВСТ с нормативной трудоемкостью (в табличном виде)")
-    public ResponseEntity<TableDataDTO<Map<String, Integer>>> listEquipmentWithLaborInputData() {
+    public ResponseEntity<TableDataDTO<Map<String, Integer>>> listEquipmentWithLaborInputData(
+            @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> ids,
+            @ApiParam(value = "Ключи подтипов, по которым осуществляется фильтр") @RequestParam(value = "subTypeId", required = false) List<Long> subTypeIds,
+            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
         List<NestedColumnsDTO> columns =
-                repairTypeService.list(true).stream()
+                repairTypeService.list(true)
+                                 .stream()
                                  .map(rt -> new NestedColumnsDTO(rt.getId().toString(), rt.getFullName()))
                                  .collect(Collectors.toList());
         List<EquipmentLaborInputPerTypeRowData> data =
                 equipmentService
-                        .listWithLaborInputPerType()
+                        .listWithLaborInputPerType(ids, subTypeIds, typeIds)
                         .entrySet()
                         .stream()
                         .map(equipmentMapEntry ->
                                      new EquipmentLaborInputPerTypeRowData(
-                                             equipmentMapEntry.getKey().getId(),
-                                             equipmentMapEntry.getKey().getName(),
-                                             equipmentMapEntry.getKey().getEquipmentSubType().getId(),
-                                             equipmentMapEntry.getKey().getEquipmentSubType().getShortName(),
+                                             equipmentMapEntry.getKey(),
                                              equipmentMapEntry
                                                      .getValue()
                                                      .entrySet()
@@ -150,8 +142,14 @@ public class EquipmentController {
 
     @GetMapping(value = "/labor-input/report", produces = "application/vnd.ms-excel")
     @ResponseBody
-    public ResponseEntity<byte[]> equipmentLaborInputPerType() throws UnsupportedEncodingException {
-        byte[] bytes = equipmentReportService.generateReport(equipmentService.listGroupedByTypes(null, null, null));
+    public ResponseEntity<byte[]> equipmentLaborInputPerTypeReport(
+            @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> ids,
+            @ApiParam(value = "Ключи подтипов, по которым осуществляется фильтр") @RequestParam(value = "subTypeId", required = false) List<Long> subTypeIds,
+            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds)
+            throws UnsupportedEncodingException {
+        byte[] bytes = equipmentReportService.generateReport(equipmentService.listGroupedByTypes(ids,
+                                                                                                 subTypeIds,
+                                                                                                 typeIds));
 
         return ReportResponseEntity.ok("Список ВВСТ (с трудоёмкостью)", bytes);
     }

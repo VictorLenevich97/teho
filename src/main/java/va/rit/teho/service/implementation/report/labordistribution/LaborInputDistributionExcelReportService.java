@@ -113,14 +113,18 @@ public class LaborInputDistributionExcelReportService
         for (Map.Entry<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> e : data
                 .getLaborInputDistribution()
                 .entrySet()) {
-            createRowWideCell(sheet, lastRowIndex, colSize, e.getKey().getFullName(), true, false);
+            String prefix = "";
+            if (e.getKey() != null) {
+                prefix = "Итого ";
+                createRowWideCell(sheet, lastRowIndex, colSize, e.getKey().getFullName(), true, false);
+            }
             for (Map.Entry<EquipmentSubType, List<EquipmentLaborInputDistribution>> entry : e.getValue().entrySet()) {
                 EquipmentSubType equipmentSubType = entry.getKey();
                 List<EquipmentLaborInputDistribution> equipmentLaborInputDistributions = entry.getValue();
                 createRowWideCell(sheet,
                                   lastRowIndex + 1,
                                   colSize,
-                                  "Итого " + equipmentSubType.getFullName(),
+                                  prefix + equipmentSubType.getFullName(),
                                   true,
                                   false);
                 writeRows(sheet, lastRowIndex + 2, data, equipmentLaborInputDistributions);

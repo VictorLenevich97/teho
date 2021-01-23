@@ -13,7 +13,6 @@ import va.rit.teho.dto.labordistribution.CountAndLaborInputDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionNestedColumnsDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
-import va.rit.teho.dto.table.RowData;
 import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
@@ -92,32 +91,14 @@ public class LaborInputDistributionController {
                                                                           wdi.getLowerBound(),
                                                                           wdi.getUpperBound()))
                         .collect(Collectors.toList());
-        List<RowData<List<RowData<List<LaborDistributionRowData>>>>> rowData = laborInputDistribution
-                .entrySet()
-                .stream()
-                .map(eTypeEntry ->
-                             new RowData<>(
-                                     eTypeEntry.getKey().getFullName(),
-                                     eTypeEntry
-                                             .getValue()
-                                             .entrySet()
-                                             .stream()
-                                             .map(eSubTypeEntry ->
-                                                          new RowData<>(
-                                                                  eSubTypeEntry.getKey().getFullName(),
-                                                                  eSubTypeEntry
-                                                                          .getValue()
-                                                                          .stream()
-                                                                          .map(this::getLaborDistributionRowData)
-                                                                          .collect(Collectors.toList())))
-                                             .collect(Collectors.toList())))
-                .collect(Collectors.toList());
-        //TODO: Вернуть группировку по типам и подтипам когда будет готова UI-часть
-        List<LaborDistributionRowData> collect = rowData.stream().flatMap(rd -> rd
-                .getData()
-                .stream()
-                .flatMap(rdi -> rdi.getData().stream())).collect(Collectors.toList());
-        return ResponseEntity.ok(new TableDataDTO<>(columns, collect));
+        List<LaborDistributionRowData> rows =
+                laborInputDistribution
+                        .entrySet()
+                        .stream()
+                        .flatMap(rd -> rd.getValue().values().stream()
+                                         .flatMap(l -> l.stream().map(this::getLaborDistributionRowData)))
+                        .collect(Collectors.toList());
+        return ResponseEntity.ok(new TableDataDTO<>(columns, rows));
     }
 
     private LaborDistributionRowData getLaborDistributionRowData(EquipmentLaborInputDistribution elid) {
@@ -128,14 +109,16 @@ public class LaborInputDistributionController {
                         .stream()
                         .collect(Collectors.toMap(e -> e.getKey().toString(),
                                                   e -> new CountAndLaborInputDTO(
-                                                          Formatter.formatDouble(e.getValue().getCount()),
-                                                          Formatter.formatDouble(e.getValue().getLaborInput()))));
+                                                          Formatter.formatDoubleAsString(e.getValue().getCount()),
+                                                          Formatter.formatDoubleAsString(e
+                                                                                                 .getValue()
+                                                                                                 .getLaborInput()))));
         return new LaborDistributionRowData(elid.getFormationName(),
                                             countAndLaborInputDTOMap,
                                             elid.getEquipmentName(),
-                                            Formatter.formatDouble(elid.getAvgDailyFailure()),
+                                            Formatter.formatDoubleAsString(elid.getAvgDailyFailure()),
                                             elid.getStandardLaborInput(),
-                                            Formatter.formatDouble(elid.getTotalRepairComplexity()));
+                                            Formatter.formatDoubleAsString(elid.getTotalRepairComplexity()));
     }
 
     @PostMapping

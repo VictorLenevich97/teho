@@ -50,24 +50,23 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType() {
-        //TODO: LEFT OUTER JOIN и дополнить
-        List<Equipment> equipmentList = list();
-        List<RepairType> repairTypes = repairTypeService.list(true);
-        List<EquipmentLaborInputPerType> laborInputPerTypeList =
-                (List<EquipmentLaborInputPerType>) equipmentLaborInputPerTypeRepository.findAll();
-        Map<Equipment, Map<RepairType, Integer>> grouped = new HashMap<>();
-        for (EquipmentLaborInputPerType equipmentLaborInputPerType : laborInputPerTypeList) {
-            grouped.computeIfAbsent(equipmentLaborInputPerType.getEquipment(), e -> new HashMap<>())
-                   .put(equipmentLaborInputPerType.getRepairType(), equipmentLaborInputPerType.getAmount());
-        }
+    public Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(List<Long> ids,
+                                                                              List<Long> subTypeIds,
+                                                                              List<Long> typeIds) {
+        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, subTypeIds, typeIds);
+
         Map<RepairType, Integer> defaultLaborInputData =
-                repairTypes.stream().collect(Collectors.groupingBy(rt -> rt, Collectors.summingInt(rt -> 0)));
-        Map<Equipment, Map<RepairType, Integer>> result = new HashMap<>();
-        for (Equipment equipment : equipmentList) {
-            result.put(equipment, grouped.getOrDefault(equipment, defaultLaborInputData));
-        }
-        return result;
+                repairTypeService.list(true).stream().collect(Collectors.toMap(rt -> rt, rt -> 0));
+
+        return equipmentList
+                .stream()
+                .collect(Collectors.toMap(e -> e,
+                                          e -> e.getLaborInputPerTypes().isEmpty() ? defaultLaborInputData :
+                                                  e.getLaborInputPerTypes()
+                                                   .stream()
+                                                   .collect(Collectors.toMap(
+                                                           EquipmentLaborInputPerType::getRepairType,
+                                                           EquipmentLaborInputPerType::getAmount))));
     }
 
     @Override
@@ -80,7 +79,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         String logLine = String.format("Добавление ВВСТ \"%s\", subTypeId = %d", name, subTypeId);
         LOGGER.debug(logLine);
         EquipmentSubType equipmentSubType = equipmentTypeService.getSubType(subTypeId);
-        if (equipmentRepository.findByName(name).isPresent()) {
+        if (equipmentRepository.findByNameIgnoreCase(name).isPresent()) {
             throw new AlreadyExistsException("ВВСТ", "имя", name);
         }
         long newId = equipmentRepository.getMaxId() + 1;
@@ -113,11 +112,12 @@ public class EquipmentServiceImpl implements EquipmentService {
     public Equipment update(Long id, String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap) {
         String logLine = String.format("Обновление ВВСТ (id = %d) \"%s\", subTypeId = %d", id, name, subTypeId);
         LOGGER.debug(logLine);
-        equipmentRepository.findByName(name).ifPresent(e -> {
+        equipmentRepository.findByNameIgnoreCase(name).ifPresent(e -> {
             if (!e.getId().equals(id)) {
                 throw new AlreadyExistsException("ВВСТ", "имя", name);
             }
         });
+
         EquipmentSubType equipmentSubType = equipmentTypeService.getSubType(subTypeId);
         Equipment equipment = get(id);
         equipment.setName(name);

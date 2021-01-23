@@ -234,7 +234,7 @@ public class EquipmentPerFormationController {
                                EquipmentPerFormation::getEquipment,
                                EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
                                0.0,
-                               va.rit.teho.controller.helper.Formatter::formatDouble,
+                               va.rit.teho.controller.helper.Formatter::formatDoubleAsString,
                                failureIntensityData,
                                equipmentIds);
     }
@@ -294,7 +294,7 @@ public class EquipmentPerFormationController {
         return ResponseEntity.ok(this.getEquipmentRowData(formationId,
                                                           EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
                                                           0.0,
-                                                          va.rit.teho.controller.helper.Formatter::formatDouble,
+                                                          va.rit.teho.controller.helper.Formatter::formatDoubleAsString,
                                                           equipmentIds));
     }
 

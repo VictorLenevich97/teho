@@ -4,11 +4,16 @@ import java.text.DecimalFormat;
 
 public class Formatter {
 
-    private Formatter() {}
+    private Formatter() {
+    }
 
     private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("#.###");
 
-    public static String formatDouble(Double d) {
+    public static String formatDoubleAsString(Double d) {
         return DECIMAL_FORMATTER.format(d);
+    }
+
+    public static Double formatDouble(Double d) {
+        return Double.valueOf(formatDoubleAsString(d));
     }
 }

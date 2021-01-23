@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping(path = "formation/repair-formation/unit", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -81,19 +82,12 @@ public class RepairCapabilitiesController {
     @PostMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для указанного РВО)")
-    public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGetPerStation(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId,
-                                                                                       @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId) {
+    public ResponseEntity<Object> calculateAndGetPerStation(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId,
+                                                            @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilitiesPerStation(tehoSession.getSessionId(),
                                                                                       repairFormationUnitId,
                                                                                       repairTypeId);
-        TableDataDTO<Map<String, String>> repairCapabilitiesDTO =
-                getCalculatedRepairCapabilities(repairTypeId,
-                                                Collections.singletonList(repairFormationUnitId),
-                                                Collections.emptyList(),
-                                                Collections.emptyList(),
-                                                Collections.emptyList(), 1,
-                                                100).getBody();
-        return ResponseEntity.accepted().body(repairCapabilitiesDTO);
+        return ResponseEntity.accepted().build();
     }
 
     @PutMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}/batch", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -128,22 +122,30 @@ public class RepairCapabilitiesController {
                                                  repairFormationUnitRepairCapability.getCapability()));
     }
 
-    private NestedColumnsDTO getRepairCapabilitiesNestedColumnsDTO(Map.Entry<EquipmentType, Map<EquipmentSubType, List<Equipment>>> equipmentTypeEntry) {
-        return new NestedColumnsDTO(
-                equipmentTypeEntry.getKey().getShortName(),
-                equipmentTypeEntry.getValue()
-                                  .entrySet()
-                                  .stream()
-                                  .map(subTypeListEntry ->
-                                               new NestedColumnsDTO(subTypeListEntry.getKey().getShortName(),
-                                                                    subTypeListEntry.getValue()
-                                                                                    .stream()
-                                                                                    .map(e -> new NestedColumnsDTO(e
-                                                                                                                           .getId()
-                                                                                                                           .toString(),
-                                                                                                                   e.getName()))
-                                                                                    .collect(Collectors.toList())))
-                                  .collect(Collectors.toList()));
+    private Stream<NestedColumnsDTO> getRepairCapabilitiesNestedColumnsDTO(Map.Entry<EquipmentType, Map<EquipmentSubType, List<Equipment>>> equipmentTypeEntry) {
+        if (equipmentTypeEntry.getKey() == null) {
+            return equipmentTypeEntry
+                    .getValue()
+                    .entrySet()
+                    .stream()
+                    .map(this::getNestedColumnsDTO);
+        } else {
+            return Stream.of(new NestedColumnsDTO(
+                    equipmentTypeEntry.getKey().getShortName(),
+                    equipmentTypeEntry.getValue()
+                                      .entrySet()
+                                      .stream()
+                                      .map(this::getNestedColumnsDTO)
+                                      .collect(Collectors.toList())));
+        }
+    }
+
+    private NestedColumnsDTO getNestedColumnsDTO(Map.Entry<EquipmentSubType, List<Equipment>> subTypeListEntry) {
+        return new NestedColumnsDTO(subTypeListEntry.getKey().getShortName(),
+                                    subTypeListEntry.getValue()
+                                                    .stream()
+                                                    .map(e -> new NestedColumnsDTO(e.getId().toString(), e.getName()))
+                                                    .collect(Collectors.toList()));
     }
 
     private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(RepairFormationUnitRepairCapabilityCombinedData combinedData) {
@@ -158,7 +160,7 @@ public class RepairCapabilitiesController {
                 combinedData.getGroupedEquipmentData()
                             .entrySet()
                             .stream()
-                            .map(this::getRepairCapabilitiesNestedColumnsDTO)
+                            .flatMap(this::getRepairCapabilitiesNestedColumnsDTO)
                             .collect(Collectors.toList());
         List<RowData<Map<String, String>>> data =
                 combinedData.getRepairFormationUnitList()
@@ -177,14 +179,13 @@ public class RepairCapabilitiesController {
         return new RowData<>(
                 rs.getId(),
                 rs.getName(),
-                columns.stream().collect(Collectors.toMap(equipment -> equipment.getId().toString(),
-                                                          equipment ->
-                                                                  Formatter.formatDouble(calculatedRepairCapabilities
-                                                                                                 .getOrDefault(rs,
-                                                                                                               Collections
-                                                                                                                       .emptyMap())
-                                                                                                 .getOrDefault(equipment,
-                                                                                                               0.0)))));
+                columns
+                        .stream()
+                        .collect(Collectors.toMap(equipment -> equipment.getId().toString(),
+                                                  equipment -> Formatter.formatDoubleAsString(
+                                                          calculatedRepairCapabilities
+                                                                  .getOrDefault(rs, Collections.emptyMap())
+                                                                  .getOrDefault(equipment, 0.0)))));
     }
 
     @GetMapping("/{repairFormationUnitId}/capabilities/repair-type/{repairTypeId}")
@@ -246,7 +247,9 @@ public class RepairCapabilitiesController {
                         .stream()
                         .map(e -> new RepairCapabilityPerEquipment(e.getId(),
                                                                    e.getName(),
-                                                                   calculatedRepairCapabilities.getOrDefault(e, 0.0)))
+                                                                   Formatter.formatDouble(calculatedRepairCapabilities.getOrDefault(
+                                                                           e,
+                                                                           0.0))))
                         .collect(Collectors.toList()));
     }
 

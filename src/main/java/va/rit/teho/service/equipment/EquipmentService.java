@@ -12,7 +12,9 @@ public interface EquipmentService {
 
     List<Equipment> list();
 
-    Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType();
+    Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(List<Long> ids,
+                                                                       List<Long> subTypeIds,
+                                                                       List<Long> typeIds);
 
     Equipment get(Long equipmentId);
 

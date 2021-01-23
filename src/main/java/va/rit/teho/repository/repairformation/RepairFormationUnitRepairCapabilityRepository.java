@@ -21,11 +21,11 @@ public interface RepairFormationUnitRepairCapabilityRepository
             "(coalesce(:equipmentSubTypeIds, null) is null or c.equipment.equipmentSubType.id in (:equipmentSubTypeIds)) AND " +
             "(coalesce(:equipmentTypeIds, null) is null or c.equipment.equipmentSubType.equipmentType.id in (:equipmentTypeIds)) " +
             "ORDER BY c.repairFormationUnit.id ASC, c.equipment.equipmentSubType.id ASC, c.equipment.equipmentSubType.equipmentType.id ASC, c.equipment.id ASC")
-    List<RepairFormationUnitRepairCapability> findByIds(UUID sessionId,
-                                                        Long repairTypeId,
-                                                        List<Long> repairFormationUnitIds,
-                                                        List<Long> equipmentIds,
-                                                        List<Long> equipmentSubTypeIds,
-                                                        List<Long> equipmentTypeIds);
+    List<RepairFormationUnitRepairCapability> findFiltered(UUID sessionId,
+                                                           Long repairTypeId,
+                                                           List<Long> repairFormationUnitIds,
+                                                           List<Long> equipmentIds,
+                                                           List<Long> equipmentSubTypeIds,
+                                                           List<Long> equipmentTypeIds);
 
 }

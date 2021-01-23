@@ -35,6 +35,6 @@ public class CalculationServiceImpl implements CalculationService {
 
     public double calculateRepairCapabilities(int totalStaff, int workingTime, long avgLaborInput) {
         //0.78 - коэффициент использования рабочего времени на основные работы. Находится в интервале 0.75 - 0.8
-        return (totalStaff * workingTime * 0.78) / avgLaborInput;
+        return avgLaborInput == 0 ? 0 : (totalStaff * workingTime * 0.78) / avgLaborInput;
     }
 }

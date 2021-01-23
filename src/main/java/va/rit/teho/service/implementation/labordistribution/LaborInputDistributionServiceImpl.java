@@ -3,6 +3,7 @@ package va.rit.teho.service.implementation.labordistribution;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
+import va.rit.teho.entity.equipment.EquipmentPerFormation;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput;
 import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
@@ -54,8 +55,8 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
 
         return EquipmentLaborInputDistribution
                 .builder()
-                .formationName(eir.getFormationName())
-                .equipmentName(eir.getEquipmentName())
+                .formationName(eir.getEquipmentPerFormation().getFormation().getFullName())
+                .equipmentName(eir.getEquipmentPerFormation().getEquipment().getName())
                 .avgDailyFailure(eir.getAvgDailyFailure())
                 .standardLaborInput(eir.getLaborInput())
                 .intervalCountAndLaborInputMap(laborInputMap)
@@ -70,7 +71,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
             Long repairTypeId,
             Long stageId,
             List<Long> equipmentTypeIds) {
-        Map<EquipmentType, Map<EquipmentSubType, Map<LaborDistributionData.CompositeKey, List<LaborDistributionData>>>> grouped =
+        Map<EquipmentType, Map<EquipmentSubType, Map<EquipmentPerFormation, List<LaborDistributionData>>>> grouped =
                 laborDistributionRepository.findAllGrouped(sessionId, repairTypeId, stageId, equipmentTypeIds);
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> result = new HashMap<>();
 
