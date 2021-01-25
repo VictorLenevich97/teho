@@ -1,16 +1,18 @@
 package va.rit.teho.enums;
 
 public enum RepairTypeEnum {
-    CURRENT_REPAIR("Текущий", true),
-    AVG_REPAIR("Средний", true),
-    FULL_REPAIR("Капитальный", false),
-    LOSS("Безвозвратные потери", false);
+    CURRENT_REPAIR("Текущий", "ТР", true),
+    AVG_REPAIR("Средний", "СР", true),
+    FULL_REPAIR("Капитальный", "КР", false),
+    LOSS("Безвозвратные потери", "БП", false);
 
-    private final String name;
+    private final String fullName;
+    private final String shortName;
     private final boolean calculatable;
 
-    RepairTypeEnum(String name, boolean calculatable) {
-        this.name = name;
+    RepairTypeEnum(String name, String shortName, boolean calculatable) {
+        this.fullName = name;
+        this.shortName = shortName;
         this.calculatable = calculatable;
     }
 
@@ -18,7 +20,11 @@ public enum RepairTypeEnum {
         return calculatable;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getShortName() {
+        return shortName;
     }
 }

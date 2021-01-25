@@ -25,6 +25,7 @@ import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -87,6 +88,8 @@ public class LaborInputDistributionController {
                 laborInputDistributionService
                         .listDistributionIntervals()
                         .stream()
+                        .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
+                                                     Comparator.nullsFirst(Comparator.naturalOrder())))
                         .map(wdi -> new LaborDistributionNestedColumnsDTO(wdi.getId(),
                                                                           wdi.getLowerBound(),
                                                                           wdi.getUpperBound()))

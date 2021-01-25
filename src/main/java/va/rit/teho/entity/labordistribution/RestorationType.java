@@ -16,12 +16,20 @@ public class RestorationType {
 
     private int weight;
 
-    @OneToMany(mappedBy = "restorationType")
+    @OneToMany(mappedBy = "restorationType", cascade = CascadeType.PERSIST)
     private Set<WorkhoursDistributionInterval> workhoursDistributionIntervals;
 
     public RestorationType(String name, int weight) {
         this.name = name;
         this.weight = weight;
+    }
+
+    public RestorationType(String name,
+                           int weight,
+                           Set<WorkhoursDistributionInterval> workhoursDistributionIntervals) {
+        this.name = name;
+        this.weight = weight;
+        this.workhoursDistributionIntervals = workhoursDistributionIntervals;
     }
 
     public RestorationType() {
@@ -51,6 +59,10 @@ public class RestorationType {
 
     public Set<WorkhoursDistributionInterval> getWorkhoursDistributionIntervals() {
         return workhoursDistributionIntervals;
+    }
+
+    public void setWorkhoursDistributionIntervals(Set<WorkhoursDistributionInterval> workhoursDistributionIntervals) {
+        this.workhoursDistributionIntervals = workhoursDistributionIntervals;
     }
 
     public int getWeight() {

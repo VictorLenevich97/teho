@@ -15,8 +15,7 @@ public class WorkhoursDistributionInterval {
     private Integer upperBound;
 
     @ManyToOne
-    @MapsId("restoration_type_id")
-    @JoinColumn(name = "restoration_type_id")
+    @JoinColumn(name = "restoration_type_id", nullable = false)
     private RestorationType restorationType;
 
     public WorkhoursDistributionInterval(Integer lowerBound,
