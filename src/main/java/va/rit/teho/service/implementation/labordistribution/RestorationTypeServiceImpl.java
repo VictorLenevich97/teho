@@ -8,6 +8,7 @@ import va.rit.teho.repository.labordistribution.RestorationTypeRepository;
 import va.rit.teho.service.labordistribution.RestorationTypeService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -40,10 +41,13 @@ public class RestorationTypeServiceImpl implements RestorationTypeService {
 
     @Override
     public RestorationType update(Long id, String name, int weight) {
-        if (!restorationTypeRepository.findById(id).isPresent()) {
+        Optional<RestorationType> typeOptional = restorationTypeRepository.findById(id);
+        if (!typeOptional.isPresent()) {
             throw new NotFoundException("Тип восстановления с id = " + id + " не найден!");
         }
-
+        RestorationType restorationType = typeOptional.get();
+        restorationType.setName(name);
+        restorationType.setWeight(weight);
         return restorationTypeRepository.save(new RestorationType(id, name, weight));
     }
 }

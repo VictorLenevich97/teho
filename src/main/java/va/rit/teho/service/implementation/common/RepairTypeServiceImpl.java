@@ -31,10 +31,9 @@ public class RepairTypeServiceImpl implements RepairTypeService {
 
     @Override
     public RepairType switchCalculatableFlag(Long id) {
-        return repairTypeRepository.findById(id).map(rt -> repairTypeRepository.save(new RepairType(rt.getId(),
-                                                                                                    rt.getFullName(),
-                                                                                                    rt.getShortName(),
-                                                                                                    !rt.isCalculatable())))
-                                   .orElseThrow(() -> new NotFoundException("Тип ремонта с id = " + id + " не существует!"));
+        RepairType repairType = repairTypeRepository.findById(id).orElseThrow(() -> new NotFoundException(
+                "Тип ремонта с id = " + id + " не существует!"));
+        repairType.setCalculatable(!repairType.isCalculatable());
+        return repairTypeRepository.save(repairType);
     }
 }

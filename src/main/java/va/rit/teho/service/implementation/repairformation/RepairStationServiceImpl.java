@@ -46,7 +46,9 @@ public class RepairStationServiceImpl implements RepairStationService {
                 throw new AlreadyExistsException("Тип мастерской", "название", name);
             }
         });
-        return repairStationTypeRepository.save(new RepairStationType(id, name));
+        RepairStationType rst = repairStationType.get();
+        rst.setName(name);
+        return repairStationTypeRepository.save(rst);
     }
 
     @Override

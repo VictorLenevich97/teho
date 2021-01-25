@@ -24,14 +24,6 @@ public class RestorationType {
         this.weight = weight;
     }
 
-    public RestorationType(String name,
-                           int weight,
-                           Set<WorkhoursDistributionInterval> workhoursDistributionIntervals) {
-        this.name = name;
-        this.weight = weight;
-        this.workhoursDistributionIntervals = workhoursDistributionIntervals;
-    }
-
     public RestorationType() {
     }
 
@@ -67,6 +59,10 @@ public class RestorationType {
 
     public int getWeight() {
         return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 
     @Override
