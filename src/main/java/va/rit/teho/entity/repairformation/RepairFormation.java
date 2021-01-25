@@ -15,7 +15,7 @@ public class RepairFormation {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne
     @JoinColumn(name = "type_id", referencedColumnName = "id", nullable = false)
     private RepairFormationType repairFormationType;
 

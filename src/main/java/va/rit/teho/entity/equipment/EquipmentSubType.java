@@ -18,7 +18,7 @@ public class EquipmentSubType implements Serializable {
 
     private String fullName;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "equipment_type_id", referencedColumnName = "id")
     private EquipmentType equipmentType;
 

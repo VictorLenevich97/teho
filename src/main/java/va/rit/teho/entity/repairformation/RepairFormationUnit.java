@@ -12,7 +12,7 @@ public class RepairFormationUnit {
     @Id
     private Long id;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "repair_station_type_id", referencedColumnName = "id", nullable = false)
     private RepairStationType repairStationType;
 
@@ -21,7 +21,7 @@ public class RepairFormationUnit {
 
     private int stationAmount;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "repair_formation_id", referencedColumnName = "id", nullable = false)
     private RepairFormation repairFormation;
 
