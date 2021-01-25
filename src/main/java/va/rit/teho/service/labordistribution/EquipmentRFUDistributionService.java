@@ -8,7 +8,10 @@ import java.util.UUID;
 
 public interface EquipmentRFUDistributionService {
 
-    void distribute(UUID sessionId);
+    void distribute(UUID sessionId,
+                    List<Long> equipmentIds,
+                    List<Long> formationIds,
+                    List<Long> repairFormationUnitIds);
 
     void copy(UUID oldSessionId, UUID newSessionId);
 

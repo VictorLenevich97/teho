@@ -238,8 +238,13 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
 
     @Override
     public List<EquipmentPerFormationFailureIntensityAndLaborInput> listWithIntensityAndLaborInput(UUID sessionId,
-                                                                                                   Long repairTypeId) {
-        return equipmentPerFormationFailureIntensityRepository.findAllWithLaborInput(sessionId, repairTypeId);
+                                                                                                   Long repairTypeId,
+                                                                                                   List<Long> equipmentIds,
+                                                                                                   List<Long> formationIds) {
+        return equipmentPerFormationFailureIntensityRepository.findAllWithLaborInput(sessionId,
+                                                                                     repairTypeId,
+                                                                                     equipmentIds,
+                                                                                     formationIds);
     }
 
     @Override

@@ -50,7 +50,9 @@ public interface EquipmentPerFormationService {
             List<Long> equipmentIds);
 
     List<EquipmentPerFormationFailureIntensityAndLaborInput> listWithIntensityAndLaborInput(UUID sessionId,
-                                                                                            Long repairTypeId);
+                                                                                            Long repairTypeId,
+                                                                                            List<Long> equipmentIds,
+                                                                                            List<Long> formationIds);
 
     void copyEquipmentPerFormationData(UUID originalSessionId, UUID newSessionId);
 

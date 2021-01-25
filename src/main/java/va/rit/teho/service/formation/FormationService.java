@@ -19,7 +19,7 @@ public interface FormationService {
 
     List<Formation> list();
 
-    List<Tree<Formation>> listHierarchy();
+    List<Tree<Formation>> listHierarchy(List<Long> formationIds);
 
     void delete(Long formationId);
 }

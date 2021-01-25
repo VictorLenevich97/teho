@@ -4,7 +4,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
-import va.rit.teho.entity.equipment.*;
+import va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount;
+import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
+import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput;
+import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityPK;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,8 +17,14 @@ public interface EquipmentPerFormationFailureIntensityRepository
         extends CrudRepository<EquipmentPerFormationFailureIntensity, EquipmentPerFormationFailureIntensityPK> {
 
     @Query("SELECT new va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput(epbfi.formation.id, epbfi.equipment.id, epbfi.stage.id, elipt.repairType.id, epbfi.intensityPercentage, epbfi.avgDailyFailure, elipt.amount) FROM " +
-            "EquipmentPerFormationFailureIntensity epbfi INNER JOIN EquipmentLaborInputPerType elipt ON elipt.repairType.id = epbfi.repairType.id AND epbfi.equipment.id = elipt.equipment.id WHERE epbfi.tehoSession.id = :sessionId AND elipt.repairType.id = :repairTypeId AND epbfi.avgDailyFailure IS NOT NULL")
-    List<EquipmentPerFormationFailureIntensityAndLaborInput> findAllWithLaborInput(UUID sessionId, Long repairTypeId);
+            "EquipmentPerFormationFailureIntensity epbfi INNER JOIN EquipmentLaborInputPerType elipt ON elipt.repairType.id = epbfi.repairType.id AND epbfi.equipment.id = elipt.equipment.id " +
+            "WHERE (coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds)) AND " +
+            "(coalesce(:formationIds, null) IS NULL OR epbfi.formation.id IN (:formationIds)) AND " +
+            "epbfi.tehoSession.id = :sessionId AND elipt.repairType.id = :repairTypeId AND epbfi.avgDailyFailure IS NOT NULL")
+    List<EquipmentPerFormationFailureIntensityAndLaborInput> findAllWithLaborInput(UUID sessionId,
+                                                                                   Long repairTypeId,
+                                                                                   List<Long> equipmentIds,
+                                                                                   List<Long> formationIds);
 
     List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionId(UUID sessionId);
 

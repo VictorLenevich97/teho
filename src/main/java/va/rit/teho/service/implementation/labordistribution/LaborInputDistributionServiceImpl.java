@@ -142,12 +142,15 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     }
 
     @Override
-    public void updateLaborInputDistribution(UUID sessionId) {
+    public void updateLaborInputDistribution(UUID sessionId, List<Long> equipmentIds, List<Long> formationIds) {
         List<RepairType> repairTypeList = repairTypeService.list(true);
         repairTypeList
                 .forEach(repairType -> {
                     List<EquipmentPerFormationFailureIntensityAndLaborInput> equipmentPerFormations =
-                            equipmentPerFormationService.listWithIntensityAndLaborInput(sessionId, repairType.getId());
+                            equipmentPerFormationService.listWithIntensityAndLaborInput(sessionId,
+                                                                                        repairType.getId(),
+                                                                                        equipmentIds,
+                                                                                        formationIds);
                     calculateAndSave(repairType.getId(), sessionId, equipmentPerFormations);
                 });
     }
@@ -168,9 +171,11 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         return (List<WorkhoursDistributionInterval>) workhoursDistributionIntervalRepository.findAll();
     }
 
-    public List<LaborDistributionAggregatedData> listAggregatedDataForSessionAndFormation(Long formationId,
-                                                                                          UUID sessionId) {
-        return laborDistributionRepository.selectLaborDistributionAggregatedData(formationId, sessionId);
+    @Override
+    public List<LaborDistributionAggregatedData> listAggregatedDataForSessionAndFormation(UUID sessionId,
+                                                                                          Long formationId,
+                                                                                          List<Long> equipmentIds) {
+        return laborDistributionRepository.selectLaborDistributionAggregatedData(sessionId, formationId, equipmentIds);
     }
 
 }

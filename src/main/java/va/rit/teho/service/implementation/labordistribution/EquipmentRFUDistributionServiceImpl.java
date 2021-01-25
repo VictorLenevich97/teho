@@ -47,11 +47,20 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
         this.equipmentRFUDistributionRepository = equipmentRFUDistributionRepository;
     }
 
+    private void cleanupDistributionForSession(UUID sessionId) {
+        List<EquipmentRFUDistribution> sessionData = equipmentRFUDistributionRepository.findByTehoSessionId(
+                sessionId);
+        equipmentRFUDistributionRepository.deleteAll(sessionData);
+    }
 
     @Override
     @Transactional
-    public void distribute(UUID sessionId) {
-        List<Tree<Formation>> treeList = formationService.listHierarchy();
+    public void distribute(UUID sessionId,
+                           List<Long> equipmentIds,
+                           List<Long> formationIds,
+                           List<Long> repairFormationUnitIds) {
+        cleanupDistributionForSession(sessionId);
+        List<Tree<Formation>> treeList = formationService.listHierarchy(formationIds);
         for (Tree<Formation> t : treeList) {
             Map<Integer, Set<LaborDistributionAggregatedData>> sentUpper = new HashMap<>();
             for (int currentLevel = t.findLowestLevel(); currentLevel > 0; currentLevel--) {
@@ -61,16 +70,20 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                     Set<RepairFormation> repFormations = formationNode.getData().getRepairFormations();
                     //Get formation's equipment requiring repair
                     List<LaborDistributionAggregatedData> aggregatedDataForSession =
-                            laborInputDistributionService.listAggregatedDataForSessionAndFormation(formationNode
+                            laborInputDistributionService.listAggregatedDataForSessionAndFormation(sessionId,
+                                                                                                   formationNode
                                                                                                            .getData()
                                                                                                            .getId(),
-                                                                                                   sessionId);
+                                                                                                   equipmentIds);
 
                     //Include data from previous level (unrepaired equipment)
                     aggregatedDataForSession.addAll(sentUpper.getOrDefault(currentLevel + 1, Collections.emptySet()));
 
                     List<EquipmentRFUDistribution> distributed =
-                            distributeEquipmentPerRFU(sessionId, repFormations, aggregatedDataForSession);
+                            distributeEquipmentPerRFU(sessionId,
+                                                      repFormations,
+                                                      aggregatedDataForSession,
+                                                      repairFormationUnitIds);
 
                     List<LaborDistributionAggregatedData> undistributedData =
                             aggregatedDataForSession
@@ -163,7 +176,8 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
 
     private List<EquipmentRFUDistribution> distributeEquipmentPerRFU(UUID sessionId,
                                                                      Set<RepairFormation> repFormations,
-                                                                     List<LaborDistributionAggregatedData> aggregatedDataForSession) {
+                                                                     List<LaborDistributionAggregatedData> aggregatedDataForSession,
+                                                                     List<Long> repairFormationUnitIds) {
         List<EquipmentRFUDistribution> distributed = new ArrayList<>();
         Map<RepairFormationUnit, Map<Equipment, Double>> repairFormationUnitCapabilityMap = new HashMap<>();
         for (RepairFormation rf : repFormations) {
@@ -177,7 +191,8 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                             findCapableRFUAndDistributeEquipment(sessionId,
                                                                  repairFormationUnitCapabilityMap,
                                                                  distributionAggregatedData,
-                                                                 rf);
+                                                                 rf,
+                                                                 repairFormationUnitIds);
                     if (distribution != null) {
                         distributed.add(distribution);
                     }
@@ -190,12 +205,14 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
     private EquipmentRFUDistribution findCapableRFUAndDistributeEquipment(UUID sessionId,
                                                                           Map<RepairFormationUnit, Map<Equipment, Double>> repairFormationUnitCapabilityMap,
                                                                           LaborDistributionAggregatedData distributionAggregatedData,
-                                                                          RepairFormation rf) {
+                                                                          RepairFormation rf,
+                                                                          List<Long> repairFormationUnitIds) {
         //Find first RFU able to repair the equipment
         Optional<RepairFormationUnitRepairCapability> capableRFU =
                 rf
                         .getRepairFormationUnitSet()
                         .stream()
+                        .filter(rfu -> repairFormationUnitIds == null || repairFormationUnitIds.contains(rfu.getId()))
                         .flatMap(rfu -> rfu
                                 .getRepairCapabilities()
                                 .stream()

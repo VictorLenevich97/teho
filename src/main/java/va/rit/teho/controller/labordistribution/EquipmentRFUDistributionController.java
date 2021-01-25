@@ -4,14 +4,17 @@ import io.swagger.annotations.Api;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.ReportResponseEntity;
+import va.rit.teho.dto.labordistribution.EquipmentDistributionRowData;
+import va.rit.teho.dto.labordistribution.EquipmentDistributionTableDataDTO;
 import va.rit.teho.dto.labordistribution.EquipmentRFUDistributionDTO;
+import va.rit.teho.dto.labordistribution.LaborDistributionFilterData;
+import va.rit.teho.dto.table.NestedColumnsDTO;
+import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.labordistribution.EquipmentDistributionCombinedData;
 import va.rit.teho.entity.labordistribution.EquipmentPerFormationDistributionData;
+import va.rit.teho.entity.labordistribution.RestorationType;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
@@ -20,7 +23,9 @@ import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -47,9 +52,16 @@ public class EquipmentRFUDistributionController {
         this.distributionReportService = distributionReportService;
     }
 
+    private <T> List<T> nullIfEmpty(List<T> data) {
+        return data.isEmpty() ? null : data;
+    }
+
     @PostMapping("/repair-formation/unit/equipment")
-    public ResponseEntity<Object> distributeEquipmentPerRFU() {
-        equipmentRFUDistributionService.distribute(tehoSession.getSessionId());
+    public ResponseEntity<Object> distributeEquipmentPerRFU(@RequestBody LaborDistributionFilterData filterData) {
+        equipmentRFUDistributionService.distribute(tehoSession.getSessionId(),
+                                                   nullIfEmpty(filterData.getEquipmentIds()),
+                                                   nullIfEmpty(filterData.getFormationIds()),
+                                                   nullIfEmpty(filterData.getRepairFormationUnitIds()));
         return ResponseEntity.ok().build();
     }
 
@@ -61,6 +73,51 @@ public class EquipmentRFUDistributionController {
                 .map(EquipmentRFUDistributionDTO::from)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(equipmentRFUDistributionDTOList);
+    }
+
+
+    @GetMapping("/{formationId}/distribution")
+    public ResponseEntity<EquipmentDistributionTableDataDTO> getEquipmentDistribution(@PathVariable Long formationId) {
+        List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData =
+                equipmentRFUDistributionService.listDistributionDataForFormation(tehoSession.getSessionId(),
+                                                                                 formationId);
+        List<RepairType> repairTypes = repairTypeService.list(true);
+        List<RestorationType> restorationTypes = restorationTypeService.list();
+
+        List<EquipmentDistributionRowData> equipmentDistributionRowData = equipmentPerFormationDistributionData
+                .stream()
+                .map(epfdd -> {
+                    Map<String, Double> repairTypeAmountMap = new HashMap<>();
+                    epfdd
+                            .getAmountPerRepairType()
+                            .forEach((rt, amount) -> repairTypeAmountMap.put(rt.getId().toString(), amount));
+                    Map<String, Double> restorationTypeAmountMap = new HashMap<>();
+                    epfdd
+                            .getAmountPerRestorationType()
+                            .forEach((rt, amount) -> restorationTypeAmountMap.put(rt.getId().toString(), amount));
+
+                    return new EquipmentDistributionRowData(epfdd.getEquipment().getId(),
+                                                            epfdd.getEquipment().getName(),
+                                                            epfdd.getAmount(),
+                                                            epfdd.getAvgDailyFailure(),
+                                                            repairTypeAmountMap,
+                                                            restorationTypeAmountMap);
+                })
+                .collect(Collectors.toList());
+
+        EquipmentDistributionTableDataDTO tableDataDTO =
+                new EquipmentDistributionTableDataDTO(
+                        repairTypes
+                                .stream()
+                                .map(rt -> new NestedColumnsDTO(rt.getId().toString(), rt.getShortName()))
+                                .collect(Collectors.toList()),
+                        restorationTypes
+                                .stream()
+                                .map(rt -> new NestedColumnsDTO(rt.getId().toString(), rt.getName()))
+                                .collect(Collectors.toList()),
+                        equipmentDistributionRowData);
+
+        return ResponseEntity.ok(tableDataDTO);
     }
 
     @GetMapping("/{formationId}/distribution/report")

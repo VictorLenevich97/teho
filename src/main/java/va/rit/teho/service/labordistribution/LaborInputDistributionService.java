@@ -28,12 +28,14 @@ public interface LaborInputDistributionService {
     /**
      * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ.
      */
-    void updateLaborInputDistribution(UUID sessionId);
+    void updateLaborInputDistribution(UUID sessionId, List<Long> equipmentIds, List<Long> formationIds);
 
     void copyLaborInputDistributionData(UUID originalSessionId, UUID newSessionId);
 
     List<WorkhoursDistributionInterval> listDistributionIntervals();
 
-    List<LaborDistributionAggregatedData> listAggregatedDataForSessionAndFormation(Long formationId, UUID sessionId);
+    List<LaborDistributionAggregatedData> listAggregatedDataForSessionAndFormation(UUID sessionId,
+                                                                                   Long formationId,
+                                                                                   List<Long> equipmentIds);
 
 }

@@ -104,23 +104,28 @@ public class FormationServiceImpl implements FormationService {
         return (List<Formation>) formationRepository.findAll();
     }
 
-    private void populateTree(Tree.Node<Formation> node, Set<Formation> formations) {
+    private void populateTree(Tree.Node<Formation> node, Set<Formation> formations, List<Long> formationIds) {
         for (Formation formation : formations) {
-            Tree.Node<Formation> childrenFormationNode = node.addChildren(formation);
-            if (!formation.getChildFormations().isEmpty()) {
-                populateTree(childrenFormationNode, formation.getChildFormations());
+            if (formationIds == null || formationIds.contains(formation.getId())) {
+                Tree.Node<Formation> childrenFormationNode = node.addChildren(formation);
+                if (!formation.getChildFormations().isEmpty()) {
+                    populateTree(childrenFormationNode, formation.getChildFormations(), formationIds);
+                }
             }
         }
     }
 
     @Override
-    public List<Tree<Formation>> listHierarchy() {
-        List<Formation> rootFormations = formationRepository.findFormationByParentFormationIsNull();
+    public List<Tree<Formation>> listHierarchy(List<Long> formationIds) {
+        List<Formation> rootFormations =
+                formationIds == null ?
+                        formationRepository.findFormationByParentFormationIsNull() :
+                        formationRepository.findFormationByParentFormationIsNullAndIdNotIn(formationIds);
         List<Tree<Formation>> treeList = new ArrayList<>();
         for (Formation formation : rootFormations) {
             Tree<Formation> formationTree = new Tree<>(formation);
             treeList.add(formationTree);
-            populateTree(formationTree.getRoot(), formation.getChildFormations());
+            populateTree(formationTree.getRoot(), formation.getChildFormations(), formationIds);
         }
         return treeList;
     }

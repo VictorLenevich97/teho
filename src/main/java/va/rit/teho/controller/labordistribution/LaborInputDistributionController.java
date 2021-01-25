@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.labordistribution.CountAndLaborInputDTO;
+import va.rit.teho.dto.labordistribution.LaborDistributionFilterData;
 import va.rit.teho.dto.labordistribution.LaborDistributionNestedColumnsDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
@@ -37,9 +38,7 @@ public class LaborInputDistributionController {
 
     private final LaborInputDistributionService laborInputDistributionService;
 
-
     private final ReportService<LaborInputDistributionCombinedData> reportService;
-
 
     @Resource
     private TehoSessionData tehoSession;
@@ -124,10 +123,16 @@ public class LaborInputDistributionController {
                                             Formatter.formatDoubleAsString(elid.getTotalRepairComplexity()));
     }
 
+    private <T> List<T> nullIfEmpty(List<T> data) {
+        return data == null ? null : data.isEmpty() ? null : data;
+    }
+
     @PostMapping
     @ApiOperation(value = "Обновить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта")
-    public ResponseEntity<Object> updateDistributionData() {
-        laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId());
+    public ResponseEntity<Object> updateDistributionData(@RequestBody LaborDistributionFilterData filterData) {
+        laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId(),
+                                                                   nullIfEmpty(filterData.getEquipmentIds()),
+                                                                   nullIfEmpty(filterData.getFormationIds()));
         return ResponseEntity.accepted().build();
     }
 
