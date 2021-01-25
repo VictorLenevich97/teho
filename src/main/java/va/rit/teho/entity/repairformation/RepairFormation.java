@@ -56,6 +56,18 @@ public class RepairFormation {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setRepairFormationType(RepairFormationType repairFormationType) {
+        this.repairFormationType = repairFormationType;
+    }
+
+    public void setFormation(Formation formation) {
+        this.formation = formation;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

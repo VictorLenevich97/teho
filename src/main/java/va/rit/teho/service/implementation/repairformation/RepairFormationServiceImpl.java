@@ -53,14 +53,13 @@ public class RepairFormationServiceImpl implements RepairFormationService {
 
     @Override
     public RepairFormation update(Long id, String name, Long typeId, Long formationId) {
-        repairFormationRepository
+        RepairFormation repairFormation = repairFormationRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Формирование не найдено!"));
-        RepairFormation updated = new RepairFormation(id,
-                                                      name,
-                                                      formationService.get(formationId),
-                                                      repairFormationTypeService.get(typeId));
-        return repairFormationRepository.save(updated);
+        repairFormation.setName(name);
+        repairFormation.setRepairFormationType(repairFormationTypeService.get(typeId));
+        repairFormation.setFormation(formationService.get(formationId));
+        return repairFormationRepository.save(repairFormation);
     }
 
     @Override

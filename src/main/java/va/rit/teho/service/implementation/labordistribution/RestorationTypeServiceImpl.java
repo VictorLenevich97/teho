@@ -48,6 +48,6 @@ public class RestorationTypeServiceImpl implements RestorationTypeService {
         RestorationType restorationType = typeOptional.get();
         restorationType.setName(name);
         restorationType.setWeight(weight);
-        return restorationTypeRepository.save(new RestorationType(id, name, weight));
+        return restorationTypeRepository.save(restorationType);
     }
 }

@@ -137,10 +137,10 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     public List<RepairFormationUnitEquipmentStaff> updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList) {
         repairFormationUnitEquipmentStaffList.forEach(this::checkEquipmentStaffPreconditions);
 
-        Iterable<RepairFormationUnitEquipmentStaff> updatedEepairFormationUnitEquipmentStaff =
+        Iterable<RepairFormationUnitEquipmentStaff> updatedRepairFormationUnitEquipmentStaff =
                 repairFormationUnitEquipmentStaffRepository.saveAll(repairFormationUnitEquipmentStaffList);
         return StreamSupport
-                .stream(updatedEepairFormationUnitEquipmentStaff.spliterator(), false)
+                .stream(updatedRepairFormationUnitEquipmentStaff.spliterator(), false)
                 .collect(Collectors.toList());
     }
 
