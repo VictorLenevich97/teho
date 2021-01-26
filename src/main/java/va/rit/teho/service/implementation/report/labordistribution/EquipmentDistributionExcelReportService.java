@@ -23,7 +23,7 @@ public class EquipmentDistributionExcelReportService
             EquipmentPerFormationDistributionData epfdd) {
         ReportCell eqNameCell = new ReportCell(epfdd.getEquipment().getName());
         ReportCell eqCountCell = new ReportCell(epfdd.getAmount());
-        ReportCell failureCountCell = new ReportCell(epfdd.getAvgDailyFailure());
+        ReportCell failureCountCell = new ReportCell(epfdd.getAvgDailyFailure(), ReportCell.CellType.NUMERIC);
         List<ReportCell> repairTypeCells =
                 data
                         .getRepairTypeList()
