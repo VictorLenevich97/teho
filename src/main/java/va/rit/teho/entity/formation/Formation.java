@@ -1,8 +1,6 @@
 package va.rit.teho.entity.formation;
 
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
-import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
-import va.rit.teho.entity.labordistribution.LaborDistribution;
 import va.rit.teho.entity.repairformation.RepairFormation;
 
 import javax.persistence.*;
@@ -33,20 +31,8 @@ public class Formation implements Serializable {
     @OneToMany(mappedBy = "formation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<RepairFormation> repairFormations;
 
-    public Set<RepairFormation> getRepairFormations() {
-        return repairFormations;
-    }
-
-    public Set<Formation> getChildFormations() {
-        return childFormations;
-    }
-
     @OneToMany(mappedBy = "parentFormation")
     private Set<Formation> childFormations;
-
-    public Set<EquipmentPerFormation> getEquipmentPerFormations() {
-        return equipmentPerFormations;
-    }
 
     public Formation() {
     }
@@ -64,8 +50,28 @@ public class Formation implements Serializable {
         this.parentFormation = parentFormation;
     }
 
+    public Set<RepairFormation> getRepairFormations() {
+        return repairFormations;
+    }
+
+    public Set<Formation> getChildFormations() {
+        return childFormations;
+    }
+
+    public Set<EquipmentPerFormation> getEquipmentPerFormations() {
+        return equipmentPerFormations;
+    }
+
+    public void setEquipmentPerFormations(Set<EquipmentPerFormation> equipmentPerFormations) {
+        this.equipmentPerFormations = equipmentPerFormations;
+    }
+
     public Formation getParentFormation() {
         return parentFormation;
+    }
+
+    public void setParentFormation(Formation parentFormation) {
+        this.parentFormation = parentFormation;
     }
 
     public Long getId() {
@@ -102,16 +108,8 @@ public class Formation implements Serializable {
                 Objects.equals(fullName, formation.fullName);
     }
 
-    public void setEquipmentPerFormations(Set<EquipmentPerFormation> equipmentPerFormations) {
-        this.equipmentPerFormations = equipmentPerFormations;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(id, shortName, fullName);
-    }
-
-    public void setParentFormation(Formation parentFormation) {
-        this.parentFormation = parentFormation;
     }
 }

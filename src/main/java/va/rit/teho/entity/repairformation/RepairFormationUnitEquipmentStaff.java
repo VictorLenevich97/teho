@@ -84,20 +84,26 @@ public class RepairFormationUnitEquipmentStaff {
         return equipmentSubType;
     }
 
+    public void setEquipmentSubType(EquipmentSubType equipmentSubType) {
+        this.equipmentSubType = equipmentSubType;
+    }
+
     public Integer getTotalStaff() {
         return totalStaff;
+    }
+
+    public RepairFormationUnitEquipmentStaff setTotalStaff(int totalStaff) {
+        this.totalStaff = totalStaff;
+        return this;
     }
 
     public Integer getAvailableStaff() {
         return availableStaff;
     }
 
-    public void setTotalStaff(int totalStaff) {
-        this.totalStaff = totalStaff;
-    }
-
-    public void setAvailableStaff(int availableStaff) {
+    public RepairFormationUnitEquipmentStaff setAvailableStaff(int availableStaff) {
         this.availableStaff = availableStaff;
+        return this;
     }
 
     public TehoSession getTehoSession() {
@@ -109,9 +115,5 @@ public class RepairFormationUnitEquipmentStaff {
                 getEquipmentPerRepairFormationUnit().copy(newSessionId),
                 getTotalStaff(),
                 getAvailableStaff());
-    }
-
-    public void setEquipmentSubType(EquipmentSubType equipmentSubType) {
-        this.equipmentSubType = equipmentSubType;
     }
 }

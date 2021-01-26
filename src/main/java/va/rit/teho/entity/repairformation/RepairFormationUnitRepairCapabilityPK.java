@@ -50,10 +50,6 @@ public class RepairFormationUnitRepairCapabilityPK implements Serializable {
                 Objects.equals(sessionId, that.sessionId);
     }
 
-    public void setSessionId(UUID sessionId) {
-        this.sessionId = sessionId;
-    }
-
     public Long getRepairFormationUnitId() {
         return repairFormationUnitId;
     }
@@ -64,6 +60,10 @@ public class RepairFormationUnitRepairCapabilityPK implements Serializable {
 
     public UUID getSessionId() {
         return sessionId;
+    }
+
+    public void setSessionId(UUID sessionId) {
+        this.sessionId = sessionId;
     }
 
     public Long getRepairTypeId() {

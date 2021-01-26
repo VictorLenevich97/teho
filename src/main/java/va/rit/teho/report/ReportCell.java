@@ -31,10 +31,12 @@ public class ReportCell {
         return value.toString();
     }
 
-    public String getNumericValue() { return new DecimalFormat("#.##").format(Double.parseDouble(value.toString())); }
+    public String getNumericValue() {
+        return new DecimalFormat("#.##").format(Double.parseDouble(value.toString()));
+    }
 
     public String getValue() {
-        if(cellType.equals(CellType.TEXT)) {
+        if (cellType.equals(CellType.TEXT)) {
             return getTextValue();
         } else {
             return getNumericValue();

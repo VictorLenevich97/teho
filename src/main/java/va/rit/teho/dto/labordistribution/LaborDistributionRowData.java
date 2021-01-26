@@ -12,10 +12,6 @@ public class LaborDistributionRowData extends RowData<Map<String, CountAndLaborI
     private final Integer standardLaborInput;
     private final String totalLaborInput;
 
-    public String getEquipmentName() {
-        return equipmentName;
-    }
-
     public LaborDistributionRowData(String name,
                                     Map<String, CountAndLaborInputDTO> data,
                                     String equipmentName,
@@ -27,6 +23,10 @@ public class LaborDistributionRowData extends RowData<Map<String, CountAndLaborI
         this.avgDailyFailure = avgDailyFailure;
         this.standardLaborInput = standardLaborInput;
         this.totalLaborInput = totalLaborInput;
+    }
+
+    public String getEquipmentName() {
+        return equipmentName;
     }
 
     public Integer getStandardLaborInput() {

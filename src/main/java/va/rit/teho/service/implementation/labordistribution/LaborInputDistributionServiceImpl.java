@@ -126,6 +126,10 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                                                             repairTypeId));
     }
 
+    private void cleanupSessionData(UUID sessionId) {
+        laborDistributionRepository.deleteAll(laborDistributionRepository.findByTehoSessionId(sessionId));
+    }
+
     private void calculateAndSave(Long repairTypeId,
                                   UUID sessionId,
                                   List<EquipmentPerFormationFailureIntensityAndLaborInput> equipmentPerFormations) {
@@ -142,7 +146,9 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     }
 
     @Override
+    @Transactional
     public void updateLaborInputDistribution(UUID sessionId, List<Long> equipmentIds, List<Long> formationIds) {
+        cleanupSessionData(sessionId);
         List<RepairType> repairTypeList = repairTypeService.list(true);
         repairTypeList
                 .forEach(repairType -> {

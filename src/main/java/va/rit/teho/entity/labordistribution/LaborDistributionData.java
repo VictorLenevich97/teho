@@ -14,10 +14,6 @@ public class LaborDistributionData {
     public LaborDistributionData() {
     }
 
-    public Double getAvgDailyFailure() {
-        return avgDailyFailure;
-    }
-
     public LaborDistributionData(EquipmentPerFormation equipmentPerFormation,
                                  Integer laborInput,
                                  Long intervalId,
@@ -30,6 +26,10 @@ public class LaborDistributionData {
         this.count = count;
         this.avgLaborInput = avgLaborInput;
         this.avgDailyFailure = avgDailyFailure;
+    }
+
+    public Double getAvgDailyFailure() {
+        return avgDailyFailure;
     }
 
     public EquipmentPerFormation getEquipmentPerFormation() {

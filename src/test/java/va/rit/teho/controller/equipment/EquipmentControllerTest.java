@@ -64,7 +64,7 @@ public class EquipmentControllerTest extends ControllerTest {
     @Test
     public void testAddNewEquipment() throws Exception {
         EquipmentLaborInputPerTypeRowData equipmentLaborInputPerTypeRowData =
-                new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, "", Collections.singletonMap("1", 1));
+                new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, "test", Collections.singletonMap("1", 1));
         when(equipmentService.add(equipmentLaborInputPerTypeRowData.getName(),
                                   equipmentLaborInputPerTypeRowData.getSubTypeId(),
                                   Collections.singletonMap(1L, 1))).thenReturn(EQUIPMENT);
@@ -81,7 +81,7 @@ public class EquipmentControllerTest extends ControllerTest {
     @Test
     public void testUpdateEquipment() throws Exception {
         EquipmentLaborInputPerTypeRowData equipmentLaborInputPerTypeRowData =
-                new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, "", Collections.singletonMap("1", 1));
+                new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, null, Collections.singletonMap("1", 1));
 
         when(equipmentService.update(equipmentLaborInputPerTypeRowData.getId(),
                                      equipmentLaborInputPerTypeRowData.getName(),

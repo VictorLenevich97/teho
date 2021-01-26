@@ -7,6 +7,7 @@ import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityPK;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -27,5 +28,15 @@ public interface RepairFormationUnitRepairCapabilityRepository
                                                            List<Long> equipmentIds,
                                                            List<Long> equipmentSubTypeIds,
                                                            List<Long> equipmentTypeIds);
+
+    @Query("SELECT c FROM RepairFormationUnitRepairCapability c WHERE " +
+            "c.tehoSession.id = :sessionId AND " +
+            "c.repairFormationUnit.id = :repairFormationUnitId AND " +
+            "c.equipment.id = :equipmentId AND " +
+            "c.repairType.id = :repairTypeId")
+    Optional<RepairFormationUnitRepairCapability> find(UUID sessionId,
+                                                       Long repairFormationUnitId,
+                                                       Long equipmentId,
+                                                       Long repairTypeId);
 
 }

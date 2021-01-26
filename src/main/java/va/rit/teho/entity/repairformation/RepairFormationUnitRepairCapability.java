@@ -72,7 +72,8 @@ public class RepairFormationUnitRepairCapability {
         if (o == null || getClass() != o.getClass()) return false;
         RepairFormationUnitRepairCapability that = (RepairFormationUnitRepairCapability) o;
         return Double.compare(that.capability, capability) == 0 &&
-                Objects.equals(equipmentPerRepairFormationUnitWithRepairType, that.equipmentPerRepairFormationUnitWithRepairType) &&
+                Objects.equals(equipmentPerRepairFormationUnitWithRepairType,
+                               that.equipmentPerRepairFormationUnitWithRepairType) &&
                 Objects.equals(repairFormationUnit, that.repairFormationUnit) &&
                 Objects.equals(equipment, that.equipment) &&
                 Objects.equals(repairType, that.repairType) &&
@@ -121,8 +122,9 @@ public class RepairFormationUnitRepairCapability {
         return capability;
     }
 
-    public void setCapability(double capability) {
+    public RepairFormationUnitRepairCapability setCapability(double capability) {
         this.capability = capability;
+        return this;
     }
 
     public RepairFormationUnitRepairCapability copy(UUID newSessionId) {

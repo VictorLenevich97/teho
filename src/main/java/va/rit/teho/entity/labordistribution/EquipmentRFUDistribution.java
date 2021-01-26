@@ -47,14 +47,6 @@ public class EquipmentRFUDistribution {
     public EquipmentRFUDistribution() {
     }
 
-    public Double getRepairing() {
-        return repairing;
-    }
-
-    public Double getUnable() {
-        return unable;
-    }
-
     public EquipmentRFUDistribution(EquipmentRFUDistributionPK equipmentRFUDistributionPK,
                                     Double repairing,
                                     Double unable) {
@@ -77,6 +69,14 @@ public class EquipmentRFUDistribution {
         this.workhoursDistributionInterval = interval;
         this.repairing = repairing;
         this.unable = unable;
+    }
+
+    public Double getRepairing() {
+        return repairing;
+    }
+
+    public Double getUnable() {
+        return unable;
     }
 
     public EquipmentRFUDistributionPK getEquipmentRFUDistributionPK() {

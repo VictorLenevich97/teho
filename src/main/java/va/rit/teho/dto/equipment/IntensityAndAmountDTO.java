@@ -1,9 +1,14 @@
 package va.rit.teho.dto.equipment;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 public class IntensityAndAmountDTO {
     private List<IntensityPerRepairTypeAndStageDTO> intensities;
+
+    @Positive
+    @Max(10000)
     private int amount;
 
     public IntensityAndAmountDTO(List<IntensityPerRepairTypeAndStageDTO> intensities, int amount) {
@@ -14,12 +19,12 @@ public class IntensityAndAmountDTO {
     public IntensityAndAmountDTO() {
     }
 
-    public void setIntensities(List<IntensityPerRepairTypeAndStageDTO> intensities) {
-        this.intensities = intensities;
-    }
-
     public List<IntensityPerRepairTypeAndStageDTO> getIntensities() {
         return intensities;
+    }
+
+    public void setIntensities(List<IntensityPerRepairTypeAndStageDTO> intensities) {
+        this.intensities = intensities;
     }
 
     public int getAmount() {

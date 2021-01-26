@@ -3,10 +3,14 @@ package va.rit.teho.dto.equipment;
 import va.rit.teho.dto.table.RowData;
 import va.rit.teho.entity.equipment.Equipment;
 
+import javax.validation.constraints.Positive;
 import java.util.Map;
 
 public class EquipmentLaborInputPerTypeRowData extends RowData<Map<String, Integer>> {
+
+    @Positive
     private final Long subTypeId;
+
     private final String subTypeName;
 
     public EquipmentLaborInputPerTypeRowData() {

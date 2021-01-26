@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
@@ -25,6 +26,8 @@ import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
 import java.util.List;
@@ -32,6 +35,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
+@Validated
 @RequestMapping(path = "labor-distribution", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Распределение ремонтного фонда")
 public class LaborInputDistributionController {
@@ -53,8 +57,8 @@ public class LaborInputDistributionController {
     @ResponseBody
     @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта (в табличном формате)")
     public ResponseEntity<byte[]> getDistributionDataReport(
-            @ApiParam(value = "Ключ этапа", required = true) @PathVariable Long stageId,
-            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable Long repairTypeId,
+            @ApiParam(value = "Ключ этапа", required = true) @PathVariable @Positive Long stageId,
+            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) throws
             UnsupportedEncodingException {
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
@@ -75,8 +79,8 @@ public class LaborInputDistributionController {
     @ResponseBody
     @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта (в табличном формате)")
     public ResponseEntity<TableDataDTO<Map<String, CountAndLaborInputDTO>>> getDistributionData(
-            @ApiParam(value = "Ключ этапа", required = true) @PathVariable Long stageId,
-            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable Long repairTypeId,
+            @ApiParam(value = "Ключ этапа", required = true) @PathVariable @Positive Long stageId,
+            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) {
         Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
                 laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(),
@@ -129,7 +133,7 @@ public class LaborInputDistributionController {
 
     @PostMapping
     @ApiOperation(value = "Обновить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта")
-    public ResponseEntity<Object> updateDistributionData(@RequestBody LaborDistributionFilterData filterData) {
+    public ResponseEntity<Object> updateDistributionData(@Valid @RequestBody LaborDistributionFilterData filterData) {
         laborInputDistributionService.updateLaborInputDistribution(tehoSession.getSessionId(),
                                                                    nullIfEmpty(filterData.getEquipmentIds()),
                                                                    nullIfEmpty(filterData.getFormationIds()));

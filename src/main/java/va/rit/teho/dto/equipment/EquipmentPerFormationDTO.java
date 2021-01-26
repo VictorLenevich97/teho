@@ -13,6 +13,12 @@ public class EquipmentPerFormationDTO {
         this.amount = amount;
     }
 
+    public static EquipmentPerFormationDTO from(EquipmentPerFormation equipmentPerFormation) {
+        return new EquipmentPerFormationDTO(equipmentPerFormation.getEquipment().getId(),
+                                            equipmentPerFormation.getEquipment().getName(),
+                                            equipmentPerFormation.getAmount());
+    }
+
     public Long getEquipmentId() {
         return equipmentId;
     }
@@ -23,11 +29,5 @@ public class EquipmentPerFormationDTO {
 
     public int getAmount() {
         return amount;
-    }
-
-    public static EquipmentPerFormationDTO from(EquipmentPerFormation equipmentPerFormation) {
-        return new EquipmentPerFormationDTO(equipmentPerFormation.getEquipment().getId(),
-                                            equipmentPerFormation.getEquipment().getName(),
-                                            equipmentPerFormation.getAmount());
     }
 }
