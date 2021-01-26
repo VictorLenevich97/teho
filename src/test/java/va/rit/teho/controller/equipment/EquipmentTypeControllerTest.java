@@ -73,6 +73,13 @@ public class EquipmentTypeControllerTest extends ControllerTest {
         Long equipmentTypeId = 3L;
         EquipmentSubTypeDTO equipmentSubTypeDTO = new EquipmentSubTypeDTO("subTypeShortName", "subTypeFullName");
 
+        when(equipmentTypeService.addSubType(equipmentTypeId,
+                                             equipmentSubTypeDTO.getShortName(),
+                                             equipmentSubTypeDTO.getFullName())).thenReturn(new EquipmentSubType(
+                equipmentSubTypeDTO.getShortName(),
+                equipmentSubTypeDTO.getFullName(),
+                new EquipmentType("", "")));
+
         mockMvc.perform(post("/equipment-type/{id}/subtype", equipmentTypeId).contentType(MediaType.APPLICATION_JSON)
                                                                              .content(objectMapper.writeValueAsString(
                                                                                      equipmentSubTypeDTO)))

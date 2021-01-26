@@ -105,7 +105,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     @Override
-    public Long addSubType(Long typeId, String shortName, String fullName) {
+    public EquipmentSubType addSubType(Long typeId, String shortName, String fullName) {
         if (!equipmentTypeRepository.findById(typeId).isPresent()) {
             throw new IncorrectParamException("typeId", typeId);
         }
@@ -113,8 +113,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
             throw new AlreadyExistsException("Вид ВВСТ", "название", fullName);
         });
         return equipmentSubTypeRepository
-                .save(new EquipmentSubType(shortName, fullName, getEquipmentTypeById(typeId)))
-                .getId();
+                .save(new EquipmentSubType(shortName, fullName, getEquipmentTypeById(typeId)));
     }
 
     @Override
@@ -124,7 +123,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     @Override
-    public void updateSubType(Long id, Long typeId, String shortName, String fullName) {
+    public EquipmentSubType updateSubType(Long id, Long typeId, String shortName, String fullName) {
         EquipmentType equipmentType = equipmentTypeRepository.findById(typeId)
                                                              .orElseThrow(() -> new IncorrectParamException("typeId",
                                                                                                             typeId));
@@ -135,7 +134,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
         equipmentSubType.setEquipmentType(equipmentType);
         equipmentSubType.setShortName(shortName);
         equipmentSubType.setFullName(fullName);
-        equipmentSubTypeRepository.save(equipmentSubType);
+        return equipmentSubTypeRepository.save(equipmentSubType);
     }
 
     @Override

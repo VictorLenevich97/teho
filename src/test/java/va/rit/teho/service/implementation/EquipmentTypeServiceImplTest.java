@@ -112,7 +112,7 @@ public class EquipmentTypeServiceImplTest {
         when(equipmentSubTypeRepository.save(equipmentSubType)).thenReturn(addedEquipmentSubType);
 
         Assertions.assertEquals(
-                addedEquipmentSubType.getId(),
+                addedEquipmentSubType,
                 equipmentTypeService.addSubType(equipmentType.getId(),
                                                 equipmentSubType.getShortName(),
                                                 equipmentSubType.getFullName()));

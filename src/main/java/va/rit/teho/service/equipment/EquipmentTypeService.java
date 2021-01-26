@@ -23,11 +23,11 @@ public interface EquipmentTypeService {
 
     EquipmentType deleteType(Long id);
 
-    Long addSubType(Long typeId, String shortName, String fullName);
+    EquipmentSubType addSubType(Long typeId, String shortName, String fullName);
 
     EquipmentSubType getSubType(Long subTypeId);
 
-    void updateSubType(Long id, Long typeId, String shortName, String fullName);
+    EquipmentSubType updateSubType(Long id, Long typeId, String shortName, String fullName);
 
     void deleteSubType(Long id);
 
