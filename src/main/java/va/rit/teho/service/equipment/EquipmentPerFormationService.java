@@ -11,8 +11,6 @@ import java.util.UUID;
 
 public interface EquipmentPerFormationService {
 
-    List<EquipmentPerFormation> list(Long formationId);
-
     EquipmentPerFormation addEquipmentToFormation(Long formationId, Long equipmentId, Long amount);
 
     void addEquipmentToFormation(Long formationId, List<Long> equipmentId, int amount);
@@ -33,24 +31,28 @@ public interface EquipmentPerFormationService {
                                               Long stageId,
                                               Double dailyFailure);
 
+    void calculateAndSetEquipmentPerFormationDailyFailure(UUID sessionId,
+                                                          Long formationId,
+                                                          double coefficient);
+
+
     List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, List<Long> equipmentIds);
+
+    List<EquipmentPerFormation> getEquipmentInAllFormations(List<Long> equipmentIds);
 
     Map<EquipmentSubType, List<EquipmentPerFormation>> getGroupedEquipmentInFormation(Long formationId,
                                                                                       List<Long> equipmentIds);
 
     Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalGroupedEquipmentInFormations(List<Long> equipmentIds);
 
-    List<EquipmentPerFormationFailureIntensity> updateAvgDailyFailureData(UUID sessionId,
-                                                                          Long formationId,
-                                                                          double coefficient);
-
-    Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> getTotalFailureIntensityData(
-            UUID sessionId);
-
     Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getFailureIntensityData(
             UUID sessionId,
             Long formationId,
             List<Long> equipmentIds);
+
+
+    Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> getTotalFailureIntensityData(
+            UUID sessionId);
 
     List<EquipmentPerFormationFailureIntensityAndLaborInput> listWithIntensityAndLaborInput(UUID sessionId,
                                                                                             Long repairTypeId,

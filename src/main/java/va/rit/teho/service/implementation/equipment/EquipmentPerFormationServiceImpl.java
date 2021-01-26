@@ -15,9 +15,11 @@ import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.formation.FormationService;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -63,18 +65,18 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
             Long repairTypeId,
             Long stageId,
             Integer intensity) {
-        formationService.get(formationId);
-        equipmentService.get(equipmentId);
 
         EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
-                new EquipmentPerFormationFailureIntensity(
-                        new EquipmentPerFormationFailureIntensityPK(formationId,
-                                                                    equipmentId,
-                                                                    stageId,
-                                                                    repairTypeId,
-                                                                    sessionId),
-                        intensity,
-                        null);
+                equipmentPerFormationFailureIntensityRepository
+                        .find(sessionId, formationId, equipmentId, stageId, repairTypeId)
+                        .map(epffi -> epffi.setIntensityPercentage(intensity))
+                        .orElse(new EquipmentPerFormationFailureIntensity(sessionId,
+                                                                          formationId,
+                                                                          equipmentId,
+                                                                          stageId,
+                                                                          repairTypeId,
+                                                                          intensity,
+                                                                          null));
 
         equipmentPerFormationFailureIntensityRepository.save(equipmentPerFormationFailureIntensity);
     }
@@ -89,25 +91,19 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
         formationService.get(formationId);
         equipmentService.get(equipmentId);
 
-        Integer intensity =
-                Optional.ofNullable(equipmentPerFormationFailureIntensityRepository
-                                            .get(sessionId,
-                                                 formationId,
-                                                 equipmentId,
-                                                 stageId,
-                                                 repairTypeId))
-                        .map(EquipmentPerFormationFailureIntensity::getIntensityPercentage)
-                        .orElse(0);
 
         EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
-                new EquipmentPerFormationFailureIntensity(
-                        new EquipmentPerFormationFailureIntensityPK(formationId,
-                                                                    equipmentId,
-                                                                    stageId,
-                                                                    repairTypeId,
-                                                                    sessionId),
-                        intensity,
-                        dailyFailure);
+                equipmentPerFormationFailureIntensityRepository
+                        .find(sessionId, formationId, equipmentId, stageId, repairTypeId)
+                        .map(epffi -> epffi.setAvgDailyFailure(dailyFailure))
+                        .orElse(new EquipmentPerFormationFailureIntensity(sessionId,
+                                                                          formationId,
+                                                                          equipmentId,
+                                                                          stageId,
+                                                                          repairTypeId,
+                                                                          0,
+                                                                          dailyFailure));
+
 
         equipmentPerFormationFailureIntensityRepository.save(equipmentPerFormationFailureIntensity);
     }
@@ -115,6 +111,11 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     @Override
     public List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, List<Long> equipmentIds) {
         return equipmentPerFormationRepository.findAllByFormationId(formationId, equipmentIds);
+    }
+
+    @Override
+    public List<EquipmentPerFormation> getEquipmentInAllFormations(List<Long> equipmentIds) {
+        return equipmentPerFormationRepository.findTotal(equipmentIds);
     }
 
     @Override
@@ -136,9 +137,9 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public List<EquipmentPerFormationFailureIntensity> updateAvgDailyFailureData(UUID sessionId,
-                                                                                 Long formationId,
-                                                                                 double coefficient) {
+    public void calculateAndSetEquipmentPerFormationDailyFailure(UUID sessionId,
+                                                                 Long formationId,
+                                                                 double coefficient) {
         List<EquipmentPerFormationFailureIntensity> updatedWithAvgDailyFailureData =
                 equipmentPerFormationFailureIntensityRepository
                         .findAllByTehoSessionIdAndFormationId(sessionId, formationId, null)
@@ -152,14 +153,10 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                     .getAmount(),
                                             equipmentPerFormationFailureIntensity.getIntensityPercentage(),
                                             coefficient);
-                            return equipmentPerFormationFailureIntensity.copy().setAvgDailyFailure(avgDailyFailure);
+                            return equipmentPerFormationFailureIntensity.setAvgDailyFailure(avgDailyFailure);
                         })
                         .collect(Collectors.toList());
-        Iterable<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensities =
-                equipmentPerFormationFailureIntensityRepository.saveAll(updatedWithAvgDailyFailureData);
-        return StreamSupport
-                .stream(equipmentPerFormationFailureIntensities.spliterator(), false)
-                .collect(Collectors.toList());
+        equipmentPerFormationFailureIntensityRepository.saveAll(updatedWithAvgDailyFailureData);
     }
 
     @Override
@@ -170,25 +167,14 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
         Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> result = new HashMap<>();
 
         for (EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity : equipmentPerFormationFailureIntensityList) {
-            Map<Stage, EquipmentPerFormationFailureIntensity> map = result
+            result
                     .computeIfAbsent(equipmentPerFormationFailureIntensity.getFormation(), e -> new HashMap<>())
                     .computeIfAbsent(equipmentPerFormationFailureIntensity.getEquipment(), e -> new HashMap<>())
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), e -> new HashMap<>());
-            EquipmentPerFormationFailureIntensity existing = map.getOrDefault(equipmentPerFormationFailureIntensity.getStage(),
-                                                                              null);
-            if (existing != null) {
-                existing.setAvgDailyFailure((existing.getAvgDailyFailure() == null ? 0.0 : existing.getAvgDailyFailure()) + (equipmentPerFormationFailureIntensity
-                        .getAvgDailyFailure() == null ? 0.0 : equipmentPerFormationFailureIntensity.getAvgDailyFailure()));
-            } else {
-                map.put(equipmentPerFormationFailureIntensity.getStage(), equipmentPerFormationFailureIntensity);
-            }
+                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), e -> new HashMap<>())
+                    .put(equipmentPerFormationFailureIntensity.getStage(), equipmentPerFormationFailureIntensity);
+
         }
         return result;
-    }
-
-    @Override
-    public List<EquipmentPerFormation> list(Long formationId) {
-        return equipmentPerFormationRepository.findAllByFormationId(formationId, null);
     }
 
     @Override

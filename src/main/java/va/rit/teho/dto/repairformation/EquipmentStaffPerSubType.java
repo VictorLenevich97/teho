@@ -2,8 +2,10 @@ package va.rit.teho.dto.repairformation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
+import va.rit.teho.entity.repairformation.RepairFormationUnitPK;
 
 import java.util.List;
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentStaffPerSubType {
@@ -46,6 +48,14 @@ public class EquipmentStaffPerSubType {
                                             repairFormationUnitEquipmentStaff.getEquipmentSubType().getFullName(),
                                             repairFormationUnitEquipmentStaff.getTotalStaff(),
                                             repairFormationUnitEquipmentStaff.getAvailableStaff());
+    }
+
+    public RepairFormationUnitEquipmentStaff toEntity(UUID sessionId, Long repairFormationUnitId) {
+        return new RepairFormationUnitEquipmentStaff(new RepairFormationUnitPK(repairFormationUnitId,
+                                                                               getSubTypeId(),
+                                                                               sessionId),
+                                                     getTotal(),
+                                                     getAvailable());
     }
 
     public List<RepairCapabilityPerEquipment> getEquipment() {

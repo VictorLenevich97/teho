@@ -20,7 +20,6 @@ import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitCombinedData;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
-import va.rit.teho.entity.repairformation.RepairFormationUnitPK;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
@@ -251,15 +250,10 @@ public class RepairFormationUnitController {
     public ResponseEntity<List<EquipmentStaffPerSubType>> updateRepairFormationUnitEquipmentStaff(
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
             @ApiParam(value = "Данные по численности л/с", required = true) @Valid @RequestBody List<EquipmentStaffPerSubType> staffData) {
-        List<RepairFormationUnitEquipmentStaff> list = new ArrayList<>();
-        for (EquipmentStaffPerSubType sd : staffData) {
-            RepairFormationUnitEquipmentStaff formationUnitEquipmentStaff = new RepairFormationUnitEquipmentStaff(
-                    new RepairFormationUnitPK(repairFormationUnitId, sd.getSubTypeId(), tehoSession.getSessionId()),
-                    sd.getTotal(),
-                    sd.getAvailable());
-            formationUnitEquipmentStaff.setEquipmentSubType(equipmentTypeService.getSubType(sd.getSubTypeId()));
-            list.add(formationUnitEquipmentStaff);
-        }
+        List<RepairFormationUnitEquipmentStaff> list =
+                staffData.stream()
+                         .map(sd -> sd.toEntity(tehoSession.getSessionId(), repairFormationUnitId))
+                         .collect(Collectors.toList());
 
         return ResponseEntity.accepted().body(
                 repairFormationUnitService
