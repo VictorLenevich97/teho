@@ -7,16 +7,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.session.SessionDTO;
 import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.service.session.SessionService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
+@Validated
 @RequestMapping(path = "session", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Сессии")
 public class SessionController {
@@ -35,7 +38,7 @@ public class SessionController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Создать сессию")
-    public ResponseEntity<SessionDTO> createSession(@ApiParam(value = "Данные о сессии", required = true) @RequestBody SessionDTO sessionDTO) {
+    public ResponseEntity<SessionDTO> createSession(@ApiParam(value = "Данные о сессии", required = true) @Valid @RequestBody SessionDTO sessionDTO) {
         TehoSession tehoSession = sessionService.create(sessionDTO.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
     }
@@ -43,7 +46,7 @@ public class SessionController {
     @PutMapping(path = "/{sessionId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Скопировать сессию")
     public ResponseEntity<SessionDTO> copySession(@ApiParam(value = "Ключ оригинальной сессии", required = true) @PathVariable UUID sessionId,
-                                                  @ApiParam(value = "Данные о новой сессии", required = true) @RequestBody SessionDTO sessionDTO) {
+                                                  @ApiParam(value = "Данные о новой сессии", required = true) @Valid @RequestBody SessionDTO sessionDTO) {
         TehoSession tehoSession = sessionService.copy(sessionId, sessionDTO.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
     }

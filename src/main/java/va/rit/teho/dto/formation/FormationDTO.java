@@ -25,10 +25,6 @@ public class FormationDTO extends AbstractNamedDTO {
     @ApiModelProperty(hidden = true)
     private List<RepairFormationDTO> repairFormations;
 
-    public FormationDTO getParentFormation() {
-        return parentFormation;
-    }
-
     public FormationDTO(Long id,
                         String shortName,
                         String fullName,
@@ -65,6 +61,10 @@ public class FormationDTO extends AbstractNamedDTO {
                         .map(rf -> RepairFormationDTO.from(rf, false))
                         .collect(Collectors.toList()));
         return result;
+    }
+
+    public FormationDTO getParentFormation() {
+        return parentFormation;
     }
 
     public List<RepairFormationDTO> getRepairFormations() {

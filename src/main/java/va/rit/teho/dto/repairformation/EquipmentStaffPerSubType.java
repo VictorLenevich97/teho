@@ -41,6 +41,13 @@ public class EquipmentStaffPerSubType {
         this.equipment = equipment;
     }
 
+    public static EquipmentStaffPerSubType from(RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff) {
+        return new EquipmentStaffPerSubType(repairFormationUnitEquipmentStaff.getEquipmentSubType().getId(),
+                                            repairFormationUnitEquipmentStaff.getEquipmentSubType().getFullName(),
+                                            repairFormationUnitEquipmentStaff.getTotalStaff(),
+                                            repairFormationUnitEquipmentStaff.getAvailableStaff());
+    }
+
     public List<RepairCapabilityPerEquipment> getEquipment() {
         return equipment;
     }
@@ -59,12 +66,5 @@ public class EquipmentStaffPerSubType {
 
     public Integer getAvailable() {
         return available;
-    }
-
-    public static EquipmentStaffPerSubType from(RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff) {
-        return new EquipmentStaffPerSubType(repairFormationUnitEquipmentStaff.getEquipmentSubType().getId(),
-                                            repairFormationUnitEquipmentStaff.getEquipmentSubType().getFullName(),
-                                            repairFormationUnitEquipmentStaff.getTotalStaff(),
-                                            repairFormationUnitEquipmentStaff.getAvailableStaff());
     }
 }

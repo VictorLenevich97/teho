@@ -10,10 +10,8 @@ public class LaborDistributionAggregatedData {
     private final Equipment equipment;
     private final Formation formation;
     private final WorkhoursDistributionInterval interval;
-
-
-    private Double count;
     private final Double avgLaborInput;
+    private Double count;
 
     public LaborDistributionAggregatedData(Equipment equipment,
                                            Formation formation,
@@ -43,12 +41,12 @@ public class LaborDistributionAggregatedData {
         return count;
     }
 
-    public Double getAvgLaborInput() {
-        return avgLaborInput;
-    }
-
     public void setCount(Double count) {
         this.count = count;
+    }
+
+    public Double getAvgLaborInput() {
+        return avgLaborInput;
     }
 
     @Override
@@ -57,7 +55,7 @@ public class LaborDistributionAggregatedData {
         if (o == null || getClass() != o.getClass()) return false;
         LaborDistributionAggregatedData that = (LaborDistributionAggregatedData) o;
         return Objects.equals(equipment.getId(), that.equipment.getId()) && Objects.equals(formation.getId(),
-                                                                           that.formation.getId()) && Objects
+                                                                                           that.formation.getId()) && Objects
                 .equals(interval.getId(), that.interval.getId()) && Objects.equals(count, that.count) && Objects.equals(
                 avgLaborInput,
                 that.avgLaborInput);

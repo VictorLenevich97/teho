@@ -12,19 +12,18 @@ import java.util.UUID;
 @Entity
 public class EquipmentPerFormationFailureIntensity implements Serializable {
 
-    @EmbeddedId
-    private EquipmentPerFormationFailureIntensityPK id;
-
     @ManyToOne
     @MapsId("formation_id")
     @JoinColumn(name = "formation_id")
-    Formation formation;
+    private Formation formation;
 
     @ManyToOne
     @MapsId("equipment_id")
     @JoinColumn(name = "equipment_id")
-    Equipment equipment;
+    private Equipment equipment;
 
+    @EmbeddedId
+    private EquipmentPerFormationFailureIntensityPK id;
     @ManyToOne
     @MapsId("stage_id")
     @JoinColumn(name = "stage_id")
@@ -40,9 +39,10 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
     @JoinColumn(name = "session_id")
     private TehoSession tehoSession;
 
-    int intensityPercentage;
+    @Column(nullable = false)
+    private Integer intensityPercentage;
 
-    Double avgDailyFailure;
+    private Double avgDailyFailure;
 
     public EquipmentPerFormationFailureIntensity(EquipmentPerFormationFailureIntensityPK id,
                                                  int intensity,
@@ -87,6 +87,11 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
         return avgDailyFailure;
     }
 
+    public EquipmentPerFormationFailureIntensity setAvgDailyFailure(Double avgDailyFailure) {
+        this.avgDailyFailure = avgDailyFailure;
+        return this;
+    }
+
     public EquipmentPerFormationFailureIntensity copy() {
         return new EquipmentPerFormationFailureIntensity(getEquipmentPerFormationWithRepairTypeId(),
                                                          intensityPercentage,
@@ -111,10 +116,5 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
                 ", intensityPercentage=" + intensityPercentage +
                 ", avgDailyFailure=" + avgDailyFailure +
                 '}';
-    }
-
-    public EquipmentPerFormationFailureIntensity setAvgDailyFailure(Double avgDailyFailure) {
-        this.avgDailyFailure = avgDailyFailure;
-        return this;
     }
 }

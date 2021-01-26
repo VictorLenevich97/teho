@@ -113,6 +113,10 @@ public class LaborDistribution {
         return tehoSession;
     }
 
+    public void setTehoSession(TehoSession tehoSession) {
+        this.tehoSession = tehoSession;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -130,10 +134,6 @@ public class LaborDistribution {
     public int hashCode() {
         return Objects.hash(laborDistributionId,
                             formation, equipment, workhoursDistributionInterval, count, avgLaborInput);
-    }
-
-    public void setTehoSession(TehoSession tehoSession) {
-        this.tehoSession = tehoSession;
     }
 
     public LaborDistribution copy(UUID newSessionId) {

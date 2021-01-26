@@ -3,13 +3,23 @@ package va.rit.teho.dto.equipment;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import va.rit.teho.entity.equipment.Equipment;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentDTO {
+
+    @Positive
     private Long id;
+
+    @NotEmpty
+    @Size(min = 3, max = 255)
     private String name;
+
     private EquipmentTypeDTO type;
+
     private EquipmentSubTypeDTO subType;
 
     public EquipmentDTO() {

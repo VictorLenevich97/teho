@@ -29,10 +29,6 @@ public class LaborDistributionPK implements Serializable {
     @Column(name = "session_id")
     private UUID sessionId;
 
-    public Long getRepairTypeId() {
-        return repairTypeId;
-    }
-
     public LaborDistributionPK(Long formationId,
                                Long equipmentId,
                                Long workhoursDistributionIntervalId,
@@ -47,6 +43,10 @@ public class LaborDistributionPK implements Serializable {
     }
 
     public LaborDistributionPK() {
+    }
+
+    public Long getRepairTypeId() {
+        return repairTypeId;
     }
 
     public Long getFormationId() {

@@ -6,16 +6,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Tree<T> {
-    public Node<T> getRoot() {
-        return root;
-    }
-
     private final Node<T> root;
 
     public Tree(T rootData) {
         root = new Node<>();
         root.data = rootData;
         root.children = new ArrayList<>();
+    }
+
+    public Node<T> getRoot() {
+        return root;
     }
 
     private int internalFindLowestLevel(Node<T> n) {

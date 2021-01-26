@@ -154,7 +154,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
                                             Collections.singletonList(repairFormationUnitId),
                                             equipmentTypeIds,
                                             equipmentSubTypeIds).getOrDefault(repairFormationUnit,
-                                                                               Collections.emptyMap());
+                                                                              Collections.emptyMap());
     }
 
     @Override

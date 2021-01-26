@@ -10,6 +10,7 @@ import java.util.Set;
 @Entity
 @Table(name = "equipment_sub_type")
 public class EquipmentSubType implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

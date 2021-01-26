@@ -47,31 +47,31 @@ public class RepairFormationType {
         return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
-    }
-
-    public int getWorkingHoursMin() {
-        return workingHoursMin;
-    }
-
-    public int getWorkingHoursMax() {
-        return workingHoursMax;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public int getWorkingHoursMin() {
+        return workingHoursMin;
+    }
+
     public void setWorkingHoursMin(int workingHoursMin) {
         this.workingHoursMin = workingHoursMin;
     }
 
-    public void setWorkingHoursMax(int workingHoursMax) {
-        this.workingHoursMax = workingHoursMax;
+    public int getWorkingHoursMax() {
+        return workingHoursMax;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setWorkingHoursMax(int workingHoursMax) {
+        this.workingHoursMax = workingHoursMax;
     }
 }

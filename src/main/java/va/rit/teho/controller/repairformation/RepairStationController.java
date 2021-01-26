@@ -4,15 +4,19 @@ import io.swagger.annotations.Api;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.common.IdAndNameDTO;
 import va.rit.teho.entity.repairformation.RepairStationType;
 import va.rit.teho.service.repairformation.RepairStationService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
+@Validated
 @RequestMapping(path = "repair-station", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Мастерские")
 public class RepairStationController {
@@ -36,7 +40,7 @@ public class RepairStationController {
 
     @PostMapping(path = "/type")
     @ResponseBody
-    public ResponseEntity<IdAndNameDTO> addRepairStationType(@RequestBody IdAndNameDTO idAndNameDTO) {
+    public ResponseEntity<IdAndNameDTO> addRepairStationType(@Valid @RequestBody IdAndNameDTO idAndNameDTO) {
         RepairStationType rst = repairStationService.addType(idAndNameDTO.getName());
         return ResponseEntity.ok(new IdAndNameDTO(rst.getId(), rst.getName()));
     }
@@ -44,15 +48,15 @@ public class RepairStationController {
     @PutMapping(path = "/type/{typeId}")
     @ResponseBody
     public ResponseEntity<IdAndNameDTO> updateRepairStationType(
-            @PathVariable Long typeId,
-            @RequestBody IdAndNameDTO idAndNameDTO) {
+            @PathVariable @Positive Long typeId,
+            @Valid @RequestBody IdAndNameDTO idAndNameDTO) {
         RepairStationType rst = repairStationService.updateType(typeId, idAndNameDTO.getName());
         return ResponseEntity.accepted().body(new IdAndNameDTO(rst.getId(), rst.getName()));
     }
 
     @DeleteMapping(path = "/type/{typeId}")
     public ResponseEntity<Object> deleteRepairStationType(
-            @PathVariable Long typeId) {
+            @PathVariable @Positive Long typeId) {
         repairStationService.deleteType(typeId);
         return ResponseEntity.noContent().build();
     }

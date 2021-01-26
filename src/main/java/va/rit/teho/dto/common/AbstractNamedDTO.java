@@ -1,10 +1,16 @@
 package va.rit.teho.dto.common;
 
+import javax.validation.constraints.Size;
+
 /**
  * DTO с кратким и полным именами.
  */
 public abstract class AbstractNamedDTO {
+
+    @Size(min = 2, max = 255)
     private String shortName;
+
+    @Size(min = 2, max = 255)
     private String fullName;
 
     public AbstractNamedDTO() {

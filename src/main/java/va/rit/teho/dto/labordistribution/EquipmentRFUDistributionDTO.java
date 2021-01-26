@@ -25,6 +25,19 @@ public class EquipmentRFUDistributionDTO {
         this.unable = unable;
     }
 
+    public static EquipmentRFUDistributionDTO from(EquipmentRFUDistribution equipmentRFUDistribution) {
+        return new EquipmentRFUDistributionDTO(equipmentRFUDistribution.getFormation().getFullName(),
+                                               equipmentRFUDistribution.getEquipment().getName(),
+                                               equipmentRFUDistribution
+                                                       .getWorkhoursDistributionInterval()
+                                                       .getLowerBound(),
+                                               equipmentRFUDistribution
+                                                       .getWorkhoursDistributionInterval()
+                                                       .getUpperBound(),
+                                               equipmentRFUDistribution.getRepairing(),
+                                               equipmentRFUDistribution.getUnable());
+    }
+
     public String getFormationName() {
         return formationName;
     }
@@ -47,18 +60,5 @@ public class EquipmentRFUDistributionDTO {
 
     public Double getUnable() {
         return unable;
-    }
-
-    public static EquipmentRFUDistributionDTO from(EquipmentRFUDistribution equipmentRFUDistribution) {
-        return new EquipmentRFUDistributionDTO(equipmentRFUDistribution.getFormation().getFullName(),
-                                               equipmentRFUDistribution.getEquipment().getName(),
-                                               equipmentRFUDistribution
-                                                       .getWorkhoursDistributionInterval()
-                                                       .getLowerBound(),
-                                               equipmentRFUDistribution
-                                                       .getWorkhoursDistributionInterval()
-                                                       .getUpperBound(),
-                                               equipmentRFUDistribution.getRepairing(),
-                                               equipmentRFUDistribution.getUnable());
     }
 }

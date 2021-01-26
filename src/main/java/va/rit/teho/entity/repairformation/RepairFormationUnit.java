@@ -34,10 +34,6 @@ public class RepairFormationUnit {
     @OneToMany(mappedBy = "repairFormationUnit", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<EquipmentRFUDistribution> equipmentRFUDistributions;
 
-    public Set<RepairFormationUnitRepairCapability> getRepairCapabilities() {
-        return repairCapabilities;
-    }
-
     public RepairFormationUnit() {
         //Пустой конструктор для автоматической инициализации
     }
@@ -54,12 +50,16 @@ public class RepairFormationUnit {
         this.repairFormation = repairFormation;
     }
 
-    public void setRepairFormation(RepairFormation repairFormation) {
-        this.repairFormation = repairFormation;
+    public Set<RepairFormationUnitRepairCapability> getRepairCapabilities() {
+        return repairCapabilities;
     }
 
     public RepairFormation getRepairFormation() {
         return repairFormation;
+    }
+
+    public void setRepairFormation(RepairFormation repairFormation) {
+        this.repairFormation = repairFormation;
     }
 
     public Long getId() {

@@ -3,11 +3,26 @@ package va.rit.teho.dto.repairformation;
 import va.rit.teho.dto.common.IdAndNameDTO;
 import va.rit.teho.entity.repairformation.RepairFormationType;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
+
 public class RepairFormationTypeDTO {
+
+    @Positive
     private Long id;
+
+    @Size(min = 3, max = 255)
     private String name;
+
     private IdAndNameDTO restorationType;
+
+    @Positive
+    @Max(16L)
     private Integer workingHoursMin;
+
+    @Positive
+    @Max(16L)
     private Integer workingHoursMax;
 
     public RepairFormationTypeDTO(Long key) {

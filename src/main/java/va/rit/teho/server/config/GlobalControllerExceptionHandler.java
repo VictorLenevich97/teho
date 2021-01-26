@@ -11,6 +11,8 @@ import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
 
+import javax.validation.ConstraintViolationException;
+
 @ControllerAdvice
 public class GlobalControllerExceptionHandler
         extends ResponseEntityExceptionHandler {
@@ -28,5 +30,10 @@ public class GlobalControllerExceptionHandler
     @ExceptionHandler(value = AlreadyExistsException.class)
     protected ResponseEntity<Object> handleAlreadyExists(AlreadyExistsException e, WebRequest request) {
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException e, WebRequest request) {
+        return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 }

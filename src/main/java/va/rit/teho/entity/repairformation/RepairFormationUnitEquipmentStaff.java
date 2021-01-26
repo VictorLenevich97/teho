@@ -84,16 +84,20 @@ public class RepairFormationUnitEquipmentStaff {
         return equipmentSubType;
     }
 
+    public void setEquipmentSubType(EquipmentSubType equipmentSubType) {
+        this.equipmentSubType = equipmentSubType;
+    }
+
     public Integer getTotalStaff() {
         return totalStaff;
     }
 
-    public Integer getAvailableStaff() {
-        return availableStaff;
-    }
-
     public void setTotalStaff(int totalStaff) {
         this.totalStaff = totalStaff;
+    }
+
+    public Integer getAvailableStaff() {
+        return availableStaff;
     }
 
     public void setAvailableStaff(int availableStaff) {
@@ -109,9 +113,5 @@ public class RepairFormationUnitEquipmentStaff {
                 getEquipmentPerRepairFormationUnit().copy(newSessionId),
                 getTotalStaff(),
                 getAvailableStaff());
-    }
-
-    public void setEquipmentSubType(EquipmentSubType equipmentSubType) {
-        this.equipmentSubType = equipmentSubType;
     }
 }
