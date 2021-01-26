@@ -56,6 +56,11 @@ public class EquipmentTypeControllerTest extends ControllerTest {
     public void testAddEquipmentType() throws Exception {
         EquipmentTypeDTO equipmentTypeDTO = new EquipmentTypeDTO("shortETName", "fullETName");
 
+        when(equipmentTypeService.addType(equipmentTypeDTO.getShortName(),
+                                          equipmentTypeDTO.getFullName())).thenReturn(new EquipmentType(
+                equipmentTypeDTO.getShortName(),
+                equipmentTypeDTO.getFullName()));
+
         mockMvc.perform(post("/equipment-type").contentType(MediaType.APPLICATION_JSON)
                                                .content(objectMapper.writeValueAsString(equipmentTypeDTO)))
                .andExpect(status().isCreated());
@@ -115,6 +120,12 @@ public class EquipmentTypeControllerTest extends ControllerTest {
     public void testUpdateEquipmentType() throws Exception {
         Long equipmentId = 3L;
         EquipmentTypeDTO equipmentTypeDTO = new EquipmentTypeDTO("shortETName", "fullETName");
+
+        when(equipmentTypeService.updateType(equipmentId,
+                                             equipmentTypeDTO.getShortName(),
+                                             equipmentTypeDTO.getFullName())).thenReturn(new EquipmentType(
+                equipmentTypeDTO.getShortName(),
+                equipmentTypeDTO.getFullName()));
 
         mockMvc.perform(put("/equipment-type/{id}", equipmentId).contentType(MediaType.APPLICATION_JSON)
                                                                 .content(objectMapper.writeValueAsString(
