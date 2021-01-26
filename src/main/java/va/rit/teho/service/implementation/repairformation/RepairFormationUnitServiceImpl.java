@@ -134,13 +134,26 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public List<RepairFormationUnitEquipmentStaff> updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList) {
+    public List<RepairFormationUnitEquipmentStaff> updateEquipmentStaff(
+            List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList) {
         repairFormationUnitEquipmentStaffList.forEach(this::checkEquipmentStaffPreconditions);
 
-        Iterable<RepairFormationUnitEquipmentStaff> updatedRepairFormationUnitEquipmentStaff =
-                repairFormationUnitEquipmentStaffRepository.saveAll(repairFormationUnitEquipmentStaffList);
+        List<RepairFormationUnitEquipmentStaff> updatedData =
+                repairFormationUnitEquipmentStaffList
+                        .stream()
+                        .map(repairFormationUnitEquipmentStaff ->
+                                     repairFormationUnitEquipmentStaffRepository
+                                             .findById(repairFormationUnitEquipmentStaff.getEquipmentPerRepairFormationUnit())
+                                             .map(rfues -> rfues
+                                                     .setAvailableStaff(repairFormationUnitEquipmentStaff.getAvailableStaff())
+                                                     .setTotalStaff(repairFormationUnitEquipmentStaff.getTotalStaff()))
+                                             .orElse(repairFormationUnitEquipmentStaff))
+                        .collect(Collectors.toList());
+
+        Iterable<RepairFormationUnitEquipmentStaff> result = repairFormationUnitEquipmentStaffRepository
+                .saveAll(updatedData);
         return StreamSupport
-                .stream(updatedRepairFormationUnitEquipmentStaff.spliterator(), false)
+                .stream(result.spliterator(), false)
                 .collect(Collectors.toList());
     }
 

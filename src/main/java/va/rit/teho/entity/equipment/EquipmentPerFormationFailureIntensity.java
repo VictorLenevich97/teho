@@ -45,9 +45,24 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
     private Double avgDailyFailure;
 
     public EquipmentPerFormationFailureIntensity(EquipmentPerFormationFailureIntensityPK id,
+                                                 Integer intensityPercentage, Double avgDailyFailure) {
+        this.id = id;
+        this.intensityPercentage = intensityPercentage;
+        this.avgDailyFailure = avgDailyFailure;
+    }
+
+    public EquipmentPerFormationFailureIntensity(UUID sessionId,
+                                                 Long formationId,
+                                                 Long equipmentId,
+                                                 Long stageId,
+                                                 Long repairTypeId,
                                                  int intensity,
                                                  Double avgDailyFailure) {
-        this.id = id;
+        this.id = new EquipmentPerFormationFailureIntensityPK(formationId,
+                                                              equipmentId,
+                                                              stageId,
+                                                              repairTypeId,
+                                                              sessionId);
         this.intensityPercentage = intensity;
         this.avgDailyFailure = avgDailyFailure;
     }
@@ -87,15 +102,14 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
         return avgDailyFailure;
     }
 
-    public EquipmentPerFormationFailureIntensity setAvgDailyFailure(Double avgDailyFailure) {
-        this.avgDailyFailure = avgDailyFailure;
+    public EquipmentPerFormationFailureIntensity setIntensityPercentage(Integer intensityPercentage) {
+        this.intensityPercentage = intensityPercentage;
         return this;
     }
 
-    public EquipmentPerFormationFailureIntensity copy() {
-        return new EquipmentPerFormationFailureIntensity(getEquipmentPerFormationWithRepairTypeId(),
-                                                         intensityPercentage,
-                                                         avgDailyFailure);
+    public EquipmentPerFormationFailureIntensity setAvgDailyFailure(Double avgDailyFailure) {
+        this.avgDailyFailure = avgDailyFailure;
+        return this;
     }
 
     public EquipmentPerFormationFailureIntensity copy(UUID newSessionId) {

@@ -92,16 +92,18 @@ public class RepairFormationUnitEquipmentStaff {
         return totalStaff;
     }
 
-    public void setTotalStaff(int totalStaff) {
+    public RepairFormationUnitEquipmentStaff setTotalStaff(int totalStaff) {
         this.totalStaff = totalStaff;
+        return this;
     }
 
     public Integer getAvailableStaff() {
         return availableStaff;
     }
 
-    public void setAvailableStaff(int availableStaff) {
+    public RepairFormationUnitEquipmentStaff setAvailableStaff(int availableStaff) {
         this.availableStaff = availableStaff;
+        return this;
     }
 
     public TehoSession getTehoSession() {

@@ -65,7 +65,8 @@ public class EquipmentLaborInputPerType {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public EquipmentLaborInputPerType setAmount(int amount) {
         this.amount = amount;
+        return this;
     }
 }

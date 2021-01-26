@@ -122,8 +122,9 @@ public class RepairFormationUnitRepairCapability {
         return capability;
     }
 
-    public void setCapability(double capability) {
+    public RepairFormationUnitRepairCapability setCapability(double capability) {
         this.capability = capability;
+        return this;
     }
 
     public RepairFormationUnitRepairCapability copy(UUID newSessionId) {

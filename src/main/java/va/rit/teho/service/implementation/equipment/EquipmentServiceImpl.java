@@ -101,9 +101,13 @@ public class EquipmentServiceImpl implements EquipmentService {
                 .entrySet()
                 .stream()
                 .map(repairTypeIdLaborInputEntry ->
-                             new EquipmentLaborInputPerType(equipment.getId(),
-                                                            repairTypeIdLaborInputEntry.getKey(),
-                                                            repairTypeIdLaborInputEntry.getValue()))
+                             equipmentLaborInputPerTypeRepository
+                                     .findByEquipmentIdAndRepairTypeId(equipment.getId(),
+                                                                       repairTypeIdLaborInputEntry.getKey())
+                                     .map(eliptr -> eliptr.setAmount(repairTypeIdLaborInputEntry.getValue()))
+                                     .orElse(new EquipmentLaborInputPerType(equipment.getId(),
+                                                                            repairTypeIdLaborInputEntry.getKey(),
+                                                                            repairTypeIdLaborInputEntry.getValue())))
                 .collect(Collectors.toList());
         equipmentLaborInputPerTypeRepository.saveAll(equipmentLaborInputPerTypes);
     }

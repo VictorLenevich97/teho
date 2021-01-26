@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +141,8 @@ public class EquipmentController {
                                                      .stream()
                                                      .collect(Collectors.toMap(e -> e.getKey().getId().toString(),
                                                                                Map.Entry::getValue))))
+                        .sorted(Comparator.comparing(EquipmentLaborInputPerTypeRowData::getId,
+                                                     Comparator.reverseOrder()))
                         .collect(Collectors.toList());
 
         return ResponseEntity.ok(new TableDataDTO<>(columns, data));
