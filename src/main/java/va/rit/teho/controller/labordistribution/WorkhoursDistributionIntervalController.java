@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
+@Validated
 @RequestMapping(path = "workhours-distribution-interval", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Интервалы трудоемкости ремонта")
 public class WorkhoursDistributionIntervalController {

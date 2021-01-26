@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.repairformation.*;
@@ -27,12 +28,15 @@ import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Controller
+@Validated
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "РВО")
 public class RepairFormationUnitController {
@@ -139,7 +143,7 @@ public class RepairFormationUnitController {
     @GetMapping("/formation/repair-formation/unit/{repairFormationUnitId}/staff")
     @ApiOperation(value = "Получение состава, штатной численности и укомплектованности конкретного РВО (в виде списка)")
     public ResponseEntity<List<EquipmentTypeStaffData>> getEquipmentStaffPerType(
-            @ApiParam(value = "Ключ РВО") @PathVariable Long repairFormationUnitId,
+            @ApiParam(value = "Ключ РВО") @PathVariable @Positive Long repairFormationUnitId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
             @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId) {
         Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes =
@@ -186,7 +190,7 @@ public class RepairFormationUnitController {
     @ResponseBody
     @ApiOperation(value = "Получить детальные данные по РВО")
     public ResponseEntity<RepairFormationUnitDTO> getRepairFormationUnit(
-            @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId) {
+            @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId) {
         Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> repairFormationUnitListPair =
                 repairFormationUnitService.getWithStaff(repairFormationUnitId, tehoSession.getSessionId());
         RepairFormationUnitDTO repairFormationUnitDTO = RepairFormationUnitDTO
@@ -202,7 +206,7 @@ public class RepairFormationUnitController {
 
     @GetMapping("/formation/repair-formation/{repairFormationId}/unit")
     public ResponseEntity<List<RepairFormationUnitDTO>> listRepairFormationUnitsInFormation(
-            @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
+            @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable @Positive Long repairFormationId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(value = "id", required = false) List<Long> ids,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
@@ -215,8 +219,8 @@ public class RepairFormationUnitController {
     @PostMapping(path = "/formation/repair-formation/{repairFormationId}/unit", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавление РВО")
     public ResponseEntity<RepairFormationUnitDTO> addRepairFormationUnit(
-            @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
-            @ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
+            @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable @Positive Long repairFormationId,
+            @ApiParam(value = "Данные по РВО", required = true) @Valid @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
         RepairFormationUnit repairFormationUnit = repairFormationUnitService.add(repairFormationUnitDTO.getName(),
                                                                                  repairFormationId,
                                                                                  repairFormationUnitDTO
@@ -229,9 +233,9 @@ public class RepairFormationUnitController {
     @PutMapping(path = "/formation/repair-formation/{repairFormationId}/unit/{repairFormationUnitId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление РВО")
     public ResponseEntity<RepairFormationUnitDTO> updateRepairFormationUnit(
-            @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable Long repairFormationId,
-            @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
-            @ApiParam(value = "Данные по РВО", required = true) @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
+            @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable @Positive Long repairFormationId,
+            @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
+            @ApiParam(value = "Данные по РВО", required = true) @Valid @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
         RepairFormationUnit repairFormationUnit = repairFormationUnitService.update(repairFormationUnitId,
                                                                                     repairFormationUnitDTO.getName(),
                                                                                     repairFormationId,
@@ -245,8 +249,8 @@ public class RepairFormationUnitController {
     @PutMapping(path = "/formation/repair-formation/unit/{repairFormationUnitId}/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление информации по личному составу РВО")
     public ResponseEntity<List<EquipmentStaffPerSubType>> updateRepairFormationUnitEquipmentStaff(
-            @ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId,
-            @ApiParam(value = "Данные по численности л/с", required = true) @RequestBody List<EquipmentStaffPerSubType> staffData) {
+            @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
+            @ApiParam(value = "Данные по численности л/с", required = true) @Valid @RequestBody List<EquipmentStaffPerSubType> staffData) {
         List<RepairFormationUnitEquipmentStaff> list = new ArrayList<>();
         for (EquipmentStaffPerSubType sd : staffData) {
             RepairFormationUnitEquipmentStaff formationUnitEquipmentStaff = new RepairFormationUnitEquipmentStaff(
@@ -338,7 +342,7 @@ public class RepairFormationUnitController {
 
     @DeleteMapping(path = "/formation/repair-formation/unit/{repairFormationUnitId}")
     @Transactional
-    public ResponseEntity<Object> deleteRepairFormationUnit(@ApiParam(value = "Ключ РВО", required = true) @PathVariable Long repairFormationUnitId) {
+    public ResponseEntity<Object> deleteRepairFormationUnit(@ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId) {
         repairFormationUnitService.delete(repairFormationUnitId);
         return ResponseEntity.noContent().build();
     }

@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.labordistribution.EquipmentDistributionRowData;
@@ -22,6 +23,8 @@ import va.rit.teho.service.labordistribution.RestorationTypeService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +32,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
+@Validated
 @RequestMapping(path = "/formation", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Распределение ремонтного фонда")
 public class EquipmentRFUDistributionController {
@@ -57,7 +61,7 @@ public class EquipmentRFUDistributionController {
     }
 
     @PostMapping("/repair-formation/unit/equipment")
-    public ResponseEntity<Object> distributeEquipmentPerRFU(@RequestBody LaborDistributionFilterData filterData) {
+    public ResponseEntity<Object> distributeEquipmentPerRFU(@Valid @RequestBody LaborDistributionFilterData filterData) {
         equipmentRFUDistributionService.distribute(tehoSession.getSessionId(),
                                                    nullIfEmpty(filterData.getEquipmentIds()),
                                                    nullIfEmpty(filterData.getFormationIds()),
@@ -66,7 +70,7 @@ public class EquipmentRFUDistributionController {
     }
 
     @GetMapping("/repair-formation/unit/{repairFormationUnitId}/equipment")
-    public ResponseEntity<List<EquipmentRFUDistributionDTO>> getDistributedEquipmentForRFU(@PathVariable Long repairFormationUnitId) {
+    public ResponseEntity<List<EquipmentRFUDistributionDTO>> getDistributedEquipmentForRFU(@PathVariable @Positive Long repairFormationUnitId) {
         List<EquipmentRFUDistributionDTO> equipmentRFUDistributionDTOList = equipmentRFUDistributionService
                 .listRFUDistributedEquipment(repairFormationUnitId, tehoSession.getSessionId())
                 .stream()
@@ -77,7 +81,7 @@ public class EquipmentRFUDistributionController {
 
 
     @GetMapping("/{formationId}/distribution")
-    public ResponseEntity<EquipmentDistributionTableDataDTO> getEquipmentDistribution(@PathVariable Long formationId) {
+    public ResponseEntity<EquipmentDistributionTableDataDTO> getEquipmentDistribution(@PathVariable @Positive Long formationId) {
         List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData =
                 equipmentRFUDistributionService.listDistributionDataForFormation(tehoSession.getSessionId(),
                                                                                  formationId);
@@ -121,7 +125,7 @@ public class EquipmentRFUDistributionController {
     }
 
     @GetMapping("/{formationId}/distribution/report")
-    public ResponseEntity<byte[]> getEquipmentDistributionReport(@PathVariable Long formationId) throws
+    public ResponseEntity<byte[]> getEquipmentDistributionReport(@PathVariable @Positive Long formationId) throws
             UnsupportedEncodingException {
         List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData =
                 equipmentRFUDistributionService.listDistributionDataForFormation(tehoSession.getSessionId(),

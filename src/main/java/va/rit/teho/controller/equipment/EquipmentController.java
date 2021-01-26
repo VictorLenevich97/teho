@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentDTO;
@@ -21,6 +22,9 @@ import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.report.ReportService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +34,7 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping(path = "equipment", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "ВВСТ")
+@Validated
 public class EquipmentController {
 
     private final EquipmentService equipmentService;
@@ -57,7 +62,7 @@ public class EquipmentController {
     @GetMapping(path = "/{equipmentId}")
     @ResponseBody
     @ApiOperation(value = "Получить детали о ВВСТ")
-    public ResponseEntity<EquipmentDTO> getEquipment(@ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId) {
+    public ResponseEntity<EquipmentDTO> getEquipment(@ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable @Min(1L) Long equipmentId) {
         return ResponseEntity.ok(EquipmentDTO.from(equipmentService.get(equipmentId)));
     }
 
@@ -66,7 +71,7 @@ public class EquipmentController {
     @ApiOperation(value = "Добавить ВВСТ")
     @Transactional
     public ResponseEntity<EquipmentLaborInputPerTypeRowData> addNewEquipment(@ApiParam(value = "Данные о ВВСТ и трудоемкости ремонта", required = true)
-                                                                             @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
+                                                                             @Valid @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
         Map<Long, Integer> repairTypeIdLaborInputMap = mapStringKeysToLong(equipmentData.getData());
         Equipment added = equipmentService.add(equipmentData.getName(),
                                                equipmentData.getSubTypeId(),
@@ -86,8 +91,8 @@ public class EquipmentController {
 
     @PutMapping(path = "/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить ВВСТ")
-    public ResponseEntity<EquipmentLaborInputPerTypeRowData> updateEquipment(@ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                                             @ApiParam(value = "Данные о ВВСТ", required = true) @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
+    public ResponseEntity<EquipmentLaborInputPerTypeRowData> updateEquipment(@ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable @Positive Long equipmentId,
+                                                                             @ApiParam(value = "Данные о ВВСТ", required = true) @Valid @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
         Equipment updatedEquipment = equipmentService.update(equipmentId,
                                                              equipmentData.getName(),
                                                              equipmentData.getSubTypeId(),
@@ -101,7 +106,7 @@ public class EquipmentController {
     @ApiOperation(value = "Удалить ВВСТ")
     @Transactional
     public ResponseEntity<Object> deleteEquipment(
-            @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId) {
+            @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable @Positive Long equipmentId) {
         //Проверка на существование
         equipmentService.get(equipmentId);
 

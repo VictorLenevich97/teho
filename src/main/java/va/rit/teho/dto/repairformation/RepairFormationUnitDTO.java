@@ -4,15 +4,27 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import va.rit.teho.dto.common.IdAndNameDTO;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepairFormationUnitDTO {
+
+    @Positive
     private Long id;
+
+    @Size(min = 3, max = 255)
     private String name;
+
     private RepairFormationDTO repairFormation;
+
     private IdAndNameDTO stationType;
+
+    @PositiveOrZero
     private Integer amount;
+
     private List<RepairFormationUnitEquipmentStaffDTO> staff;
 
     public RepairFormationUnitDTO() {
@@ -21,10 +33,6 @@ public class RepairFormationUnitDTO {
     public RepairFormationUnitDTO(Long id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    public IdAndNameDTO getStationType() {
-        return stationType;
     }
 
     public RepairFormationUnitDTO(Long id,
@@ -46,6 +54,10 @@ public class RepairFormationUnitDTO {
                                           new IdAndNameDTO(repairFormationUnit.getRepairStationType().getId(),
                                                            repairFormationUnit.getRepairStationType().getName()),
                                           repairFormationUnit.getStationAmount());
+    }
+
+    public IdAndNameDTO getStationType() {
+        return stationType;
     }
 
     public List<RepairFormationUnitEquipmentStaffDTO> getStaff() {

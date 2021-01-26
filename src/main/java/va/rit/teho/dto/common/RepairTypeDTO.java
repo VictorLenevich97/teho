@@ -2,10 +2,20 @@ package va.rit.teho.dto.common;
 
 import va.rit.teho.entity.common.RepairType;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
+
 public class RepairTypeDTO {
+
+    @Positive
     private Long id;
+
+    @Size(min = 3, max = 255)
     private String fullName;
+
+    @Size(min = 2, max = 255)
     private String shortName;
+
     private boolean calculatable;
 
     public RepairTypeDTO() {

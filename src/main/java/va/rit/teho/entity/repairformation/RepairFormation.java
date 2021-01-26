@@ -26,10 +26,6 @@ public class RepairFormation {
     @OneToMany(mappedBy = "repairFormation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<RepairFormationUnit> repairFormationUnits;
 
-    public Set<RepairFormationUnit> getRepairFormationUnitSet() {
-        return repairFormationUnits;
-    }
-
     public RepairFormation() {
     }
 
@@ -40,16 +36,32 @@ public class RepairFormation {
         this.repairFormationType = repairFormationType;
     }
 
+    public Set<RepairFormationUnit> getRepairFormationUnitSet() {
+        return repairFormationUnits;
+    }
+
     public RepairFormationType getRepairFormationType() {
         return repairFormationType;
+    }
+
+    public void setRepairFormationType(RepairFormationType repairFormationType) {
+        this.repairFormationType = repairFormationType;
     }
 
     public Formation getFormation() {
         return formation;
     }
 
+    public void setFormation(Formation formation) {
+        this.formation = formation;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -58,17 +70,5 @@ public class RepairFormation {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setRepairFormationType(RepairFormationType repairFormationType) {
-        this.repairFormationType = repairFormationType;
-    }
-
-    public void setFormation(Formation formation) {
-        this.formation = formation;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 }

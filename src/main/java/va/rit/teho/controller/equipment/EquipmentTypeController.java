@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.equipment.EquipmentSubTypeDTO;
 import va.rit.teho.dto.equipment.EquipmentSubTypePerTypeDTO;
@@ -16,11 +17,14 @@ import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
+@Validated
 @RequestMapping(path = "equipment-type", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "Типы и подтипы ВВСТ")
 public class EquipmentTypeController {
@@ -76,7 +80,7 @@ public class EquipmentTypeController {
     @GetMapping("/{typeId}")
     @ResponseBody
     @ApiOperation(value = "Получить данные о типе ВВСТ (со списком подтипов)")
-    public ResponseEntity<EquipmentSubTypePerTypeDTO> getEquipmentTypeById(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId) {
+    public ResponseEntity<EquipmentSubTypePerTypeDTO> getEquipmentTypeById(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable @Positive Long typeId) {
         Pair<EquipmentType, List<EquipmentSubType>> typeWithSubTypes = equipmentTypeService.getTypeWithSubTypes(typeId);
         return ResponseEntity.ok(EquipmentSubTypePerTypeDTO
                                          .from(typeWithSubTypes.getFirst(),
@@ -87,7 +91,7 @@ public class EquipmentTypeController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить тип ВВСТ")
-    public ResponseEntity<EquipmentTypeDTO> addEquipmentType(@ApiParam("Данные о типе ВВСТ") @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
+    public ResponseEntity<EquipmentTypeDTO> addEquipmentType(@ApiParam("Данные о типе ВВСТ") @Valid @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
         EquipmentType equipmentType = equipmentTypeService.addType(equipmentTypeDTO.getShortName(),
                                                                    equipmentTypeDTO.getFullName());
         return ResponseEntity.status(HttpStatus.CREATED).body(EquipmentTypeDTO.from(equipmentType));
@@ -95,8 +99,8 @@ public class EquipmentTypeController {
 
     @PutMapping(path = "/{typeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить тип ВВСТ")
-    public ResponseEntity<Object> updateEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
-                                                      @ApiParam(value = "Данные о типе ВВСТ", required = true) @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
+    public ResponseEntity<Object> updateEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable @Positive Long typeId,
+                                                      @ApiParam(value = "Данные о типе ВВСТ", required = true) @Valid @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
         EquipmentType equipmentType = equipmentTypeService.updateType(typeId,
                                                                       equipmentTypeDTO.getShortName(),
                                                                       equipmentTypeDTO.getFullName());
@@ -105,15 +109,15 @@ public class EquipmentTypeController {
 
     @DeleteMapping(path = "/{typeId}")
     @ApiOperation(value = "Удалить тип ВВСТ.")
-    public ResponseEntity<Object> deleteEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId) {
+    public ResponseEntity<Object> deleteEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable @Positive Long typeId) {
         equipmentTypeService.deleteType(typeId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "/{typeId}/subtype", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить подтип ВВСТ")
-    public ResponseEntity<EquipmentSubTypeDTO> addEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
-                                                                   @ApiParam(value = "Данные о подтипе ВВСТ", required = true) @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
+    public ResponseEntity<EquipmentSubTypeDTO> addEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable @Positive Long typeId,
+                                                                   @ApiParam(value = "Данные о подтипе ВВСТ", required = true) @Valid @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
         EquipmentSubType equipmentSubType = equipmentTypeService.addSubType(typeId,
                                                                             equipmentSubTypeDTO.getShortName(),
                                                                             equipmentSubTypeDTO.getFullName());
@@ -122,9 +126,9 @@ public class EquipmentTypeController {
 
     @PutMapping(path = "/{typeId}/subtype/{subTypeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить подтип ВВСТ")
-    public ResponseEntity<EquipmentSubTypeDTO> updateEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
-                                                                      @ApiParam(value = "Ключ подтипа ВВСТ", required = true) @PathVariable Long subTypeId,
-                                                                      @ApiParam(value = "Данные о подтипе ВВСТ", required = true) @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
+    public ResponseEntity<EquipmentSubTypeDTO> updateEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable @Positive Long typeId,
+                                                                      @ApiParam(value = "Ключ подтипа ВВСТ", required = true) @PathVariable @Positive Long subTypeId,
+                                                                      @ApiParam(value = "Данные о подтипе ВВСТ", required = true) @Valid @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
         EquipmentSubType equipmentSubType = equipmentTypeService.updateSubType(subTypeId,
                                                                                typeId,
                                                                                equipmentSubTypeDTO.getShortName(),
@@ -134,8 +138,8 @@ public class EquipmentTypeController {
 
     @DeleteMapping(path = "/{typeId}/subtype/{subTypeId}")
     @ApiOperation(value = "Удалить подтип ВВСТ.")
-    public ResponseEntity<Object> deleteEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
-                                                         @ApiParam(value = "Ключ подтипа ВВСТ", required = true) @PathVariable Long subTypeId) {
+    public ResponseEntity<Object> deleteEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable @Positive Long typeId,
+                                                         @ApiParam(value = "Ключ подтипа ВВСТ", required = true) @PathVariable @Positive Long subTypeId) {
         equipmentTypeService.deleteSubType(subTypeId);
         return ResponseEntity.noContent().build();
     }

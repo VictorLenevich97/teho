@@ -38,7 +38,8 @@ public class RepairFormationServiceImpl implements RepairFormationService {
 
     @Override
     public RepairFormation get(Long id) {
-        return repairFormationRepository.findById(id).orElseThrow(() -> new NotFoundException("Ремонтное формирование не найдено!"));
+        return repairFormationRepository.findById(id).orElseThrow(() -> new NotFoundException(
+                "Ремонтное формирование не найдено!"));
     }
 
     @Override

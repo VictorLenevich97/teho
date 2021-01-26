@@ -10,7 +10,8 @@ import java.util.List;
 
 
 @Repository
-public interface EquipmentPerFormationRepository extends CrudRepository<EquipmentPerFormation, EquipmentPerFormationPK> {
+public interface EquipmentPerFormationRepository
+        extends CrudRepository<EquipmentPerFormation, EquipmentPerFormationPK> {
 
     @Query("SELECT new va.rit.teho.entity.equipment.EquipmentPerFormation(epb.equipment, epb.formation, SUM(epb.amount)) " +
             "FROM EquipmentPerFormation epb " +

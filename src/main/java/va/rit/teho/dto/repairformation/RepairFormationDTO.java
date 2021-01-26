@@ -4,11 +4,20 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import va.rit.teho.dto.formation.FormationDTO;
 import va.rit.teho.entity.repairformation.RepairFormation;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepairFormationDTO {
+
+    @Positive
     private Long id;
+
+    @Size(min = 3, max = 255)
     private String name;
+
     private RepairFormationTypeDTO type;
+
     private FormationDTO formation;
 
     public RepairFormationDTO() {
@@ -22,6 +31,13 @@ public class RepairFormationDTO {
         this.name = name;
         this.type = type;
         this.formation = formation;
+    }
+
+    public static RepairFormationDTO from(RepairFormation repairFormation, boolean includeFormation) {
+        return new RepairFormationDTO(repairFormation.getId(),
+                                      repairFormation.getName(),
+                                      RepairFormationTypeDTO.from(repairFormation.getRepairFormationType()),
+                                      includeFormation ? FormationDTO.from(repairFormation.getFormation()) : null);
     }
 
     public Long getId() {
@@ -38,12 +54,5 @@ public class RepairFormationDTO {
 
     public FormationDTO getFormation() {
         return formation;
-    }
-
-    public static RepairFormationDTO from(RepairFormation repairFormation, boolean includeFormation) {
-        return new RepairFormationDTO(repairFormation.getId(),
-                                      repairFormation.getName(),
-                                      RepairFormationTypeDTO.from(repairFormation.getRepairFormationType()),
-                                      includeFormation ? FormationDTO.from(repairFormation.getFormation()) : null);
     }
 }

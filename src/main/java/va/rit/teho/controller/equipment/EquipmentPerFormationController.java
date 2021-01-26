@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
@@ -25,12 +26,15 @@ import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
+@Validated
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "ВВСТ в Формированиях")
 public class EquipmentPerFormationController {
@@ -58,9 +62,9 @@ public class EquipmentPerFormationController {
 
     @PostMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить ВВСТ в Формирование")
-    public ResponseEntity<Object> addEquipmentToFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
-                                                          @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                          @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @RequestBody IntensityAndAmountDTO amount) {
+    public ResponseEntity<Object> addEquipmentToFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @Positive @PathVariable @Positive Long formationId,
+                                                          @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @Positive @PathVariable @Positive Long equipmentId,
+                                                          @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @Valid @RequestBody IntensityAndAmountDTO amount) {
         EquipmentPerFormation equipmentPerFormation = equipmentPerFormationService.addEquipmentToFormation(formationId,
                                                                                                            equipmentId,
                                                                                                            (long) amount
@@ -70,9 +74,9 @@ public class EquipmentPerFormationController {
 
     @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить ВВСТ в Формировании (количество)")
-    public ResponseEntity<EquipmentPerFormationDTO> updateEquipmentInFormationAmount(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
-                                                                                     @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
-                                                                                     @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @RequestBody IntensityAndAmountDTO amount) {
+    public ResponseEntity<EquipmentPerFormationDTO> updateEquipmentInFormationAmount(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
+                                                                                     @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable @Positive Long equipmentId,
+                                                                                     @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @Valid @RequestBody IntensityAndAmountDTO amount) {
         EquipmentPerFormation equipmentPerFormation = equipmentPerFormationService.updateEquipmentInFormation(
                 formationId,
                 equipmentId,
@@ -83,8 +87,8 @@ public class EquipmentPerFormationController {
 
     @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}/intensity", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить данные о выходе ВВСТ в ремонт в %")
-    public ResponseEntity<Object> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
-                                                             @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
+    public ResponseEntity<Object> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
+                                                             @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable @Positive Long equipmentId,
                                                              @ApiParam(value = "Данные о выходе ВВСТ в ремонт (%) ({'ключ этапа': {'ключ типа ремонта': 'значение'}})", required = true, example = "{'1': {'1': '21', '2': '15'}}")
                                                              @RequestBody Map<Long, Map<Long, Integer>> data) {
 
@@ -107,7 +111,7 @@ public class EquipmentPerFormationController {
     @ResponseBody
     @ApiOperation(value = "Получить список ВВСТ в Формированиях")
     public ResponseEntity<List<EquipmentPerFormationDTO>> getEquipmentPerFormationData(
-            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId) {
+            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId) {
         return ResponseEntity.ok(equipmentPerFormationService
                                          .list(formationId)
                                          .stream()
@@ -121,7 +125,7 @@ public class EquipmentPerFormationController {
     @ApiOperation(value = "Получить данные о ВВСТ в Формированиях с интенсивностью выхода в ремонт в % (в табличном виде)")
     public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerFormationTableData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1")
-            @PathVariable Long formationId,
+            @PathVariable @Positive Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) {
         return this.getEquipmentRowData(formationId,
                                         EquipmentPerFormationFailureIntensity::getIntensityPercentage,
@@ -133,7 +137,7 @@ public class EquipmentPerFormationController {
     @GetMapping("/formation/{formationId}/equipment/intensity/report")
     @ResponseBody
     public ResponseEntity<byte[]> getEquipmentFailureIntensityDataReport(@ApiParam(value = "Ключ ВЧ", required = true, example = "1")
-                                                                         @PathVariable Long formationId,
+                                                                         @PathVariable @Positive Long formationId,
                                                                          @RequestParam(required = false) List<Long> equipmentIds) throws
             UnsupportedEncodingException {
         Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> failureIntensityData =
@@ -263,7 +267,7 @@ public class EquipmentPerFormationController {
     @ResponseBody
     @ApiOperation(value = "Получить данные о ВВСТ в Формированиях c интенсивностью выхода в ремонт в ед. (в табличном виде)")
     public ResponseEntity<byte[]> getEquipmentPerFormationDailyFailureDataReport(
-            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
+            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) throws UnsupportedEncodingException {
         Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> failureIntensityData =
                 equipmentPerFormationService.getFailureIntensityData(tehoSession.getSessionId(),
@@ -275,7 +279,9 @@ public class EquipmentPerFormationController {
                 equipmentPerFormationService.getGroupedEquipmentInFormation(formationId, equipmentIds);
         byte[] bytes = reportService.generateReport(new EquipmentFailureIntensityCombinedData(stages,
                                                                                               repairTypes,
-                                                                                              Collections.singletonMap(null, totalEquipmentInFormations),
+                                                                                              Collections.singletonMap(
+                                                                                                      null,
+                                                                                                      totalEquipmentInFormations),
                                                                                               Collections.singletonMap(
                                                                                                       null,
                                                                                                       failureIntensityData),
@@ -289,7 +295,7 @@ public class EquipmentPerFormationController {
     @ResponseBody
     @ApiOperation(value = "Получить данные о ВВСТ в Формированиях c интенсивностью выхода в ремонт в ед. (в табличном виде)")
     public ResponseEntity<TableDataDTO<Map<String, Map<String, String>>>> getEquipmentPerFormationDailyFailureData(
-            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable Long formationId,
+            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) {
         return ResponseEntity.ok(this.getEquipmentRowData(formationId,
                                                           EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
@@ -301,7 +307,7 @@ public class EquipmentPerFormationController {
     @PostMapping("/formation/{formationId}/equipment/daily-failure/{coefficient}")
     @ApiOperation(value = "Обновить данные о выходе ВВСТ из строя на основе интенсивности (%)")
     public ResponseEntity<TableDataDTO<Map<String, Map<String, String>>>> updateAvgDailyFailureData(
-            @ApiParam(value = "Ключ формирования", required = true, example = "1") @PathVariable Long formationId,
+            @ApiParam(value = "Ключ формирования", required = true, example = "1") @PathVariable @Positive Long formationId,
             @ApiParam(value = "Коэффициент (k), используемый в расчетах", required = true) @PathVariable Double coefficient) {
 
         equipmentPerFormationService.updateAvgDailyFailureData(tehoSession.getSessionId(),
@@ -314,8 +320,8 @@ public class EquipmentPerFormationController {
     @ResponseBody
     @ApiOperation(value = "Обновить данные о выходе ВВСТ в ремонт в ед.")
     public ResponseEntity<Object> updateEquipmentPerFormationFailureData(
-            @ApiParam(value = "Ключ формирования", required = true, example = "1") @PathVariable Long formationId,
-            @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable Long equipmentId,
+            @ApiParam(value = "Ключ формирования", required = true, example = "1") @PathVariable @Positive Long formationId,
+            @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable @Positive Long equipmentId,
             @ApiParam(value = "Данные о выходе ВВСТ в ремонт ({'ключ этапа': {'ключ типа ремонта': 'значение'}})",
                     required = true,
                     example = "{'1': {'1': '1.2', '2': '4.3'}}") @RequestBody Map<Long, Map<Long, Double>> data) {
@@ -377,8 +383,8 @@ public class EquipmentPerFormationController {
 
     @DeleteMapping("/formation/{formationId}/equipment/{equipmentId}")
     @Transactional
-    public ResponseEntity<Object> deleteEquipmentFromFormation(@PathVariable Long formationId,
-                                                               @PathVariable Long equipmentId) {
+    public ResponseEntity<Object> deleteEquipmentFromFormation(@PathVariable @Positive Long formationId,
+                                                               @PathVariable @Positive Long equipmentId) {
         equipmentPerFormationService.deleteEquipmentFromFormation(formationId, equipmentId);
         return ResponseEntity.noContent().build();
     }

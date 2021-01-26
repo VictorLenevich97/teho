@@ -3,8 +3,11 @@ package va.rit.teho.dto.equipment;
 import va.rit.teho.dto.common.AbstractNamedDTO;
 import va.rit.teho.entity.equipment.EquipmentType;
 
+import javax.validation.constraints.Positive;
+
 public class EquipmentTypeDTO extends AbstractNamedDTO {
 
+    @Positive
     private Long id;
 
     public EquipmentTypeDTO() {

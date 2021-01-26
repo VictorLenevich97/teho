@@ -48,7 +48,7 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
                                                                           "name",
                                                                           new RestorationType(1L, "", 1),
                                                                           2,
-                                                                          22);
+                                                                          16);
         RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(null,
                                                                                    repairFormationType.getName(),
                                                                                    new IdAndNameDTO(repairFormationType
@@ -82,7 +82,7 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
                                                                           "name",
                                                                           new RestorationType(1L, "", 1),
                                                                           2,
-                                                                          22);
+                                                                          16);
         RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(repairFormationType.getId(),
                                                                                    repairFormationType.getName(),
                                                                                    new IdAndNameDTO(repairFormationType

@@ -14,7 +14,8 @@ public interface RepairFormationUnitEquipmentStaffRepository
         extends CrudRepository<RepairFormationUnitEquipmentStaff, RepairFormationUnitPK> {
     List<RepairFormationUnitEquipmentStaff> findAllByTehoSessionId(UUID sessionId);
 
-    List<RepairFormationUnitEquipmentStaff> findAllByRepairFormationUnitIdAndTehoSessionId(Long repairFormationUnitId, UUID sessionId);
+    List<RepairFormationUnitEquipmentStaff> findAllByRepairFormationUnitIdAndTehoSessionId(Long repairFormationUnitId,
+                                                                                           UUID sessionId);
 
     @Query("SELECT rses from RepairFormationUnitEquipmentStaff rses WHERE " +
             "rses.tehoSession.id = :sessionId AND " +

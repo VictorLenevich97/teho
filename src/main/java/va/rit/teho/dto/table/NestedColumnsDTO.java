@@ -10,10 +10,6 @@ public class NestedColumnsDTO {
     private Object key;
     private List<NestedColumnsDTO> columns;
 
-    public Object getKey() {
-        return key;
-    }
-
     public NestedColumnsDTO(List<NestedColumnsDTO> columns) {
         this.columns = columns;
     }
@@ -32,6 +28,10 @@ public class NestedColumnsDTO {
     public NestedColumnsDTO(String title, List<NestedColumnsDTO> columns) {
         this.title = title;
         this.columns = columns;
+    }
+
+    public Object getKey() {
+        return key;
     }
 
     public String getTitle() {

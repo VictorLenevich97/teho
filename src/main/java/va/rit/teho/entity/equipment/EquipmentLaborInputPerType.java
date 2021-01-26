@@ -20,7 +20,8 @@ public class EquipmentLaborInputPerType {
     @JoinColumn(name = "repair_type_id")
     private RepairType repairType;
 
-    int amount;
+    @Column(nullable = false)
+    private int amount;
 
     public EquipmentLaborInputPerType() {
         //Пустой конструктор для автоматической инициализации
