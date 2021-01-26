@@ -1,6 +1,7 @@
 package va.rit.teho.dto.common;
 
 public class IdAndNameDTO {
+
     private Long id;
     private String name;
 

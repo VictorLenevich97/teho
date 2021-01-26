@@ -125,11 +125,11 @@ public class EquipmentTypeController {
     public ResponseEntity<EquipmentSubTypeDTO> updateEquipmentSubType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
                                                                       @ApiParam(value = "Ключ подтипа ВВСТ", required = true) @PathVariable Long subTypeId,
                                                                       @ApiParam(value = "Данные о подтипе ВВСТ", required = true) @RequestBody EquipmentSubTypeDTO equipmentSubTypeDTO) {
-        equipmentTypeService.updateSubType(subTypeId,
-                                           typeId,
-                                           equipmentSubTypeDTO.getShortName(),
-                                           equipmentSubTypeDTO.getFullName());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        EquipmentSubType equipmentSubType = equipmentTypeService.updateSubType(subTypeId,
+                                                                               typeId,
+                                                                               equipmentSubTypeDTO.getShortName(),
+                                                                               equipmentSubTypeDTO.getFullName());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(EquipmentSubTypeDTO.from(equipmentSubType));
     }
 
     @DeleteMapping(path = "/{typeId}/subtype/{subTypeId}")
