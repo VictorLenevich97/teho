@@ -17,11 +17,11 @@ public interface EquipmentTypeService {
 
     Pair<EquipmentType, List<EquipmentSubType>> getTypeWithSubTypes(Long typeId);
 
-    Long addType(String shortName, String fullName);
+    EquipmentType addType(String shortName, String fullName);
 
-    void updateType(Long id, String shortName, String fullName);
+    EquipmentType updateType(Long id, String shortName, String fullName);
 
-    void deleteType(Long id);
+    EquipmentType deleteType(Long id);
 
     Long addSubType(Long typeId, String shortName, String fullName);
 

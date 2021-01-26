@@ -87,17 +87,20 @@ public class EquipmentTypeController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить тип ВВСТ")
-    public ResponseEntity<Object> addEquipmentType(@ApiParam("Данные о типе ВВСТ") @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
-        equipmentTypeService.addType(equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<EquipmentTypeDTO> addEquipmentType(@ApiParam("Данные о типе ВВСТ") @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
+        EquipmentType equipmentType = equipmentTypeService.addType(equipmentTypeDTO.getShortName(),
+                                                                   equipmentTypeDTO.getFullName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(EquipmentTypeDTO.from(equipmentType));
     }
 
     @PutMapping(path = "/{typeId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновить тип ВВСТ")
     public ResponseEntity<Object> updateEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable Long typeId,
                                                       @ApiParam(value = "Данные о типе ВВСТ", required = true) @RequestBody EquipmentTypeDTO equipmentTypeDTO) {
-        equipmentTypeService.updateType(typeId, equipmentTypeDTO.getShortName(), equipmentTypeDTO.getFullName());
-        return ResponseEntity.accepted().build();
+        EquipmentType equipmentType = equipmentTypeService.updateType(typeId,
+                                                                      equipmentTypeDTO.getShortName(),
+                                                                      equipmentTypeDTO.getFullName());
+        return ResponseEntity.accepted().body(EquipmentTypeDTO.from(equipmentType));
     }
 
     @DeleteMapping(path = "/{typeId}")

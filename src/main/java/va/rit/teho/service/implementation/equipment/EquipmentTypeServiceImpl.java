@@ -72,19 +72,18 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     @Override
-    public Long addType(String shortName, String fullName) {
+    public EquipmentType addType(String shortName, String fullName) {
         String logLine = String.format("Добавление типа ВВСТ: \"%s\" (\"%s\")", shortName, fullName);
         LOGGER.debug(logLine);
         equipmentTypeRepository.findByFullName(fullName).ifPresent(et -> {
             throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
         });
         EquipmentType equipmentType = new EquipmentType(shortName, fullName);
-        EquipmentType type = equipmentTypeRepository.save(equipmentType);
-        return type.getId();
+        return equipmentTypeRepository.save(equipmentType);
     }
 
     @Override
-    public void updateType(Long id, String shortName, String fullName) {
+    public EquipmentType updateType(Long id, String shortName, String fullName) {
         String logLine = String.format("Обновление типа ВВСТ (id = %d): \"%s\" (\"%s\")", id, shortName, fullName);
         LOGGER.debug(logLine);
         EquipmentType equipmentType = equipmentTypeRepository.findById(id)
@@ -92,15 +91,17 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
                                                                      "Тип ВВСТ с id = " + id + " не найден!"));
         equipmentType.setShortName(shortName);
         equipmentType.setFullName(fullName);
-        equipmentTypeRepository.save(equipmentType);
+        return equipmentTypeRepository.save(equipmentType);
     }
 
     @Override
-    public void deleteType(Long id) {
-        if (!getTypeWithSubTypes(id).getSecond().isEmpty()) {
+    public EquipmentType deleteType(Long id) {
+        Pair<EquipmentType, List<EquipmentSubType>> typeWithSubTypes = getTypeWithSubTypes(id);
+        if (!typeWithSubTypes.getSecond().isEmpty()) {
             throw new IncorrectParamException("У типа ВВСТ существуют подтипы, удаление невозможно!");
         }
         equipmentTypeRepository.deleteById(id);
+        return typeWithSubTypes.getFirst();
     }
 
     @Override
