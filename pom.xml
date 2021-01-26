@@ -10,7 +10,7 @@
     </parent>
     <groupId>va.rit.teho</groupId>
     <artifactId>teho</artifactId>
-    <version>0.8-SNAPSHOT</version>
+    <version>1.0-RELEASE</version>
     <name>teho</name>
     <description>TehO project</description>
 
