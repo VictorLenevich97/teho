@@ -120,7 +120,6 @@ public class EquipmentController {
     @ApiOperation(value = "Получить список ВВСТ с нормативной трудоемкостью (в табличном виде)")
     public ResponseEntity<TableDataDTO<Map<String, Integer>>> listEquipmentWithLaborInputData(
             @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> ids,
-            @ApiParam(value = "Ключи подтипов, по которым осуществляется фильтр") @RequestParam(value = "subTypeId", required = false) List<Long> subTypeIds,
             @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
         List<NestedColumnsDTO> columns =
                 repairTypeService.list(true)

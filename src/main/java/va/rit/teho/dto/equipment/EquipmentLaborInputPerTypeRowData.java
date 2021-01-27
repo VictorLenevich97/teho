@@ -27,12 +27,12 @@ public class EquipmentLaborInputPerTypeRowData extends RowData<Map<String, Integ
 
     public EquipmentLaborInputPerTypeRowData(Long id,
                                              String name,
-                                             Long subTypeId,
-                                             String subTypeName,
+                                             Long typeId,
+                                             String typeName,
                                              Map<String, Integer> data) {
         super(id, name, data);
-        this.typeId = subTypeId;
-        this.typeName = subTypeName;
+        this.typeId = typeId;
+        this.typeName = typeName;
     }
 
     public Long getTypeId() {

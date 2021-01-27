@@ -20,7 +20,7 @@ public interface EquipmentService {
 
     Equipment add(String name, Long typeId, Map<Long, Integer> repairTypeIdLaborInputMap);
 
-    Equipment update(Long id, String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap);
+    Equipment update(Long id, String name, Long typeId, Map<Long, Integer> repairTypeIdLaborInputMap);
 
     void delete(Long id);
 
