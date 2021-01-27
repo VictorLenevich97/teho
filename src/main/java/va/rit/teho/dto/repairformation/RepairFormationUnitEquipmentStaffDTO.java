@@ -9,7 +9,7 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepairFormationUnitEquipmentStaffDTO {
 
-    Long equipmentSubTypeId;
+    Long EquipmentTypeId;
     Integer total;
     Integer available;
 
@@ -21,24 +21,24 @@ public class RepairFormationUnitEquipmentStaffDTO {
     public RepairFormationUnitEquipmentStaffDTO() {
     }
 
-    public RepairFormationUnitEquipmentStaffDTO(Long equipmentSubTypeKey, Integer totalStaff, Integer availableStaff) {
-        this.equipmentSubTypeId = equipmentSubTypeKey;
+    public RepairFormationUnitEquipmentStaffDTO(Long EquipmentTypeKey, Integer totalStaff, Integer availableStaff) {
+        this.EquipmentTypeId = EquipmentTypeKey;
         this.total = totalStaff;
         this.available = availableStaff;
     }
 
     public static RepairFormationUnitEquipmentStaffDTO from(RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff) {
-        return new RepairFormationUnitEquipmentStaffDTO(repairFormationUnitEquipmentStaff.getEquipmentSubType().getId(),
+        return new RepairFormationUnitEquipmentStaffDTO(repairFormationUnitEquipmentStaff.getEquipmentType().getId(),
                                                         repairFormationUnitEquipmentStaff.getTotalStaff(),
                                                         repairFormationUnitEquipmentStaff.getAvailableStaff());
     }
 
-    public Long getEquipmentSubTypeId() {
-        return equipmentSubTypeId;
+    public Long getEquipmentTypeId() {
+        return EquipmentTypeId;
     }
 
-    public void setEquipmentSubTypeId(Long equipmentSubTypeId) {
-        this.equipmentSubTypeId = equipmentSubTypeId;
+    public void setEquipmentTypeId(Long EquipmentTypeId) {
+        this.EquipmentTypeId = EquipmentTypeId;
     }
 
     public Integer getTotal() {
@@ -58,11 +58,11 @@ public class RepairFormationUnitEquipmentStaffDTO {
     }
 
     public RepairFormationUnitEquipmentStaff toEntity(UUID sessionId,
-                                                      Long equipmentSubTypeId,
+                                                      Long EquipmentTypeId,
                                                       Long repairFormationUnitId) {
         return new RepairFormationUnitEquipmentStaff(
                 new RepairFormationUnitPK(repairFormationUnitId,
-                                          this.equipmentSubTypeId == null ? equipmentSubTypeId : this.equipmentSubTypeId,
+                                          this.EquipmentTypeId == null ? EquipmentTypeId : this.EquipmentTypeId,
                                           sessionId),
                 total,
                 available);

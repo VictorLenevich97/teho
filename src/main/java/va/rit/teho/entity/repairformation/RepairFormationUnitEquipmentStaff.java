@@ -1,6 +1,6 @@
 package va.rit.teho.entity.repairformation;
 
-import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.session.TehoSession;
 
 import javax.persistence.*;
@@ -22,9 +22,9 @@ public class RepairFormationUnitEquipmentStaff {
     private RepairFormationUnit repairFormationUnit;
 
     @ManyToOne
-    @MapsId("equipment_sub_type_id")
-    @JoinColumn(name = "equipment_sub_type_id")
-    private EquipmentSubType equipmentSubType;
+    @MapsId("equipment_type_id")
+    @JoinColumn(name = "equipment_type_id")
+    private EquipmentType equipmentType;
 
     private Integer totalStaff;
     private Integer availableStaff;
@@ -52,7 +52,7 @@ public class RepairFormationUnitEquipmentStaff {
         RepairFormationUnitEquipmentStaff that = (RepairFormationUnitEquipmentStaff) o;
         return Objects.equals(equipmentPerRepairFormationUnit, that.equipmentPerRepairFormationUnit) &&
                 Objects.equals(repairFormationUnit, that.repairFormationUnit) &&
-                Objects.equals(equipmentSubType, that.equipmentSubType) &&
+                Objects.equals(equipmentType, that.equipmentType) &&
                 Objects.equals(totalStaff, that.totalStaff) &&
                 Objects.equals(availableStaff, that.availableStaff) &&
                 Objects.equals(tehoSession, that.tehoSession);
@@ -62,7 +62,7 @@ public class RepairFormationUnitEquipmentStaff {
     public int hashCode() {
         return Objects.hash(equipmentPerRepairFormationUnit,
                             repairFormationUnit,
-                            equipmentSubType,
+                            equipmentType,
                             totalStaff,
                             availableStaff,
                             tehoSession);
@@ -80,12 +80,12 @@ public class RepairFormationUnitEquipmentStaff {
         this.repairFormationUnit = repairFormationUnit;
     }
 
-    public EquipmentSubType getEquipmentSubType() {
-        return equipmentSubType;
+    public EquipmentType getEquipmentType() {
+        return equipmentType;
     }
 
-    public void setEquipmentSubType(EquipmentSubType equipmentSubType) {
-        this.equipmentSubType = equipmentSubType;
+    public void setEquipmentType(EquipmentType equipmentType) {
+        this.equipmentType = equipmentType;
     }
 
     public Integer getTotalStaff() {

@@ -1,7 +1,6 @@
 package va.rit.teho.entity.repairformation;
 
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 
 import java.util.List;
@@ -10,14 +9,14 @@ import java.util.Map;
 public class RepairFormationUnitRepairCapabilityCombinedData {
 
     private final List<RepairFormationUnit> repairFormationUnitList;
-    private final Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> groupedEquipmentData;
+    private final List<EquipmentType> equipmentTypes;
     private final Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities;
 
     public RepairFormationUnitRepairCapabilityCombinedData(List<RepairFormationUnit> repairFormationUnitList,
-                                                           Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped,
+                                                           List<EquipmentType> equipmentTypes,
                                                            Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities) {
         this.repairFormationUnitList = repairFormationUnitList;
-        this.groupedEquipmentData = grouped;
+        this.equipmentTypes = equipmentTypes;
         this.calculatedRepairCapabilities = calculatedRepairCapabilities;
     }
 
@@ -25,8 +24,8 @@ public class RepairFormationUnitRepairCapabilityCombinedData {
         return repairFormationUnitList;
     }
 
-    public Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> getGroupedEquipmentData() {
-        return groupedEquipmentData;
+    public List<EquipmentType> getEquipmentTypes() {
+        return equipmentTypes;
     }
 
     public Map<RepairFormationUnit, Map<Equipment, Double>> getCalculatedRepairCapabilities() {

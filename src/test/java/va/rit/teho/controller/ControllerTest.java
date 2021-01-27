@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
@@ -78,10 +77,6 @@ public abstract class ControllerTest {
     @MockBean
     protected RepairStationService repairStationService;
 
-    protected Formation base(Long id, String name) {
-        return new Formation(id, "short" + name, "full" + name);
-    }
-
     protected Equipment equipment(Long id, String name) {
         return new Equipment(id, name, null);
     }
@@ -94,7 +89,7 @@ public abstract class ControllerTest {
                                   String typeName) {
         EquipmentType equipmentType = new EquipmentType("short" + typeName, "full" + typeName);
         equipmentType.setId(typeId);
-        EquipmentSubType equipmentSubType = new EquipmentSubType("short" + subTypeName,
+        EquipmentType equipmentSubType = new EquipmentType("short" + subTypeName,
                                                                  "full" + subTypeName,
                                                                  equipmentType);
         equipmentSubType.setId(subTypeId);

@@ -13,7 +13,7 @@ public class RepairFormationUnitPK implements Serializable {
     private Long repairFormationUnitId;
 
     @Column(name = "equipment_sub_type_id")
-    private Long equipmentSubTypeId;
+    private Long EquipmentTypeId;
 
     @Column(name = "session_id")
     private UUID sessionId;
@@ -21,9 +21,9 @@ public class RepairFormationUnitPK implements Serializable {
     public RepairFormationUnitPK() {
     }
 
-    public RepairFormationUnitPK(Long repairFormationUnitId, Long equipmentSubTypeId, UUID sessionId) {
+    public RepairFormationUnitPK(Long repairFormationUnitId, Long EquipmentTypeId, UUID sessionId) {
         this.repairFormationUnitId = repairFormationUnitId;
-        this.equipmentSubTypeId = equipmentSubTypeId;
+        this.EquipmentTypeId = EquipmentTypeId;
         this.sessionId = sessionId;
     }
 
@@ -33,7 +33,7 @@ public class RepairFormationUnitPK implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         RepairFormationUnitPK that = (RepairFormationUnitPK) o;
         return Objects.equals(repairFormationUnitId, that.repairFormationUnitId) &&
-                Objects.equals(equipmentSubTypeId, that.equipmentSubTypeId) &&
+                Objects.equals(EquipmentTypeId, that.EquipmentTypeId) &&
                 Objects.equals(sessionId, that.sessionId);
     }
 
@@ -43,18 +43,18 @@ public class RepairFormationUnitPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(repairFormationUnitId, equipmentSubTypeId, sessionId);
+        return Objects.hash(repairFormationUnitId, EquipmentTypeId, sessionId);
     }
 
     public Long getRepairFormationUnitId() {
         return repairFormationUnitId;
     }
 
-    public Long getEquipmentSubTypeId() {
-        return equipmentSubTypeId;
+    public Long getEquipmentTypeId() {
+        return EquipmentTypeId;
     }
 
     public RepairFormationUnitPK copy(UUID sessionId) {
-        return new RepairFormationUnitPK(getRepairFormationUnitId(), getEquipmentSubTypeId(), sessionId);
+        return new RepairFormationUnitPK(getRepairFormationUnitId(), getEquipmentTypeId(), sessionId);
     }
 }

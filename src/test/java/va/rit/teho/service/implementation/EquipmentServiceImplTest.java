@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.repository.equipment.EquipmentLaborInputPerTypeRepository;
 import va.rit.teho.repository.equipment.EquipmentRepository;
@@ -27,7 +26,7 @@ public class EquipmentServiceImplTest {
             new Equipment(
                     1L,
                     "equipment",
-                    new EquipmentSubType("s", "f", new EquipmentType("s", "f")));
+                    new EquipmentType("s", "f"));
 
     private final EquipmentRepository equipmentRepository = Mockito.mock(EquipmentRepository.class);
     private final EquipmentLaborInputPerTypeRepository equipmentLaborInputPerTypeRepository = Mockito.mock(
@@ -59,32 +58,32 @@ public class EquipmentServiceImplTest {
 
     @Test
     public void testAdd() {
-        Long equipmentSubTypeId = 2L;
-        EquipmentSubType equipmentSubType = new EquipmentSubType("short", "full", new EquipmentType("", ""));
-        Equipment equipmentToAdd = new Equipment(1L, "eqName", equipmentSubType);
-        Equipment addedEquipment = new Equipment(15L, equipmentToAdd.getName(), equipmentToAdd.getEquipmentSubType());
+        Long equipmentTypeId = 2L;
+        EquipmentType equipmentType = new EquipmentType("", "");
+        Equipment equipmentToAdd = new Equipment(1L, "eqName", equipmentType);
+        Equipment addedEquipment = new Equipment(15L, equipmentToAdd.getName(), equipmentToAdd.getEquipmentType());
         when(equipmentRepository.getMaxId()).thenReturn(0L);
-        when(equipmentTypeService.getSubType(equipmentSubTypeId)).thenReturn(equipmentSubType);
+        when(equipmentTypeService.get(equipmentTypeId)).thenReturn(equipmentType);
         when(equipmentRepository.save(equipmentToAdd)).thenReturn(addedEquipment);
         Assertions.assertEquals(addedEquipment.getId(),
-                                equipmentService.add(equipmentToAdd.getName(), equipmentSubTypeId).getId());
+                                equipmentService.add(equipmentToAdd.getName(), equipmentTypeId).getId());
 
         verify(equipmentRepository).save(equipmentToAdd);
     }
 
     @Test
     public void testUpdate() {
-        Long equipmentSubTypeId = 2L;
-        EquipmentSubType equipmentSubType = new EquipmentSubType("short", "full", new EquipmentType("", ""));
-        Equipment equipmentToAdd = new Equipment(0L, "eqName", equipmentSubType);
-        Equipment addedEquipment = new Equipment(15L, equipmentToAdd.getName(), equipmentToAdd.getEquipmentSubType());
-        when(equipmentTypeService.getSubType(equipmentSubTypeId)).thenReturn(equipmentSubType);
+        Long equipmentTypeId = 2L;
+        EquipmentType equipmentType = new EquipmentType("", "");
+        Equipment equipmentToAdd = new Equipment(0L, "eqName", equipmentType);
+        Equipment addedEquipment = new Equipment(15L, equipmentToAdd.getName(), equipmentToAdd.getEquipmentType());
+        when(equipmentTypeService.get(equipmentTypeId)).thenReturn(equipmentType);
         when(equipmentRepository.findById(addedEquipment.getId())).thenReturn(Optional.of(addedEquipment));
         when(equipmentRepository.save(equipmentToAdd)).thenReturn(addedEquipment);
 
         Equipment update = equipmentService.update(addedEquipment.getId(),
                                                    equipmentToAdd.getName(),
-                                                   equipmentSubTypeId,
+                                                   equipmentTypeId,
                                                    Collections.emptyMap());
         Assertions.assertEquals(update.getId(), addedEquipment.getId());
         Assertions.assertEquals(update.getName(), equipmentToAdd.getName());
@@ -92,18 +91,12 @@ public class EquipmentServiceImplTest {
 
     @Test
     public void testListGroupedByTypes() {
-        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> result = Collections.singletonMap(EQUIPMENT
-                                                                                                             .getEquipmentSubType()
-                                                                                                             .getEquipmentType(),
-                                                                                                     Collections.singletonMap(
-                                                                                                             EQUIPMENT.getEquipmentSubType(),
-                                                                                                             Collections
-                                                                                                                     .singletonList(
-                                                                                                                             EQUIPMENT)));
+        Map<EquipmentType, List<Equipment>> result = Collections.singletonMap(EQUIPMENT.getEquipmentType(),
+                                                                              Collections.singletonList(EQUIPMENT));
 
-        when(equipmentRepository.findFiltered(null, null, null)).thenReturn(Collections.singletonList(EQUIPMENT));
+        when(equipmentRepository.findFiltered(null, null)).thenReturn(Collections.singletonList(EQUIPMENT));
 
-        Assertions.assertEquals(result, equipmentService.listGroupedByTypes(null, null, null));
+        Assertions.assertEquals(result, equipmentService.listGroupedByTypes(null, null));
     }
 
 }

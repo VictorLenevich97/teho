@@ -20,7 +20,7 @@ public class EquipmentDTO {
 
     private EquipmentTypeDTO type;
 
-    private EquipmentSubTypeDTO subType;
+    private EquipmentTypeDTO subType;
 
     public EquipmentDTO() {
     }
@@ -42,9 +42,9 @@ public class EquipmentDTO {
         EquipmentDTO equipmentDTO = new EquipmentDTO();
         equipmentDTO.setId(equipment.getId());
         equipmentDTO.setName(equipment.getName());
-        equipmentDTO.setSubType(EquipmentSubTypeDTO.from(equipment.getEquipmentSubType()));
-        Optional.ofNullable(equipment.getEquipmentSubType().getEquipmentType())
-                .ifPresent(et -> equipmentDTO.setType(EquipmentTypeDTO.from(et)));
+        equipmentDTO.setSubType(EquipmentTypeDTO.fromEntity(equipment.getEquipmentType()));
+        Optional.ofNullable(equipment.getEquipmentType())
+                .ifPresent(et -> equipmentDTO.setType(EquipmentTypeDTO.fromEntity(et)));
         return equipmentDTO;
     }
 
@@ -56,11 +56,11 @@ public class EquipmentDTO {
         this.type = type;
     }
 
-    public EquipmentSubTypeDTO getSubType() {
+    public EquipmentTypeDTO getSubType() {
         return subType;
     }
 
-    public void setSubType(EquipmentSubTypeDTO subType) {
+    public void setSubType(EquipmentTypeDTO subType) {
         this.subType = subType;
     }
 

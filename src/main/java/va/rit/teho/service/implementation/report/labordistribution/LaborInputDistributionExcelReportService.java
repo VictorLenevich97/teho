@@ -3,7 +3,6 @@ package va.rit.teho.service.implementation.report.labordistribution;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
@@ -12,7 +11,10 @@ import va.rit.teho.report.ReportCell;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -107,30 +109,37 @@ public class LaborInputDistributionExcelReportService
                              totalLaborInputHeader);
     }
 
-    @Override
-    protected void writeData(LaborInputDistributionCombinedData data, Sheet sheet, int lastRowIndex) {
-        int colSize = (data.getWorkhoursDistributionIntervals().size() * 2) + 4;
-        for (Map.Entry<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> e : data
-                .getLaborInputDistribution()
-                .entrySet()) {
-            String prefix = "";
-            if (e.getKey() != null) {
-                prefix = "Итого ";
-                createRowWideCell(sheet, lastRowIndex, colSize, e.getKey().getFullName(), true, false);
-            }
-            for (Map.Entry<EquipmentSubType, List<EquipmentLaborInputDistribution>> entry : e.getValue().entrySet()) {
-                EquipmentSubType equipmentSubType = entry.getKey();
-                List<EquipmentLaborInputDistribution> equipmentLaborInputDistributions = entry.getValue();
-                createRowWideCell(sheet,
-                                  lastRowIndex + 1,
-                                  colSize,
-                                  prefix + equipmentSubType.getFullName(),
-                                  true,
-                                  false);
-                writeRows(sheet, lastRowIndex + 2, data, equipmentLaborInputDistributions);
+    private void writeTypeData(List<EquipmentType> equipmentTypes,
+                               LaborInputDistributionCombinedData data,
+                               Sheet sheet,
+                               int lastRowIndex,
+                               int colSize) {
+        for (EquipmentType equipmentType : equipmentTypes) {
+            String prefix = equipmentType.getParentType() == null ? "" : "Итого: ";
+            createRowWideCell(sheet, lastRowIndex, colSize, prefix + equipmentType.getFullName(), true, false);
 
-                lastRowIndex += equipmentLaborInputDistributions.size() + 1;
-            }
+            List<EquipmentLaborInputDistribution> equipmentLaborInputDistributions =
+                    data.getLaborInputDistribution().get(equipmentType);
+
+            writeRows(sheet, lastRowIndex + 1, data, equipmentLaborInputDistributions);
+
+            lastRowIndex += equipmentLaborInputDistributions.size() + 1;
         }
+    }
+
+    @Override
+    protected int writeData(LaborInputDistributionCombinedData data, Sheet sheet, int lastRowIndex) {
+        int colSize = (data.getWorkhoursDistributionIntervals().size() * 2) + 4;
+
+        List<EquipmentType> highestLevelTypes = data
+                .getLaborInputDistribution()
+                .keySet()
+                .stream()
+                .filter(et -> et.getParentType() == null)
+                .collect(Collectors.toList());
+
+        writeTypeData(highestLevelTypes, data, sheet, lastRowIndex, colSize);
+
+        return lastRowIndex;
     }
 }

@@ -16,7 +16,6 @@ import va.rit.teho.dto.labordistribution.LaborDistributionNestedColumnsDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
@@ -61,7 +60,7 @@ public class LaborInputDistributionController {
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) throws
             UnsupportedEncodingException {
-        Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution =
                 laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(),
                                                                         repairTypeId,
                                                                         stageId,
@@ -82,7 +81,7 @@ public class LaborInputDistributionController {
             @ApiParam(value = "Ключ этапа", required = true) @PathVariable @Positive Long stageId,
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) {
-        Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution =
                 laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(),
                                                                         repairTypeId,
                                                                         stageId,
@@ -101,8 +100,8 @@ public class LaborInputDistributionController {
                 laborInputDistribution
                         .entrySet()
                         .stream()
-                        .flatMap(rd -> rd.getValue().values().stream()
-                                         .flatMap(l -> l.stream().map(this::getLaborDistributionRowData)))
+                        .flatMap(rd -> rd.getValue().stream()
+                                         .map(this::getLaborDistributionRowData))
                         .collect(Collectors.toList());
         return ResponseEntity.ok(new TableDataDTO<>(columns, rows));
     }

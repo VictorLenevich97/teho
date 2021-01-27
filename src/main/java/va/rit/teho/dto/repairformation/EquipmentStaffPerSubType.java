@@ -44,8 +44,8 @@ public class EquipmentStaffPerSubType {
     }
 
     public static EquipmentStaffPerSubType from(RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff) {
-        return new EquipmentStaffPerSubType(repairFormationUnitEquipmentStaff.getEquipmentSubType().getId(),
-                                            repairFormationUnitEquipmentStaff.getEquipmentSubType().getFullName(),
+        return new EquipmentStaffPerSubType(repairFormationUnitEquipmentStaff.getEquipmentType().getId(),
+                                            repairFormationUnitEquipmentStaff.getEquipmentType().getFullName(),
                                             repairFormationUnitEquipmentStaff.getTotalStaff(),
                                             repairFormationUnitEquipmentStaff.getAvailableStaff());
     }

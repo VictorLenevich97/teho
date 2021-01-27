@@ -4,10 +4,13 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import va.rit.teho.entity.equipment.EquipmentType;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface EquipmentTypeRepository extends CrudRepository<EquipmentType, Long> {
 
     Optional<EquipmentType> findByFullName(String fullName);
+
+    List<EquipmentType> findEquipmentTypeByParentTypeIsNullAndIdIn(List<Long> ids);
 }

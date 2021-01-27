@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentLaborInputPerType;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.EquipmentNotFoundException;
@@ -51,9 +50,8 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(List<Long> ids,
-                                                                              List<Long> subTypeIds,
                                                                               List<Long> typeIds) {
-        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, subTypeIds, typeIds);
+        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, typeIds);
 
         Map<RepairType, Integer> defaultLaborInputData =
                 repairTypeService.list(true).stream().collect(Collectors.toMap(rt -> rt, rt -> 0));
@@ -75,15 +73,15 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Equipment add(String name, Long subTypeId) {
-        String logLine = String.format("Добавление ВВСТ \"%s\", subTypeId = %d", name, subTypeId);
+    public Equipment add(String name, Long typeId) {
+        String logLine = String.format("Добавление ВВСТ \"%s\", typeId = %d", name, typeId);
         LOGGER.debug(logLine);
-        EquipmentSubType equipmentSubType = equipmentTypeService.getSubType(subTypeId);
+        EquipmentType equipmentType = equipmentTypeService.get(typeId);
         if (equipmentRepository.findByNameIgnoreCase(name).isPresent()) {
             throw new AlreadyExistsException("ВВСТ", "имя", name);
         }
         long newId = equipmentRepository.getMaxId() + 1;
-        return equipmentRepository.save(new Equipment(newId, name, equipmentSubType));
+        return equipmentRepository.save(new Equipment(newId, name, equipmentType));
     }
 
     @Override
@@ -113,8 +111,8 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Equipment update(Long id, String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap) {
-        String logLine = String.format("Обновление ВВСТ (id = %d) \"%s\", subTypeId = %d", id, name, subTypeId);
+    public Equipment update(Long id, String name, Long typeId, Map<Long, Integer> repairTypeIdLaborInputMap) {
+        String logLine = String.format("Обновление ВВСТ (id = %d) \"%s\", typeId = %d", id, name, typeId);
         LOGGER.debug(logLine);
         equipmentRepository.findByNameIgnoreCase(name).ifPresent(e -> {
             if (!e.getId().equals(id)) {
@@ -122,10 +120,10 @@ public class EquipmentServiceImpl implements EquipmentService {
             }
         });
 
-        EquipmentSubType equipmentSubType = equipmentTypeService.getSubType(subTypeId);
+        EquipmentType equipmentType = equipmentTypeService.get(typeId);
         Equipment equipment = get(id);
         equipment.setName(name);
-        equipment.setEquipmentSubType(equipmentSubType);
+        equipment.setEquipmentType(equipmentType);
 
         equipmentRepository.save(equipment);
         updateLaborInputData(repairTypeIdLaborInputMap, equipment);
@@ -139,16 +137,12 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
-                                                                                         List<Long> subTypeIds,
-                                                                                         List<Long> typeIds) {
-        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, subTypeIds, typeIds);
-        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> result = new HashMap<>();
+    public Map<EquipmentType, List<Equipment>> listGroupedByTypes(List<Long> ids,
+                                                                  List<Long> typeIds) {
+        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, typeIds);
+        Map<EquipmentType, List<Equipment>> result = new HashMap<>();
         for (Equipment equipment : equipmentList) {
-            result
-                    .computeIfAbsent(equipment.getEquipmentSubType().getEquipmentType(), k -> new HashMap<>())
-                    .computeIfAbsent(equipment.getEquipmentSubType(), k -> new ArrayList<>())
-                    .add(equipment);
+            result.computeIfAbsent(equipment.getEquipmentType(), k -> new ArrayList<>()).add(equipment);
         }
         return result;
     }

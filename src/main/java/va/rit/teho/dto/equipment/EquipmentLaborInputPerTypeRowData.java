@@ -21,8 +21,8 @@ public class EquipmentLaborInputPerTypeRowData extends RowData<Map<String, Integ
 
     public EquipmentLaborInputPerTypeRowData(Equipment e, Map<String, Integer> data) {
         super(e.getId(), e.getName(), data);
-        this.subTypeId = e.getEquipmentSubType().getId();
-        this.subTypeName = e.getEquipmentSubType().getFullName();
+        this.subTypeId = e.getEquipmentType().getId();
+        this.subTypeName = e.getEquipmentType().getFullName();
     }
 
     public EquipmentLaborInputPerTypeRowData(Long id,

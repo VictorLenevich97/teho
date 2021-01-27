@@ -1,6 +1,5 @@
 package va.rit.teho.entity.repairformation;
 
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 
 import java.util.List;
@@ -8,14 +7,14 @@ import java.util.Map;
 
 public class RepairFormationUnitCombinedData {
     private final List<RepairFormationUnit> repairFormationUnitList;
-    private final Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes;
-    private final Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff;
+    private final List<EquipmentType> equipmentTypes;
+    private final Map<RepairFormationUnit, Map<EquipmentType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff;
 
     public RepairFormationUnitCombinedData(List<RepairFormationUnit> repairFormationUnitList,
-                                           Map<EquipmentType, List<EquipmentSubType>> typesWithSubTypes,
-                                           Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff) {
+                                           List<EquipmentType> equipmentTypes,
+                                           Map<RepairFormationUnit, Map<EquipmentType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff) {
         this.repairFormationUnitList = repairFormationUnitList;
-        this.typesWithSubTypes = typesWithSubTypes;
+        this.equipmentTypes = equipmentTypes;
         this.repairFormationUnitEquipmentStaff = repairFormationUnitEquipmentStaff;
     }
 
@@ -23,11 +22,11 @@ public class RepairFormationUnitCombinedData {
         return repairFormationUnitList;
     }
 
-    public Map<EquipmentType, List<EquipmentSubType>> getTypesWithSubTypes() {
-        return typesWithSubTypes;
+    public List<EquipmentType> getEquipmentTypes() {
+        return equipmentTypes;
     }
 
-    public Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> getRepairFormationUnitEquipmentStaff() {
+    public Map<RepairFormationUnit, Map<EquipmentType, RepairFormationUnitEquipmentStaff>> getRepairFormationUnitEquipmentStaff() {
         return repairFormationUnitEquipmentStaff;
     }
 }

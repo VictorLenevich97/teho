@@ -2,7 +2,6 @@ package va.rit.teho.service.equipment;
 
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 
 import java.util.List;
@@ -13,7 +12,6 @@ public interface EquipmentService {
     List<Equipment> list();
 
     Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(List<Long> ids,
-                                                                       List<Long> subTypeIds,
                                                                        List<Long> typeIds);
 
     Equipment get(Long equipmentId);
@@ -26,8 +24,7 @@ public interface EquipmentService {
 
     void delete(Long id);
 
-    Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
-                                                                                  List<Long> subTypeIds,
-                                                                                  List<Long> typeIds);
+    Map<EquipmentType, List<Equipment>> listGroupedByTypes(List<Long> ids,
+                                                           List<Long> typeIds);
 
 }

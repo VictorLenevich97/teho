@@ -70,8 +70,9 @@ public class EquipmentDistributionExcelReportService
     }
 
     @Override
-    protected void writeData(EquipmentDistributionCombinedData data, Sheet sheet, int lastRowIndex) {
+    protected int writeData(EquipmentDistributionCombinedData data, Sheet sheet, int lastRowIndex) {
         writeRows(sheet, lastRowIndex, data, data.getEquipmentPerFormationDistributionDataList());
+        return lastRowIndex + data.getEquipmentPerFormationDistributionDataList().size();
     }
 
 }
