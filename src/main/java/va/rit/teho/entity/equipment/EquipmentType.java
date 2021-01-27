@@ -1,7 +1,5 @@
 package va.rit.teho.entity.equipment;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,7 +8,6 @@ import java.util.stream.Stream;
 
 @Entity
 @Table(name = "equipment_type")
-@Transactional
 public class EquipmentType implements Serializable {
 
     @Id
@@ -37,6 +34,19 @@ public class EquipmentType implements Serializable {
     public EquipmentType(String shortName, String fullName) {
         this.shortName = shortName;
         this.fullName = fullName;
+    }
+
+    public EquipmentType(Long id, String shortName, String fullName) {
+        this.id = id;
+        this.shortName = shortName;
+        this.fullName = fullName;
+    }
+
+    public EquipmentType(Long id, String shortName, String fullName, EquipmentType parentType) {
+        this.id = id;
+        this.shortName = shortName;
+        this.fullName = fullName;
+        this.parentType = parentType;
     }
 
     public EquipmentType(String shortName, String fullName, EquipmentType parentType) {

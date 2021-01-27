@@ -28,6 +28,7 @@ import va.rit.teho.service.repairformation.RepairFormationUnitService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
@@ -69,6 +70,7 @@ public class RepairCapabilitiesController {
     @PostMapping(path = "/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для всех РВО по всем ВВСТ)")
+    @Transactional
     public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGet(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilities(tehoSession.getSessionId(),
                                                                             repairTypeId);
@@ -131,10 +133,13 @@ public class RepairCapabilitiesController {
             return Stream.of(
                     new NestedColumnsDTO(
                             equipmentType.getShortName(),
-                            getRepairCapabilitiesNestedColumnsDTO(equipmentType).collect(Collectors.toList())));
+                            equipmentType
+                                    .getEquipmentTypes()
+                                    .stream()
+                                    .flatMap(this::getRepairCapabilitiesNestedColumnsDTO)
+                                    .collect(Collectors.toList())));
         }
     }
-
 
     private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(RepairFormationUnitRepairCapabilityCombinedData combinedData) {
         List<Equipment> columns =
@@ -175,6 +180,7 @@ public class RepairCapabilitiesController {
 
     @GetMapping("/{repairFormationUnitId}/capabilities/repair-type/{repairTypeId}")
     @ResponseBody
+    @Transactional
     public ResponseEntity<List<EquipmentTypeStaffData>> getCalculatedRepairCapabilitiesForUnit(
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
@@ -227,8 +233,7 @@ public class RepairCapabilitiesController {
                                                                                                .getOrDefault(
                                                                                                        equipment,
                                                                                                        0.0)))
-                                    .collect(Collectors.toList())
-                    );
+                                    .collect(Collectors.toList()));
                 });
     }
 

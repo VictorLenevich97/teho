@@ -75,7 +75,7 @@ public class EquipmentController {
                                                                              @Valid @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
         Map<Long, Integer> repairTypeIdLaborInputMap = mapStringKeysToLong(equipmentData.getData());
         Equipment added = equipmentService.add(equipmentData.getName(),
-                                               equipmentData.getSubTypeId(),
+                                               equipmentData.getTypeId(),
                                                repairTypeIdLaborInputMap);
         return ResponseEntity.status(HttpStatus.CREATED).body(new EquipmentLaborInputPerTypeRowData(added,
                                                                                                     equipmentData.getData()));
@@ -96,7 +96,7 @@ public class EquipmentController {
                                                                              @ApiParam(value = "Данные о ВВСТ", required = true) @Valid @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
         Equipment updatedEquipment = equipmentService.update(equipmentId,
                                                              equipmentData.getName(),
-                                                             equipmentData.getSubTypeId(),
+                                                             equipmentData.getTypeId(),
                                                              mapStringKeysToLong(equipmentData.getData()));
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)

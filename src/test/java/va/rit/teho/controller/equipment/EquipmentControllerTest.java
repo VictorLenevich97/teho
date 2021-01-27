@@ -63,7 +63,7 @@ public class EquipmentControllerTest extends ControllerTest {
         EquipmentLaborInputPerTypeRowData equipmentLaborInputPerTypeRowData =
                 new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, "test", Collections.singletonMap("1", 1));
         when(equipmentService.add(equipmentLaborInputPerTypeRowData.getName(),
-                                  equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                  equipmentLaborInputPerTypeRowData.getTypeId(),
                                   Collections.singletonMap(1L, 1))).thenReturn(EQUIPMENT);
         mockMvc.perform(post("/equipment")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -71,7 +71,7 @@ public class EquipmentControllerTest extends ControllerTest {
                .andExpect(status().isCreated());
 
         verify(equipmentService).add(equipmentLaborInputPerTypeRowData.getName(),
-                                     equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                     equipmentLaborInputPerTypeRowData.getTypeId(),
                                      Collections.singletonMap(1L, 1));
     }
 
@@ -82,7 +82,7 @@ public class EquipmentControllerTest extends ControllerTest {
 
         when(equipmentService.update(equipmentLaborInputPerTypeRowData.getId(),
                                      equipmentLaborInputPerTypeRowData.getName(),
-                                     equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                     equipmentLaborInputPerTypeRowData.getTypeId(),
                                      Collections.singletonMap(1L, 1))).thenReturn(EQUIPMENT);
 
         mockMvc.perform(put("/equipment/{id}", equipmentLaborInputPerTypeRowData.getId())
@@ -93,7 +93,7 @@ public class EquipmentControllerTest extends ControllerTest {
 
         verify(equipmentService).update(equipmentLaborInputPerTypeRowData.getId(),
                                         equipmentLaborInputPerTypeRowData.getName(),
-                                        equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                        equipmentLaborInputPerTypeRowData.getTypeId(),
                                         Collections.singletonMap(1L, 1));
     }
 }

@@ -18,6 +18,6 @@ public interface FormationRepository extends CrudRepository<Formation, Long> {
 
     List<Formation> findFormationByParentFormationIsNull();
 
-    List<Formation> findFormationByParentFormationIsNullAndIdNotIn(List<Long> formationIds);
+    List<Formation> findFormationByParentFormationIsNullAndIdIn(List<Long> formationIds);
 
 }

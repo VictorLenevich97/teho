@@ -87,9 +87,9 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     @Transactional
     public Equipment add(String name,
-                         Long subTypeId,
+                         Long typeId,
                          Map<Long, Integer> repairTypeIdLaborInputMap) {
-        Equipment equipment = add(name, subTypeId);
+        Equipment equipment = add(name, typeId);
         updateLaborInputData(repairTypeIdLaborInputMap, equipment);
         return equipment;
     }

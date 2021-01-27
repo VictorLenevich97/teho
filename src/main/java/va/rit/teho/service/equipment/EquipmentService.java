@@ -16,9 +16,9 @@ public interface EquipmentService {
 
     Equipment get(Long equipmentId);
 
-    Equipment add(String name, Long subTypeId);
+    Equipment add(String name, Long typeId);
 
-    Equipment add(String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap);
+    Equipment add(String name, Long typeId, Map<Long, Integer> repairTypeIdLaborInputMap);
 
     Equipment update(Long id, String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap);
 

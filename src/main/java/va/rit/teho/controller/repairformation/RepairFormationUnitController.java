@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 @Validated
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "РВО")
+@Transactional
 public class RepairFormationUnitController {
 
     private static final String KEY_TOTAL_STAFF = "total";
@@ -228,9 +229,9 @@ public class RepairFormationUnitController {
 
     @PutMapping(path = "/formation/repair-formation/unit/{repairFormationUnitId}/staff", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Обновление информации по личному составу РВО")
-    public ResponseEntity<List<EquipmentStaffPerSubType>> updateRepairFormationUnitEquipmentStaff(
+    public ResponseEntity<List<EquipmentStaffPerType>> updateRepairFormationUnitEquipmentStaff(
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
-            @ApiParam(value = "Данные по численности л/с", required = true) @Valid @RequestBody List<EquipmentStaffPerSubType> staffData) {
+            @ApiParam(value = "Данные по численности л/с", required = true) @Valid @RequestBody List<EquipmentStaffPerType> staffData) {
         List<RepairFormationUnitEquipmentStaff> list =
                 staffData.stream()
                          .map(sd -> sd.toEntity(tehoSession.getSessionId(), repairFormationUnitId))
@@ -240,7 +241,7 @@ public class RepairFormationUnitController {
                 repairFormationUnitService
                         .updateEquipmentStaff(list)
                         .stream()
-                        .map(EquipmentStaffPerSubType::from)
+                        .map(EquipmentStaffPerType::from)
                         .collect(Collectors.toList()));
     }
 

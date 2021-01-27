@@ -11,7 +11,6 @@ import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.equipment.EquipmentTypeRepository;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -27,6 +26,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     @Override
+    @Transactional
     public EquipmentType get(Long id) {
         return equipmentTypeRepository
                 .findById(id)
@@ -34,6 +34,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     @Override
+    @Transactional
     public List<EquipmentType> listTypes(List<Long> typeIds) {
         Iterable<EquipmentType> result;
         if (typeIds == null || typeIds.isEmpty()) {
@@ -45,8 +46,10 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     @Override
+    @Transactional
     public List<EquipmentType> listHighestLevelTypes(List<Long> typeIds) {
-        return equipmentTypeRepository.findEquipmentTypeByParentTypeIsNullAndIdIn(typeIds == null ? Collections.emptyList() : typeIds);
+        return typeIds == null || typeIds.isEmpty() ? equipmentTypeRepository.findEquipmentTypeByParentTypeIsNull() :
+                equipmentTypeRepository.findEquipmentTypeByParentTypeIsNullAndIdIn(typeIds);
     }
 
     @Override
@@ -56,7 +59,8 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
         equipmentTypeRepository.findByFullName(fullName).ifPresent(et -> {
             throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
         });
-        EquipmentType equipmentType = new EquipmentType(shortName, fullName);
+        long newId = equipmentTypeRepository.getMaxId() + 1;
+        EquipmentType equipmentType = new EquipmentType(newId, shortName, fullName);
         return equipmentTypeRepository.save(equipmentType);
     }
 
@@ -69,8 +73,10 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
             throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
         });
 
+        long newId = equipmentTypeRepository.getMaxId() + 1;
+
         EquipmentType parentType = get(parentTypeId);
-        EquipmentType equipmentType = new EquipmentType(shortName, fullName, parentType);
+        EquipmentType equipmentType = new EquipmentType(newId, shortName, fullName, parentType);
         return equipmentTypeRepository.save(equipmentType);
     }
 

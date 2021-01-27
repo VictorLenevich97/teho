@@ -12,8 +12,8 @@ public class RepairFormationUnitPK implements Serializable {
     @Column(name = "repair_formation_unit_id")
     private Long repairFormationUnitId;
 
-    @Column(name = "equipment_sub_type_id")
-    private Long EquipmentTypeId;
+    @Column(name = "equipment_type_id")
+    private Long equipmentTypeId;
 
     @Column(name = "session_id")
     private UUID sessionId;
@@ -21,9 +21,9 @@ public class RepairFormationUnitPK implements Serializable {
     public RepairFormationUnitPK() {
     }
 
-    public RepairFormationUnitPK(Long repairFormationUnitId, Long EquipmentTypeId, UUID sessionId) {
+    public RepairFormationUnitPK(Long repairFormationUnitId, Long equipmentTypeId, UUID sessionId) {
         this.repairFormationUnitId = repairFormationUnitId;
-        this.EquipmentTypeId = EquipmentTypeId;
+        this.equipmentTypeId = equipmentTypeId;
         this.sessionId = sessionId;
     }
 
@@ -33,7 +33,7 @@ public class RepairFormationUnitPK implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         RepairFormationUnitPK that = (RepairFormationUnitPK) o;
         return Objects.equals(repairFormationUnitId, that.repairFormationUnitId) &&
-                Objects.equals(EquipmentTypeId, that.EquipmentTypeId) &&
+                Objects.equals(equipmentTypeId, that.equipmentTypeId) &&
                 Objects.equals(sessionId, that.sessionId);
     }
 
@@ -43,7 +43,7 @@ public class RepairFormationUnitPK implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(repairFormationUnitId, EquipmentTypeId, sessionId);
+        return Objects.hash(repairFormationUnitId, equipmentTypeId, sessionId);
     }
 
     public Long getRepairFormationUnitId() {
@@ -51,7 +51,7 @@ public class RepairFormationUnitPK implements Serializable {
     }
 
     public Long getEquipmentTypeId() {
-        return EquipmentTypeId;
+        return equipmentTypeId;
     }
 
     public RepairFormationUnitPK copy(UUID sessionId) {
