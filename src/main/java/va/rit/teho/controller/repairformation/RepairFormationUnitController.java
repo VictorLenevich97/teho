@@ -268,22 +268,20 @@ public class RepairFormationUnitController {
     }
 
     private Stream<NestedColumnsDTO> getEquipmentStaffNestedColumnsDTO(EquipmentType equipmentType) {
+        Stream<NestedColumnsDTO> subColumns;
+        if (equipmentType.getEquipmentTypes().isEmpty()) {
+            subColumns =
+                    STAFF_KEYS_AND_TEXT
+                            .entrySet()
+                            .stream()
+                            .map(e -> new NestedColumnsDTO(Arrays.asList(equipmentType.getId().toString(), e.getKey()),
+                                                           e.getValue()));
+        } else {
+            subColumns = equipmentType.getEquipmentTypes().stream().flatMap(this::getEquipmentStaffNestedColumnsDTO);
+        }
         return Stream.of(new NestedColumnsDTO(
                 equipmentType.getShortName(),
-                equipmentType.getEquipmentTypes()
-                             .stream()
-                             .flatMap(this::getEquipmentStaffNestedColumnsDTO)
-                             .collect(Collectors.toList())));
-    }
-
-    private NestedColumnsDTO getEquipmentTypeNestedColumnsDTOFunction(EquipmentType est) {
-        return new NestedColumnsDTO(est.getShortName(),
-                                    STAFF_KEYS_AND_TEXT
-                                            .entrySet()
-                                            .stream()
-                                            .map(e -> new NestedColumnsDTO(
-                                                    Arrays.asList(est.getId().toString(), e.getKey()), e.getValue()))
-                                            .collect(Collectors.toList()));
+                subColumns.collect(Collectors.toList())));
     }
 
     private RowData<Map<String, RepairFormationUnitEquipmentStaffDTO>> getEquipmentStaffRow(

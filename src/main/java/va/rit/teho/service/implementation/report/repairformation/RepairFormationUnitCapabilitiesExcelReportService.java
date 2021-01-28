@@ -40,7 +40,8 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
                 .map(e -> new ReportCell(data
                                                  .getCalculatedRepairCapabilities()
                                                  .getOrDefault(rfu, Collections.emptyMap())
-                                                 .getOrDefault(e, 0.0)))
+                                                 .getOrDefault(e, 0.0),
+                                         ReportCell.CellType.NUMERIC))
                 .collect(Collectors.toList());
         functions.addAll(capabilityFunctions);
         return functions;
@@ -54,9 +55,13 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
     private ReportHeader populateHeader(EquipmentType equipmentType) {
         ReportHeader header = header(equipmentType.getShortName());
 
-        equipmentType.getEquipmentTypes().forEach(et -> header.addSubHeader(populateHeader(et)));
-
         equipmentType.getEquipmentSet().forEach(e -> header.addSubHeader(header(e.getName(), true)));
+
+        equipmentType.getEquipmentTypes().forEach(et -> {
+            if (!(et.getEquipmentTypes().isEmpty() && et.getEquipmentSet().isEmpty())) {
+                header.addSubHeader(populateHeader(et));
+            }
+        });
 
         return header;
     }

@@ -32,10 +32,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -126,18 +123,19 @@ public class RepairCapabilitiesController {
     }
 
     private Stream<NestedColumnsDTO> getRepairCapabilitiesNestedColumnsDTO(EquipmentType equipmentType) {
-        if (equipmentType.getEquipmentTypes().isEmpty()) {
-            return equipmentType.getEquipmentSet().stream().map(e -> new NestedColumnsDTO(e.getId().toString(),
-                                                                                          e.getName()));
+        Set<EquipmentType> subTypes = equipmentType.getEquipmentTypes();
+        Set<Equipment> equipmentSet = equipmentType.getEquipmentSet();
+        if (subTypes.isEmpty() && equipmentSet.isEmpty()) {
+            return Stream.empty();
         } else {
-            return Stream.of(
-                    new NestedColumnsDTO(
-                            equipmentType.getShortName(),
-                            equipmentType
-                                    .getEquipmentTypes()
-                                    .stream()
-                                    .flatMap(this::getRepairCapabilitiesNestedColumnsDTO)
-                                    .collect(Collectors.toList())));
+            Stream<NestedColumnsDTO> equipmentSubColumns =
+                    equipmentSet.stream().map(e -> new NestedColumnsDTO(e.getId().toString(), e.getName()));
+            Stream<NestedColumnsDTO> subTypesColumns =
+                    subTypes.stream().flatMap(this::getRepairCapabilitiesNestedColumnsDTO);
+            return Stream.of(new NestedColumnsDTO(equipmentType.getShortName(),
+                                                  Stream
+                                                          .concat(equipmentSubColumns, subTypesColumns)
+                                                          .collect(Collectors.toList())));
         }
     }
 
@@ -241,6 +239,7 @@ public class RepairCapabilitiesController {
     @GetMapping("/capabilities/repair-type/{id}")
     @ResponseBody
     @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
+    @Transactional
     public ResponseEntity<TableDataDTO<Map<String, String>>> getCalculatedRepairCapabilities(
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
@@ -262,6 +261,7 @@ public class RepairCapabilitiesController {
     @GetMapping("/capabilities/repair-type/{id}/report")
     @ResponseBody
     @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
+    @Transactional
     public ResponseEntity<byte[]> getCalculatedRepairCapabilitiesReport(
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,

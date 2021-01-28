@@ -102,8 +102,8 @@ public class EquipmentType implements Serializable {
     }
 
     public Stream<Equipment> collectRelatedEquipment() {
-        return Stream.concat(getEquipmentTypes().stream().flatMap(EquipmentType::collectRelatedEquipment),
-                             getEquipmentSet().stream());
+        return Stream.concat(getEquipmentSet().stream(),
+                             getEquipmentTypes().stream().flatMap(EquipmentType::collectRelatedEquipment));
     }
 
 
