@@ -149,6 +149,7 @@ public class EquipmentController {
 
     @GetMapping(value = "/labor-input/report", produces = "application/vnd.ms-excel")
     @ResponseBody
+    @Transactional
     public ResponseEntity<byte[]> equipmentLaborInputPerTypeReport(
             @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds)
             throws UnsupportedEncodingException {

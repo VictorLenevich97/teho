@@ -7,13 +7,20 @@ import java.util.Map;
 
 public class LaborInputDistributionCombinedData {
 
-    private final Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution;
+    private final List<EquipmentType> equipmentTypes;
     private final List<WorkhoursDistributionInterval> workhoursDistributionIntervals;
+    private final Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution;
 
-    public LaborInputDistributionCombinedData(Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution,
+    public LaborInputDistributionCombinedData(List<EquipmentType> equipmentTypes,
+                                              Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution,
                                               List<WorkhoursDistributionInterval> workhoursDistributionIntervals) {
+        this.equipmentTypes = equipmentTypes;
         this.laborInputDistribution = laborInputDistribution;
         this.workhoursDistributionIntervals = workhoursDistributionIntervals;
+    }
+
+    public List<EquipmentType> getEquipmentTypes() {
+        return equipmentTypes;
     }
 
     public Map<EquipmentType, List<EquipmentLaborInputDistribution>> getLaborInputDistribution() {

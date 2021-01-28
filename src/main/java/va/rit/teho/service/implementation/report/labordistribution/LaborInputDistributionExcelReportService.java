@@ -11,10 +11,7 @@ import va.rit.teho.report.ReportCell;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -109,37 +106,41 @@ public class LaborInputDistributionExcelReportService
                              totalLaborInputHeader);
     }
 
-    private void writeTypeData(List<EquipmentType> equipmentTypes,
-                               LaborInputDistributionCombinedData data,
-                               Sheet sheet,
-                               int lastRowIndex,
-                               int colSize) {
+    private int writeTypeData(Collection<EquipmentType> equipmentTypes,
+                              LaborInputDistributionCombinedData data,
+                              Sheet sheet,
+                              int lastRowIndex,
+                              int colSize) {
         for (EquipmentType equipmentType : equipmentTypes) {
-            String prefix = equipmentType.getParentType() == null ? "" : "Итого: ";
-            createRowWideCell(sheet, lastRowIndex, colSize, prefix + equipmentType.getFullName(), true, false);
+            if (data.getLaborInputDistribution().containsKey(equipmentType) || equipmentType
+                    .getEquipmentTypes()
+                    .stream()
+                    .anyMatch(data.getLaborInputDistribution()::containsKey)) {
+                String prefix = equipmentType.getParentType() == null ? "" : "Итого: ";
+                createRowWideCell(sheet, lastRowIndex, colSize, prefix + equipmentType.getFullName(), true, false);
 
-            List<EquipmentLaborInputDistribution> equipmentLaborInputDistributions =
-                    data.getLaborInputDistribution().get(equipmentType);
+                List<EquipmentLaborInputDistribution> equipmentLaborInputDistributions =
+                        Optional
+                                .ofNullable(data.getLaborInputDistribution().get(equipmentType))
+                                .orElse(Collections.emptyList());
 
-            writeRows(sheet, lastRowIndex + 1, data, equipmentLaborInputDistributions);
 
-            lastRowIndex += equipmentLaborInputDistributions.size() + 1;
+                writeRows(sheet, lastRowIndex + 1, data, equipmentLaborInputDistributions);
+
+                lastRowIndex = writeTypeData(equipmentType.getEquipmentTypes(),
+                                             data,
+                                             sheet,
+                                             lastRowIndex + equipmentLaborInputDistributions.size() + 1,
+                                             colSize);
+            }
         }
+        return lastRowIndex;
     }
 
     @Override
     protected int writeData(LaborInputDistributionCombinedData data, Sheet sheet, int lastRowIndex) {
         int colSize = (data.getWorkhoursDistributionIntervals().size() * 2) + 4;
 
-        List<EquipmentType> highestLevelTypes = data
-                .getLaborInputDistribution()
-                .keySet()
-                .stream()
-                .filter(et -> et.getParentType() == null)
-                .collect(Collectors.toList());
-
-        writeTypeData(highestLevelTypes, data, sheet, lastRowIndex, colSize);
-
-        return lastRowIndex;
+        return writeTypeData(data.getEquipmentTypes(), data, sheet, lastRowIndex, colSize);
     }
 }

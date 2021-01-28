@@ -42,11 +42,19 @@ public class EquipmentExcelReportService
                             int lastRowIndex) {
         List<RepairType> repairTypes = repairTypeService.list(true);
         for (EquipmentType equipmentType : data) {
-            createRowWideCell(sheet, lastRowIndex, repairTypes.size() + 1, equipmentType.getShortName(), false, true);
+            if (equipmentType.getParentType() == null || !equipmentType.getEquipmentTypes().isEmpty()) {
+                createRowWideCell(sheet,
+                                  lastRowIndex,
+                                  repairTypes.size() + 1,
+                                  equipmentType.getShortName(),
+                                  false,
+                                  true);
+                lastRowIndex += 1;
+            }
             Set<Equipment> equipmentSet = equipmentType.getEquipmentSet();
-            writeRows(sheet, lastRowIndex + 1, data, equipmentSet);
+            writeRows(sheet, lastRowIndex, data, equipmentSet);
 
-            lastRowIndex = writeData(equipmentType.getEquipmentTypes(), sheet, equipmentSet.size() + lastRowIndex + 1);
+            lastRowIndex = writeData(equipmentType.getEquipmentTypes(), sheet, equipmentSet.size() + lastRowIndex);
         }
 
         return lastRowIndex;
