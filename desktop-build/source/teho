@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+java -jar /var/lib/teho/teho-1.0-RELEASE.jar > /dev/null &
+
+processId=$(ps -ef | grep 'teho-1.0-RELEASE.jar' | grep -v 'grep' | awk '{ printf $2 }')
+
+/var/lib/teho/desktop/linux-unpacked/texo-web %U --no-sandbox
+
+kill $processId
+
+sleep 2
