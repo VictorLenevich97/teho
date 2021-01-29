@@ -40,6 +40,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
+
 @Controller
 @Validated
 @RequestMapping(path = "formation/repair-formation/unit", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -201,21 +203,21 @@ public class RepairCapabilitiesController {
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
             @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId) {
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped =
-                equipmentService.listGroupedByTypes(equipmentId,
-                                                    equipmentSubTypeId,
-                                                    equipmentTypeId);
+                equipmentService.listGroupedByTypes(nullIfEmpty(equipmentId),
+                                                    nullIfEmpty(equipmentSubTypeId),
+                                                    nullIfEmpty(equipmentTypeId));
         Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> equipmentStaff =
                 repairFormationUnitService.getEquipmentStaffPerSubType(tehoSession.getSessionId(),
                                                                        repairFormationUnitId,
-                                                                       equipmentTypeId,
-                                                                       equipmentSubTypeId);
+                                                                       nullIfEmpty(equipmentTypeId),
+                                                                       nullIfEmpty(equipmentSubTypeId));
         Map<Equipment, Double> calculatedRepairCapabilities =
                 repairCapabilitiesService.getCalculatedRepairCapabilities(repairFormationUnitId,
                                                                           tehoSession.getSessionId(),
                                                                           repairTypeId,
-                                                                          equipmentId,
-                                                                          equipmentSubTypeId,
-                                                                          equipmentTypeId);
+                                                                          nullIfEmpty(equipmentId),
+                                                                          nullIfEmpty(equipmentSubTypeId),
+                                                                          nullIfEmpty(equipmentTypeId));
         List<EquipmentTypeStaffData> result = grouped
                 .entrySet()
                 .stream()
@@ -310,20 +312,21 @@ public class RepairCapabilitiesController {
                                                                                       List<Long> equipmentSubTypeId,
                                                                                       int pageNum,
                                                                                       int pageSize) {
-        List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(repairFormationUnitId,
+        List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(nullIfEmpty(
+                repairFormationUnitId),
                                                                                             pageNum,
                                                                                             pageSize);
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped =
-                equipmentService.listGroupedByTypes(equipmentId,
-                                                    equipmentSubTypeId,
-                                                    equipmentTypeId);
+                equipmentService.listGroupedByTypes(nullIfEmpty(equipmentId),
+                                                    nullIfEmpty(equipmentSubTypeId),
+                                                    nullIfEmpty(equipmentTypeId));
         Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities =
                 repairCapabilitiesService.getCalculatedRepairCapabilities(tehoSession.getSessionId(),
                                                                           repairTypeId,
-                                                                          repairFormationUnitId,
-                                                                          equipmentId,
-                                                                          equipmentSubTypeId,
-                                                                          equipmentTypeId);
+                                                                          nullIfEmpty(repairFormationUnitId),
+                                                                          nullIfEmpty(equipmentId),
+                                                                          nullIfEmpty(equipmentSubTypeId),
+                                                                          nullIfEmpty(equipmentTypeId));
         return new RepairFormationUnitRepairCapabilityCombinedData(
                 repairFormationUnitList,
                 grouped,

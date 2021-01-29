@@ -22,6 +22,7 @@ import javax.validation.constraints.Positive;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
 
 @Controller
 @Validated
@@ -69,7 +70,7 @@ public class EquipmentTypeController {
             @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
         List<EquipmentSubTypePerTypeDTO> equipmentSubTypePerTypeDTOList =
                 equipmentTypeService
-                        .listTypesWithSubTypes(typeIds, subTypeIds)
+                        .listTypesWithSubTypes(nullIfEmpty(typeIds), nullIfEmpty(subTypeIds))
                         .entrySet()
                         .stream()
                         .flatMap(typeEntry -> EquipmentSubTypePerTypeDTO.from(typeEntry.getKey(), typeEntry.getValue()))
