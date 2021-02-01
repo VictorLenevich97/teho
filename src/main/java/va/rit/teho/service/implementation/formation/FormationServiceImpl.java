@@ -120,7 +120,7 @@ public class FormationServiceImpl implements FormationService {
         List<Formation> rootFormations =
                 formationIds == null ?
                         formationRepository.findFormationByParentFormationIsNull() :
-                        formationRepository.findFormationByParentFormationIsNullAndIdNotIn(formationIds);
+                        formationRepository.findFormationByParentFormationIsNullAndIdIn(formationIds);
         List<Tree<Formation>> treeList = new ArrayList<>();
         for (Formation formation : rootFormations) {
             Tree<Formation> formationTree = new Tree<>(formation);

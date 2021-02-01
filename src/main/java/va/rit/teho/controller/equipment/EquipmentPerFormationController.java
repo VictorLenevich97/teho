@@ -33,6 +33,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
+
 @Controller
 @Validated
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -216,7 +218,7 @@ public class EquipmentPerFormationController {
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) throws UnsupportedEncodingException {
         byte[] bytes = generateEquipmentFailureReport(formationId,
-                                                      equipmentIds,
+                                                      nullIfEmpty(equipmentIds),
                                                       EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
                                                       "ед.");
 
@@ -254,7 +256,7 @@ public class EquipmentPerFormationController {
                                                           EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
                                                           0.0,
                                                           va.rit.teho.controller.helper.Formatter::formatDoubleAsString,
-                                                          equipmentIds));
+                                                          nullIfEmpty(equipmentIds)));
     }
 
     @PostMapping("/formation/{formationId}/equipment/daily-failure/{coefficient}")
