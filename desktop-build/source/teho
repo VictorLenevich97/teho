@@ -1,7 +1,7 @@
 #!/usr/bin/bash
-java -jar /opt/TEHO/teho-1.0-RELEASE.jar &
+java -cp /opt/TEHO/unpacked/BOOT-INF/classes:/opt/TEHO/unpacked/BOOT-INF/lib/* -Xms2G -noverify -Dspring.jmx.enabled=false -XX:TieredStopAtLevel=1 va.rit.teho.server.TehoApplication --spring.config.location=classpath:application.properties --spring.main.lazy-initialization=true &
 
-processId=$(ps -ef | grep 'teho-1.0-RELEASE.jar' | grep -v 'grep' | awk '{ printf $2 }')
+processId=$(ps -ef | grep 'va.rit.teho.server.TehoApplication' | grep -v 'grep' | awk '{ printf $2 }')
 
 /opt/TEHO/frontend/texo-web-0.1.0.AppImage --no-sandbox
 

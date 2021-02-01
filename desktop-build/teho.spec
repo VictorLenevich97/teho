@@ -1,9 +1,10 @@
 %define __jar_repack %{nil}
 Name:       teho
 Version:    1.0
-Release:    2
+Release:    3
 Summary:    TEHO Software
 License:    NONE
+AutoReqProv: no
               
 %description
 
@@ -27,8 +28,10 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p %{buildroot}/usr/bin/
 mkdir -p %{buildroot}/usr/share/applications/
 mkdir -p %{buildroot}/usr/share/icons/hicolor/256x256/apps/
-mkdir -p %{buildroot}/opt/TEHO
-install -m 755 $RPM_SOURCE_DIR/teho-1.0-RELEASE.jar %{buildroot}/opt/TEHO/teho-1.0-RELEASE.jar
+mkdir -p %{buildroot}/opt/TEHO/unpacked
+install -m 755 $RPM_SOURCE_DIR/teho-1.0-RELEASE.jar %{buildroot}/opt/TEHO/unpacked/teho-1.0-RELEASE.jar
+cd %{buildroot}/opt/TEHO/unpacked && jar -xf teho-1.0-RELEASE.jar
+rm %{buildroot}/opt/TEHO/unpacked/teho-1.0-RELEASE.jar
 install -m 755 $RPM_SOURCE_DIR/teho %{buildroot}/usr/bin/teho
 chmod +x %{buildroot}/usr/bin/teho
 sudo cp -r $RPM_SOURCE_DIR/frontend %{buildroot}/opt/TEHO
