@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public interface RepairFormationUnitService {
 
+    Long count(List<Long> filterIds);
+
     List<RepairFormationUnit> list(List<Long> filterIds, Integer pageNum, Integer pageSize);
 
     List<RepairFormationUnit> list(Long repairFormationId, List<Long> filterIds, Integer pageNum, Integer pageSize);

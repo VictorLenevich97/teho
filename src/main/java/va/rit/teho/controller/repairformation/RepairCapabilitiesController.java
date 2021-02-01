@@ -154,7 +154,9 @@ public class RepairCapabilitiesController {
                                                     .collect(Collectors.toList()));
     }
 
-    private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(RepairFormationUnitRepairCapabilityCombinedData combinedData) {
+    private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(RepairFormationUnitRepairCapabilityCombinedData combinedData,
+                                                                         long rowCount,
+                                                                         int pageSize) {
         List<Equipment> columns =
                 combinedData.getGroupedEquipmentData()
                             .values()
@@ -175,7 +177,8 @@ public class RepairCapabilitiesController {
                                                                 columns,
                                                                 rs))
                             .collect(Collectors.toList());
-        return new TableDataDTO<>(equipmentPerTypeDTOList, data);
+        Long totalPageNum = (pageSize == 0 ? 1 : rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1));
+        return new TableDataDTO<>(equipmentPerTypeDTOList, data, totalPageNum);
     }
 
     private RowData<Map<String, String>> getRepairCapabilitiesRow(
@@ -278,7 +281,10 @@ public class RepairCapabilitiesController {
                 equipmentSubTypeId,
                 pageNum,
                 pageSize);
-        TableDataDTO<Map<String, String>> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(combinedData);
+        Long rowCount = repairFormationUnitService.count(repairFormationUnitId);
+        TableDataDTO<Map<String, String>> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(combinedData,
+                                                                                                 rowCount,
+                                                                                                 pageSize);
         return ResponseEntity.ok(repairCapabilitiesFullDTO);
     }
 
@@ -312,10 +318,11 @@ public class RepairCapabilitiesController {
                                                                                       List<Long> equipmentSubTypeId,
                                                                                       int pageNum,
                                                                                       int pageSize) {
-        List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(nullIfEmpty(
-                repairFormationUnitId),
-                                                                                            pageNum,
-                                                                                            pageSize);
+
+        List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(
+                nullIfEmpty(repairFormationUnitId),
+                pageNum,
+                pageSize);
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped =
                 equipmentService.listGroupedByTypes(nullIfEmpty(equipmentId),
                                                     nullIfEmpty(equipmentSubTypeId),
