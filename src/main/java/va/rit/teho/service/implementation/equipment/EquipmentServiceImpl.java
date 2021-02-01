@@ -2,6 +2,7 @@ package va.rit.teho.service.implementation.equipment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
@@ -50,10 +51,20 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
+    public Long count(List<Long> ids, List<Long> subTypeIds, List<Long> typeIds) {
+        return equipmentRepository.countFiltered(ids, subTypeIds, typeIds);
+    }
+
+    @Override
     public Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(List<Long> ids,
                                                                               List<Long> subTypeIds,
-                                                                              List<Long> typeIds) {
-        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, subTypeIds, typeIds);
+                                                                              List<Long> typeIds,
+                                                                              Integer pageNum,
+                                                                              Integer pageSize) {
+        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids,
+                                                                         subTypeIds,
+                                                                         typeIds,
+                                                                         PageRequest.of(pageNum - 1, pageSize));
 
         Map<RepairType, Integer> defaultLaborInputData =
                 repairTypeService.list(true).stream().collect(Collectors.toMap(rt -> rt, rt -> 0));
@@ -142,7 +153,10 @@ public class EquipmentServiceImpl implements EquipmentService {
     public Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
                                                                                          List<Long> subTypeIds,
                                                                                          List<Long> typeIds) {
-        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, subTypeIds, typeIds);
+        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids,
+                                                                         subTypeIds,
+                                                                         typeIds,
+                                                                         PageRequest.of(1, 10000));
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> result = new HashMap<>();
         for (Equipment equipment : equipmentList) {
             result

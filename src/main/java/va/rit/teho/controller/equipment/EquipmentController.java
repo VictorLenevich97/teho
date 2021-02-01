@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
+
 @Controller
 @RequestMapping(path = "equipment", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "ВВСТ")
@@ -121,7 +123,15 @@ public class EquipmentController {
     public ResponseEntity<TableDataDTO<Map<String, Integer>>> listEquipmentWithLaborInputData(
             @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> ids,
             @ApiParam(value = "Ключи подтипов, по которым осуществляется фильтр") @RequestParam(value = "subTypeId", required = false) List<Long> subTypeIds,
-            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds) {
+            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds,
+            @RequestParam(required = false, defaultValue = "1") int pageNum,
+            @RequestParam(required = false, defaultValue = "100") int pageSize) {
+        List<Long> idsFilter = nullIfEmpty(ids);
+        List<Long> subTypeIdsFilter = nullIfEmpty(subTypeIds);
+        List<Long> typeIdsFilter = nullIfEmpty(typeIds);
+
+        Long rowCount = equipmentService.count(idsFilter, subTypeIdsFilter, typeIdsFilter);
+
         List<NestedColumnsDTO> columns =
                 repairTypeService.list(true)
                                  .stream()
@@ -129,7 +139,7 @@ public class EquipmentController {
                                  .collect(Collectors.toList());
         List<EquipmentLaborInputPerTypeRowData> data =
                 equipmentService
-                        .listWithLaborInputPerType(ids, subTypeIds, typeIds)
+                        .listWithLaborInputPerType(idsFilter, subTypeIdsFilter, typeIdsFilter, pageNum, pageSize)
                         .entrySet()
                         .stream()
                         .map(equipmentMapEntry ->
@@ -144,8 +154,9 @@ public class EquipmentController {
                         .sorted(Comparator.comparing(EquipmentLaborInputPerTypeRowData::getId,
                                                      Comparator.reverseOrder()))
                         .collect(Collectors.toList());
+        Long totalPageNum = (pageSize == 0 ? 1 : rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1));
 
-        return ResponseEntity.ok(new TableDataDTO<>(columns, data));
+        return ResponseEntity.ok(new TableDataDTO<>(columns, data, totalPageNum));
     }
 
     @GetMapping(value = "/labor-input/report", produces = "application/vnd.ms-excel")
