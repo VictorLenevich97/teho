@@ -156,7 +156,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         List<Equipment> equipmentList = equipmentRepository.findFiltered(ids,
                                                                          subTypeIds,
                                                                          typeIds,
-                                                                         PageRequest.of(1, 10000));
+                                                                         PageRequest.of(0, 10000));
         Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> result = new HashMap<>();
         for (Equipment equipment : equipmentList) {
             result
