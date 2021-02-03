@@ -101,7 +101,7 @@ public class EquipmentServiceImplTest {
                                                                                                                      .singletonList(
                                                                                                                              EQUIPMENT)));
 
-        when(equipmentRepository.findFiltered(null, null, null)).thenReturn(Collections.singletonList(EQUIPMENT));
+        when(equipmentRepository.findFiltered(null, null, null, null)).thenReturn(Collections.singletonList(EQUIPMENT));
 
         Assertions.assertEquals(result, equipmentService.listGroupedByTypes(null, null, null));
     }

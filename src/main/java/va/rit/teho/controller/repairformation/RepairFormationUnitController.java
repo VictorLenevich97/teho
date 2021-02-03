@@ -136,8 +136,11 @@ public class RepairFormationUnitController {
                 equipmentSubTypeId,
                 pageNum,
                 pageSize);
+
+        Long rowCount = repairFormationUnitService.count(repairFormationUnitId);
+
         TableDataDTO<Map<String, RepairFormationUnitEquipmentStaffDTO>> equipmentStaffDTO =
-                buildEquipmentStaffDTO(repairFormationUnitCombinedData);
+                buildEquipmentStaffDTO(repairFormationUnitCombinedData, rowCount, pageSize);
         return ResponseEntity.ok(equipmentStaffDTO);
     }
 
@@ -266,7 +269,9 @@ public class RepairFormationUnitController {
     }
 
     private TableDataDTO<Map<String, RepairFormationUnitEquipmentStaffDTO>> buildEquipmentStaffDTO(
-            RepairFormationUnitCombinedData repairFormationUnitCombinedData) {
+            RepairFormationUnitCombinedData repairFormationUnitCombinedData,
+            long rowCount,
+            int pageSize) {
         List<EquipmentSubType> columns =
                 repairFormationUnitCombinedData.getTypesWithSubTypes()
                                                .values()
@@ -286,7 +291,8 @@ public class RepairFormationUnitController {
                                                 columns,
                                                 rs))
                 .collect(Collectors.toList());
-        return new TableDataDTO<>(nestedColumnsTotal, rows);
+        Long totalPageNum = (pageSize == 0 ? 1 : rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1));
+        return new TableDataDTO<>(nestedColumnsTotal, rows, totalPageNum);
     }
 
     private Stream<NestedColumnsDTO> getEquipmentStaffNestedColumnsDTO(
