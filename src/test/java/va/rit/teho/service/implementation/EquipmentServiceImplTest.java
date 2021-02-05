@@ -94,7 +94,7 @@ public class EquipmentServiceImplTest {
         Map<EquipmentType, List<Equipment>> result = Collections.singletonMap(EQUIPMENT.getEquipmentType(),
                                                                               Collections.singletonList(EQUIPMENT));
 
-        when(equipmentRepository.findFiltered(null, null)).thenReturn(Collections.singletonList(EQUIPMENT));
+        when(equipmentRepository.findFiltered(null, null, null)).thenReturn(Collections.singletonList(EQUIPMENT));
 
         Assertions.assertEquals(result, equipmentService.listGroupedByTypes(null, null));
     }

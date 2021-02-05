@@ -48,6 +48,15 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
+    public Long count(List<Long> filterIds) {
+        if (filterIds == null || filterIds.isEmpty()) {
+            return repairFormationUnitRepository.count();
+        } else {
+            return repairFormationUnitRepository.countByIdIn(filterIds);
+        }
+    }
+
+    @Override
     public List<RepairFormationUnit> list(List<Long> filterIds, Integer pageNum, Integer pageSize) {
         return repairFormationUnitRepository.findSorted(filterIds, PageRequest.of(pageNum - 1, pageSize));
     }

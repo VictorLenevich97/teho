@@ -16,6 +16,7 @@ import va.rit.teho.service.equipment.EquipmentTypeService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,10 +39,11 @@ public class EquipmentTypeController {
     public ResponseEntity<List<EquipmentTypeDTO>> getEquipmentTypes(
             @RequestParam(required = false, defaultValue = "false") boolean grouped,
             @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> typeIds) {
+        List<Long> typeIdsFilter = typeIds == null ? Collections.emptyList() : typeIds;
         List<EquipmentTypeDTO> equipmentTypeDTOList;
         if (grouped) {
             equipmentTypeDTOList = equipmentTypeService
-                    .listHighestLevelTypes(typeIds)
+                    .listHighestLevelTypes(typeIdsFilter)
                     .stream()
                     .map(EquipmentTypeDTO::fromEntityIncludeSubtypes)
                     .collect(Collectors.toList());

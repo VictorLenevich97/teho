@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
+
 @Controller
 @Validated
 @RequestMapping(path = "/formation", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -54,10 +56,6 @@ public class EquipmentRFUDistributionController {
         this.repairTypeService = repairTypeService;
         this.restorationTypeService = restorationTypeService;
         this.distributionReportService = distributionReportService;
-    }
-
-    private <T> List<T> nullIfEmpty(List<T> data) {
-        return data.isEmpty() ? null : data;
     }
 
     @PostMapping("/repair-formation/unit/equipment")

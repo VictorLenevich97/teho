@@ -2,6 +2,7 @@ package va.rit.teho.service.implementation.equipment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
@@ -49,9 +50,18 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
+    public Long count(List<Long> ids, List<Long> typeIds) {
+        return equipmentRepository.countFiltered(ids, typeIds);
+    }
+
+    @Override
     public Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(List<Long> ids,
-                                                                              List<Long> typeIds) {
-        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, typeIds);
+                                                                              List<Long> typeIds,
+                                                                              Integer pageNum,
+                                                                              Integer pageSize) {
+        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids,
+                                                                         typeIds,
+                                                                         PageRequest.of(pageNum - 1, pageSize));
 
         Map<RepairType, Integer> defaultLaborInputData =
                 repairTypeService.list(true).stream().collect(Collectors.toMap(rt -> rt, rt -> 0));
@@ -139,7 +149,9 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public Map<EquipmentType, List<Equipment>> listGroupedByTypes(List<Long> ids,
                                                                   List<Long> typeIds) {
-        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids, typeIds);
+        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids,
+                                                                         typeIds,
+                                                                         PageRequest.of(0, 10000));
         Map<EquipmentType, List<Equipment>> result = new HashMap<>();
         for (Equipment equipment : equipmentList) {
             result.computeIfAbsent(equipment.getEquipmentType(), k -> new ArrayList<>()).add(equipment);

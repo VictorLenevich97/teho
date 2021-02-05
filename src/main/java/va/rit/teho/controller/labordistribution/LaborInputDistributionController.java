@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
+
 @Controller
 @Validated
 @RequestMapping(path = "labor-distribution", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -70,7 +72,7 @@ public class LaborInputDistributionController {
                 laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(),
                                                                         repairTypeId,
                                                                         stageId,
-                                                                        equipmentTypeId);
+                                                                        nullIfEmpty(equipmentTypeId));
         List<WorkhoursDistributionInterval> distributionIntervals =
                 laborInputDistributionService.listDistributionIntervals();
 
@@ -93,7 +95,7 @@ public class LaborInputDistributionController {
                 laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(),
                                                                         repairTypeId,
                                                                         stageId,
-                                                                        equipmentTypeId);
+                                                                        nullIfEmpty(equipmentTypeId));
         List<NestedColumnsDTO> columns =
                 laborInputDistributionService
                         .listDistributionIntervals()
@@ -132,10 +134,6 @@ public class LaborInputDistributionController {
                                             Formatter.formatDoubleAsString(elid.getAvgDailyFailure()),
                                             elid.getStandardLaborInput(),
                                             Formatter.formatDoubleAsString(elid.getTotalRepairComplexity()));
-    }
-
-    private <T> List<T> nullIfEmpty(List<T> data) {
-        return data == null ? null : data.isEmpty() ? null : data;
     }
 
     @PostMapping

@@ -27,4 +27,6 @@ public interface RepairFormationUnitRepository extends PagingAndSortingRepositor
             "ORDER BY rdu.id ASC")
     List<RepairFormationUnit> findSorted(Long repairFormationId, List<Long> repairFormationUnitIds, Pageable pageable);
 
+    Long countByIdIn(List<Long> ids);
+
 }

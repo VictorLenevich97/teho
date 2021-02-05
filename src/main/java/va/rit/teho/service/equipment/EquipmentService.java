@@ -11,8 +11,12 @@ public interface EquipmentService {
 
     List<Equipment> list();
 
+    Long count(List<Long> ids, List<Long> typeIds);
+
     Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(List<Long> ids,
-                                                                       List<Long> typeIds);
+                                                                       List<Long> typeIds,
+                                                                       Integer pageNum,
+                                                                       Integer pageSize);
 
     Equipment get(Long equipmentId);
 
