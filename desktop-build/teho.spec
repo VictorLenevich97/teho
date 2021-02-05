@@ -14,7 +14,7 @@ cp ~/IdeaProjects/teho-backend/target/teho-1.0-RELEASE.jar $RPM_SOURCE_DIR/teho-
 cp ~/IdeaProjects/teho-backend/desktop-build/source/teho $RPM_SOURCE_DIR/teho
 rm -rf $RPM_SOURCE_DIR/frontend
 mkdir $RPM_SOURCE_DIR/frontend
-cp ~/IdeaProjects/teho-frontend/dist/texo-web-0.1.0.AppImage $RPM_SOURCE_DIR/frontend/texo-web-0.1.0.AppImage
+cp ~/IdeaProjects/teho-frontend/dist/teho-web-0.1.0.AppImage $RPM_SOURCE_DIR/frontend/teho-web-0.1.0.AppImage
 cp ~/IdeaProjects/teho-backend/desktop-build/source/teho-web.desktop $RPM_SOURCE_DIR/teho-web.desktop
 cp ~/IdeaProjects/teho-backend/desktop-build/source/teho-web.png $RPM_SOURCE_DIR/teho-web.png
 
