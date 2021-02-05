@@ -38,7 +38,8 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
                 .map(e -> new ReportCell(data
                                                  .getCalculatedRepairCapabilities()
                                                  .getOrDefault(rfu, Collections.emptyMap())
-                                                 .getOrDefault(e, 0.0)))
+                                                 .getOrDefault(e, 0.0),
+                                         ReportCell.CellType.NUMERIC))
                 .collect(Collectors.toList());
         functions.addAll(capabilityFunctions);
         return functions;
