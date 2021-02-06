@@ -12,6 +12,9 @@ import java.util.UUID;
 @Entity
 public class EquipmentPerFormationFailureIntensity implements Serializable {
 
+    @EmbeddedId
+    private EquipmentPerFormationFailureIntensityPK id;
+
     @ManyToOne
     @MapsId("formation_id")
     @JoinColumn(name = "formation_id")
@@ -22,8 +25,6 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
     @JoinColumn(name = "equipment_id")
     private Equipment equipment;
 
-    @EmbeddedId
-    private EquipmentPerFormationFailureIntensityPK id;
     @ManyToOne
     @MapsId("stage_id")
     @JoinColumn(name = "stage_id")

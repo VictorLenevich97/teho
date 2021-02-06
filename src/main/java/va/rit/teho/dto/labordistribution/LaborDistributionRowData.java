@@ -6,14 +6,14 @@ import va.rit.teho.dto.table.RowData;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LaborDistributionRowData extends RowData<Map<String, CountAndLaborInputDTO>> {
+public class LaborDistributionRowData<T> extends RowData<Map<String, T>> {
     private final String equipmentName;
     private final String avgDailyFailure;
     private final Integer standardLaborInput;
     private final String totalLaborInput;
 
     public LaborDistributionRowData(String name,
-                                    Map<String, CountAndLaborInputDTO> data,
+                                    Map<String, T> data,
                                     String equipmentName,
                                     String avgDailyFailure,
                                     Integer standardLaborInput,

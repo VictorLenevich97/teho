@@ -59,7 +59,9 @@ public class InitialDataLoader implements ApplicationRunner {
                         .stream(RepairTypeEnum.values())
                         .map(repairTypeEnum -> new RepairType(repairTypeEnum.getFullName(),
                                                               repairTypeEnum.getShortName(),
-                                                              repairTypeEnum.isCalculatable()))
+                                                              repairTypeEnum.isCalculatable(),
+                                                              repairTypeEnum.isRepairable(),
+                                                              repairTypeEnum.isSplitToIntervals()))
                         .filter(rt -> !existingRepairTypes.contains(rt.getShortName()))
                         .collect(Collectors.toList()));
     }

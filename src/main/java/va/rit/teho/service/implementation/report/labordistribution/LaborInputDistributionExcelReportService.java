@@ -22,16 +22,24 @@ public class LaborInputDistributionExcelReportService
     private static Stream<ReportCell> getCountAndLaborInputCells(
             EquipmentLaborInputDistribution elid,
             WorkhoursDistributionInterval wdi) {
-        return
-                Stream.of(
-                        new ReportCell(elid.getIntervalCountAndLaborInputMap()
-                                           .get(wdi.getId())
-                                           .getCount(),
-                                       ReportCell.CellType.NUMERIC),
-                        new ReportCell(elid.getIntervalCountAndLaborInputMap()
-                                           .get(wdi.getId())
-                                           .getLaborInput(),
-                                       ReportCell.CellType.NUMERIC));
+        return elid
+                .getCountAndLaborInputCombinedData()
+                .entrySet()
+                .stream()
+                .flatMap(entry ->
+                                 Stream.of(
+                                         new ReportCell(entry
+                                                                .getValue()
+                                                                .getCountAndLaborInputMap()
+                                                                .get(wdi.getId())
+                                                                .getCount(),
+                                                        ReportCell.CellType.NUMERIC),
+                                         new ReportCell(entry
+                                                                .getValue()
+                                                                .getCountAndLaborInputMap()
+                                                                .get(wdi.getId())
+                                                                .getLaborInput(),
+                                                        ReportCell.CellType.NUMERIC)));
     }
 
     @Override

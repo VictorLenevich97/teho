@@ -24,6 +24,8 @@ public interface LaborInputDistributionService {
                                                                                         Long stageId,
                                                                                         List<Long> equipmentTypeIds);
 
+    Map<EquipmentType, List<EquipmentLaborInputDistribution>> getAggregatedLaborInputDistribution(UUID sessionId);
+
     /**
      * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ.
      */

@@ -21,7 +21,7 @@ public class RepairTypeControllerTest extends ControllerTest {
 
     @Test
     public void testListRepairTypes() throws Exception {
-        RepairType repairType = new RepairType("repair-type", "", true);
+        RepairType repairType = new RepairType("repair-type", "", true, false, false);
 
         List<RepairType> repairTypeList = Collections.singletonList(repairType);
         when(repairTypeService.list()).thenReturn(repairTypeList);
@@ -33,7 +33,7 @@ public class RepairTypeControllerTest extends ControllerTest {
 
     @Test
     public void testListRepairableRepairTypes() throws Exception {
-        RepairType repairType = new RepairType("repair-type", "", true);
+        RepairType repairType = new RepairType("repair-type", "", true, false, false);
 
         List<RepairType> repairTypeList = Collections.singletonList(repairType);
         when(repairTypeService.list(true)).thenReturn(repairTypeList);

@@ -1,20 +1,47 @@
 package va.rit.teho.entity.equipment;
 
 import va.rit.teho.entity.common.RepairType;
+import va.rit.teho.entity.formation.Formation;
 
 public class EquipmentFailurePerRepairTypeAmount {
-    private final Equipment equipment;
+    private final EquipmentPerFormation equipmentPerFormation;
     private final RepairType repairType;
+    private final Integer laborInput;
     private final Double amount;
 
-    public EquipmentFailurePerRepairTypeAmount(Equipment equipment, RepairType repairType, Double amount) {
-        this.equipment = equipment;
+    public EquipmentFailurePerRepairTypeAmount(EquipmentPerFormation equipmentPerFormation,
+                                               RepairType repairType,
+                                               Double amount) {
+        this.equipmentPerFormation = equipmentPerFormation;
         this.repairType = repairType;
+        this.laborInput = 0;
         this.amount = amount;
     }
 
+    public EquipmentFailurePerRepairTypeAmount(EquipmentPerFormation equipmentPerFormation,
+                                               RepairType repairType,
+                                               Integer laborInput,
+                                               Double amount) {
+        this.equipmentPerFormation = equipmentPerFormation;
+        this.repairType = repairType;
+        this.laborInput = laborInput;
+        this.amount = amount;
+    }
+
+    public EquipmentPerFormation getEquipmentPerFormation() {
+        return equipmentPerFormation;
+    }
+
+    public Integer getLaborInput() {
+        return laborInput;
+    }
+
+    public Formation getFormation() {
+        return equipmentPerFormation.getFormation();
+    }
+
     public Equipment getEquipment() {
-        return equipment;
+        return equipmentPerFormation.getEquipment();
     }
 
     public RepairType getRepairType() {

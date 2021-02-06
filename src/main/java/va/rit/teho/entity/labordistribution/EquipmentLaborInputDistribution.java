@@ -1,5 +1,7 @@
 package va.rit.teho.entity.labordistribution;
 
+import va.rit.teho.entity.common.RepairType;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -7,24 +9,31 @@ public class EquipmentLaborInputDistribution {
 
     private final String formationName;
     private final String equipmentName;
+    private final int equipmentAmount;
     private final double avgDailyFailure;
     private final int standardLaborInput;
-    private final Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap;
+    private final Map<RepairType, CountAndLaborInputCombinedData> countAndLaborInputCombinedData;
     private final double totalRepairComplexity;
 
     public EquipmentLaborInputDistribution(
             String formationName,
             String equipmentName,
+            int equipmentAmount,
             double avgDailyFailure,
             int standardLaborInput,
-            Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap,
+            Map<RepairType, CountAndLaborInputCombinedData> countAndLaborInputCombinedData,
             double totalRepairComplexity) {
         this.formationName = formationName;
         this.equipmentName = equipmentName;
+        this.equipmentAmount = equipmentAmount;
         this.avgDailyFailure = avgDailyFailure;
         this.standardLaborInput = standardLaborInput;
-        this.intervalCountAndLaborInputMap = intervalCountAndLaborInputMap;
+        this.countAndLaborInputCombinedData = countAndLaborInputCombinedData;
         this.totalRepairComplexity = totalRepairComplexity;
+    }
+
+    public int getEquipmentAmount() {
+        return equipmentAmount;
     }
 
     public static Builder builder() {
@@ -51,8 +60,8 @@ public class EquipmentLaborInputDistribution {
         return standardLaborInput;
     }
 
-    public Map<Long, CountAndLaborInput> getIntervalCountAndLaborInputMap() {
-        return intervalCountAndLaborInputMap;
+    public Map<RepairType, CountAndLaborInputCombinedData> getCountAndLaborInputCombinedData() {
+        return countAndLaborInputCombinedData;
     }
 
     @Override
@@ -65,7 +74,7 @@ public class EquipmentLaborInputDistribution {
                 Double.compare(that.totalRepairComplexity, totalRepairComplexity) == 0 &&
                 Objects.equals(formationName, that.formationName) &&
                 Objects.equals(equipmentName, that.equipmentName) &&
-                Objects.equals(intervalCountAndLaborInputMap, that.intervalCountAndLaborInputMap);
+                Objects.equals(countAndLaborInputCombinedData, that.countAndLaborInputCombinedData);
     }
 
     @Override
@@ -74,16 +83,17 @@ public class EquipmentLaborInputDistribution {
                             equipmentName,
                             avgDailyFailure,
                             standardLaborInput,
-                            intervalCountAndLaborInputMap,
+                            countAndLaborInputCombinedData,
                             totalRepairComplexity);
     }
 
     public static class Builder {
         private String formationName;
         private String equipmentName;
+        private int equipmentAmount;
         private double avgDailyFailure;
         private int standardLaborInput;
-        private Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap;
+        private Map<RepairType, CountAndLaborInputCombinedData> countAndLaborInputCombinedData;
         private double totalRepairComplexity;
 
         public Builder formationName(String formationName) {
@@ -101,13 +111,9 @@ public class EquipmentLaborInputDistribution {
             return this;
         }
 
+
         public Builder standardLaborInput(int standardLaborInput) {
             this.standardLaborInput = standardLaborInput;
-            return this;
-        }
-
-        public Builder intervalCountAndLaborInputMap(Map<Long, CountAndLaborInput> intervalCountAndLaborInputMap) {
-            this.intervalCountAndLaborInputMap = intervalCountAndLaborInputMap;
             return this;
         }
 
@@ -116,12 +122,23 @@ public class EquipmentLaborInputDistribution {
             return this;
         }
 
+        public Builder countAndLaborInputCombinedData(Map<RepairType, CountAndLaborInputCombinedData> countAndLaborInputCombinedData) {
+            this.countAndLaborInputCombinedData = countAndLaborInputCombinedData;
+            return this;
+        }
+
+        public Builder equipmentAmount(int equipmentAmount) {
+            this.equipmentAmount = equipmentAmount;
+            return this;
+        }
+
         public EquipmentLaborInputDistribution build() {
             return new EquipmentLaborInputDistribution(formationName,
                                                        equipmentName,
+                                                       equipmentAmount,
                                                        avgDailyFailure,
                                                        standardLaborInput,
-                                                       intervalCountAndLaborInputMap,
+                                                       countAndLaborInputCombinedData,
                                                        totalRepairComplexity);
         }
 
