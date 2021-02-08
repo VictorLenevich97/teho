@@ -48,7 +48,7 @@ public interface EquipmentPerFormationFailureIntensityRepository
 
     @Query("SELECT new va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount(epffi.id.equipmentPerFormation, epffi.repairType, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
             "WHERE epffi.tehoSession.id = :sessionId AND epffi.formation.id = :formationId " +
-            "GROUP BY epffi.equipment.id, epffi.repairType.id")
+            "GROUP BY epffi.formation.id, epffi.equipment.id, epffi.repairType.id")
     List<EquipmentFailurePerRepairTypeAmount> listFailureDataPerRepairType(UUID sessionId, Long formationId);
 
     @Query("SELECT new va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount(epffi.id.equipmentPerFormation, epffi.repairType, elipt.amount, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
