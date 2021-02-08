@@ -189,6 +189,7 @@ public class LaborInputDistributionController {
         return new LaborDistributionRowData<>(elid.getFormationName(),
                                               countAndLaborInputDTOMap,
                                               elid.getEquipmentName(),
+                                              elid.getEquipmentAmount(),
                                               Formatter.formatDoubleAsString(elid.getAvgDailyFailure()),
                                               elid.getStandardLaborInput(),
                                               Formatter.formatDoubleAsString(elid.getTotalRepairComplexity()));
@@ -224,6 +225,7 @@ public class LaborInputDistributionController {
                 elid.getFormationName(),
                 countMap,
                 elid.getEquipmentName(),
+                elid.getEquipmentAmount(),
                 Formatter.formatDoubleAsString(
                         elid.getAvgDailyFailure()),
                 elid.getStandardLaborInput(),
