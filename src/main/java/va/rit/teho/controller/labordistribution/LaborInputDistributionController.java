@@ -3,6 +3,7 @@ package va.rit.teho.controller.labordistribution;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,10 +34,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
@@ -52,6 +50,7 @@ public class LaborInputDistributionController {
     private final RepairTypeService repairTypeService;
 
     private final ReportService<LaborInputDistributionCombinedData> reportService;
+    private final ReportService<LaborInputDistributionCombinedData> distributionForAllRepairTypesReportService;
 
     @Resource
     private TehoSessionData tehoSession;
@@ -59,11 +58,13 @@ public class LaborInputDistributionController {
     public LaborInputDistributionController(EquipmentTypeService equipmentTypeService,
                                             LaborInputDistributionService laborInputDistributionService,
                                             RepairTypeService repairTypeService,
-                                            ReportService<LaborInputDistributionCombinedData> reportService) {
+                                            @Qualifier("oneRepairType") ReportService<LaborInputDistributionCombinedData> reportService,
+                                            @Qualifier("allRepairTypes") ReportService<LaborInputDistributionCombinedData> distributionForAllRepairTypesReportService) {
         this.equipmentTypeService = equipmentTypeService;
         this.laborInputDistributionService = laborInputDistributionService;
         this.repairTypeService = repairTypeService;
         this.reportService = reportService;
+        this.distributionForAllRepairTypesReportService = distributionForAllRepairTypesReportService;
     }
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}/report")
@@ -85,6 +86,7 @@ public class LaborInputDistributionController {
 
         byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(
                 equipmentTypeService.listHighestLevelTypes(equipmentTypeId),
+                Collections.emptyList(),
                 laborInputDistribution,
                 distributionIntervals));
 
@@ -143,6 +145,24 @@ public class LaborInputDistributionController {
                         .flatMap(rd -> rd.getValue().stream().map(this::buildRowDataPerRepairTypes))
                         .collect(Collectors.toList());
         return ResponseEntity.ok(new TableDataDTO<>(columns, rows));
+    }
+
+    @GetMapping("/report")
+    @ResponseBody
+    @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта по всем типам ремонта (в табличном формате)")
+    @Transactional
+    public ResponseEntity<byte[]> getDistributionDataForAllRepairTypesReport() throws UnsupportedEncodingException {
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> aggregatedLaborInputDistribution =
+                laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId());
+        List<RepairType> repairTypes = repairTypeService.list();
+
+        byte[] bytes = distributionForAllRepairTypesReportService.generateReport(new LaborInputDistributionCombinedData(
+                equipmentTypeService.listHighestLevelTypes(null),
+                repairTypes,
+                aggregatedLaborInputDistribution,
+                laborInputDistributionService.listDistributionIntervals()));
+
+        return ReportResponseEntity.ok("Распределение производственного фонда (по всем типам ремонта)", bytes);
     }
 
     private NestedColumnsDTO buildDistributionNestedColumnsPerRepairType(RepairType rt) {

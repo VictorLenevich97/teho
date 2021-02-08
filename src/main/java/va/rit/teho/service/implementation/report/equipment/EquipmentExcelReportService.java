@@ -63,8 +63,8 @@ public class EquipmentExcelReportService
     }
 
     @Override
-    protected List<ReportCell> populatedRowCells(Collection<EquipmentType> data,
-                                                 Equipment equipment) {
+    protected List<ReportCell> populateRowCells(Collection<EquipmentType> data,
+                                                Equipment equipment) {
         List<RepairType> repairTypes = repairTypeService.list(true).stream().filter(RepairType::isRepairable).collect(
                 Collectors.toList());
         List<ReportCell> reportCells =

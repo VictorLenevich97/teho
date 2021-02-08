@@ -1,23 +1,22 @@
 package va.rit.teho.service.implementation.report.labordistribution;
 
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
-import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 import va.rit.teho.report.ReportCell;
 import va.rit.teho.report.ReportHeader;
-import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Service
-public class LaborInputDistributionExcelReportService
-        extends AbstractExcelReportService<LaborInputDistributionCombinedData, EquipmentLaborInputDistribution> {
+
+@Service(value = "oneRepairType")
+public class LaborInputDistributionExcelReportService extends AbstractLaborDistributionExcelReport {
 
     private static Stream<ReportCell> getCountAndLaborInputCells(
             EquipmentLaborInputDistribution elid,
@@ -43,7 +42,7 @@ public class LaborInputDistributionExcelReportService
     }
 
     @Override
-    protected List<ReportCell> populatedRowCells(
+    protected List<ReportCell> populateRowCells(
             LaborInputDistributionCombinedData data,
             EquipmentLaborInputDistribution elid) {
         ReportCell formationNameCell =
@@ -83,17 +82,11 @@ public class LaborInputDistributionExcelReportService
 
     @Override
     protected List<ReportHeader> buildHeader(LaborInputDistributionCombinedData data) {
-        ReportHeader formationHeader = header("Воинская часть (подразделение)");
-        ReportHeader equipmentNameHeader = header("Наименование ВВСТ");
-        ReportHeader avgDailyFailureHeader = header("Среднесуточный выход в ремонт, ед.", true);
         ReportHeader standardLaborInputHeader =
                 header("Нормативная трудоемкость ремонта, чел.-час.", true);
 
         ReportHeader distributionTopHeader = header("Распределение ремонтного фонда по трудоемкости ремонта");
 
-        data
-                .getWorkhoursDistributionIntervals()
-                .sort(Comparator.comparing(WorkhoursDistributionInterval::getUpperBound));
         data
                 .getWorkhoursDistributionIntervals()
                 .forEach(wdi -> {
@@ -105,50 +98,18 @@ public class LaborInputDistributionExcelReportService
                     distributionTopHeader.addSubHeader(intervalHeader);
                 });
 
-        ReportHeader totalLaborInputHeader = header("Суммарная трудоемксоть ремонта, чел.-час.", true);
-        return Arrays.asList(formationHeader,
-                             equipmentNameHeader,
-                             avgDailyFailureHeader,
+        ReportHeader totalLaborInputHeader = header("Суммарная трудоемкость ремонта, чел.-час.", true);
+        return Arrays.asList(FORMATION_HEADER,
+                             EQ_NAME_HEADER,
+                             AVG_DAILY_FAILURE_HEADER,
                              standardLaborInputHeader,
                              distributionTopHeader,
                              totalLaborInputHeader);
     }
 
-    private int writeTypeData(Collection<EquipmentType> equipmentTypes,
-                              LaborInputDistributionCombinedData data,
-                              Sheet sheet,
-                              int lastRowIndex,
-                              int colSize) {
-        for (EquipmentType equipmentType : equipmentTypes) {
-            if (data.getLaborInputDistribution().containsKey(equipmentType) || equipmentType
-                    .getEquipmentTypes()
-                    .stream()
-                    .anyMatch(data.getLaborInputDistribution()::containsKey)) {
-                String prefix = equipmentType.getParentType() == null ? "" : "Итого: ";
-                createRowWideCell(sheet, lastRowIndex, colSize, prefix + equipmentType.getFullName(), true, false);
-
-                List<EquipmentLaborInputDistribution> equipmentLaborInputDistributions =
-                        Optional
-                                .ofNullable(data.getLaborInputDistribution().get(equipmentType))
-                                .orElse(Collections.emptyList());
-
-
-                writeRows(sheet, lastRowIndex + 1, data, equipmentLaborInputDistributions);
-
-                lastRowIndex = writeTypeData(equipmentType.getEquipmentTypes(),
-                                             data,
-                                             sheet,
-                                             lastRowIndex + equipmentLaborInputDistributions.size() + 1,
-                                             colSize);
-            }
-        }
-        return lastRowIndex;
-    }
-
     @Override
-    protected int writeData(LaborInputDistributionCombinedData data, Sheet sheet, int lastRowIndex) {
-        int colSize = (data.getWorkhoursDistributionIntervals().size() * 2) + 4;
-
-        return writeTypeData(data.getEquipmentTypes(), data, sheet, lastRowIndex, colSize);
+    protected int columnCount(LaborInputDistributionCombinedData data) {
+        return (data.getWorkhoursDistributionIntervals().size() * 2) + 4;
     }
+
 }

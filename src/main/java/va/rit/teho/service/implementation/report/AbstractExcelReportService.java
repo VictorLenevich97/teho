@@ -77,7 +77,9 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         return c;
     }
 
-    protected abstract List<ReportCell> populatedRowCells(T combinedData, R row);
+    protected static ReportHeader header(String name) {
+        return header(name, false);
+    }
 
     protected abstract String reportName();
 
@@ -97,13 +99,11 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         c.setCellStyle(centeredRotatedCellStyle);
     }
 
-    protected ReportHeader header(String name) {
-        return header(name, false);
-    }
-
-    protected ReportHeader header(String name, boolean vertical) {
+    protected static ReportHeader header(String name, boolean vertical) {
         return new ReportHeader(name, vertical);
     }
+
+    protected abstract List<ReportCell> populateRowCells(T combinedData, R row);
 
     protected void createRowWideCell(Sheet sheet, int index, int colSize, String data, boolean bold, boolean centered) {
         Row row = sheet.createRow(index);
@@ -194,7 +194,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
                              Collection<R> data) {
         int i = 0;
         for (R item : data) {
-            List<ReportCell> reportCells = populatedRowCells(combinedData, item);
+            List<ReportCell> reportCells = populateRowCells(combinedData, item);
             Row row = sheet.createRow(rowStartIndex + i);
             row.setHeight((short) -1);
             for (int j = 0; j < reportCells.size(); j++) {

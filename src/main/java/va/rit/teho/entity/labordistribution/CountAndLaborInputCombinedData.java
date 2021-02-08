@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.Map;
 
 public class CountAndLaborInputCombinedData {
+
+    public static final CountAndLaborInputCombinedData EMPTY = new CountAndLaborInputCombinedData(Collections.emptyMap());
+
     private final Map<Long, CountAndLaborInput> countAndLaborInputMap;
     private final Double totalFailureAmount;
 

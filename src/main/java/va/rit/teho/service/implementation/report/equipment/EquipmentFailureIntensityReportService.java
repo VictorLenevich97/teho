@@ -20,7 +20,7 @@ public class EquipmentFailureIntensityReportService
         extends AbstractExcelReportService<EquipmentFailureIntensityCombinedData, EquipmentPerFormation> {
 
     @Override
-    protected List<ReportCell> populatedRowCells(
+    protected List<ReportCell> populateRowCells(
             EquipmentFailureIntensityCombinedData data,
             EquipmentPerFormation epf) {
         List<ReportCell> cellFunctions =

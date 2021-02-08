@@ -22,7 +22,7 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
         AbstractExcelReportService<RepairFormationUnitRepairCapabilityCombinedData, RepairFormationUnit> {
 
     @Override
-    protected List<ReportCell> populatedRowCells(
+    protected List<ReportCell> populateRowCells(
             RepairFormationUnitRepairCapabilityCombinedData data,
             RepairFormationUnit rfu) {
         List<ReportCell> functions =
