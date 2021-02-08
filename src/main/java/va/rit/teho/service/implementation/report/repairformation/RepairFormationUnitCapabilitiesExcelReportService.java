@@ -1,5 +1,6 @@
 package va.rit.teho.service.implementation.report.repairformation;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
@@ -11,10 +12,7 @@ import va.rit.teho.report.ReportCell;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +31,9 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
                 data
                         .getEquipmentTypes()
                         .stream()
-                        .flatMap(EquipmentType::collectRelatedEquipment)
+                        .flatMap(et -> CollectionUtils.isEmpty(data.getEquipmentIds()) ?
+                                et.collectRelatedEquipment() :
+                                et.collectRelatedEquipment(data.getEquipmentIds()))
                         .collect(Collectors.toList());
         List<ReportCell> capabilityFunctions = equipmentList
                 .stream()
@@ -52,18 +52,33 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
         return "Производственные возможности РВО по ремонту ВВСТ";
     }
 
-    private ReportHeader populateHeader(EquipmentType equipmentType) {
+    private Optional<ReportHeader> populateHeader(EquipmentType equipmentType, List<Long> equipmentIds) {
+        Set<EquipmentType> subTypes = equipmentType.getEquipmentTypes();
+        Set<Equipment> equipmentSet = equipmentType
+                .getEquipmentSet()
+                .stream()
+                .filter(e -> CollectionUtils.isEmpty(equipmentIds) || equipmentIds.contains(e.getId()))
+                .collect(Collectors.toSet());
+
+        if(subTypes.isEmpty() && equipmentSet.isEmpty()) {
+            return Optional.empty();
+        }
+
         ReportHeader header = header(equipmentType.getShortName());
 
-        equipmentType.getEquipmentSet().forEach(e -> header.addSubHeader(header(e.getName(), true)));
-
-        equipmentType.getEquipmentTypes().forEach(et -> {
-            if (!(et.getEquipmentTypes().isEmpty() && et.getEquipmentSet().isEmpty())) {
-                header.addSubHeader(populateHeader(et));
+        equipmentSet.forEach(e -> {
+            if (CollectionUtils.isEmpty(equipmentIds) || equipmentIds.contains(e.getId())) {
+                header.addSubHeader(header(e.getName(), true));
             }
         });
 
-        return header;
+        equipmentType.getEquipmentTypes().forEach(et -> {
+            if (!(et.getEquipmentTypes().isEmpty() && et.getEquipmentSet().isEmpty())) {
+                populateHeader(et, equipmentIds).ifPresent(header::addSubHeader);
+            }
+        });
+
+        return Optional.of(header);
     }
 
     @Override
@@ -71,7 +86,7 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
         ReportHeader nameHeader = header("Наименование ремонтного органа формирования", true);
         ReportHeader topHeader = header("Производственные возможности по ремонту ВВСТ, ед./сут.");
 
-        data.getEquipmentTypes().forEach(et -> topHeader.addSubHeader(populateHeader(et)));
+        data.getEquipmentTypes().forEach(et -> populateHeader(et, data.getEquipmentIds()).ifPresent(topHeader::addSubHeader));
 
         return Arrays.asList(nameHeader, topHeader);
     }

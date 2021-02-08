@@ -1,5 +1,6 @@
 package va.rit.teho.service.implementation.repairformation;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
 
     @Override
     public Long count(List<Long> filterIds) {
-        if (filterIds == null || filterIds.isEmpty()) {
+        if (CollectionUtils.isEmpty(filterIds)) {
             return repairFormationUnitRepository.count();
         } else {
             return repairFormationUnitRepository.countByIdIn(filterIds);

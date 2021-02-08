@@ -2,6 +2,7 @@ package va.rit.teho.entity.equipment;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -104,6 +105,11 @@ public class EquipmentType implements Serializable {
     public Stream<Equipment> collectRelatedEquipment() {
         return Stream.concat(getEquipmentSet().stream(),
                              getEquipmentTypes().stream().flatMap(EquipmentType::collectRelatedEquipment));
+    }
+
+    public Stream<Equipment> collectRelatedEquipment(List<Long> equipmentIds) {
+        return Stream.concat(getEquipmentSet().stream().filter(e -> equipmentIds.contains(e.getId())),
+                             getEquipmentTypes().stream().flatMap(et -> et.collectRelatedEquipment(equipmentIds)));
     }
 
 

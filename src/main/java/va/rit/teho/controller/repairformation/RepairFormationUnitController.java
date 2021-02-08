@@ -160,7 +160,11 @@ public class RepairFormationUnitController {
     public ResponseEntity<List<EquipmentTypeStaffData>> getEquipmentStaffPerType(
             @ApiParam(value = "Ключ РВО") @PathVariable @Positive Long repairFormationUnitId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) {
-        List<EquipmentType> equipmentTypes = equipmentTypeService.listHighestLevelTypes(nullIfEmpty(equipmentTypeId));
+        List<EquipmentType> equipmentTypes =
+                Optional
+                        .ofNullable(nullIfEmpty(equipmentTypeId))
+                        .map(equipmentTypeService::listTypes)
+                        .orElse(equipmentTypeService.listHighestLevelTypes(null));
         Map<EquipmentType, RepairFormationUnitEquipmentStaff> equipmentStaff =
                 repairFormationUnitService.getEquipmentStaffPerType(tehoSession.getSessionId(),
                                                                     repairFormationUnitId,

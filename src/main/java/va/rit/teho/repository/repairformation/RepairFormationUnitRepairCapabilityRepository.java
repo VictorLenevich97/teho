@@ -19,7 +19,8 @@ public interface RepairFormationUnitRepairCapabilityRepository
             "c.repairType.id = :repairTypeId AND " +
             "(coalesce(:repairFormationUnitIds, null) is null or c.repairFormationUnit.id in (:repairFormationUnitIds)) AND " +
             "(coalesce(:equipmentIds, null) is null or c.equipment.id in (:equipmentIds)) AND " +
-            "(coalesce(:equipmentTypeIds, null) is null or c.equipment.equipmentType.id in (:equipmentTypeIds)) " +
+            "(coalesce(:equipmentTypeIds, null) is null or c.equipment.equipmentType.id in (:equipmentTypeIds) or " +
+            "(c.equipment.equipmentType.parentType IS NOT NULL AND c.equipment.equipmentType.parentType.id IN (:equipmentTypeIds))) " +
             "ORDER BY c.repairFormationUnit.id ASC, c.equipment.equipmentType.id ASC, c.equipment.id ASC")
     List<RepairFormationUnitRepairCapability> findFiltered(UUID sessionId,
                                                            Long repairTypeId,

@@ -28,7 +28,9 @@ public interface LaborDistributionRepository
             "INNER JOIN EquipmentLaborInputPerType ipt ON ld.equipment.id = ipt.equipment.id " +
             "INNER JOIN EquipmentPerFormationFailureIntensity epbfi on (ld.equipment.id = epbfi.equipment.id and ld.formation.id = epbfi.formation.id and ld.tehoSession.id = epbfi.tehoSession.id and ld.stage.id = epbfi.stage.id and ipt.repairType.id = epbfi.repairType.id) " +
             "WHERE ipt.repairType.id = :repairTypeId AND ld.tehoSession.id = :sessionId AND" +
-            "(coalesce(:equipmentTypeIds, null) is null or ld.equipment.equipmentType.id IN (:equipmentTypeIds)) " +
+            "(coalesce(:equipmentTypeIds, null) is null or " +
+            "ld.equipment.equipmentType.id IN (:equipmentTypeIds) or " +
+            "(ld.equipment.equipmentType.parentType IS NOT NULL AND ld.equipment.equipmentType.parentType.id IN (:equipmentTypeIds))) " +
             "AND ld.stage.id = :stageId AND ld.repairType.id = :repairTypeId")
     List<LaborDistributionData> findAllAsData(UUID sessionId,
                                               Long repairTypeId,
