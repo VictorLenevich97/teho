@@ -20,10 +20,7 @@ import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.EquipmentType;
-import va.rit.teho.entity.labordistribution.CountAndLaborInput;
-import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
-import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
-import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
+import va.rit.teho.entity.labordistribution.*;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
@@ -133,6 +130,7 @@ public class LaborInputDistributionController {
         Map<EquipmentType, List<EquipmentLaborInputDistribution>> aggregatedLaborInputDistribution =
                 laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId());
         List<RepairType> repairTypes = repairTypeService.list();
+        repairTypes.sort(Comparator.comparing(RepairType::getShortName).reversed());
         List<NestedColumnsDTO> columns =
                 repairTypes
                         .stream()
@@ -142,7 +140,7 @@ public class LaborInputDistributionController {
                 aggregatedLaborInputDistribution
                         .entrySet()
                         .stream()
-                        .flatMap(rd -> rd.getValue().stream().map(this::buildRowDataPerRepairTypes))
+                        .flatMap(rd -> rd.getValue().stream().map(v -> buildRowDataPerRepairTypes(v, repairTypes)))
                         .collect(Collectors.toList());
         return ResponseEntity.ok(new TableDataDTO<>(columns, rows));
     }
@@ -224,22 +222,25 @@ public class LaborInputDistributionController {
         return ResponseEntity.accepted().build();
     }
 
-    private LaborDistributionRowData<String> buildRowDataPerRepairTypes(EquipmentLaborInputDistribution elid) {
+    private LaborDistributionRowData<String> buildRowDataPerRepairTypes(EquipmentLaborInputDistribution elid,
+                                                                        List<RepairType> repairTypes) {
         Map<String, String> countMap = new HashMap<>();
-        elid.getCountAndLaborInputCombinedData()
-            .forEach((repairType, countAndLaborInputCombinedData) -> {
-                Map<Long, CountAndLaborInput> countAndLaborInputMap = countAndLaborInputCombinedData
-                        .getCountAndLaborInputMap();
-                if (!countAndLaborInputMap.isEmpty()) {
-                    countAndLaborInputMap
-                            .forEach((key, countAndLaborInput) -> countMap.put(
-                                    buildCombinedKey(repairType, key),
-                                    Formatter.formatDoubleAsString(
-                                            countAndLaborInput.getCount())));
-                }
-                countMap.put("rt_" + repairType.getId(),
+        repairTypes.forEach(repairType -> {
+            CountAndLaborInputCombinedData countAndLaborInputCombinedData = elid
+                    .getCountAndLaborInputCombinedData()
+                    .getOrDefault(repairType, CountAndLaborInputCombinedData.EMPTY);
+            Map<Long, CountAndLaborInput> countAndLaborInputMap = countAndLaborInputCombinedData
+                    .getCountAndLaborInputMap();
+            if (!countAndLaborInputMap.isEmpty()) {
+                countAndLaborInputMap
+                        .forEach((key, countAndLaborInput) -> countMap.put(
+                                buildCombinedKey(repairType, key),
+                                Formatter.formatDoubleAsString(
+                                        countAndLaborInput.getCount())));
+            }
+            countMap.put("rt_" + repairType.getId(),
                          Formatter.formatDoubleAsString(countAndLaborInputCombinedData.getTotalFailureAmount()));
-            });
+        });
         return new LaborDistributionRowData<>(
                 elid.getFormationName(),
                 countMap,
