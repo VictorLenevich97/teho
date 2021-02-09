@@ -230,16 +230,15 @@ public class LaborInputDistributionController {
             .forEach((repairType, countAndLaborInputCombinedData) -> {
                 Map<Long, CountAndLaborInput> countAndLaborInputMap = countAndLaborInputCombinedData
                         .getCountAndLaborInputMap();
-                if (countAndLaborInputMap.isEmpty()) {
-                    countMap.put("rt_" + repairType.getId(),
-                                 Formatter.formatDoubleAsString(countAndLaborInputCombinedData.getTotalFailureAmount()));
-                } else {
+                if (!countAndLaborInputMap.isEmpty()) {
                     countAndLaborInputMap
                             .forEach((key, countAndLaborInput) -> countMap.put(
                                     buildCombinedKey(repairType, key),
                                     Formatter.formatDoubleAsString(
                                             countAndLaborInput.getCount())));
                 }
+                countMap.put("rt_" + repairType.getId(),
+                         Formatter.formatDoubleAsString(countAndLaborInputCombinedData.getTotalFailureAmount()));
             });
         return new LaborDistributionRowData<>(
                 elid.getFormationName(),
