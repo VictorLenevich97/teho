@@ -15,7 +15,8 @@ import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.labordistribution.EquipmentDistributionCombinedData;
 import va.rit.teho.entity.labordistribution.EquipmentPerFormationDistributionData;
-import va.rit.teho.entity.labordistribution.RestorationType;
+import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
+import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
@@ -26,7 +27,6 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,6 +43,7 @@ public class EquipmentRFUDistributionController {
     private final RepairTypeService repairTypeService;
     private final RestorationTypeService restorationTypeService;
 
+    private final ReportService<Map<RepairFormationUnit, List<EquipmentRFUDistribution>>> distributionPerRFUReportService;
     private final ReportService<EquipmentDistributionCombinedData> distributionReportService;
 
     @Resource
@@ -51,10 +52,12 @@ public class EquipmentRFUDistributionController {
     public EquipmentRFUDistributionController(EquipmentRFUDistributionService equipmentRFUDistributionService,
                                               RepairTypeService repairTypeService,
                                               RestorationTypeService restorationTypeService,
+                                              ReportService<Map<RepairFormationUnit, List<EquipmentRFUDistribution>>> distributionPerRFUReportService,
                                               ReportService<EquipmentDistributionCombinedData> distributionReportService) {
         this.equipmentRFUDistributionService = equipmentRFUDistributionService;
         this.repairTypeService = repairTypeService;
         this.restorationTypeService = restorationTypeService;
+        this.distributionPerRFUReportService = distributionPerRFUReportService;
         this.distributionReportService = distributionReportService;
     }
 
@@ -75,6 +78,15 @@ public class EquipmentRFUDistributionController {
                 .map(EquipmentRFUDistributionDTO::from)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(equipmentRFUDistributionDTOList);
+    }
+
+    @GetMapping("/repair-formation/unit/equipment/report")
+    public ResponseEntity<byte[]> getDistributedEquipmentForRFUReport() throws
+            UnsupportedEncodingException {
+        Map<RepairFormationUnit, List<EquipmentRFUDistribution>> repairFormationUnitDistributionData =
+                equipmentRFUDistributionService.listDistributedEquipment(tehoSession.getSessionId());
+        byte[] bytes = distributionPerRFUReportService.generateReport(repairFormationUnitDistributionData);
+        return ReportResponseEntity.ok("Распределение вышедшего из строя ВВСТ по РВО", bytes);
     }
 
 
@@ -123,7 +135,7 @@ public class EquipmentRFUDistributionController {
     }
 
     @GetMapping("/{formationId}/distribution/report")
-    public ResponseEntity<byte[]> getEquipmentDistributionReport(@PathVariable @Positive Long formationId) throws
+    public ResponseEntity<byte[]> getEquipmentDistributionPerFormationReport(@PathVariable @Positive Long formationId) throws
             UnsupportedEncodingException {
         List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData =
                 equipmentRFUDistributionService.listDistributionDataForFormation(tehoSession.getSessionId(),

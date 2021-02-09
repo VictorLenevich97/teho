@@ -55,6 +55,21 @@ public class EquipmentRFUDistribution {
         this.unable = unable;
     }
 
+    public EquipmentRFUDistribution(Formation formation,
+                                    Equipment equipment,
+                                    RepairFormationUnit repairFormationUnit,
+                                    WorkhoursDistributionInterval interval,
+                                    Double repairing,
+                                    Double unable) {
+        this.equipmentRFUDistributionPK = null;
+        this.formation = formation;
+        this.equipment = equipment;
+        this.repairFormationUnit = repairFormationUnit;
+        this.workhoursDistributionInterval = interval;
+        this.repairing = repairing;
+        this.unable = unable;
+    }
+
     public EquipmentRFUDistribution(EquipmentRFUDistributionPK equipmentRFUDistributionPK,
                                     Formation formation,
                                     Equipment equipment,
