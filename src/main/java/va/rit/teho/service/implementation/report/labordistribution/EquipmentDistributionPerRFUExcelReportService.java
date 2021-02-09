@@ -18,7 +18,7 @@ public class EquipmentDistributionPerRFUExcelReportService extends
         AbstractExcelReportService<Map<RepairFormationUnit, List<EquipmentRFUDistribution>>, EquipmentRFUDistribution> {
 
     @Override
-    protected List<ReportCell> populatedRowCells(Map<RepairFormationUnit, List<EquipmentRFUDistribution>> combinedData,
+    protected List<ReportCell> populateRowCells(Map<RepairFormationUnit, List<EquipmentRFUDistribution>> combinedData,
                                                  EquipmentRFUDistribution row) {
         ReportCell formationNameCell = new ReportCell(row.getFormation().getFullName());
         ReportCell equipmentNameCell = new ReportCell(row.getEquipment().getName());
@@ -26,7 +26,7 @@ public class EquipmentDistributionPerRFUExcelReportService extends
                                                            .getRestorationType()
                                                            .getName());
         ReportCell repairingAmountCell = new ReportCell(row.getRepairing(), ReportCell.CellType.NUMERIC);
-        ReportCell unableAmountCell = new ReportCell(row.getUnable());
+        ReportCell unableAmountCell = new ReportCell(row.getUnable(), ReportCell.CellType.NUMERIC);
         return Arrays.asList(formationNameCell,
                              equipmentNameCell,
                              restorationTypeCell,
@@ -55,7 +55,7 @@ public class EquipmentDistributionPerRFUExcelReportService extends
     }
 
     @Override
-    protected void writeData(Map<RepairFormationUnit, List<EquipmentRFUDistribution>> data,
+    protected int writeData(Map<RepairFormationUnit, List<EquipmentRFUDistribution>> data,
                              Sheet sheet,
                              int lastRowIndex) {
         int colSize = 4;
@@ -72,5 +72,6 @@ public class EquipmentDistributionPerRFUExcelReportService extends
 
             lastRowIndex += EquipmentRFUDistributions.size() + 1;
         }
+        return lastRowIndex;
     }
 }
