@@ -8,7 +8,6 @@ import va.rit.teho.TestRunner;
 import va.rit.teho.controller.ControllerTest;
 import va.rit.teho.dto.equipment.EquipmentLaborInputPerTypeRowData;
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 
 import java.util.Collections;
@@ -28,7 +27,7 @@ public class EquipmentControllerTest extends ControllerTest {
             new Equipment(
                     1L,
                     "equipment",
-                    new EquipmentSubType("s", "f", new EquipmentType("s", "f")));
+                    new EquipmentType("s", "f", new EquipmentType("s", "f")));
 
     @Test
     public void testGetEquipmentList() throws Exception {
@@ -54,11 +53,9 @@ public class EquipmentControllerTest extends ControllerTest {
                .andExpect(jsonPath("$.id", is(equipment.getId().intValue())))
                .andExpect(jsonPath("$.name", is(equipment.getName())))
                .andExpect(jsonPath("$.type.shortName",
-                                   is(equipment.getEquipmentSubType().getEquipmentType().getShortName())))
+                                   is(equipment.getEquipmentType().getShortName())))
                .andExpect(jsonPath("$.type.fullName",
-                                   is(equipment.getEquipmentSubType().getEquipmentType().getFullName())))
-               .andExpect(jsonPath("$.subType.shortName", is(equipment.getEquipmentSubType().getShortName())))
-               .andExpect(jsonPath("$.subType.fullName", is(equipment.getEquipmentSubType().getFullName())));
+                                   is(equipment.getEquipmentType().getFullName())));
     }
 
     @Test
@@ -66,7 +63,7 @@ public class EquipmentControllerTest extends ControllerTest {
         EquipmentLaborInputPerTypeRowData equipmentLaborInputPerTypeRowData =
                 new EquipmentLaborInputPerTypeRowData(3L, "equipment", 2L, "test", Collections.singletonMap("1", 1));
         when(equipmentService.add(equipmentLaborInputPerTypeRowData.getName(),
-                                  equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                  equipmentLaborInputPerTypeRowData.getTypeId(),
                                   Collections.singletonMap(1L, 1))).thenReturn(EQUIPMENT);
         mockMvc.perform(post("/equipment")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -74,7 +71,7 @@ public class EquipmentControllerTest extends ControllerTest {
                .andExpect(status().isCreated());
 
         verify(equipmentService).add(equipmentLaborInputPerTypeRowData.getName(),
-                                     equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                     equipmentLaborInputPerTypeRowData.getTypeId(),
                                      Collections.singletonMap(1L, 1));
     }
 
@@ -85,7 +82,7 @@ public class EquipmentControllerTest extends ControllerTest {
 
         when(equipmentService.update(equipmentLaborInputPerTypeRowData.getId(),
                                      equipmentLaborInputPerTypeRowData.getName(),
-                                     equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                     equipmentLaborInputPerTypeRowData.getTypeId(),
                                      Collections.singletonMap(1L, 1))).thenReturn(EQUIPMENT);
 
         mockMvc.perform(put("/equipment/{id}", equipmentLaborInputPerTypeRowData.getId())
@@ -96,7 +93,7 @@ public class EquipmentControllerTest extends ControllerTest {
 
         verify(equipmentService).update(equipmentLaborInputPerTypeRowData.getId(),
                                         equipmentLaborInputPerTypeRowData.getName(),
-                                        equipmentLaborInputPerTypeRowData.getSubTypeId(),
+                                        equipmentLaborInputPerTypeRowData.getTypeId(),
                                         Collections.singletonMap(1L, 1));
     }
 }

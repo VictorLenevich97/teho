@@ -199,7 +199,7 @@ public class EquipmentPerFormationController {
                 equipmentPerFormationService.getTotalFailureIntensityData(tehoSession.getSessionId());
         List<Stage> stages = stageService.list();
         List<RepairType> repairTypes = repairTypeService.list(true);
-        Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> totalEquipmentInFormations =
+        Map<Formation, Map<EquipmentType, List<EquipmentPerFormation>>> totalEquipmentInFormations =
                 equipmentPerFormationService.getTotalGroupedEquipmentInFormations(equipmentIds);
         byte[] bytes = reportService.generateReport(new EquipmentFailureIntensityCombinedData(stages,
                                                                                               repairTypes,
@@ -235,7 +235,7 @@ public class EquipmentPerFormationController {
                                                                      equipmentIds);
         List<Stage> stages = stageService.list();
         List<RepairType> repairTypes = repairTypeService.list(true);
-        Map<EquipmentSubType, List<EquipmentPerFormation>> totalEquipmentInFormations =
+        Map<EquipmentType, List<EquipmentPerFormation>> totalEquipmentInFormations =
                 equipmentPerFormationService.getGroupedEquipmentInFormation(formationId, equipmentIds);
         return reportService.generateReport(
                 new EquipmentFailureIntensityCombinedData(stages,

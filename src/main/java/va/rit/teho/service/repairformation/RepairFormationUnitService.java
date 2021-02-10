@@ -1,7 +1,7 @@
 package va.rit.teho.service.repairformation;
 
 import org.springframework.data.util.Pair;
-import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 
@@ -28,16 +28,14 @@ public interface RepairFormationUnitService {
 
     List<RepairFormationUnitEquipmentStaff> updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList);
 
-    Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> getEquipmentStaffPerSubType(UUID sessionId,
-                                                                                         Long repairFormationUnitId,
-                                                                                         List<Long> equipmentTypeIds,
-                                                                                         List<Long> equipmentSubTypeIds);
+    Map<EquipmentType, RepairFormationUnitEquipmentStaff> getEquipmentStaffPerType(UUID sessionId,
+                                                                                   Long repairFormationUnitId,
+                                                                                   List<Long> equipmentTypeIds);
 
-    Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> listEquipmentStaffPerSubType(
+    Map<RepairFormationUnit, Map<EquipmentType, RepairFormationUnitEquipmentStaff>> listEquipmentStaffPerType(
             UUID sessionId,
             List<Long> repairFormationUnitIds,
-            List<Long> equipmentTypeIds,
-            List<Long> equipmentSubTypeIds);
+            List<Long> equipmentTypeIds);
 
     List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(Long repairFormationUnitId, UUID sessionId);
 

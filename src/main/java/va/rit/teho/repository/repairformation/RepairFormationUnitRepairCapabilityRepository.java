@@ -19,14 +19,12 @@ public interface RepairFormationUnitRepairCapabilityRepository
             "c.repairType.id = :repairTypeId AND " +
             "(coalesce(:repairFormationUnitIds, null) is null or c.repairFormationUnit.id in (:repairFormationUnitIds)) AND " +
             "(coalesce(:equipmentIds, null) is null or c.equipment.id in (:equipmentIds)) AND " +
-            "(coalesce(:equipmentSubTypeIds, null) is null or c.equipment.equipmentSubType.id in (:equipmentSubTypeIds)) AND " +
-            "(coalesce(:equipmentTypeIds, null) is null or c.equipment.equipmentSubType.equipmentType.id in (:equipmentTypeIds)) " +
-            "ORDER BY c.repairFormationUnit.id ASC, c.equipment.equipmentSubType.id ASC, c.equipment.equipmentSubType.equipmentType.id ASC, c.equipment.id ASC")
+            "(coalesce(:equipmentTypeIds, null) is null or c.equipment.equipmentType.id in (:equipmentTypeIds)) " +
+            "ORDER BY c.repairFormationUnit.id ASC, c.equipment.equipmentType.id ASC, c.equipment.id ASC")
     List<RepairFormationUnitRepairCapability> findFiltered(UUID sessionId,
                                                            Long repairTypeId,
                                                            List<Long> repairFormationUnitIds,
                                                            List<Long> equipmentIds,
-                                                           List<Long> equipmentSubTypeIds,
                                                            List<Long> equipmentTypeIds);
 
     @Query("SELECT c FROM RepairFormationUnitRepairCapability c WHERE " +

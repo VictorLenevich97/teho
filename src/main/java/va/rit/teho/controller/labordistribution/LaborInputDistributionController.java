@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
@@ -16,12 +17,12 @@ import va.rit.teho.dto.labordistribution.LaborDistributionNestedColumnsDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 import va.rit.teho.server.config.TehoSessionData;
+import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.report.ReportService;
 
@@ -33,6 +34,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
 
 @Controller
@@ -41,6 +43,7 @@ import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
 @Api(tags = "Распределение ремонтного фонда")
 public class LaborInputDistributionController {
 
+    private final EquipmentTypeService equipmentTypeService;
     private final LaborInputDistributionService laborInputDistributionService;
 
     private final ReportService<LaborInputDistributionCombinedData> reportService;
@@ -48,8 +51,10 @@ public class LaborInputDistributionController {
     @Resource
     private TehoSessionData tehoSession;
 
-    public LaborInputDistributionController(LaborInputDistributionService laborInputDistributionService,
+    public LaborInputDistributionController(EquipmentTypeService equipmentTypeService,
+                                            LaborInputDistributionService laborInputDistributionService,
                                             ReportService<LaborInputDistributionCombinedData> reportService) {
+        this.equipmentTypeService = equipmentTypeService;
         this.laborInputDistributionService = laborInputDistributionService;
         this.reportService = reportService;
     }
@@ -57,12 +62,13 @@ public class LaborInputDistributionController {
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}/report")
     @ResponseBody
     @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта (в табличном формате)")
+    @Transactional
     public ResponseEntity<byte[]> getDistributionDataReport(
             @ApiParam(value = "Ключ этапа", required = true) @PathVariable @Positive Long stageId,
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) throws
             UnsupportedEncodingException {
-        Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution =
                 laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(),
                                                                         repairTypeId,
                                                                         stageId,
@@ -70,8 +76,10 @@ public class LaborInputDistributionController {
         List<WorkhoursDistributionInterval> distributionIntervals =
                 laborInputDistributionService.listDistributionIntervals();
 
-        byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(laborInputDistribution,
-                                                                                           distributionIntervals));
+        byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(
+                equipmentTypeService.listHighestLevelTypes(equipmentTypeId),
+                laborInputDistribution,
+                distributionIntervals));
 
         return ReportResponseEntity.ok("Распределение производственного фонда", bytes);
     }
@@ -83,7 +91,7 @@ public class LaborInputDistributionController {
             @ApiParam(value = "Ключ этапа", required = true) @PathVariable @Positive Long stageId,
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) {
-        Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution =
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution =
                 laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(),
                                                                         repairTypeId,
                                                                         stageId,
@@ -102,8 +110,8 @@ public class LaborInputDistributionController {
                 laborInputDistribution
                         .entrySet()
                         .stream()
-                        .flatMap(rd -> rd.getValue().values().stream()
-                                         .flatMap(l -> l.stream().map(this::getLaborDistributionRowData)))
+                        .flatMap(rd -> rd.getValue().stream()
+                                         .map(this::getLaborDistributionRowData))
                         .collect(Collectors.toList());
         return ResponseEntity.ok(new TableDataDTO<>(columns, rows));
     }

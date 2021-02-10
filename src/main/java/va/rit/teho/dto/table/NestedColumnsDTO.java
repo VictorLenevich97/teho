@@ -14,7 +14,7 @@ public class NestedColumnsDTO {
         this.columns = columns;
     }
 
-    public NestedColumnsDTO(String title, Object key, List<NestedColumnsDTO> columns) {
+    public NestedColumnsDTO(Object key, String title, List<NestedColumnsDTO> columns) {
         this.title = title;
         this.key = key;
         this.columns = columns;

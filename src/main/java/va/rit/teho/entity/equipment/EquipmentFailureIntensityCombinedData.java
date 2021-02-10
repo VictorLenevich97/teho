@@ -12,14 +12,14 @@ public class EquipmentFailureIntensityCombinedData {
 
     private final List<Stage> stages;
     private final List<RepairType> repairTypes;
-    private final Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> equipmentPerFormations;
+    private final Map<Formation, Map<EquipmentType, List<EquipmentPerFormation>>> equipmentPerFormations;
     private final Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData;
     private final Function<EquipmentPerFormationFailureIntensity, Number> intensityFunction;
     private final String unitIndicator;
 
     public EquipmentFailureIntensityCombinedData(List<Stage> stages,
                                                  List<RepairType> repairTypes,
-                                                 Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> equipmentPerFormations,
+                                                 Map<Formation, Map<EquipmentType, List<EquipmentPerFormation>>> equipmentPerFormations,
                                                  Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
                                                  Function<EquipmentPerFormationFailureIntensity, Number> intensityFunction,
                                                  String unitIndicator) {
@@ -39,7 +39,7 @@ public class EquipmentFailureIntensityCombinedData {
         return repairTypes;
     }
 
-    public Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getEquipmentPerFormations() {
+    public Map<Formation, Map<EquipmentType, List<EquipmentPerFormation>>> getEquipmentPerFormations() {
         return equipmentPerFormations;
     }
 

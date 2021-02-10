@@ -9,37 +9,37 @@ import java.util.Map;
 public class EquipmentLaborInputPerTypeRowData extends RowData<Map<String, Integer>> {
 
     @Positive
-    private final Long subTypeId;
+    private final Long typeId;
 
-    private final String subTypeName;
+    private final String typeName;
 
     public EquipmentLaborInputPerTypeRowData() {
         super(null, null);
-        this.subTypeName = null;
-        this.subTypeId = null;
+        this.typeName = null;
+        this.typeId = null;
     }
 
     public EquipmentLaborInputPerTypeRowData(Equipment e, Map<String, Integer> data) {
         super(e.getId(), e.getName(), data);
-        this.subTypeId = e.getEquipmentSubType().getId();
-        this.subTypeName = e.getEquipmentSubType().getFullName();
+        this.typeId = e.getEquipmentType().getId();
+        this.typeName = e.getEquipmentType().getFullName();
     }
 
     public EquipmentLaborInputPerTypeRowData(Long id,
                                              String name,
-                                             Long subTypeId,
-                                             String subTypeName,
+                                             Long typeId,
+                                             String typeName,
                                              Map<String, Integer> data) {
         super(id, name, data);
-        this.subTypeId = subTypeId;
-        this.subTypeName = subTypeName;
+        this.typeId = typeId;
+        this.typeName = typeName;
     }
 
-    public Long getSubTypeId() {
-        return subTypeId;
+    public Long getTypeId() {
+        return typeId;
     }
 
-    public String getSubTypeName() {
-        return subTypeName;
+    public String getTypeName() {
+        return typeName;
     }
 }

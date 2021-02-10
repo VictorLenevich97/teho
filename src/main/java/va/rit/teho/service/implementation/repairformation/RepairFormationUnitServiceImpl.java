@@ -4,7 +4,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
@@ -132,9 +132,9 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
         getRepairFormationUnitOrThrow(repairFormationUnitEquipmentStaff
                                               .getEquipmentPerRepairFormationUnit()
                                               .getRepairFormationUnitId());
-        equipmentTypeService.getSubType(repairFormationUnitEquipmentStaff
-                                                .getEquipmentPerRepairFormationUnit()
-                                                .getEquipmentSubTypeId()); //Проверка на существование
+        equipmentTypeService.get(repairFormationUnitEquipmentStaff
+                                         .getEquipmentPerRepairFormationUnit()
+                                         .getEquipmentTypeId()); //Проверка на существование
         if (repairFormationUnitEquipmentStaff.getTotalStaff() < repairFormationUnitEquipmentStaff.getAvailableStaff()) {
             throw new IncorrectParamException(
                     "Всего производственников < доступно производственников (" + repairFormationUnitEquipmentStaff.getTotalStaff() + " < " + repairFormationUnitEquipmentStaff
@@ -167,35 +167,31 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> getEquipmentStaffPerSubType(UUID sessionId,
-                                                                                                Long repairFormationUnitId,
-                                                                                                List<Long> equipmentTypeIds,
-                                                                                                List<Long> equipmentSubTypeIds) {
+    public Map<EquipmentType, RepairFormationUnitEquipmentStaff> getEquipmentStaffPerType(UUID sessionId,
+                                                                                          Long repairFormationUnitId,
+                                                                                          List<Long> equipmentTypeIds) {
         RepairFormationUnit repairFormationUnit = getRepairFormationUnitOrThrow(repairFormationUnitId);
-        return listEquipmentStaffPerSubType(sessionId,
-                                            Collections.singletonList(repairFormationUnitId),
-                                            equipmentTypeIds,
-                                            equipmentSubTypeIds).getOrDefault(repairFormationUnit,
-                                                                              Collections.emptyMap());
+        return listEquipmentStaffPerType(sessionId,
+                                         Collections.singletonList(repairFormationUnitId),
+                                         equipmentTypeIds).getOrDefault(repairFormationUnit,
+                                                                        Collections.emptyMap());
     }
 
     @Override
-    public Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> listEquipmentStaffPerSubType(
+    public Map<RepairFormationUnit, Map<EquipmentType, RepairFormationUnitEquipmentStaff>> listEquipmentStaffPerType(
             UUID sessionId,
             List<Long> repairFormationUnitIds,
-            List<Long> equipmentTypeIds,
-            List<Long> equipmentSubTypeIds) {
+            List<Long> equipmentTypeIds) {
         List<RepairFormationUnitEquipmentStaff> equipmentStaffList =
                 repairFormationUnitEquipmentStaffRepository.findFiltered(sessionId,
                                                                          repairFormationUnitIds,
-                                                                         equipmentTypeIds,
-                                                                         equipmentSubTypeIds);
+                                                                         equipmentTypeIds);
 
-        Map<RepairFormationUnit, Map<EquipmentSubType, RepairFormationUnitEquipmentStaff>> result = new HashMap<>();
+        Map<RepairFormationUnit, Map<EquipmentType, RepairFormationUnitEquipmentStaff>> result = new HashMap<>();
         for (RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff : equipmentStaffList) {
             RepairFormationUnit repairFormationUnit = repairFormationUnitEquipmentStaff.getRepairFormationUnit();
             result.computeIfAbsent(repairFormationUnit, rs -> new HashMap<>());
-            result.get(repairFormationUnit).put(repairFormationUnitEquipmentStaff.getEquipmentSubType(),
+            result.get(repairFormationUnit).put(repairFormationUnitEquipmentStaff.getEquipmentType(),
                                                 repairFormationUnitEquipmentStaff);
         }
         return result;
@@ -216,10 +212,7 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     @Override
     public void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId) {
         List<RepairFormationUnitEquipmentStaff> equipmentStaffList =
-                repairFormationUnitEquipmentStaffRepository.findFiltered(originalSessionId,
-                                                                         null,
-                                                                         null,
-                                                                         null);
+                repairFormationUnitEquipmentStaffRepository.findFiltered(originalSessionId, null, null);
         List<RepairFormationUnitEquipmentStaff> updatedRepairFormationUnitEquipmentStaffList =
                 equipmentStaffList.stream().map(rses -> rses.copy(newSessionId)).collect(Collectors.toList());
 

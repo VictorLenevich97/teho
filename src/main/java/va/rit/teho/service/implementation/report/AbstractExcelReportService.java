@@ -139,7 +139,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
         c.setCellStyle(boldCellStyle);
     }
 
-    protected abstract void writeData(T data, Sheet sheet, int lastRowIndex);
+    protected abstract int writeData(T data, Sheet sheet, int lastRowIndex);
 
     protected byte[] writeSheet(Sheet sheet, int columnCount) {
         for (int i = 0; i < columnCount; i++) {

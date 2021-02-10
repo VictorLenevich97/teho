@@ -16,15 +16,13 @@ public interface EquipmentRepository extends PagingAndSortingRepository<Equipmen
     Long getMaxId();
 
     @Query("SELECT COUNT(e) from Equipment e WHERE (coalesce(:ids, null) is null or e.id in (:ids)) AND " +
-            "(coalesce(:subTypeIds, null) is null or e.equipmentSubType.id in (:subTypeIds)) AND " +
-            "(coalesce(:typeIds, null) is null or e.equipmentSubType.equipmentType.id in (:typeIds)) ")
-    Long countFiltered(List<Long> ids, List<Long> subTypeIds, List<Long> typeIds);
+            "(coalesce(:typeIds, null) is null or e.equipmentType.id in (:typeIds)) ")
+    Long countFiltered(List<Long> ids, List<Long> typeIds);
 
     @Query("SELECT e from Equipment e WHERE (coalesce(:ids, null) is null or e.id in (:ids)) AND " +
-            "(coalesce(:subTypeIds, null) is null or e.equipmentSubType.id in (:subTypeIds)) AND " +
-            "(coalesce(:typeIds, null) is null or e.equipmentSubType.equipmentType.id in (:typeIds)) " +
-            "ORDER BY e.equipmentSubType.equipmentType.id ASC, e.equipmentSubType.id ASC, e.id ASC")
-    List<Equipment> findFiltered(List<Long> ids, List<Long> subTypeIds, List<Long> typeIds, Pageable pageable);
+            "(coalesce(:typeIds, null) is null or e.equipmentType.id in (:typeIds)) " +
+            "ORDER BY e.equipmentType.id ASC, e.id ASC")
+    List<Equipment> findFiltered(List<Long> ids, List<Long> typeIds, Pageable pageable);
 
     Optional<Equipment> findByNameIgnoreCase(String name);
 }
