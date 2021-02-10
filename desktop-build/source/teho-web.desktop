@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=TEHO
+Exec=/usr/bin/teho
+Terminal=false
+Type=Application
+Icon=teho-web
+StartupWMClass=TEHO
+Comment=TEHO-Desktop
+Categories=Utility;
