@@ -126,10 +126,13 @@ public class LaborInputDistributionController {
     @GetMapping
     @ResponseBody
     @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта по всем типам ремонта (в табличном формате)")
-    public ResponseEntity<TableDataDTO<Map<String, String>>> getDistributionDataForAllRepairTypes() {
+    public ResponseEntity<TableDataDTO<Map<String, String>>> getDistributionDataForAllRepairTypes(@RequestParam(value = "formationId", required = false) List<Long> formationIds,
+                                                                                                  @RequestParam(value = "equipmentId", required = false) List<Long> equipmentIds) {
         Map<EquipmentType, List<EquipmentLaborInputDistribution>> aggregatedLaborInputDistribution =
-                laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId());
-        List<RepairType> repairTypes = repairTypeService.list();
+                laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId(),
+                                                                                  nullIfEmpty(formationIds),
+                                                                                  nullIfEmpty(equipmentIds));
+        List<RepairType> repairTypes = repairTypeService.list(true);
         repairTypes.sort(Comparator.comparing(RepairType::getShortName).reversed());
         List<NestedColumnsDTO> columns =
                 repairTypes
@@ -149,10 +152,14 @@ public class LaborInputDistributionController {
     @ResponseBody
     @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта по всем типам ремонта (в табличном формате)")
     @Transactional
-    public ResponseEntity<byte[]> getDistributionDataForAllRepairTypesReport() throws UnsupportedEncodingException {
+    public ResponseEntity<byte[]> getDistributionDataForAllRepairTypesReport(@RequestParam(required = false) List<Long> formationIds,
+                                                                             @RequestParam(required = false) List<Long> equipmentIds) throws
+            UnsupportedEncodingException {
         Map<EquipmentType, List<EquipmentLaborInputDistribution>> aggregatedLaborInputDistribution =
-                laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId());
-        List<RepairType> repairTypes = repairTypeService.list();
+                laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId(),
+                                                                                  nullIfEmpty(formationIds),
+                                                                                  nullIfEmpty(equipmentIds));
+        List<RepairType> repairTypes = repairTypeService.list(true);
 
         byte[] bytes = distributionForAllRepairTypesReportService.generateReport(new LaborInputDistributionCombinedData(
                 equipmentTypeService.listHighestLevelTypes(null),

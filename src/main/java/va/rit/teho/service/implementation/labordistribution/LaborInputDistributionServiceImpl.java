@@ -91,10 +91,14 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
 
     @Override
     public Map<EquipmentType, List<EquipmentLaborInputDistribution>> getAggregatedLaborInputDistribution(
-            UUID sessionId) {
-        List<LaborDistribution> aggregated = laborDistributionRepository.findByTehoSessionId(sessionId);
+            UUID sessionId, List<Long> formationIds, List<Long> equipmentIds) {
+        List<LaborDistribution> aggregated = laborDistributionRepository.findByTehoSessionIdAndFilters(sessionId,
+                                                                                                       formationIds,
+                                                                                                       equipmentIds);
         List<EquipmentFailurePerRepairTypeAmount> equipmentFailurePerRepairTypeAmounts =
-                equipmentPerFormationFailureIntensityRepository.listFailureDataWithLaborInputPerRepairType(sessionId);
+                equipmentPerFormationFailureIntensityRepository.listFailureDataWithLaborInputPerRepairType(sessionId,
+                                                                                                           formationIds,
+                                                                                                           equipmentIds);
 
         Map<EquipmentType, List<EquipmentLaborInputDistribution>> result = new HashMap<>();
 

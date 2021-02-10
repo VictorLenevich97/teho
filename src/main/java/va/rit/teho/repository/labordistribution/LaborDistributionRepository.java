@@ -19,6 +19,13 @@ public interface LaborDistributionRepository
 
     List<LaborDistribution> findByTehoSessionId(UUID sessionId);
 
+    @Query("SELECT ld FROM LaborDistribution ld WHERE ld.tehoSession.id = :sessionId AND " +
+            "(coalesce(:formationIds, null) is null or ld.formation.id IN (:formationIds)) AND " +
+            "(coalesce(:equipmentIds, null) is null or ld.equipment.id IN (:equipmentIds)) ")
+    List<LaborDistribution> findByTehoSessionIdAndFilters(UUID sessionId,
+                                                          List<Long> formationIds,
+                                                          List<Long> equipmentIds);
+
     @Query("SELECT new va.rit.teho.entity.labordistribution.LaborDistributionData(ld.laborDistributionId.equipmentPerFormation, " +
             "ipt.amount, " +
             "ld.workhoursDistributionInterval.id, " +
