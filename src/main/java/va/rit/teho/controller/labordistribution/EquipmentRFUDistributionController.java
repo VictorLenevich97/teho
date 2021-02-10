@@ -4,13 +4,11 @@ import io.swagger.annotations.Api;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.ReportResponseEntity;
-import va.rit.teho.dto.labordistribution.EquipmentDistributionRowData;
-import va.rit.teho.dto.labordistribution.EquipmentDistributionTableDataDTO;
-import va.rit.teho.dto.labordistribution.EquipmentRFUDistributionDTO;
-import va.rit.teho.dto.labordistribution.LaborDistributionFilterData;
+import va.rit.teho.dto.labordistribution.*;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.labordistribution.EquipmentDistributionCombinedData;
@@ -82,8 +80,27 @@ public class EquipmentRFUDistributionController {
         return ResponseEntity.ok(equipmentRFUDistributionDTOList);
     }
 
+    @GetMapping("/repair-formation/unit/equipment")
+    @Transactional
+    public ResponseEntity<List<AggregatedEquipmentRFUDistributionDTO>> getDistributionEquipmentForAllRFU() {
+        Map<RepairFormationUnit, List<EquipmentRFUDistribution>> repairFormationUnitDistributionData =
+                equipmentRFUDistributionService.listDistributedEquipment(tehoSession.getSessionId());
+        List<AggregatedEquipmentRFUDistributionDTO> result = repairFormationUnitDistributionData
+                .entrySet()
+                .stream()
+                .map(repairFormationUnitListEntry ->
+                             new AggregatedEquipmentRFUDistributionDTO(repairFormationUnitListEntry.getKey().getName(),
+                                                                       repairFormationUnitListEntry
+                                                                               .getValue()
+                                                                               .stream()
+                                                                               .map(EquipmentRFUDistributionDTO::from)
+                                                                               .collect(Collectors.toList())))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/repair-formation/unit/equipment/report")
-    public ResponseEntity<byte[]> getDistributedEquipmentForRFUReport() throws
+    public ResponseEntity<byte[]> getDistributedEquipmentForAllRFUReport() throws
             UnsupportedEncodingException {
         Map<RepairFormationUnit, List<EquipmentRFUDistribution>> repairFormationUnitDistributionData =
                 equipmentRFUDistributionService.listDistributedEquipment(tehoSession.getSessionId());
