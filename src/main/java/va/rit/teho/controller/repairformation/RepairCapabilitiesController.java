@@ -10,33 +10,29 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
-import va.rit.teho.dto.repairformation.EquipmentStaffPerSubType;
 import va.rit.teho.dto.repairformation.EquipmentTypeStaffData;
 import va.rit.teho.dto.repairformation.RepairCapabilityPerEquipment;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.RowData;
 import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityCombinedData;
 import va.rit.teho.server.config.TehoSessionData;
-import va.rit.teho.service.equipment.EquipmentService;
+import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.repairformation.RepairCapabilitiesService;
 import va.rit.teho.service.repairformation.RepairFormationUnitService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,7 +45,7 @@ import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
 public class RepairCapabilitiesController {
 
     private final RepairCapabilitiesService repairCapabilitiesService;
-    private final EquipmentService equipmentService;
+    private final EquipmentTypeService equipmentTypeService;
     private final RepairFormationUnitService repairFormationUnitService;
     private final ReportService<RepairFormationUnitRepairCapabilityCombinedData> reportService;
 
@@ -58,11 +54,11 @@ public class RepairCapabilitiesController {
 
     public RepairCapabilitiesController(
             RepairCapabilitiesService repairCapabilitiesService,
-            EquipmentService equipmentService,
+            EquipmentTypeService equipmentTypeService,
             RepairFormationUnitService repairFormationUnitService,
             ReportService<RepairFormationUnitRepairCapabilityCombinedData> reportService) {
         this.repairCapabilitiesService = repairCapabilitiesService;
-        this.equipmentService = equipmentService;
+        this.equipmentTypeService = equipmentTypeService;
         this.repairFormationUnitService = repairFormationUnitService;
         this.reportService = reportService;
     }
@@ -73,11 +69,11 @@ public class RepairCapabilitiesController {
     @PostMapping(path = "/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для всех РВО по всем ВВСТ)")
+    @Transactional
     public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGet(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilities(tehoSession.getSessionId(),
                                                                             repairTypeId);
         return getCalculatedRepairCapabilities(repairTypeId,
-                                               Collections.emptyList(),
                                                Collections.emptyList(),
                                                Collections.emptyList(),
                                                Collections.emptyList(),
@@ -128,45 +124,33 @@ public class RepairCapabilitiesController {
                                                  repairFormationUnitRepairCapability.getCapability()));
     }
 
-    private Stream<NestedColumnsDTO> getRepairCapabilitiesNestedColumnsDTO(Map.Entry<EquipmentType, Map<EquipmentSubType, List<Equipment>>> equipmentTypeEntry) {
-        if (equipmentTypeEntry.getKey() == null) {
-            return equipmentTypeEntry
-                    .getValue()
-                    .entrySet()
-                    .stream()
-                    .map(this::getNestedColumnsDTO);
+    private Stream<NestedColumnsDTO> getRepairCapabilitiesNestedColumnsDTO(EquipmentType equipmentType) {
+        Set<EquipmentType> subTypes = equipmentType.getEquipmentTypes();
+        Set<Equipment> equipmentSet = equipmentType.getEquipmentSet();
+        if (subTypes.isEmpty() && equipmentSet.isEmpty()) {
+            return Stream.empty();
         } else {
-            return Stream.of(new NestedColumnsDTO(
-                    equipmentTypeEntry.getKey().getShortName(),
-                    equipmentTypeEntry.getValue()
-                                      .entrySet()
-                                      .stream()
-                                      .map(this::getNestedColumnsDTO)
-                                      .collect(Collectors.toList())));
+            Stream<NestedColumnsDTO> equipmentSubColumns =
+                    equipmentSet.stream().map(e -> new NestedColumnsDTO(e.getId().toString(), e.getName()));
+            Stream<NestedColumnsDTO> subTypesColumns =
+                    subTypes.stream().flatMap(this::getRepairCapabilitiesNestedColumnsDTO);
+            return Stream.of(new NestedColumnsDTO(equipmentType.getShortName(),
+                                                  Stream
+                                                          .concat(equipmentSubColumns, subTypesColumns)
+                                                          .collect(Collectors.toList())));
         }
-    }
-
-    private NestedColumnsDTO getNestedColumnsDTO(Map.Entry<EquipmentSubType, List<Equipment>> subTypeListEntry) {
-        return new NestedColumnsDTO(subTypeListEntry.getKey().getShortName(),
-                                    subTypeListEntry.getValue()
-                                                    .stream()
-                                                    .map(e -> new NestedColumnsDTO(e.getId().toString(), e.getName()))
-                                                    .collect(Collectors.toList()));
     }
 
     private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(RepairFormationUnitRepairCapabilityCombinedData combinedData,
                                                                          long rowCount,
                                                                          int pageSize) {
         List<Equipment> columns =
-                combinedData.getGroupedEquipmentData()
-                            .values()
+                combinedData.getEquipmentTypes()
                             .stream()
-                            .flatMap(l -> l.values().stream())
-                            .flatMap(List::stream)
+                            .flatMap(EquipmentType::collectRelatedEquipment)
                             .collect(Collectors.toList());
         List<NestedColumnsDTO> equipmentPerTypeDTOList =
-                combinedData.getGroupedEquipmentData()
-                            .entrySet()
+                combinedData.getEquipmentTypes()
                             .stream()
                             .flatMap(this::getRepairCapabilitiesNestedColumnsDTO)
                             .collect(Collectors.toList());
@@ -199,78 +183,75 @@ public class RepairCapabilitiesController {
 
     @GetMapping("/{repairFormationUnitId}/capabilities/repair-type/{repairTypeId}")
     @ResponseBody
+    @Transactional
     public ResponseEntity<List<EquipmentTypeStaffData>> getCalculatedRepairCapabilitiesForUnit(
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
             @ApiParam(value = "Ключи ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentId,
-            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
-            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId) {
-        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped =
-                equipmentService.listGroupedByTypes(nullIfEmpty(equipmentId),
-                                                    nullIfEmpty(equipmentSubTypeId),
-                                                    nullIfEmpty(equipmentTypeId));
-        Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> equipmentStaff =
-                repairFormationUnitService.getEquipmentStaffPerSubType(tehoSession.getSessionId(),
-                                                                       repairFormationUnitId,
-                                                                       nullIfEmpty(equipmentTypeId),
-                                                                       nullIfEmpty(equipmentSubTypeId));
+            @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) {
+        List<Long> filteredEquipmentIds = nullIfEmpty(equipmentId);
+        List<Long> filteredEquipmentTypeIds = nullIfEmpty(equipmentTypeId);
+        List<EquipmentType> equipmentTypes = equipmentTypeService.listHighestLevelTypes(filteredEquipmentTypeIds);
+        Map<EquipmentType, RepairFormationUnitEquipmentStaff> equipmentStaff =
+                repairFormationUnitService.getEquipmentStaffPerType(tehoSession.getSessionId(),
+                                                                    repairFormationUnitId,
+                                                                    filteredEquipmentTypeIds);
         Map<Equipment, Double> calculatedRepairCapabilities =
-                repairCapabilitiesService.getCalculatedRepairCapabilities(repairFormationUnitId,
-                                                                          tehoSession.getSessionId(),
-                                                                          repairTypeId,
-                                                                          nullIfEmpty(equipmentId),
-                                                                          nullIfEmpty(equipmentSubTypeId),
-                                                                          nullIfEmpty(equipmentTypeId));
-        List<EquipmentTypeStaffData> result = grouped
-                .entrySet()
-                .stream()
-                .map(equipmentTypeListEntry -> {
-                    List<EquipmentStaffPerSubType> subTypes =
-                            equipmentTypeListEntry
-                                    .getValue()
-                                    .entrySet()
-                                    .stream()
-                                    .map(est -> getEquipmentStaffPerSubType(equipmentStaff,
-                                                                            calculatedRepairCapabilities,
-                                                                            est))
-                                    .collect(Collectors.toList());
-                    return Optional
-                            .ofNullable(equipmentTypeListEntry.getKey())
-                            .map(et -> new EquipmentTypeStaffData(et.getId(), et.getFullName(), subTypes))
-                            .orElse(new EquipmentTypeStaffData(-1L, subTypes));
-                })
-                .collect(Collectors.toList());
+                repairCapabilitiesService.getCalculatedRepairCapabilities(
+                        tehoSession.getSessionId(),
+                        repairFormationUnitId,
+                        repairTypeId,
+                        filteredEquipmentIds,
+                        filteredEquipmentTypeIds);
+
+        List<EquipmentTypeStaffData> result =
+                getEquipmentTypeStaffData(equipmentTypes,
+                                          equipmentStaff,
+                                          calculatedRepairCapabilities)
+                        .collect(Collectors.toList());
+
         return ResponseEntity.ok(result);
     }
 
-    private EquipmentStaffPerSubType getEquipmentStaffPerSubType(Map<EquipmentSubType, RepairFormationUnitEquipmentStaff> equipmentStaff,
-                                                                 Map<Equipment, Double> calculatedRepairCapabilities,
-                                                                 Map.Entry<EquipmentSubType, List<Equipment>> est) {
-        return new EquipmentStaffPerSubType(
-                est.getKey().getId(),
-                est.getKey().getFullName(),
-                equipmentStaff.getOrDefault(est.getKey(), RepairFormationUnitEquipmentStaff.EMPTY).getTotalStaff(),
-                equipmentStaff.getOrDefault(est.getKey(), RepairFormationUnitEquipmentStaff.EMPTY).getAvailableStaff(),
-                est
-                        .getValue()
-                        .stream()
-                        .map(e -> new RepairCapabilityPerEquipment(e.getId(),
-                                                                   e.getName(),
-                                                                   Formatter.formatDouble(calculatedRepairCapabilities.getOrDefault(
-                                                                           e,
-                                                                           0.0))))
-                        .collect(Collectors.toList()));
+    private Stream<EquipmentTypeStaffData> getEquipmentTypeStaffData(Collection<EquipmentType> equipmentTypes,
+                                                                     Map<EquipmentType, RepairFormationUnitEquipmentStaff> equipmentStaff,
+                                                                     Map<Equipment, Double> calculatedRepairCapabilities) {
+        return equipmentTypes
+                .stream()
+                .map(equipmentType -> {
+                    RepairFormationUnitEquipmentStaff staff = equipmentStaff.getOrDefault(equipmentType,
+                                                                                          RepairFormationUnitEquipmentStaff.EMPTY);
+                    return new EquipmentTypeStaffData(
+                            equipmentType.getId(),
+                            equipmentType.getShortName(),
+                            staff.getTotalStaff(),
+                            staff.getAvailableStaff(),
+                            getEquipmentTypeStaffData(equipmentType.getEquipmentTypes(),
+                                                      equipmentStaff,
+                                                      calculatedRepairCapabilities).collect(Collectors.toList()),
+                            equipmentType
+                                    .getEquipmentSet()
+                                    .stream()
+                                    .map(equipment -> new RepairCapabilityPerEquipment(equipment.getId(),
+                                                                                       equipment.getName(),
+                                                                                       calculatedRepairCapabilities
+                                                                                               .getOrDefault(
+                                                                                                       equipment,
+                                                                                                       0.0)))
+                                    .collect(Collectors.toList()));
+                });
     }
+
 
     @GetMapping("/capabilities/repair-type/{id}")
     @ResponseBody
     @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
+    @Transactional
     public ResponseEntity<TableDataDTO<Map<String, String>>> getCalculatedRepairCapabilities(
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
             @ApiParam(value = "Ключи ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
-            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
         RepairFormationUnitRepairCapabilityCombinedData combinedData = getCapabilityCombinedData(
@@ -278,7 +259,6 @@ public class RepairCapabilitiesController {
                 repairFormationUnitId,
                 equipmentId,
                 equipmentTypeId,
-                equipmentSubTypeId,
                 pageNum,
                 pageSize);
         Long rowCount = repairFormationUnitService.count(repairFormationUnitId);
@@ -291,12 +271,12 @@ public class RepairCapabilitiesController {
     @GetMapping("/capabilities/repair-type/{id}/report")
     @ResponseBody
     @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
+    @Transactional
     public ResponseEntity<byte[]> getCalculatedRepairCapabilitiesReport(
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
             @ApiParam(value = "Ключи ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
-            @ApiParam(value = "Ключи подтипов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentSubTypeId,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) throws UnsupportedEncodingException {
         RepairFormationUnitRepairCapabilityCombinedData combinedData = getCapabilityCombinedData(
@@ -304,7 +284,6 @@ public class RepairCapabilitiesController {
                 repairFormationUnitId,
                 equipmentId,
                 equipmentTypeId,
-                equipmentSubTypeId,
                 pageNum,
                 pageSize);
 
@@ -315,28 +294,21 @@ public class RepairCapabilitiesController {
                                                                                       List<Long> repairFormationUnitId,
                                                                                       List<Long> equipmentId,
                                                                                       List<Long> equipmentTypeId,
-                                                                                      List<Long> equipmentSubTypeId,
                                                                                       int pageNum,
                                                                                       int pageSize) {
-
         List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(
                 nullIfEmpty(repairFormationUnitId),
                 pageNum,
                 pageSize);
-        Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> grouped =
-                equipmentService.listGroupedByTypes(nullIfEmpty(equipmentId),
-                                                    nullIfEmpty(equipmentSubTypeId),
-                                                    nullIfEmpty(equipmentTypeId));
         Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities =
                 repairCapabilitiesService.getCalculatedRepairCapabilities(tehoSession.getSessionId(),
                                                                           repairTypeId,
                                                                           nullIfEmpty(repairFormationUnitId),
                                                                           nullIfEmpty(equipmentId),
-                                                                          nullIfEmpty(equipmentSubTypeId),
                                                                           nullIfEmpty(equipmentTypeId));
         return new RepairFormationUnitRepairCapabilityCombinedData(
                 repairFormationUnitList,
-                grouped,
+                equipmentTypeService.listHighestLevelTypes(equipmentTypeId),
                 calculatedRepairCapabilities);
     }
 

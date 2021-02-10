@@ -8,51 +8,53 @@ import java.util.List;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EquipmentStaffPerSubType {
-    private final Long subTypeId;
+public class EquipmentStaffPerType {
+    private final Long typeId;
     private final String name;
     private final Integer total;
     private final Integer available;
     private final List<RepairCapabilityPerEquipment> equipment;
 
-    public EquipmentStaffPerSubType() {
-        this.subTypeId = null;
+    public EquipmentStaffPerType() {
+        this.typeId = null;
         this.name = null;
         this.total = 0;
         this.available = 0;
         this.equipment = null;
     }
 
-    public EquipmentStaffPerSubType(Long subTypeId, String name, Integer total, Integer available) {
-        this.subTypeId = subTypeId;
+    public EquipmentStaffPerType(Long typeId, String name, Integer total, Integer available) {
+        this.typeId = typeId;
         this.name = name;
         this.total = total;
         this.available = available;
         this.equipment = null;
     }
 
-    public EquipmentStaffPerSubType(Long subTypeId,
-                                    String name,
-                                    Integer total,
-                                    Integer available,
-                                    List<RepairCapabilityPerEquipment> equipment) {
-        this.subTypeId = subTypeId;
+    public EquipmentStaffPerType(Long typeId,
+                                 String name,
+                                 Integer total,
+                                 Integer available,
+                                 List<RepairCapabilityPerEquipment> equipment) {
+        this.typeId = typeId;
         this.name = name;
         this.total = total;
         this.available = available;
         this.equipment = equipment;
     }
 
-    public static EquipmentStaffPerSubType from(RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff) {
-        return new EquipmentStaffPerSubType(repairFormationUnitEquipmentStaff.getEquipmentSubType().getId(),
-                                            repairFormationUnitEquipmentStaff.getEquipmentSubType().getFullName(),
-                                            repairFormationUnitEquipmentStaff.getTotalStaff(),
-                                            repairFormationUnitEquipmentStaff.getAvailableStaff());
+    public static EquipmentStaffPerType from(RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff) {
+        return new EquipmentStaffPerType(repairFormationUnitEquipmentStaff
+                                                 .getEquipmentPerRepairFormationUnit()
+                                                 .getEquipmentTypeId(),
+                                         "",
+                                         repairFormationUnitEquipmentStaff.getTotalStaff(),
+                                         repairFormationUnitEquipmentStaff.getAvailableStaff());
     }
 
     public RepairFormationUnitEquipmentStaff toEntity(UUID sessionId, Long repairFormationUnitId) {
         return new RepairFormationUnitEquipmentStaff(new RepairFormationUnitPK(repairFormationUnitId,
-                                                                               getSubTypeId(),
+                                                                               getTypeId(),
                                                                                sessionId),
                                                      getTotal(),
                                                      getAvailable());
@@ -62,8 +64,8 @@ public class EquipmentStaffPerSubType {
         return equipment;
     }
 
-    public Long getSubTypeId() {
-        return subTypeId;
+    public Long getTypeId() {
+        return typeId;
     }
 
     public String getName() {

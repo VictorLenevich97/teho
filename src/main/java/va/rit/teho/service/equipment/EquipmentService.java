@@ -2,7 +2,6 @@ package va.rit.teho.service.equipment;
 
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 
 import java.util.List;
@@ -12,26 +11,24 @@ public interface EquipmentService {
 
     List<Equipment> list();
 
-    Long count(List<Long> ids, List<Long> subTypeIds, List<Long> typeIds);
+    Long count(List<Long> ids, List<Long> typeIds);
 
     Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(List<Long> ids,
-                                                                       List<Long> subTypeIds,
                                                                        List<Long> typeIds,
                                                                        Integer pageNum,
                                                                        Integer pageSize);
 
     Equipment get(Long equipmentId);
 
-    Equipment add(String name, Long subTypeId);
+    Equipment add(String name, Long typeId);
 
-    Equipment add(String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap);
+    Equipment add(String name, Long typeId, Map<Long, Integer> repairTypeIdLaborInputMap);
 
-    Equipment update(Long id, String name, Long subTypeId, Map<Long, Integer> repairTypeIdLaborInputMap);
+    Equipment update(Long id, String name, Long typeId, Map<Long, Integer> repairTypeIdLaborInputMap);
 
     void delete(Long id);
 
-    Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>> listGroupedByTypes(List<Long> ids,
-                                                                                  List<Long> subTypeIds,
-                                                                                  List<Long> typeIds);
+    Map<EquipmentType, List<Equipment>> listGroupedByTypes(List<Long> ids,
+                                                           List<Long> typeIds);
 
 }

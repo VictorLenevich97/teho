@@ -40,10 +40,10 @@ public interface EquipmentPerFormationService {
 
     List<EquipmentPerFormation> getEquipmentInAllFormations(List<Long> equipmentIds);
 
-    Map<EquipmentSubType, List<EquipmentPerFormation>> getGroupedEquipmentInFormation(Long formationId,
-                                                                                      List<Long> equipmentIds);
+    Map<EquipmentType, List<EquipmentPerFormation>> getGroupedEquipmentInFormation(Long formationId,
+                                                                                   List<Long> equipmentIds);
 
-    Map<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> getTotalGroupedEquipmentInFormations(List<Long> equipmentIds);
+    Map<Formation, Map<EquipmentType, List<EquipmentPerFormation>>> getTotalGroupedEquipmentInFormations(List<Long> equipmentIds);
 
     Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getFailureIntensityData(
             UUID sessionId,

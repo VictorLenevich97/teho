@@ -31,11 +31,10 @@ public interface RepairCapabilitiesService {
                                                                  Double capability);
 
     Map<Equipment, Double> getCalculatedRepairCapabilities(
-            Long repairFormationUnitId,
             UUID sessionId,
+            Long repairFormationUnitId,
             Long repairTypeId,
             List<Long> equipmentIds,
-            List<Long> equipmentSubTypeIds,
             List<Long> equipmentTypeIds);
 
     Map<RepairFormationUnit, Map<Equipment, Double>> getCalculatedRepairCapabilities(
@@ -43,7 +42,6 @@ public interface RepairCapabilitiesService {
             Long repairTypeId,
             List<Long> repairFormationUnitIds,
             List<Long> equipmentIds,
-            List<Long> equipmentSubTypeIds,
             List<Long> equipmentTypeIds);
 
 }

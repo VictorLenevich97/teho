@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.*;
 import va.rit.teho.repository.labordistribution.LaborDistributionRepository;
@@ -66,21 +65,19 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     }
 
     @Override
-    public Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> getLaborInputDistribution(
+    public Map<EquipmentType, List<EquipmentLaborInputDistribution>> getLaborInputDistribution(
             UUID sessionId,
             Long repairTypeId,
             Long stageId,
             List<Long> equipmentTypeIds) {
-        Map<EquipmentType, Map<EquipmentSubType, Map<EquipmentPerFormation, List<LaborDistributionData>>>> grouped =
+        Map<EquipmentType, Map<EquipmentPerFormation, List<LaborDistributionData>>> grouped =
                 laborDistributionRepository.findAllGrouped(sessionId, repairTypeId, stageId, equipmentTypeIds);
-        Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> result = new HashMap<>();
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> result = new HashMap<>();
 
         grouped.forEach((equipmentType, subTypeMap) -> subTypeMap
-                .forEach((subType, compositeKeyMap) -> compositeKeyMap
-                        .forEach((key, equipmentInRepairDataList) ->
-                                         result.computeIfAbsent(equipmentType, k -> new HashMap<>())
-                                               .computeIfAbsent(subType, k -> new ArrayList<>())
-                                               .add(buildLaborInputDistribution(equipmentInRepairDataList)))));
+                .forEach((key, equipmentInRepairDataList) ->
+                                 result.computeIfAbsent(equipmentType, k -> new ArrayList<>())
+                                       .add(buildLaborInputDistribution(equipmentInRepairDataList))));
         return result;
     }
 

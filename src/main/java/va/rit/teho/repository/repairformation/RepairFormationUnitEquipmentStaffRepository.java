@@ -20,11 +20,9 @@ public interface RepairFormationUnitEquipmentStaffRepository
     @Query("SELECT rses from RepairFormationUnitEquipmentStaff rses WHERE " +
             "rses.tehoSession.id = :sessionId AND " +
             "(coalesce(:repairFormationUnitIds, null) is null or rses.repairFormationUnit.id in (:repairFormationUnitIds)) AND " +
-            "(coalesce(:equipmentSubTypeIds, null) is null or rses.equipmentSubType.id in (:equipmentSubTypeIds)) AND " +
-            "(coalesce(:equipmentTypeIds, null) is null or rses.equipmentSubType.equipmentType.id in (:equipmentTypeIds))")
+            "(coalesce(:equipmentTypeIds, null) is null or rses.equipmentType.id in (:equipmentTypeIds))")
     List<RepairFormationUnitEquipmentStaff> findFiltered(UUID sessionId,
                                                          List<Long> repairFormationUnitIds,
-                                                         List<Long> equipmentTypeIds,
-                                                         List<Long> equipmentSubTypeIds);
+                                                         List<Long> equipmentTypeIds);
 
 }

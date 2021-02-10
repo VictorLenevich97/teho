@@ -18,8 +18,8 @@ public class Equipment implements Serializable {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "equipment_sub_type_id", referencedColumnName = "id")
-    private EquipmentSubType equipmentSubType;
+    @JoinColumn(name = "equipment_type_id", referencedColumnName = "id")
+    private EquipmentType equipmentType;
 
     @OneToMany(mappedBy = "equipment", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<EquipmentLaborInputPerType> laborInputPerTypes;
@@ -33,10 +33,10 @@ public class Equipment implements Serializable {
     public Equipment() {
     }
 
-    public Equipment(Long id, String name, EquipmentSubType equipmentSubType) {
+    public Equipment(Long id, String name, EquipmentType equipmentType) {
         this.id = id;
         this.name = name;
-        this.equipmentSubType = equipmentSubType;
+        this.equipmentType = equipmentType;
     }
 
     public Set<EquipmentLaborInputPerType> getLaborInputPerTypes() {
@@ -63,12 +63,12 @@ public class Equipment implements Serializable {
         this.name = name;
     }
 
-    public EquipmentSubType getEquipmentSubType() {
-        return equipmentSubType;
+    public EquipmentType getEquipmentType() {
+        return equipmentType;
     }
 
-    public void setEquipmentSubType(EquipmentSubType equipmentSubType) {
-        this.equipmentSubType = equipmentSubType;
+    public void setEquipmentType(EquipmentType equipmentType) {
+        this.equipmentType = equipmentType;
     }
 
     @Override
@@ -78,11 +78,11 @@ public class Equipment implements Serializable {
         Equipment equipment = (Equipment) o;
         return Objects.equals(id, equipment.id) &&
                 Objects.equals(name, equipment.name) &&
-                Objects.equals(equipmentSubType, equipment.equipmentSubType);
+                Objects.equals(equipmentType, equipment.equipmentType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, equipmentSubType);
+        return Objects.hash(id, name, equipmentType);
     }
 }

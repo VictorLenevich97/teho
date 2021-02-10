@@ -6,7 +6,7 @@ import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.EquipmentFailureIntensityCombinedData;
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
-import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.report.ReportCell;
 import va.rit.teho.report.ReportHeader;
@@ -74,31 +74,32 @@ public class EquipmentFailureIntensityReportService
     }
 
     @Override
-    protected void writeData(EquipmentFailureIntensityCombinedData data, Sheet sheet, int lastRowIndex) {
+    protected int writeData(EquipmentFailureIntensityCombinedData data, Sheet sheet, int lastRowIndex) {
         if (data.getEquipmentPerFormations().size() == 1) {
-            writeRows(sheet, lastRowIndex, data,
-                      data
-                              .getEquipmentPerFormations()
-                              .values()
-                              .stream()
-                              .flatMap(m -> m.values().stream())
-                              .flatMap(List::stream)
-                              .collect(Collectors.toList()));
+            List<EquipmentPerFormation> equipmentPerFormations = data
+                    .getEquipmentPerFormations()
+                    .values()
+                    .stream()
+                    .flatMap(m -> m.values().stream())
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
+            writeRows(sheet, lastRowIndex, data, equipmentPerFormations);
+            lastRowIndex += equipmentPerFormations.size();
         } else {
             int colSize = data.getStages().size() * data.getRepairTypes().size() + 1;
-            for (Map.Entry<Formation, Map<EquipmentSubType, List<EquipmentPerFormation>>> entry : data
+            for (Map.Entry<Formation, Map<EquipmentType, List<EquipmentPerFormation>>> entry : data
                     .getEquipmentPerFormations()
                     .entrySet()) {
                 Formation formation = entry.getKey();
-                Map<EquipmentSubType, List<EquipmentPerFormation>> equipmentSubTypeMap = entry.getValue();
+                Map<EquipmentType, List<EquipmentPerFormation>> EquipmentTypeMap = entry.getValue();
 
                 createRowWideCell(sheet, lastRowIndex, colSize, formation.getFullName(), true, true);
 
-                for (Map.Entry<EquipmentSubType, List<EquipmentPerFormation>> e : equipmentSubTypeMap.entrySet()) {
-                    EquipmentSubType equipmentSubType = e.getKey();
+                for (Map.Entry<EquipmentType, List<EquipmentPerFormation>> e : EquipmentTypeMap.entrySet()) {
+                    EquipmentType equipmentType = e.getKey();
                     List<EquipmentPerFormation> equipmentPerFormations = e.getValue();
 
-                    createRowWideCell(sheet, lastRowIndex + 1, colSize, equipmentSubType.getFullName(), true, false);
+                    createRowWideCell(sheet, lastRowIndex + 1, colSize, equipmentType.getFullName(), true, false);
 
                     writeRows(sheet, lastRowIndex + 2, data, equipmentPerFormations);
 
@@ -106,5 +107,6 @@ public class EquipmentFailureIntensityReportService
                 }
             }
         }
+        return lastRowIndex;
     }
 }

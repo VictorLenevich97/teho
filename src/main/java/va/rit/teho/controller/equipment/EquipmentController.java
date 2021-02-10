@@ -16,20 +16,17 @@ import va.rit.teho.dto.equipment.EquipmentLaborInputPerTypeRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentService;
+import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
@@ -41,13 +38,16 @@ import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
 public class EquipmentController {
 
     private final EquipmentService equipmentService;
+    private final EquipmentTypeService equipmentTypeService;
     private final RepairTypeService repairTypeService;
-    private final ReportService<Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>>> equipmentReportService;
+    private final ReportService<Collection<EquipmentType>> equipmentReportService;
 
     public EquipmentController(EquipmentService equipmentService,
+                               EquipmentTypeService equipmentTypeService,
                                RepairTypeService repairTypeService,
-                               ReportService<Map<EquipmentType, Map<EquipmentSubType, List<Equipment>>>> equipmentReportService) {
+                               ReportService<Collection<EquipmentType>> equipmentReportService) {
         this.equipmentService = equipmentService;
+        this.equipmentTypeService = equipmentTypeService;
         this.repairTypeService = repairTypeService;
         this.equipmentReportService = equipmentReportService;
     }
@@ -77,7 +77,7 @@ public class EquipmentController {
                                                                              @Valid @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
         Map<Long, Integer> repairTypeIdLaborInputMap = mapStringKeysToLong(equipmentData.getData());
         Equipment added = equipmentService.add(equipmentData.getName(),
-                                               equipmentData.getSubTypeId(),
+                                               equipmentData.getTypeId(),
                                                repairTypeIdLaborInputMap);
         return ResponseEntity.status(HttpStatus.CREATED).body(new EquipmentLaborInputPerTypeRowData(added,
                                                                                                     equipmentData.getData()));
@@ -98,7 +98,7 @@ public class EquipmentController {
                                                                              @ApiParam(value = "Данные о ВВСТ", required = true) @Valid @RequestBody EquipmentLaborInputPerTypeRowData equipmentData) {
         Equipment updatedEquipment = equipmentService.update(equipmentId,
                                                              equipmentData.getName(),
-                                                             equipmentData.getSubTypeId(),
+                                                             equipmentData.getTypeId(),
                                                              mapStringKeysToLong(equipmentData.getData()));
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -122,16 +122,13 @@ public class EquipmentController {
     @ApiOperation(value = "Получить список ВВСТ с нормативной трудоемкостью (в табличном виде)")
     public ResponseEntity<TableDataDTO<Map<String, Integer>>> listEquipmentWithLaborInputData(
             @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> ids,
-            @ApiParam(value = "Ключи подтипов, по которым осуществляется фильтр") @RequestParam(value = "subTypeId", required = false) List<Long> subTypeIds,
             @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
         List<Long> idsFilter = nullIfEmpty(ids);
-        List<Long> subTypeIdsFilter = nullIfEmpty(subTypeIds);
         List<Long> typeIdsFilter = nullIfEmpty(typeIds);
 
-        Long rowCount = equipmentService.count(idsFilter, subTypeIdsFilter, typeIdsFilter);
-
+        Long rowCount = equipmentService.count(idsFilter, typeIdsFilter);
         List<NestedColumnsDTO> columns =
                 repairTypeService.list(true)
                                  .stream()
@@ -139,7 +136,7 @@ public class EquipmentController {
                                  .collect(Collectors.toList());
         List<EquipmentLaborInputPerTypeRowData> data =
                 equipmentService
-                        .listWithLaborInputPerType(idsFilter, subTypeIdsFilter, typeIdsFilter, pageNum, pageSize)
+                        .listWithLaborInputPerType(idsFilter, typeIdsFilter, pageNum, pageSize)
                         .entrySet()
                         .stream()
                         .map(equipmentMapEntry ->
@@ -161,14 +158,11 @@ public class EquipmentController {
 
     @GetMapping(value = "/labor-input/report", produces = "application/vnd.ms-excel")
     @ResponseBody
+    @Transactional
     public ResponseEntity<byte[]> equipmentLaborInputPerTypeReport(
-            @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> ids,
-            @ApiParam(value = "Ключи подтипов, по которым осуществляется фильтр") @RequestParam(value = "subTypeId", required = false) List<Long> subTypeIds,
             @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds)
             throws UnsupportedEncodingException {
-        byte[] bytes = equipmentReportService.generateReport(equipmentService.listGroupedByTypes(ids,
-                                                                                                 subTypeIds,
-                                                                                                 typeIds));
+        byte[] bytes = equipmentReportService.generateReport(equipmentTypeService.listHighestLevelTypes(typeIds));
 
         return ReportResponseEntity.ok("Список ВВСТ (с трудоёмкостью)", bytes);
     }

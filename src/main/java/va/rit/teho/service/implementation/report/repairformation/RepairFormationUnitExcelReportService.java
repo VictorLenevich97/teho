@@ -3,7 +3,7 @@ package va.rit.teho.service.implementation.report.repairformation;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
-import va.rit.teho.entity.equipment.EquipmentSubType;
+import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitCombinedData;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
@@ -27,13 +27,11 @@ public class RepairFormationUnitExcelReportService
                         new ReportCell(rfu.getName(), ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),
                         new ReportCell(rfu.getRepairStationType().getName()),
                         new ReportCell(rfu.getStationAmount(), ReportCell.CellType.NUMERIC)));
-        List<EquipmentSubType> subTypes =
-                data
-                        .getTypesWithSubTypes()
-                        .entrySet()
-                        .stream()
-                        .flatMap(e -> e.getValue().stream())
-                        .collect(Collectors.toList());
+        List<EquipmentType> subTypes = data
+                .getEquipmentTypes()
+                .stream()
+                .flatMap(EquipmentType::collectLowestLevelTypes)
+                .collect(Collectors.toList());
         populateCellFunctions
                 .addAll(subTypes.stream()
                                 .flatMap(st -> getStaff(rfu,
@@ -53,7 +51,7 @@ public class RepairFormationUnitExcelReportService
 
     private Stream<ReportCell> getStaff(RepairFormationUnit rfu,
                                         RepairFormationUnitCombinedData data,
-                                        EquipmentSubType st,
+                                        EquipmentType st,
                                         Function<RepairFormationUnitEquipmentStaff, Integer> f) {
         return Stream.of(new ReportCell(f.apply(data
                                                         .getRepairFormationUnitEquipmentStaff()
@@ -71,33 +69,26 @@ public class RepairFormationUnitExcelReportService
         ReportHeader nameReportHeader = header("Наименование ремонтного органа формирования", true);
         ReportHeader repairStationTypeReportHeader = header("Тип мастерской", true);
         ReportHeader rstCountReportHeader = header("Кол-во", true);
+        List<ReportHeader> equipmentTypeHeaders = equipmentTypeSubHeaders(data.getEquipmentTypes()).collect(Collectors.toList());
         return Arrays.asList(nameReportHeader,
                              repairStationTypeReportHeader,
                              rstCountReportHeader,
-                             getSubHeaders("По штату, чел.", data),
-                             getSubHeaders("В наличии, чел.", data));
+                             new ReportHeader("По штату, чел.", equipmentTypeHeaders),
+                             new ReportHeader("В наличии, чел.", equipmentTypeHeaders));
     }
 
-    private ReportHeader getSubHeaders(String topHeader, RepairFormationUnitCombinedData data) {
-        List<ReportHeader> subReportHeaders = data
-                .getTypesWithSubTypes()
-                .entrySet()
+
+    private Stream<ReportHeader> equipmentTypeSubHeaders(Collection<EquipmentType> equipmentTypes) {
+        return equipmentTypes
                 .stream()
-                .flatMap(e -> Optional.ofNullable(e.getKey())
-                                      .map(key -> Stream.of(
-                                              new ReportHeader(key.getShortName(),
-                                                               e.getValue()
-                                                                .stream()
-                                                                .map(est -> header(est.getShortName(), true))
-                                                                .collect(Collectors.toList()))))
-                                      .orElse(e.getValue().stream().map(est -> header(est.getShortName(), true))))
-                .collect(Collectors.toList());
-        return new ReportHeader(topHeader, subReportHeaders);
+                .map(et -> new ReportHeader(et.getShortName(),
+                                            equipmentTypeSubHeaders(et.getEquipmentTypes()).collect(Collectors.toList())));
     }
 
     @Override
-    protected void writeData(RepairFormationUnitCombinedData data, Sheet sheet, int lastRowIndex) {
+    protected int writeData(RepairFormationUnitCombinedData data, Sheet sheet, int lastRowIndex) {
         writeRows(sheet, lastRowIndex, data, data.getRepairFormationUnitList());
+        return lastRowIndex + data.getRepairFormationUnitList().size();
     }
 
 }

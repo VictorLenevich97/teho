@@ -1,6 +1,5 @@
 package va.rit.teho.service.labordistribution;
 
-import va.rit.teho.entity.equipment.EquipmentSubType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborDistributionAggregatedData;
@@ -20,10 +19,10 @@ public interface LaborInputDistributionService {
      *
      * @return Map, ключ это тип ВВСТ, значение - список данных о записи
      */
-    Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> getLaborInputDistribution(UUID sessionId,
-                                                                                                               Long repairTypeId,
-                                                                                                               Long stageId,
-                                                                                                               List<Long> equipmentTypeIds);
+    Map<EquipmentType, List<EquipmentLaborInputDistribution>> getLaborInputDistribution(UUID sessionId,
+                                                                                        Long repairTypeId,
+                                                                                        Long stageId,
+                                                                                        List<Long> equipmentTypeIds);
 
     /**
      * Расчет распределения ремонтного фонда по трудоемкости ремонта по всем ВВСТ.
