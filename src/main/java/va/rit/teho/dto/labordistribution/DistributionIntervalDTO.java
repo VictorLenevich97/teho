@@ -11,6 +11,13 @@ public class DistributionIntervalDTO {
     private final Integer to;
     private IdAndNameDTO restorationType;
 
+    public DistributionIntervalDTO() {
+        this.id = null;
+        this.from = null;
+        this.to = null;
+        this.restorationType = null;
+    }
+
     public DistributionIntervalDTO(Long id, Integer from, Integer to) {
         this.id = id;
         this.from = from;
