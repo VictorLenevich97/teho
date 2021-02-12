@@ -113,6 +113,12 @@ public class InitialDataLoader implements ApplicationRunner {
                                                                            .equals(existingInterval.getRestorationType())))
                 .collect(Collectors.toList());
 
+        long latestNewId = workhoursDistributionIntervalRepository.getMaxId() + 1;
+
+        for (WorkhoursDistributionInterval interval : intervals) {
+            interval.setId(latestNewId);
+            latestNewId++;
+        }
         this.workhoursDistributionIntervalRepository.saveAll(intervals);
     }
 
