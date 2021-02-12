@@ -31,8 +31,8 @@ public class RepairTypeController {
     }
 
     @GetMapping
-    @ApiOperation(value = "Получить список типов ремонта")
     @ResponseBody
+    @ApiOperation(value = "Получить список типов ремонта")
     public ResponseEntity<List<RepairTypeDTO>> listRepairTypes(
             @ApiParam(value = "Фильтр по индикатору, определяющему используется ли тип ремонта в расчетах. В случае, когда параметр не указан, возвращаются все типы ремонта.",
                     example = "true") @RequestParam(required = false) Boolean calculatable,

@@ -1,5 +1,6 @@
 package va.rit.teho.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @Controller
 @Validated
 @RequestMapping(path = "/restoration-type", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "Типы восстановления")
 public class RestorationTypeController {
 
     private final RestorationTypeService restorationTypeService;
@@ -27,8 +29,8 @@ public class RestorationTypeController {
     }
 
     @GetMapping
-    @ApiOperation(value = "Получить список типов восстановления")
     @ResponseBody
+    @ApiOperation(value = "Получить список типов восстановления")
     public ResponseEntity<List<IdAndNameDTO>> listRepairTypes() {
         List<RestorationType> restorationTypes = restorationTypeService.list();
         return ResponseEntity.ok(restorationTypes

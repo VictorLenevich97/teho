@@ -71,7 +71,7 @@ public class RepairFormationUnitController {
     @ResponseBody
     @ApiOperation(value = "Получить список РВО")
     public ResponseEntity<List<RepairFormationUnitDTO>> listRepairFormationUnits(
-            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(value = "id", required = false) List<Long> ids,
+            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> ids,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
         List<RepairFormationUnitDTO> repairFormationUnitDTOList =
@@ -196,9 +196,10 @@ public class RepairFormationUnitController {
     }
 
     @GetMapping("/formation/repair-formation/{repairFormationId}/unit")
+    @ApiOperation(value = "Получить список РВО, принадлежащих данному Ремонтному Формированию")
     public ResponseEntity<List<RepairFormationUnitDTO>> listRepairFormationUnitsInFormation(
             @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable @Positive Long repairFormationId,
-            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(value = "id", required = false) List<Long> ids,
+            @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> ids,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
         return ResponseEntity.ok(repairFormationUnitService.list(repairFormationId, ids, pageNum, pageSize)
@@ -319,6 +320,7 @@ public class RepairFormationUnitController {
 
     @DeleteMapping(path = "/formation/repair-formation/unit/{repairFormationUnitId}")
     @Transactional
+    @ApiOperation(value = "Удалить РВО и все связанные сущности/рассчитанные данные")
     public ResponseEntity<Object> deleteRepairFormationUnit(@ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId) {
         repairFormationUnitService.delete(repairFormationUnitId);
         return ResponseEntity.noContent().build();

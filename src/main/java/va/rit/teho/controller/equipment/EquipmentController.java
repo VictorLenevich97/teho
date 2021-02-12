@@ -122,8 +122,8 @@ public class EquipmentController {
     @GetMapping("/labor-input")
     @ApiOperation(value = "Получить список ВВСТ с нормативной трудоемкостью (в табличном виде)")
     public ResponseEntity<TableDataDTO<Map<String, Integer>>> listEquipmentWithLaborInputData(
-            @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> ids,
-            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds,
+            @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> ids,
+            @ApiParam(value = "Ключи типов ВВСТ, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> typeIds,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
         List<Long> idsFilter = nullIfEmpty(ids);
@@ -162,7 +162,7 @@ public class EquipmentController {
     @ResponseBody
     @Transactional
     public ResponseEntity<byte[]> equipmentLaborInputPerTypeReport(
-            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "typeId", required = false) List<Long> typeIds)
+            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> typeIds)
             throws UnsupportedEncodingException {
         byte[] bytes = equipmentReportService.generateReport(equipmentTypeService.listHighestLevelTypes(typeIds));
 

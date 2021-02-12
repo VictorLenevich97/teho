@@ -109,6 +109,7 @@ public class EquipmentPerFormationController {
 
     @DeleteMapping("/formation/{formationId}/equipment/{equipmentId}")
     @Transactional
+    @ApiOperation(value = "Удалить ВВСТ из Формирования")
     public ResponseEntity<Object> deleteEquipmentFromFormation(@PathVariable @Positive Long formationId,
                                                                @PathVariable @Positive Long equipmentId) {
         equipmentPerFormationService.deleteEquipmentFromFormation(formationId, equipmentId);
@@ -146,6 +147,7 @@ public class EquipmentPerFormationController {
 
     @GetMapping("/formation/{formationId}/equipment/intensity/report")
     @ResponseBody
+    @ApiOperation(value = "Получить отчет по интенсивности выхода ВВСТ в ремонт (%)")
     public ResponseEntity<byte[]> getEquipmentFailureIntensityDataReport(@ApiParam(value = "Ключ ВЧ", required = true, example = "1")
                                                                          @PathVariable @Positive Long formationId,
                                                                          @RequestParam(required = false) List<Long> equipmentIds) throws
@@ -178,6 +180,7 @@ public class EquipmentPerFormationController {
 
     @GetMapping("/formation/equipment/daily-failure")
     @ResponseBody
+    @ApiOperation(value = "Таблица с интенсивностью выхода ВВСТ в ремонт (по всем Формированиям), %")
     public TableDataDTO<Map<String, Map<String, String>>> getTotalEquipmentPerFormationDailyFailureData(
             @RequestParam(required = false) List<Long> equipmentIds) {
         Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData =
@@ -193,6 +196,7 @@ public class EquipmentPerFormationController {
 
     @GetMapping("/formation/equipment/daily-failure/report")
     @ResponseBody
+    @ApiOperation(value = "Получить очтет с интенсивностью выхода ВВСТ в ремонт (по всем Формированиям), %")
     public ResponseEntity<byte[]> getTotalEquipmentPerFormationDailyFailureDataReport(
             @RequestParam(required = false) List<Long> equipmentIds) throws UnsupportedEncodingException {
         Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData =

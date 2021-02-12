@@ -11,16 +11,15 @@ import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.*;
 import va.rit.teho.repository.equipment.EquipmentPerFormationFailureIntensityRepository;
 import va.rit.teho.repository.labordistribution.LaborDistributionRepository;
-import va.rit.teho.repository.labordistribution.WorkhoursDistributionIntervalRepository;
 import va.rit.teho.service.common.CalculationService;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
+import va.rit.teho.service.labordistribution.WorkhoursDistributionIntervalService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -31,16 +30,16 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     private final RepairTypeService repairTypeService;
     private final LaborDistributionRepository laborDistributionRepository;
     private final EquipmentPerFormationFailureIntensityRepository equipmentPerFormationFailureIntensityRepository;
-    private final WorkhoursDistributionIntervalRepository workhoursDistributionIntervalRepository;
+    private final WorkhoursDistributionIntervalService workhoursDistributionIntervalService;
 
     public LaborInputDistributionServiceImpl(
-            WorkhoursDistributionIntervalRepository workhoursDistributionIntervalRepository,
+            WorkhoursDistributionIntervalService workhoursDistributionIntervalService,
             CalculationService calculationService,
             EquipmentPerFormationService equipmentPerFormationService,
             RepairTypeService repairTypeService,
             LaborDistributionRepository laborDistributionRepository,
             EquipmentPerFormationFailureIntensityRepository equipmentPerFormationFailureIntensityRepository) {
-        this.workhoursDistributionIntervalRepository = workhoursDistributionIntervalRepository;
+        this.workhoursDistributionIntervalService = workhoursDistributionIntervalService;
         this.calculationService = calculationService;
         this.equipmentPerFormationService = equipmentPerFormationService;
         this.repairTypeService = repairTypeService;
@@ -199,8 +198,9 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
             Long repairTypeId,
             Double avgDailyFailure,
             EquipmentPerFormationFailureIntensityAndLaborInput equipmentPerFormationAndLaborInput) {
-        return StreamSupport
-                .stream(workhoursDistributionIntervalRepository.findAll().spliterator(), false)
+        return workhoursDistributionIntervalService
+                .list()
+                .stream()
                 .map(interval -> calculateLaborDistribution(sessionId,
                                                             equipmentPerFormationAndLaborInput.getFormationId(),
                                                             equipmentPerFormationAndLaborInput.getEquipmentId(),
@@ -259,11 +259,6 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 laborDistributionList.stream().map(eir -> eir.copy(newSessionId)).collect(Collectors.toList());
 
         laborDistributionRepository.saveAll(updatedLaborDistributionList);
-    }
-
-    @Override
-    public List<WorkhoursDistributionInterval> listDistributionIntervals() {
-        return (List<WorkhoursDistributionInterval>) workhoursDistributionIntervalRepository.findAll();
     }
 
     @Override

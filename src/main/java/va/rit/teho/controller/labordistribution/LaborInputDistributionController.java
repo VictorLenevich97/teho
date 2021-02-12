@@ -25,6 +25,7 @@ import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
+import va.rit.teho.service.labordistribution.WorkhoursDistributionIntervalService;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
@@ -44,6 +45,7 @@ public class LaborInputDistributionController {
 
     private final EquipmentTypeService equipmentTypeService;
     private final LaborInputDistributionService laborInputDistributionService;
+    private final WorkhoursDistributionIntervalService workhoursDistributionIntervalService;
     private final RepairTypeService repairTypeService;
 
     private final ReportService<LaborInputDistributionCombinedData> reportService;
@@ -54,11 +56,13 @@ public class LaborInputDistributionController {
 
     public LaborInputDistributionController(EquipmentTypeService equipmentTypeService,
                                             LaborInputDistributionService laborInputDistributionService,
+                                            WorkhoursDistributionIntervalService workhoursDistributionIntervalService,
                                             RepairTypeService repairTypeService,
                                             @Qualifier("oneRepairType") ReportService<LaborInputDistributionCombinedData> reportService,
                                             @Qualifier("allRepairTypes") ReportService<LaborInputDistributionCombinedData> distributionForAllRepairTypesReportService) {
         this.equipmentTypeService = equipmentTypeService;
         this.laborInputDistributionService = laborInputDistributionService;
+        this.workhoursDistributionIntervalService = workhoursDistributionIntervalService;
         this.repairTypeService = repairTypeService;
         this.reportService = reportService;
         this.distributionForAllRepairTypesReportService = distributionForAllRepairTypesReportService;
@@ -66,8 +70,8 @@ public class LaborInputDistributionController {
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}/report")
     @ResponseBody
-    @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта (в табличном формате)")
     @Transactional
+    @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта (в табличном формате)")
     public ResponseEntity<byte[]> getDistributionDataReport(
             @ApiParam(value = "Ключ этапа", required = true) @PathVariable @Positive Long stageId,
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
@@ -78,8 +82,7 @@ public class LaborInputDistributionController {
                                                                         repairTypeId,
                                                                         stageId,
                                                                         nullIfEmpty(equipmentTypeId));
-        List<WorkhoursDistributionInterval> distributionIntervals =
-                laborInputDistributionService.listDistributionIntervals();
+        List<WorkhoursDistributionInterval> distributionIntervals = workhoursDistributionIntervalService.list();
 
         byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(
                 equipmentTypeService.listHighestLevelTypes(equipmentTypeId),
@@ -103,8 +106,8 @@ public class LaborInputDistributionController {
                                                                         stageId,
                                                                         nullIfEmpty(equipmentTypeId));
         List<NestedColumnsDTO> columns =
-                laborInputDistributionService
-                        .listDistributionIntervals()
+                workhoursDistributionIntervalService
+                        .list()
                         .stream()
                         .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
                                                      Comparator.nullsFirst(Comparator.naturalOrder())))
@@ -126,8 +129,8 @@ public class LaborInputDistributionController {
     @GetMapping
     @ResponseBody
     @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта по всем типам ремонта (в табличном формате)")
-    public ResponseEntity<TableDataDTO<Map<String, String>>> getDistributionDataForAllRepairTypes(@RequestParam(value = "formationId", required = false) List<Long> formationIds,
-                                                                                                  @RequestParam(value = "equipmentId", required = false) List<Long> equipmentIds) {
+    public ResponseEntity<TableDataDTO<Map<String, String>>> getDistributionDataForAllRepairTypes(@RequestParam(required = false) List<Long> formationIds,
+                                                                                                  @RequestParam(required = false) List<Long> equipmentIds) {
         Map<EquipmentType, List<EquipmentLaborInputDistribution>> aggregatedLaborInputDistribution =
                 laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId(),
                                                                                   nullIfEmpty(formationIds),
@@ -150,8 +153,8 @@ public class LaborInputDistributionController {
 
     @GetMapping("/report")
     @ResponseBody
-    @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта по всем типам ремонта (в табличном формате)")
     @Transactional
+    @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта по всем типам ремонта (в табличном формате)")
     public ResponseEntity<byte[]> getDistributionDataForAllRepairTypesReport(@RequestParam(required = false) List<Long> formationIds,
                                                                              @RequestParam(required = false) List<Long> equipmentIds) throws
             UnsupportedEncodingException {
@@ -165,15 +168,15 @@ public class LaborInputDistributionController {
                 equipmentTypeService.listHighestLevelTypes(null),
                 repairTypes,
                 aggregatedLaborInputDistribution,
-                laborInputDistributionService.listDistributionIntervals()));
+                workhoursDistributionIntervalService.list()));
 
         return ReportResponseEntity.ok("Распределение производственного фонда (по всем типам ремонта)", bytes);
     }
 
     private NestedColumnsDTO buildDistributionNestedColumnsPerRepairType(RepairType rt) {
         List<NestedColumnsDTO> intervalColumns =
-                laborInputDistributionService
-                        .listDistributionIntervals()
+                workhoursDistributionIntervalService
+                        .list()
                         .stream()
                         .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
                                                      Comparator.nullsFirst(Comparator.naturalOrder())))

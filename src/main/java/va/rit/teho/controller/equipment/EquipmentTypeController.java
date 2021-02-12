@@ -38,8 +38,8 @@ public class EquipmentTypeController {
     @ApiOperation(value = "Получить типы ВВСТ")
     public ResponseEntity<List<EquipmentTypeDTO>> getEquipmentTypes(
             @RequestParam(required = false, defaultValue = "false") boolean grouped,
-            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(value = "id", required = false) List<Long> typeIds) {
-        List<Long> typeIdsFilter = typeIds == null ? Collections.emptyList() : typeIds;
+            @ApiParam(value = "Ключи типов, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> ids) {
+        List<Long> typeIdsFilter = ids == null ? Collections.emptyList() : ids;
         List<EquipmentTypeDTO> equipmentTypeDTOList;
         if (grouped) {
             equipmentTypeDTOList = equipmentTypeService
@@ -48,7 +48,7 @@ public class EquipmentTypeController {
                     .map(EquipmentTypeDTO::fromEntityIncludeSubtypes)
                     .collect(Collectors.toList());
         } else {
-            equipmentTypeDTOList = equipmentTypeService.listTypes(typeIds)
+            equipmentTypeDTOList = equipmentTypeService.listTypes(ids)
                                                        .stream()
                                                        .map(EquipmentTypeDTO::fromEntity)
                                                        .collect(Collectors.toList());
@@ -98,7 +98,7 @@ public class EquipmentTypeController {
     }
 
     @DeleteMapping(path = "/{typeId}")
-    @ApiOperation(value = "Удалить тип ВВСТ.")
+    @ApiOperation(value = "Удалить тип ВВСТ")
     public ResponseEntity<Object> deleteEquipmentType(@ApiParam(value = "Ключ типа ВВСТ", required = true) @PathVariable @Positive Long typeId) {
         equipmentTypeService.deleteType(typeId);
         return ResponseEntity.noContent().build();

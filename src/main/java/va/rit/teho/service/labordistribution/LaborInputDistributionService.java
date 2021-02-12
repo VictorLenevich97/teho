@@ -3,7 +3,6 @@ package va.rit.teho.service.labordistribution;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
 import va.rit.teho.entity.labordistribution.LaborDistributionAggregatedData;
-import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 
 import java.util.List;
 import java.util.Map;
@@ -34,8 +33,6 @@ public interface LaborInputDistributionService {
     void updateLaborInputDistribution(UUID sessionId, List<Long> equipmentIds, List<Long> formationIds);
 
     void copyLaborInputDistributionData(UUID originalSessionId, UUID newSessionId);
-
-    List<WorkhoursDistributionInterval> listDistributionIntervals();
 
     List<LaborDistributionAggregatedData> listAggregatedDataForSessionAndFormation(UUID sessionId,
                                                                                    Long formationId,

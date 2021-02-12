@@ -29,6 +29,13 @@ public class RestorationTypeServiceImpl implements RestorationTypeService {
     }
 
     @Override
+    public RestorationType get(Long id) {
+        return restorationTypeRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Тип восстановления с id = \"" + id + "\" не найден!"));
+    }
+
+    @Override
     public RestorationType add(String name, int weight) {
         if (!restorationTypeRepository.findByNameIgnoreCase(name).isEmpty()) {
             throw new AlreadyExistsException("Тип восстановления", "название", name);

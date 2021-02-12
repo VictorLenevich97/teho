@@ -69,8 +69,8 @@ public class RepairCapabilitiesController {
      */
     @PostMapping(path = "/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для всех РВО по всем ВВСТ)")
     @Transactional
+    @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для всех РВО по всем ВВСТ)")
     public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGet(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilities(tehoSession.getSessionId(),
                                                                             repairTypeId);
@@ -194,6 +194,7 @@ public class RepairCapabilitiesController {
     @GetMapping("/{repairFormationUnitId}/capabilities/repair-type/{repairTypeId}")
     @ResponseBody
     @Transactional
+    @ApiOperation(value = "Получить производственные возможности данного РВО по ремонту ВВСТ (для конкретного типа ремонта)")
     public ResponseEntity<List<EquipmentTypeStaffData>> getCalculatedRepairCapabilitiesForUnit(
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
@@ -255,8 +256,8 @@ public class RepairCapabilitiesController {
 
     @GetMapping("/capabilities/repair-type/{id}")
     @ResponseBody
-    @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
     @Transactional
+    @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
     public ResponseEntity<TableDataDTO<Map<String, String>>> getCalculatedRepairCapabilities(
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
@@ -280,8 +281,8 @@ public class RepairCapabilitiesController {
 
     @GetMapping("/capabilities/repair-type/{id}/report")
     @ResponseBody
-    @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
     @Transactional
+    @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
     public ResponseEntity<byte[]> getCalculatedRepairCapabilitiesReport(
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,

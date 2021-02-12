@@ -1,6 +1,7 @@
 package va.rit.teho.controller.labordistribution;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -62,6 +63,7 @@ public class EquipmentRFUDistributionController {
     }
 
     @PostMapping("/repair-formation/unit/equipment")
+    @ApiOperation(value = "Распределение вышедшего из строя ВВСТ по РВО для ремонта")
     public ResponseEntity<Object> distributeEquipmentPerRFU(@Valid @RequestBody LaborDistributionFilterData filterData) {
         equipmentRFUDistributionService.distribute(tehoSession.getSessionId(),
                                                    nullIfEmpty(filterData.getEquipmentIds()),
@@ -71,6 +73,7 @@ public class EquipmentRFUDistributionController {
     }
 
     @GetMapping("/repair-formation/unit/{repairFormationUnitId}/equipment")
+    @ApiOperation(value = "Получить список вышедшего из строя ВВСТ, ремонтируемого в данном РВО")
     public ResponseEntity<List<EquipmentRFUDistributionDTO>> getDistributedEquipmentForRFU(@PathVariable @Positive Long repairFormationUnitId) {
         List<EquipmentRFUDistributionDTO> equipmentRFUDistributionDTOList = equipmentRFUDistributionService
                 .listRFUDistributedEquipment(repairFormationUnitId, tehoSession.getSessionId())
@@ -82,6 +85,7 @@ public class EquipmentRFUDistributionController {
 
     @GetMapping("/repair-formation/unit/equipment")
     @Transactional
+    @ApiOperation(value = "Получить список вышедшего из строя ВВСТ, ремонтируемого во всех РВО")
     public ResponseEntity<List<AggregatedEquipmentRFUDistributionDTO>> getDistributionEquipmentForAllRFU() {
         Map<RepairFormationUnit, List<EquipmentRFUDistribution>> repairFormationUnitDistributionData =
                 equipmentRFUDistributionService.listDistributedEquipment(tehoSession.getSessionId());
@@ -100,6 +104,7 @@ public class EquipmentRFUDistributionController {
     }
 
     @GetMapping("/repair-formation/unit/equipment/report")
+    @ApiOperation(value = "Получить отчет по вышедшему из строя ВВСТ, ремонтируемому во всех РВО")
     public ResponseEntity<byte[]> getDistributedEquipmentForAllRFUReport() throws
             UnsupportedEncodingException {
         Map<RepairFormationUnit, List<EquipmentRFUDistribution>> repairFormationUnitDistributionData =
@@ -110,6 +115,8 @@ public class EquipmentRFUDistributionController {
 
 
     @GetMapping("/{formationId}/distribution")
+    @ApiOperation(value = "Получить таблицу со списком ВВСТ, вышедшего из строя в данном формировании, и данными по распределению: " +
+            "количество техники, выходящей в конкретные типы ремонта; количество техники, находящейся на конкретном уровне восстановления")
     public ResponseEntity<EquipmentDistributionTableDataDTO> getEquipmentDistribution(@PathVariable @Positive Long formationId) {
         List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData =
                 equipmentRFUDistributionService.listDistributionDataForFormation(tehoSession.getSessionId(),
@@ -154,6 +161,8 @@ public class EquipmentRFUDistributionController {
     }
 
     @GetMapping("/{formationId}/distribution/report")
+    @ApiOperation(value = "Получить отчет со списком ВВСТ, вышедшего из строя в данном формировании, и данными по распределению: " +
+            "количество техники, выходящей в конкретные типы ремонта; количество техники, находящейся на конкретном уровне восстановления")
     public ResponseEntity<byte[]> getEquipmentDistributionPerFormationReport(@PathVariable @Positive Long formationId) throws
             UnsupportedEncodingException {
         List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData =
