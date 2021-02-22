@@ -1,7 +1,8 @@
-package va.rit.teho.entity.labordistribution;
+package va.rit.teho.entity.labordistribution.combined;
 
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 
 import java.util.List;
 import java.util.Map;

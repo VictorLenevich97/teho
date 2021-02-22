@@ -2,7 +2,11 @@ package va.rit.teho.service.equipment;
 
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
-import va.rit.teho.entity.equipment.*;
+import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentPerFormation;
+import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
+import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.entity.equipment.combined.EquipmentPerFormationFailureIntensityAndLaborInput;
 import va.rit.teho.entity.formation.Formation;
 
 import java.util.List;

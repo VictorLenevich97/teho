@@ -1,7 +1,8 @@
-package va.rit.teho.entity.repairformation;
+package va.rit.teho.entity.repairformation.combined;
 
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.entity.repairformation.RepairFormationUnit;
 
 import java.util.List;
 import java.util.Map;

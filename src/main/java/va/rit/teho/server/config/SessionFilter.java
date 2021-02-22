@@ -1,6 +1,7 @@
 package va.rit.teho.server.config;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import va.rit.teho.exception.NotFoundException;
@@ -30,8 +31,8 @@ public class SessionFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
-                                    HttpServletResponse httpServletResponse,
-                                    FilterChain filterChain) throws ServletException, IOException {
+                                    @NonNull HttpServletResponse httpServletResponse,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String sessionId = httpServletRequest.getHeader("Session-Id");
         if (sessionId == null || sessionId.equals("null")) {
             prepareBadRequestResponse(httpServletResponse, "Missing Session-Id header!");

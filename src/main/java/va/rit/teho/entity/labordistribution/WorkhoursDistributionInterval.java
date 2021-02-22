@@ -2,12 +2,12 @@ package va.rit.teho.entity.labordistribution;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class WorkhoursDistributionInterval {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Integer lowerBound;
@@ -18,6 +18,12 @@ public class WorkhoursDistributionInterval {
     @JoinColumn(name = "restoration_type_id", nullable = false)
     private RestorationType restorationType;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "workhoursDistributionInterval", orphanRemoval = true)
+    private Set<LaborDistribution> laborDistributions;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "workhoursDistributionInterval", orphanRemoval = true)
+    private Set<EquipmentRFUDistribution> equipmentRFUDistributions;
+
     public WorkhoursDistributionInterval(Integer lowerBound,
                                          Integer upperBound,
                                          RestorationType restorationType) {
@@ -26,8 +32,30 @@ public class WorkhoursDistributionInterval {
         this.restorationType = restorationType;
     }
 
+    public WorkhoursDistributionInterval(Long id,
+                                         Integer lowerBound,
+                                         Integer upperBound,
+                                         RestorationType restorationType) {
+        this.id = id;
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
+        this.restorationType = restorationType;
+    }
+
     public WorkhoursDistributionInterval() {
         //Пустой конструктор для автоматической инициализации
+    }
+
+    public void setLowerBound(Integer lowerBound) {
+        this.lowerBound = lowerBound;
+    }
+
+    public void setUpperBound(Integer upperBound) {
+        this.upperBound = upperBound;
+    }
+
+    public void setRestorationType(RestorationType restorationType) {
+        this.restorationType = restorationType;
     }
 
     public Long getId() {

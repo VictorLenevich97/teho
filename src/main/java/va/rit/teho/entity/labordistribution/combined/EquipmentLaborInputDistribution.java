@@ -1,4 +1,4 @@
-package va.rit.teho.entity.labordistribution;
+package va.rit.teho.entity.labordistribution.combined;
 
 import va.rit.teho.entity.common.RepairType;
 

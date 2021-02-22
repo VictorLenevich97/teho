@@ -1,10 +1,12 @@
-package va.rit.teho.entity.labordistribution;
+package va.rit.teho.entity.labordistribution.combined;
 
 import va.rit.teho.entity.common.RepairType;
+import va.rit.teho.entity.labordistribution.RestorationType;
 
 import java.util.List;
 
 public class EquipmentDistributionCombinedData {
+
     private final List<RepairType> repairTypeList;
     private final List<RestorationType> restorationTypeList;
     private final List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionDataList;

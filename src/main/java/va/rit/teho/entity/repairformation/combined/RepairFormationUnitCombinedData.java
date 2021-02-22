@@ -1,11 +1,14 @@
-package va.rit.teho.entity.repairformation;
+package va.rit.teho.entity.repairformation.combined;
 
 import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.entity.repairformation.RepairFormationUnit;
+import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 
 import java.util.List;
 import java.util.Map;
 
 public class RepairFormationUnitCombinedData {
+
     private final List<RepairFormationUnit> repairFormationUnitList;
     private final List<EquipmentType> equipmentTypes;
     private final Map<RepairFormationUnit, Map<EquipmentType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff;

@@ -1,11 +1,13 @@
-package va.rit.teho.entity.labordistribution;
+package va.rit.teho.entity.labordistribution.combined;
 
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.labordistribution.RestorationType;
 
 import java.util.Map;
 
 public class EquipmentPerFormationDistributionData {
+
     private final Equipment equipment;
     private final Integer amount;
     private final Double avgDailyFailure;

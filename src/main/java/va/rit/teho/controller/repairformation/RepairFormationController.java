@@ -1,6 +1,7 @@
 package va.rit.teho.controller.repairformation;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,6 +35,7 @@ public class RepairFormationController {
 
     @GetMapping("/formation/{formationId}/repair-formation")
     @ResponseBody
+    @ApiOperation(value = "Получить список Ремонтных Формирований, принадлежащих данному Формированию")
     public ResponseEntity<List<RepairFormationDTO>> listRepairFormationsInFormation(
             @ApiParam(value = "Ключ формирования", required = true) @PathVariable @Positive Long formationId) {
         return ResponseEntity.ok(repairFormationService
@@ -45,6 +47,7 @@ public class RepairFormationController {
 
     @GetMapping("/formation/repair-formation/grouped")
     @ResponseBody
+    @ApiOperation(value = "Получить список всех Ремонтных Формирований, сгруппированый по Формированиям, которым они принадлежат")
     public ResponseEntity<List<FormationDTO>> listRepairFormationsGroupedByFormation() {
         List<FormationDTO> formationDTOList = repairFormationService
                 .list()
@@ -62,6 +65,7 @@ public class RepairFormationController {
 
     @GetMapping("/formation/repair-formation")
     @ResponseBody
+    @ApiOperation(value = "Получить список всех Ремонтных Формирований")
     public ResponseEntity<List<RepairFormationDTO>> listRepairFormations() {
         List<RepairFormationDTO> repairFormationDTOList = repairFormationService
                 .list()
@@ -74,11 +78,13 @@ public class RepairFormationController {
 
     @GetMapping("/formation/repair-formation/{repairFormationId}")
     @ResponseBody
+    @ApiOperation(value = "Получить детали Ремонтного Формирования (название, тип, Формирование)")
     public ResponseEntity<RepairFormationDTO> getRepairFormationDetails(@PathVariable @Positive Long repairFormationId) {
         return ResponseEntity.ok(RepairFormationDTO.from(repairFormationService.get(repairFormationId), true));
     }
 
     @PostMapping(path = "/formation/{formationId}/repair-formation", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Добавить Ремонтное Формирование (обязательно: имя, id типа, id формирования)")
     public ResponseEntity<RepairFormationDTO> addRepairFormation(
             @ApiParam(value = "Ключ формирования", required = true) @PathVariable @Positive Long formationId,
             @Valid @RequestBody RepairFormationDTO repairFormationDTO) {
@@ -89,6 +95,7 @@ public class RepairFormationController {
     }
 
     @PutMapping(path = "/formation/{formationId}/repair-formation/{repairFormationId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Обновить Ремонтное Формирование")
     public ResponseEntity<RepairFormationDTO> updateRepairFormation(
             @ApiParam(value = "Ключ формирования", required = true) @PathVariable @Positive Long formationId,
             @ApiParam(value = "Ключ обновляемого ремонтного формирования", required = true) @PathVariable @Positive Long repairFormationId,
@@ -102,6 +109,7 @@ public class RepairFormationController {
 
     @DeleteMapping(path = "/formation/{formationId}/repair-formation/{repairFormationId}")
     @Transactional
+    @ApiOperation(value = "Удалить Ремонтное Формирование и все связанные сущности")
     public ResponseEntity<Object> deleteRepairFormation(
             @ApiParam(value = "Ключ формирования", required = true) @PathVariable @Positive Long formationId,
             @ApiParam(value = "Ключ обновляемого ремонтного формирования", required = true) @PathVariable @Positive Long repairFormationId) {

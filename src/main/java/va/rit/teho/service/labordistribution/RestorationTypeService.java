@@ -8,6 +8,8 @@ public interface RestorationTypeService {
 
     List<RestorationType> list();
 
+    RestorationType get(Long id);
+
     RestorationType add(String name, int weight);
 
     RestorationType update(Long id, String name, int weight);

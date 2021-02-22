@@ -3,10 +3,10 @@ package va.rit.teho.repository.equipment;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
-import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityPK;
+import va.rit.teho.entity.equipment.combined.EquipmentFailurePerRepairTypeAmount;
+import va.rit.teho.entity.equipment.combined.EquipmentPerFormationFailureIntensityAndLaborInput;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public interface EquipmentPerFormationFailureIntensityRepository
         extends CrudRepository<EquipmentPerFormationFailureIntensity, EquipmentPerFormationFailureIntensityPK> {
 
-    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensityAndLaborInput(epbfi.formation.id, epbfi.equipment.id, epbfi.stage.id, elipt.repairType.id, epbfi.intensityPercentage, epbfi.avgDailyFailure, elipt.amount) FROM " +
+    @Query("SELECT new va.rit.teho.entity.equipment.combined.EquipmentPerFormationFailureIntensityAndLaborInput(epbfi.formation.id, epbfi.equipment.id, epbfi.stage.id, elipt.repairType.id, epbfi.intensityPercentage, epbfi.avgDailyFailure, elipt.amount) FROM " +
             "EquipmentPerFormationFailureIntensity epbfi INNER JOIN EquipmentLaborInputPerType elipt ON elipt.repairType.id = epbfi.repairType.id AND epbfi.equipment.id = elipt.equipment.id " +
             "WHERE (coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds)) AND " +
             "(coalesce(:formationIds, null) IS NULL OR epbfi.formation.id IN (:formationIds)) AND " +
@@ -46,12 +46,12 @@ public interface EquipmentPerFormationFailureIntensityRepository
                                                          Long stageId,
                                                          Long repairTypeId);
 
-    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount(epffi.id.equipmentPerFormation, epffi.repairType, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
+    @Query("SELECT new va.rit.teho.entity.equipment.combined.EquipmentFailurePerRepairTypeAmount(epffi.id.equipmentPerFormation, epffi.repairType, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
             "WHERE epffi.tehoSession.id = :sessionId AND epffi.formation.id = :formationId " +
             "GROUP BY epffi.formation.id, epffi.equipment.id, epffi.repairType.id")
     List<EquipmentFailurePerRepairTypeAmount> listFailureDataPerRepairType(UUID sessionId, Long formationId);
 
-    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount(epffi.id.equipmentPerFormation, epffi.repairType, elipt.amount, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
+    @Query("SELECT new va.rit.teho.entity.equipment.combined.EquipmentFailurePerRepairTypeAmount(epffi.id.equipmentPerFormation, epffi.repairType, elipt.amount, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
             "LEFT OUTER JOIN EquipmentLaborInputPerType elipt ON epffi.equipment = elipt.equipment AND epffi.repairType = elipt.repairType " +
             "WHERE epffi.tehoSession.id = :sessionId AND " +
             "(coalesce(:formationIds, null) is null or epffi.formation.id IN (:formationIds)) AND " +

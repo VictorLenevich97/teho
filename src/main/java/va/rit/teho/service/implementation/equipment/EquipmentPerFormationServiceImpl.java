@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.*;
+import va.rit.teho.entity.equipment.combined.EquipmentPerFormationFailureIntensityAndLaborInput;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.NotFoundException;

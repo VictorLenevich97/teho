@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-java -cp /opt/TEHO/unpacked/BOOT-INF/classes:/opt/TEHO/unpacked/BOOT-INF/lib/* -Xms2G -noverify -Dspring.jmx.enabled=false -XX:TieredStopAtLevel=1 va.rit.teho.server.TehoApplication --spring.config.location=classpath:application.properties --spring.main.lazy-initialization=true &
+java -cp /opt/TEHO/unpacked/BOOT-INF/classes:/opt/TEHO/unpacked/BOOT-INF/lib/* -Xms2G -noverify -Dspring.jmx.enabled=false -XX:TieredStopAtLevel=1 -Dspring.profiles.active=production va.rit.teho.server.TehoApplication --spring.config.location=classpath:application.properties --spring.main.lazy-initialization=true &
 
 processId=$(ps -ef | grep 'va.rit.teho.server.TehoApplication' | grep -v 'grep' | awk '{ printf $2 }')
 

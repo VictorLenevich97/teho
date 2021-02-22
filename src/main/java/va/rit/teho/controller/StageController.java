@@ -1,5 +1,6 @@
 package va.rit.teho.controller;
 
+import io.swagger.annotations.Api;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @Controller
 @Validated
 @RequestMapping(path = "stage", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(tags = "Этапы операции")
 public class StageController {
 
     private final StageService stageService;

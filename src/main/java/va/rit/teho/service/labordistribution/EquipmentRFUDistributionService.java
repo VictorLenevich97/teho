@@ -1,7 +1,7 @@
 package va.rit.teho.service.labordistribution;
 
-import va.rit.teho.entity.labordistribution.EquipmentPerFormationDistributionData;
 import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
+import va.rit.teho.entity.labordistribution.combined.EquipmentPerFormationDistributionData;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 
 import java.util.List;
