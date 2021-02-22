@@ -322,7 +322,7 @@ public class EquipmentPerFormationController {
                                              rt.getShortName());
                 repairTypeColumns.add(repairTypeColumn);
             }
-            NestedColumnsDTO nestedColumnsDTO = new NestedColumnsDTO(s.getId().toString(), repairTypeColumns);
+            NestedColumnsDTO nestedColumnsDTO = new NestedColumnsDTO(s.getStageNum().toString(), repairTypeColumns);
             stageColumns.add(nestedColumnsDTO);
         }
 

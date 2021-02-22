@@ -202,7 +202,10 @@ public class RepairCapabilitiesController {
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) {
         List<Long> filteredEquipmentIds = nullIfEmpty(equipmentId);
         List<Long> filteredEquipmentTypeIds = nullIfEmpty(equipmentTypeId);
-        List<EquipmentType> equipmentTypes = equipmentTypeService.listHighestLevelTypes(filteredEquipmentTypeIds);
+        List<EquipmentType> equipmentTypes =
+                filteredEquipmentTypeIds == null ?
+                        equipmentTypeService.listHighestLevelTypes(null) :
+                        equipmentTypeService.listTypes(filteredEquipmentTypeIds);
         Map<EquipmentType, RepairFormationUnitEquipmentStaff> equipmentStaff =
                 repairFormationUnitService.getEquipmentStaffPerType(tehoSession.getSessionId(),
                                                                     repairFormationUnitId,
