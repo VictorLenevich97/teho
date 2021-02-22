@@ -1,5 +1,6 @@
-package va.rit.teho.entity.equipment;
+package va.rit.teho.entity.equipment.combined;
 
+import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.labordistribution.RestorationType;
 
 public class EquipmentPerRestorationTypeAmount {

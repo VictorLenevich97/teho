@@ -1,9 +1,12 @@
-package va.rit.teho.entity.equipment;
+package va.rit.teho.entity.equipment.combined;
 
 import va.rit.teho.entity.common.RepairType;
+import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentPerFormation;
 import va.rit.teho.entity.formation.Formation;
 
 public class EquipmentFailurePerRepairTypeAmount {
+
     private final EquipmentPerFormation equipmentPerFormation;
     private final RepairType repairType;
     private final Integer laborInput;

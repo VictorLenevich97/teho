@@ -1,26 +1,28 @@
-package va.rit.teho.entity.equipment;
+package va.rit.teho.entity.equipment.combined;
 
-public abstract class ExtendedEquipmentPerFormationFailureIntensity {
-
+public class EquipmentPerFormationFailureIntensityAndLaborInput {
     private final Long formationId;
     private final Long equipmentId;
     private final Long stageId;
     private final Long repairTypeId;
     private final int failureIntensity;
     private final Double avgDailyFailure;
+    private final int laborInput;
 
-    public ExtendedEquipmentPerFormationFailureIntensity(Long formationId,
-                                                         Long equipmentId,
-                                                         Long stageId,
-                                                         Long repairTypeId,
-                                                         int failureIntensity,
-                                                         Double avgDailyFailure) {
+    public EquipmentPerFormationFailureIntensityAndLaborInput(Long formationId,
+                                                              Long equipmentId,
+                                                              Long stageId,
+                                                              Long repairTypeId,
+                                                              int failureIntensity,
+                                                              Double avgDailyFailure,
+                                                              int laborInput) {
         this.formationId = formationId;
         this.equipmentId = equipmentId;
         this.stageId = stageId;
         this.repairTypeId = repairTypeId;
         this.failureIntensity = failureIntensity;
         this.avgDailyFailure = avgDailyFailure;
+        this.laborInput = laborInput;
     }
 
     public Double getAvgDailyFailure() {
@@ -46,4 +48,9 @@ public abstract class ExtendedEquipmentPerFormationFailureIntensity {
     public Long getRepairTypeId() {
         return repairTypeId;
     }
+
+    public int getLaborInput() {
+        return laborInput;
+    }
+
 }

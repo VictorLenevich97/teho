@@ -3,9 +3,9 @@ package va.rit.teho.service.implementation.report.labordistribution;
 import org.apache.poi.ss.usermodel.Sheet;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.EquipmentType;
-import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
-import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
+import va.rit.teho.entity.labordistribution.combined.EquipmentLaborInputDistribution;
+import va.rit.teho.entity.labordistribution.combined.LaborInputDistributionCombinedData;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
 

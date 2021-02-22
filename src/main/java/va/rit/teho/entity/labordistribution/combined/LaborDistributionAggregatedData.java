@@ -1,7 +1,8 @@
-package va.rit.teho.entity.labordistribution;
+package va.rit.teho.entity.labordistribution.combined;
 
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.formation.Formation;
+import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 
 import java.util.Objects;
 

@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.LaborDistribution;
-import va.rit.teho.entity.labordistribution.LaborDistributionAggregatedData;
-import va.rit.teho.entity.labordistribution.LaborDistributionData;
 import va.rit.teho.entity.labordistribution.LaborDistributionPK;
+import va.rit.teho.entity.labordistribution.combined.LaborDistributionAggregatedData;
+import va.rit.teho.entity.labordistribution.combined.LaborDistributionData;
 
 import java.util.*;
 
@@ -26,7 +26,7 @@ public interface LaborDistributionRepository
                                                           List<Long> formationIds,
                                                           List<Long> equipmentIds);
 
-    @Query("SELECT new va.rit.teho.entity.labordistribution.LaborDistributionData(ld.laborDistributionId.equipmentPerFormation, " +
+    @Query("SELECT new va.rit.teho.entity.labordistribution.combined.LaborDistributionData(ld.laborDistributionId.equipmentPerFormation, " +
             "ipt.amount, " +
             "ld.workhoursDistributionInterval.id, " +
             "ld.count, " +
@@ -62,7 +62,7 @@ public interface LaborDistributionRepository
         return result;
     }
 
-    @Query(value = "SELECT new va.rit.teho.entity.labordistribution.LaborDistributionAggregatedData(ld.equipment, ld.formation, ld.workhoursDistributionInterval, sum(ld.count), avg(ld.avgLaborInput)) " +
+    @Query(value = "SELECT new va.rit.teho.entity.labordistribution.combined.LaborDistributionAggregatedData(ld.equipment, ld.formation, ld.workhoursDistributionInterval, sum(ld.count), avg(ld.avgLaborInput)) " +
             "FROM LaborDistribution ld " +
             "WHERE ld.formation.id = :formationId AND ld.tehoSession.id = :sessionId AND (coalesce(:equipmentIds, null) is null or ld.equipment.id IN (:equipmentIds)) " +
             "GROUP BY ld.equipment, ld.formation, ld.workhoursDistributionInterval")

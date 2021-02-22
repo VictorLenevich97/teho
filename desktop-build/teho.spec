@@ -1,7 +1,7 @@
 %define __jar_repack %{nil}
 Name:       teho
-Version:    1.0
-Release:    3
+Version:    1.0.1
+Release:    1
 Summary:    TEHO Software
 License:    NONE
 AutoReqProv: no

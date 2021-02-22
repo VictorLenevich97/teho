@@ -1,8 +1,8 @@
 package va.rit.teho.service.labordistribution;
 
 import va.rit.teho.entity.equipment.EquipmentType;
-import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
-import va.rit.teho.entity.labordistribution.LaborDistributionAggregatedData;
+import va.rit.teho.entity.labordistribution.combined.EquipmentLaborInputDistribution;
+import va.rit.teho.entity.labordistribution.combined.LaborDistributionAggregatedData;
 
 import java.util.List;
 import java.util.Map;

@@ -2,8 +2,8 @@ package va.rit.teho.service.implementation.report.labordistribution;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
-import va.rit.teho.entity.labordistribution.EquipmentDistributionCombinedData;
-import va.rit.teho.entity.labordistribution.EquipmentPerFormationDistributionData;
+import va.rit.teho.entity.labordistribution.combined.EquipmentDistributionCombinedData;
+import va.rit.teho.entity.labordistribution.combined.EquipmentPerFormationDistributionData;
 import va.rit.teho.report.ReportCell;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;

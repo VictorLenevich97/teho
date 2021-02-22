@@ -3,10 +3,10 @@ package va.rit.teho.service.implementation.report.labordistribution;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.common.RepairType;
-import va.rit.teho.entity.labordistribution.CountAndLaborInput;
-import va.rit.teho.entity.labordistribution.CountAndLaborInputCombinedData;
-import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
-import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
+import va.rit.teho.entity.labordistribution.combined.CountAndLaborInput;
+import va.rit.teho.entity.labordistribution.combined.CountAndLaborInputCombinedData;
+import va.rit.teho.entity.labordistribution.combined.EquipmentLaborInputDistribution;
+import va.rit.teho.entity.labordistribution.combined.LaborInputDistributionCombinedData;
 import va.rit.teho.report.ReportCell;
 import va.rit.teho.report.ReportHeader;
 

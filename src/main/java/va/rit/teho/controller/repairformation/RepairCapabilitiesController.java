@@ -21,7 +21,7 @@ import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
-import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityCombinedData;
+import va.rit.teho.entity.repairformation.combined.RepairFormationUnitRepairCapabilityCombinedData;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.repairformation.RepairCapabilitiesService;

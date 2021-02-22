@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
-import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapabilityCombinedData;
+import va.rit.teho.entity.repairformation.combined.RepairFormationUnitRepairCapabilityCombinedData;
 import va.rit.teho.report.ReportCell;
 import va.rit.teho.report.ReportHeader;
 import va.rit.teho.service.implementation.report.AbstractExcelReportService;
