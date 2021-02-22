@@ -60,6 +60,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.200</version>
@@ -68,14 +74,14 @@
         <!-- XLS generation-->
         <dependency>
             <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>4.1.2</version>
+            <artifactId>poi-ooxml-lite</artifactId>
+            <version>5.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>4.1.2</version>
+            <artifactId>poi</artifactId>
+            <version>5.0.0</version>
         </dependency>
 
         <!-- Swagger -->
@@ -83,7 +89,9 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
             <version>3.0.0</version>
+            <scope>provided</scope>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -92,12 +100,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>io.springfox</groupId>
-                            <artifactId>springfox-boot-starter</artifactId>
-                        </exclude>
-                    </excludes>
+                    <excludeGroupIds>io.springfox</excludeGroupIds>
                 </configuration>
             </plugin>
             <plugin>
