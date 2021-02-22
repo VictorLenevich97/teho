@@ -10,14 +10,21 @@ public class RepairFormationUnitRepairCapabilityCombinedData {
 
     private final List<RepairFormationUnit> repairFormationUnitList;
     private final List<EquipmentType> equipmentTypes;
+    private final List<Long> equipmentIds;
     private final Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities;
 
     public RepairFormationUnitRepairCapabilityCombinedData(List<RepairFormationUnit> repairFormationUnitList,
                                                            List<EquipmentType> equipmentTypes,
+                                                           List<Long> equipmentIds,
                                                            Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities) {
         this.repairFormationUnitList = repairFormationUnitList;
         this.equipmentTypes = equipmentTypes;
+        this.equipmentIds = equipmentIds;
         this.calculatedRepairCapabilities = calculatedRepairCapabilities;
+    }
+
+    public List<Long> getEquipmentIds() {
+        return equipmentIds;
     }
 
     public List<RepairFormationUnit> getRepairFormationUnitList() {

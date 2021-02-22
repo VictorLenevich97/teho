@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class CountAndLaborInput {
 
+    public static final CountAndLaborInput EMPTY = new CountAndLaborInput(0.0, 0.0);
+
     private final double count;
     private final double laborInput;
 

@@ -46,8 +46,18 @@ public interface EquipmentPerFormationFailureIntensityRepository
                                                          Long stageId,
                                                          Long repairTypeId);
 
-    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount(epffi.equipment, epffi.repairType, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
+    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount(epffi.id.equipmentPerFormation, epffi.repairType, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
             "WHERE epffi.tehoSession.id = :sessionId AND epffi.formation.id = :formationId " +
-            "GROUP BY epffi.tehoSession.id, epffi.equipment.id, epffi.repairType.id")
+            "GROUP BY epffi.formation.id, epffi.equipment.id, epffi.repairType.id")
     List<EquipmentFailurePerRepairTypeAmount> listFailureDataPerRepairType(UUID sessionId, Long formationId);
+
+    @Query("SELECT new va.rit.teho.entity.equipment.EquipmentFailurePerRepairTypeAmount(epffi.id.equipmentPerFormation, epffi.repairType, elipt.amount, SUM(epffi.avgDailyFailure)) FROM EquipmentPerFormationFailureIntensity epffi " +
+            "LEFT OUTER JOIN EquipmentLaborInputPerType elipt ON epffi.equipment = elipt.equipment AND epffi.repairType = elipt.repairType " +
+            "WHERE epffi.tehoSession.id = :sessionId AND " +
+            "(coalesce(:formationIds, null) is null or epffi.formation.id IN (:formationIds)) AND " +
+            "(coalesce(:equipmentIds, null) is null or epffi.equipment.id IN (:equipmentIds)) " +
+            "GROUP BY epffi.formation.id, epffi.equipment.id, epffi.repairType.id, elipt.amount")
+    List<EquipmentFailurePerRepairTypeAmount> listFailureDataWithLaborInputPerRepairType(UUID sessionId,
+                                                                                         List<Long> formationIds,
+                                                                                         List<Long> equipmentIds);
 }

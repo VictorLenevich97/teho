@@ -64,7 +64,11 @@ public class EquipmentServiceImpl implements EquipmentService {
                                                                          PageRequest.of(pageNum - 1, pageSize));
 
         Map<RepairType, Integer> defaultLaborInputData =
-                repairTypeService.list(true).stream().collect(Collectors.toMap(rt -> rt, rt -> 0));
+                repairTypeService
+                        .list(true)
+                        .stream()
+                        .filter(RepairType::isRepairable)
+                        .collect(Collectors.toMap(rt -> rt, rt -> 0));
 
         return equipmentList
                 .stream()

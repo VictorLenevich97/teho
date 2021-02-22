@@ -26,7 +26,7 @@
     </logger>
 
     <root level="info">
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="CONSOLE"/>
     </root>
 
 </configuration>

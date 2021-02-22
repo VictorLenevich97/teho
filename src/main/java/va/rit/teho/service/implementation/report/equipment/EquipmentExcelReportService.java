@@ -28,7 +28,8 @@ public class EquipmentExcelReportService
     @Override
     protected List<ReportHeader> buildHeader(Collection<EquipmentType> data) {
         List<ReportHeader> result = new ArrayList<>(Arrays.asList(header("Тип ВВСТ, марка техники"), header("Вид")));
-        List<RepairType> repairTypes = repairTypeService.list(true);
+        List<RepairType> repairTypes = repairTypeService.list(true).stream().filter(RepairType::isRepairable).collect(
+                Collectors.toList());
         ReportHeader repairTypeReportHeader = header("Вид ремонта");
         repairTypes.forEach(repairType -> repairTypeReportHeader.addSubHeader(header(repairType.getFullName())));
 
@@ -40,7 +41,8 @@ public class EquipmentExcelReportService
     protected int writeData(Collection<EquipmentType> data,
                             Sheet sheet,
                             int lastRowIndex) {
-        List<RepairType> repairTypes = repairTypeService.list(true);
+        List<RepairType> repairTypes = repairTypeService.list(true).stream().filter(RepairType::isRepairable).collect(
+                Collectors.toList());
         for (EquipmentType equipmentType : data) {
             if (equipmentType.getParentType() == null || !equipmentType.getEquipmentTypes().isEmpty()) {
                 createRowWideCell(sheet,
@@ -61,9 +63,10 @@ public class EquipmentExcelReportService
     }
 
     @Override
-    protected List<ReportCell> populatedRowCells(Collection<EquipmentType> data,
-                                                 Equipment equipment) {
-        List<RepairType> repairTypes = repairTypeService.list(true);
+    protected List<ReportCell> populateRowCells(Collection<EquipmentType> data,
+                                                Equipment equipment) {
+        List<RepairType> repairTypes = repairTypeService.list(true).stream().filter(RepairType::isRepairable).collect(
+                Collectors.toList());
         List<ReportCell> reportCells =
                 new ArrayList<>(Arrays.asList(
                         new ReportCell(equipment.getName(), ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),

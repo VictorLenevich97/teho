@@ -3,6 +3,7 @@ package va.rit.teho.controller.labordistribution;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,11 +18,11 @@ import va.rit.teho.dto.labordistribution.LaborDistributionNestedColumnsDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
+import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.EquipmentType;
-import va.rit.teho.entity.labordistribution.EquipmentLaborInputDistribution;
-import va.rit.teho.entity.labordistribution.LaborInputDistributionCombinedData;
-import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
+import va.rit.teho.entity.labordistribution.*;
 import va.rit.teho.server.config.TehoSessionData;
+import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.report.ReportService;
@@ -30,9 +31,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.io.UnsupportedEncodingException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
@@ -45,18 +44,24 @@ public class LaborInputDistributionController {
 
     private final EquipmentTypeService equipmentTypeService;
     private final LaborInputDistributionService laborInputDistributionService;
+    private final RepairTypeService repairTypeService;
 
     private final ReportService<LaborInputDistributionCombinedData> reportService;
+    private final ReportService<LaborInputDistributionCombinedData> distributionForAllRepairTypesReportService;
 
     @Resource
     private TehoSessionData tehoSession;
 
     public LaborInputDistributionController(EquipmentTypeService equipmentTypeService,
                                             LaborInputDistributionService laborInputDistributionService,
-                                            ReportService<LaborInputDistributionCombinedData> reportService) {
+                                            RepairTypeService repairTypeService,
+                                            @Qualifier("oneRepairType") ReportService<LaborInputDistributionCombinedData> reportService,
+                                            @Qualifier("allRepairTypes") ReportService<LaborInputDistributionCombinedData> distributionForAllRepairTypesReportService) {
         this.equipmentTypeService = equipmentTypeService;
         this.laborInputDistributionService = laborInputDistributionService;
+        this.repairTypeService = repairTypeService;
         this.reportService = reportService;
+        this.distributionForAllRepairTypesReportService = distributionForAllRepairTypesReportService;
     }
 
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}/report")
@@ -78,6 +83,7 @@ public class LaborInputDistributionController {
 
         byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(
                 equipmentTypeService.listHighestLevelTypes(equipmentTypeId),
+                Collections.emptyList(),
                 laborInputDistribution,
                 distributionIntervals));
 
@@ -104,9 +110,10 @@ public class LaborInputDistributionController {
                                                      Comparator.nullsFirst(Comparator.naturalOrder())))
                         .map(wdi -> new LaborDistributionNestedColumnsDTO(wdi.getId(),
                                                                           wdi.getLowerBound(),
-                                                                          wdi.getUpperBound()))
+                                                                          wdi.getUpperBound(),
+                                                                          true))
                         .collect(Collectors.toList());
-        List<LaborDistributionRowData> rows =
+        List<LaborDistributionRowData<CountAndLaborInputDTO>> rows =
                 laborInputDistribution
                         .entrySet()
                         .stream()
@@ -116,24 +123,101 @@ public class LaborInputDistributionController {
         return ResponseEntity.ok(new TableDataDTO<>(columns, rows));
     }
 
-    private LaborDistributionRowData getLaborDistributionRowData(EquipmentLaborInputDistribution elid) {
-        Map<String, CountAndLaborInputDTO> countAndLaborInputDTOMap =
-                elid
-                        .getIntervalCountAndLaborInputMap()
+    @GetMapping
+    @ResponseBody
+    @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта по всем типам ремонта (в табличном формате)")
+    public ResponseEntity<TableDataDTO<Map<String, String>>> getDistributionDataForAllRepairTypes(@RequestParam(value = "formationId", required = false) List<Long> formationIds,
+                                                                                                  @RequestParam(value = "equipmentId", required = false) List<Long> equipmentIds) {
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> aggregatedLaborInputDistribution =
+                laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId(),
+                                                                                  nullIfEmpty(formationIds),
+                                                                                  nullIfEmpty(equipmentIds));
+        List<RepairType> repairTypes = repairTypeService.list(true);
+        repairTypes.sort(Comparator.comparing(RepairType::getShortName).reversed());
+        List<NestedColumnsDTO> columns =
+                repairTypes
+                        .stream()
+                        .map(this::buildDistributionNestedColumnsPerRepairType)
+                        .collect(Collectors.toList());
+        List<LaborDistributionRowData<String>> rows =
+                aggregatedLaborInputDistribution
                         .entrySet()
                         .stream()
+                        .flatMap(rd -> rd.getValue().stream().map(v -> buildRowDataPerRepairTypes(v, repairTypes)))
+                        .collect(Collectors.toList());
+        return ResponseEntity.ok(new TableDataDTO<>(columns, rows));
+    }
+
+    @GetMapping("/report")
+    @ResponseBody
+    @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта по всем типам ремонта (в табличном формате)")
+    @Transactional
+    public ResponseEntity<byte[]> getDistributionDataForAllRepairTypesReport(@RequestParam(required = false) List<Long> formationIds,
+                                                                             @RequestParam(required = false) List<Long> equipmentIds) throws
+            UnsupportedEncodingException {
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> aggregatedLaborInputDistribution =
+                laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId(),
+                                                                                  nullIfEmpty(formationIds),
+                                                                                  nullIfEmpty(equipmentIds));
+        List<RepairType> repairTypes = repairTypeService.list(true);
+
+        byte[] bytes = distributionForAllRepairTypesReportService.generateReport(new LaborInputDistributionCombinedData(
+                equipmentTypeService.listHighestLevelTypes(null),
+                repairTypes,
+                aggregatedLaborInputDistribution,
+                laborInputDistributionService.listDistributionIntervals()));
+
+        return ReportResponseEntity.ok("Распределение производственного фонда (по всем типам ремонта)", bytes);
+    }
+
+    private NestedColumnsDTO buildDistributionNestedColumnsPerRepairType(RepairType rt) {
+        List<NestedColumnsDTO> intervalColumns =
+                laborInputDistributionService
+                        .listDistributionIntervals()
+                        .stream()
+                        .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
+                                                     Comparator.nullsFirst(Comparator.naturalOrder())))
+                        .map(wdi -> new LaborDistributionNestedColumnsDTO(buildCombinedKey(rt,
+                                                                                           wdi.getId()),
+                                                                          wdi.getLowerBound(),
+                                                                          wdi.getUpperBound(),
+                                                                          false))
+                        .collect(Collectors.toList());
+        if (rt.includesIntervals()) {
+            return new NestedColumnsDTO(rt.getShortName(), intervalColumns);
+        } else {
+            return new NestedColumnsDTO("rt_" + rt.getId(), rt.getShortName());
+        }
+    }
+
+    private String buildCombinedKey(RepairType rt, Long wdiId) {
+        return "rt_" + rt.getId() + "_i_" + wdiId;
+    }
+
+    private LaborDistributionRowData<CountAndLaborInputDTO> getLaborDistributionRowData(EquipmentLaborInputDistribution elid) {
+        Map<String, CountAndLaborInputDTO> countAndLaborInputDTOMap =
+                elid
+                        .getCountAndLaborInputCombinedData()
+                        .entrySet()
+                        .stream()
+                        .flatMap(repairTypeCountAndLaborInputCombinedDataEntry -> repairTypeCountAndLaborInputCombinedDataEntry
+                                .getValue()
+                                .getCountAndLaborInputMap()
+                                .entrySet()
+                                .stream())
                         .collect(Collectors.toMap(e -> e.getKey().toString(),
                                                   e -> new CountAndLaborInputDTO(
                                                           Formatter.formatDoubleAsString(e.getValue().getCount()),
                                                           Formatter.formatDoubleAsString(e
                                                                                                  .getValue()
                                                                                                  .getLaborInput()))));
-        return new LaborDistributionRowData(elid.getFormationName(),
-                                            countAndLaborInputDTOMap,
-                                            elid.getEquipmentName(),
-                                            Formatter.formatDoubleAsString(elid.getAvgDailyFailure()),
-                                            elid.getStandardLaborInput(),
-                                            Formatter.formatDoubleAsString(elid.getTotalRepairComplexity()));
+        return new LaborDistributionRowData<>(elid.getFormationName(),
+                                              countAndLaborInputDTOMap,
+                                              elid.getEquipmentName(),
+                                              elid.getEquipmentAmount(),
+                                              Formatter.formatDoubleAsString(elid.getAvgDailyFailure()),
+                                              elid.getStandardLaborInput(),
+                                              Formatter.formatDoubleAsString(elid.getTotalRepairComplexity()));
     }
 
     @PostMapping
@@ -145,4 +229,34 @@ public class LaborInputDistributionController {
         return ResponseEntity.accepted().build();
     }
 
+    private LaborDistributionRowData<String> buildRowDataPerRepairTypes(EquipmentLaborInputDistribution elid,
+                                                                        List<RepairType> repairTypes) {
+        Map<String, String> countMap = new HashMap<>();
+        repairTypes.forEach(repairType -> {
+            CountAndLaborInputCombinedData countAndLaborInputCombinedData = elid
+                    .getCountAndLaborInputCombinedData()
+                    .getOrDefault(repairType, CountAndLaborInputCombinedData.EMPTY);
+            Map<Long, CountAndLaborInput> countAndLaborInputMap = countAndLaborInputCombinedData
+                    .getCountAndLaborInputMap();
+            if (!countAndLaborInputMap.isEmpty()) {
+                countAndLaborInputMap
+                        .forEach((key, countAndLaborInput) -> countMap.put(
+                                buildCombinedKey(repairType, key),
+                                Formatter.formatDoubleAsString(
+                                        countAndLaborInput.getCount())));
+            }
+            countMap.put("rt_" + repairType.getId(),
+                         Formatter.formatDoubleAsString(countAndLaborInputCombinedData.getTotalFailureAmount()));
+        });
+        return new LaborDistributionRowData<>(
+                elid.getFormationName(),
+                countMap,
+                elid.getEquipmentName(),
+                elid.getEquipmentAmount(),
+                Formatter.formatDoubleAsString(
+                        elid.getAvgDailyFailure()),
+                elid.getStandardLaborInput(),
+                Formatter.formatDoubleAsString(
+                        elid.getTotalRepairComplexity()));
+    }
 }

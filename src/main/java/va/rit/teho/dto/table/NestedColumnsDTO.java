@@ -41,4 +41,8 @@ public class NestedColumnsDTO {
     public List<NestedColumnsDTO> getColumns() {
         return columns;
     }
+
+    public void setKey(Object key) {
+        this.key = key;
+    }
 }

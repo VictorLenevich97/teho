@@ -15,6 +15,7 @@ import va.rit.teho.dto.equipment.EquipmentDTO;
 import va.rit.teho.dto.equipment.EquipmentLaborInputPerTypeRowData;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.dto.table.TableDataDTO;
+import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.service.common.RepairTypeService;
@@ -132,6 +133,7 @@ public class EquipmentController {
         List<NestedColumnsDTO> columns =
                 repairTypeService.list(true)
                                  .stream()
+                                 .filter(RepairType::isRepairable)
                                  .map(rt -> new NestedColumnsDTO(rt.getId().toString(), rt.getFullName()))
                                  .collect(Collectors.toList());
         List<EquipmentLaborInputPerTypeRowData> data =

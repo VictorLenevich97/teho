@@ -18,20 +18,38 @@ public class RepairType implements Serializable {
 
     private boolean calculatable;
 
-    public RepairType(String fullName, String shortName, boolean calculatable) {
+    @Column(updatable = false)
+    private boolean repairable;
+
+    private boolean includesIntervals;
+
+    public RepairType(String fullName,
+                      String shortName,
+                      boolean calculatable,
+                      boolean repairable,
+                      boolean includesIntervals) {
         this.fullName = fullName;
         this.shortName = shortName;
         this.calculatable = calculatable;
+        this.repairable = repairable;
+        this.includesIntervals = includesIntervals;
     }
 
     public RepairType() {
     }
 
-    public RepairType(Long id, String fullName, String shortName, boolean calculatable) {
+    public RepairType(Long id,
+                      String fullName,
+                      String shortName,
+                      boolean calculatable,
+                      boolean repairable,
+                      boolean includesIntervals) {
         this.id = id;
         this.fullName = fullName;
         this.shortName = shortName;
         this.calculatable = calculatable;
+        this.repairable = repairable;
+        this.includesIntervals = includesIntervals;
     }
 
     public RepairType(Long id) {
@@ -60,6 +78,14 @@ public class RepairType implements Serializable {
 
     public String getShortName() {
         return shortName;
+    }
+
+    public boolean isRepairable() {
+        return repairable;
+    }
+
+    public boolean includesIntervals() {
+        return includesIntervals;
     }
 
     @Override

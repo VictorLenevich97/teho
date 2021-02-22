@@ -19,7 +19,7 @@ public class RepairTypeServiceImplTest {
 
     @Test
     public void testList() {
-        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true));
+        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true, false, false));
 
         when(repairTypeRepository.findAll()).thenReturn(repairTypeList);
 
@@ -28,7 +28,7 @@ public class RepairTypeServiceImplTest {
 
     @Test
     public void testListRepairableTrue() {
-        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true));
+        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true, false, false));
 
         when(repairTypeRepository.findAllByCalculatable(true)).thenReturn(repairTypeList);
 
@@ -37,7 +37,7 @@ public class RepairTypeServiceImplTest {
 
     @Test
     public void testListRepairableFalse() {
-        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true));
+        List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true, false, false));
 
         when(repairTypeRepository.findAllByCalculatable(false)).thenReturn(repairTypeList);
 

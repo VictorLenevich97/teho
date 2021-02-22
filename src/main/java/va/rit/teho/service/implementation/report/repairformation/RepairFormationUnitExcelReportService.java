@@ -21,7 +21,7 @@ public class RepairFormationUnitExcelReportService
         extends AbstractExcelReportService<RepairFormationUnitCombinedData, RepairFormationUnit> {
 
     @Override
-    protected List<ReportCell> populatedRowCells(RepairFormationUnitCombinedData data, RepairFormationUnit rfu) {
+    protected List<ReportCell> populateRowCells(RepairFormationUnitCombinedData data, RepairFormationUnit rfu) {
         List<ReportCell> populateCellFunctions =
                 new ArrayList<>(Arrays.asList(
                         new ReportCell(rfu.getName(), ReportCell.CellType.TEXT, HorizontalAlignment.LEFT),

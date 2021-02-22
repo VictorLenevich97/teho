@@ -3,6 +3,7 @@ package va.rit.teho.controller.repairformation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -124,16 +125,21 @@ public class RepairCapabilitiesController {
                                                  repairFormationUnitRepairCapability.getCapability()));
     }
 
-    private Stream<NestedColumnsDTO> getRepairCapabilitiesNestedColumnsDTO(EquipmentType equipmentType) {
+    private Stream<NestedColumnsDTO> getRepairCapabilitiesNestedColumnsDTO(EquipmentType equipmentType,
+                                                                           List<Long> equipmentIds) {
         Set<EquipmentType> subTypes = equipmentType.getEquipmentTypes();
-        Set<Equipment> equipmentSet = equipmentType.getEquipmentSet();
+        Set<Equipment> equipmentSet = equipmentType
+                .getEquipmentSet()
+                .stream()
+                .filter(e -> CollectionUtils.isEmpty(equipmentIds) || equipmentIds.contains(e.getId()))
+                .collect(Collectors.toSet());
         if (subTypes.isEmpty() && equipmentSet.isEmpty()) {
             return Stream.empty();
         } else {
             Stream<NestedColumnsDTO> equipmentSubColumns =
                     equipmentSet.stream().map(e -> new NestedColumnsDTO(e.getId().toString(), e.getName()));
             Stream<NestedColumnsDTO> subTypesColumns =
-                    subTypes.stream().flatMap(this::getRepairCapabilitiesNestedColumnsDTO);
+                    subTypes.stream().flatMap(st -> getRepairCapabilitiesNestedColumnsDTO(st, equipmentIds));
             return Stream.of(new NestedColumnsDTO(equipmentType.getShortName(),
                                                   Stream
                                                           .concat(equipmentSubColumns, subTypesColumns)
@@ -144,25 +150,29 @@ public class RepairCapabilitiesController {
     private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(RepairFormationUnitRepairCapabilityCombinedData combinedData,
                                                                          long rowCount,
                                                                          int pageSize) {
-        List<Equipment> columns =
+        List<NestedColumnsDTO> equipmentPerTypeNestedColumns =
                 combinedData.getEquipmentTypes()
                             .stream()
-                            .flatMap(EquipmentType::collectRelatedEquipment)
+                            .flatMap(et -> getRepairCapabilitiesNestedColumnsDTO(et, combinedData.getEquipmentIds()))
                             .collect(Collectors.toList());
-        List<NestedColumnsDTO> equipmentPerTypeDTOList =
+
+        List<Equipment> filteredEquipmentList =
                 combinedData.getEquipmentTypes()
                             .stream()
-                            .flatMap(this::getRepairCapabilitiesNestedColumnsDTO)
+                            .flatMap(et -> CollectionUtils.isEmpty(combinedData.getEquipmentIds()) ?
+                                    et.collectRelatedEquipment() :
+                                    et.collectRelatedEquipment(combinedData.getEquipmentIds()))
                             .collect(Collectors.toList());
+
         List<RowData<Map<String, String>>> data =
                 combinedData.getRepairFormationUnitList()
                             .stream()
                             .map(rs -> getRepairCapabilitiesRow(combinedData.getCalculatedRepairCapabilities(),
-                                                                columns,
+                                                                filteredEquipmentList,
                                                                 rs))
                             .collect(Collectors.toList());
         Long totalPageNum = (pageSize == 0 ? 1 : rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1));
-        return new TableDataDTO<>(equipmentPerTypeDTOList, data, totalPageNum);
+        return new TableDataDTO<>(equipmentPerTypeNestedColumns, data, totalPageNum);
     }
 
     private RowData<Map<String, String>> getRepairCapabilitiesRow(
@@ -300,15 +310,20 @@ public class RepairCapabilitiesController {
                 nullIfEmpty(repairFormationUnitId),
                 pageNum,
                 pageSize);
+        List<Long> equipmentTypeIdsFilter = nullIfEmpty(equipmentTypeId);
         Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities =
                 repairCapabilitiesService.getCalculatedRepairCapabilities(tehoSession.getSessionId(),
                                                                           repairTypeId,
                                                                           nullIfEmpty(repairFormationUnitId),
                                                                           nullIfEmpty(equipmentId),
-                                                                          nullIfEmpty(equipmentTypeId));
+                                                                          equipmentTypeIdsFilter);
         return new RepairFormationUnitRepairCapabilityCombinedData(
                 repairFormationUnitList,
-                equipmentTypeService.listHighestLevelTypes(equipmentTypeId),
+                Optional
+                        .ofNullable(equipmentTypeIdsFilter)
+                        .map(equipmentTypeService::listTypes)
+                        .orElse(equipmentTypeService.listHighestLevelTypes(null)),
+                equipmentId,
                 calculatedRepairCapabilities);
     }
 

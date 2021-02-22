@@ -35,11 +35,15 @@ public class RepairTypeController {
     @ResponseBody
     public ResponseEntity<List<RepairTypeDTO>> listRepairTypes(
             @ApiParam(value = "Фильтр по индикатору, определяющему используется ли тип ремонта в расчетах. В случае, когда параметр не указан, возвращаются все типы ремонта.",
+                    example = "true") @RequestParam(required = false) Boolean calculatable,
+            @ApiParam(value = "Фильтр по индикатору, определяющему ремонтнопригодность.",
                     example = "true") @RequestParam(required = false) Boolean repairable) {
         List<RepairType> types =
-                Optional.ofNullable(repairable).map(repairTypeService::list).orElse(repairTypeService.list());
+                Optional.ofNullable(calculatable).map(repairTypeService::list).orElse(repairTypeService.list());
+
         return ResponseEntity.ok(types
                                          .stream()
+                                         .filter(rt -> repairable == null || (rt.isRepairable() == repairable))
                                          .map(RepairTypeDTO::from)
                                          .sorted(Comparator.comparing(RepairTypeDTO::getId))
                                          .collect(Collectors.toList()));

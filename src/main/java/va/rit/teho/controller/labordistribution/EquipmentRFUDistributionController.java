@@ -4,18 +4,18 @@ import io.swagger.annotations.Api;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.ReportResponseEntity;
-import va.rit.teho.dto.labordistribution.EquipmentDistributionRowData;
-import va.rit.teho.dto.labordistribution.EquipmentDistributionTableDataDTO;
-import va.rit.teho.dto.labordistribution.EquipmentRFUDistributionDTO;
-import va.rit.teho.dto.labordistribution.LaborDistributionFilterData;
+import va.rit.teho.dto.labordistribution.*;
 import va.rit.teho.dto.table.NestedColumnsDTO;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.labordistribution.EquipmentDistributionCombinedData;
 import va.rit.teho.entity.labordistribution.EquipmentPerFormationDistributionData;
+import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
 import va.rit.teho.entity.labordistribution.RestorationType;
+import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
@@ -43,6 +43,7 @@ public class EquipmentRFUDistributionController {
     private final RepairTypeService repairTypeService;
     private final RestorationTypeService restorationTypeService;
 
+    private final ReportService<Map<RepairFormationUnit, List<EquipmentRFUDistribution>>> distributionPerRFUReportService;
     private final ReportService<EquipmentDistributionCombinedData> distributionReportService;
 
     @Resource
@@ -51,10 +52,12 @@ public class EquipmentRFUDistributionController {
     public EquipmentRFUDistributionController(EquipmentRFUDistributionService equipmentRFUDistributionService,
                                               RepairTypeService repairTypeService,
                                               RestorationTypeService restorationTypeService,
+                                              ReportService<Map<RepairFormationUnit, List<EquipmentRFUDistribution>>> distributionPerRFUReportService,
                                               ReportService<EquipmentDistributionCombinedData> distributionReportService) {
         this.equipmentRFUDistributionService = equipmentRFUDistributionService;
         this.repairTypeService = repairTypeService;
         this.restorationTypeService = restorationTypeService;
+        this.distributionPerRFUReportService = distributionPerRFUReportService;
         this.distributionReportService = distributionReportService;
     }
 
@@ -75,6 +78,34 @@ public class EquipmentRFUDistributionController {
                 .map(EquipmentRFUDistributionDTO::from)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(equipmentRFUDistributionDTOList);
+    }
+
+    @GetMapping("/repair-formation/unit/equipment")
+    @Transactional
+    public ResponseEntity<List<AggregatedEquipmentRFUDistributionDTO>> getDistributionEquipmentForAllRFU() {
+        Map<RepairFormationUnit, List<EquipmentRFUDistribution>> repairFormationUnitDistributionData =
+                equipmentRFUDistributionService.listDistributedEquipment(tehoSession.getSessionId());
+        List<AggregatedEquipmentRFUDistributionDTO> result = repairFormationUnitDistributionData
+                .entrySet()
+                .stream()
+                .map(repairFormationUnitListEntry ->
+                             new AggregatedEquipmentRFUDistributionDTO(repairFormationUnitListEntry.getKey().getName(),
+                                                                       repairFormationUnitListEntry
+                                                                               .getValue()
+                                                                               .stream()
+                                                                               .map(EquipmentRFUDistributionDTO::from)
+                                                                               .collect(Collectors.toList())))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/repair-formation/unit/equipment/report")
+    public ResponseEntity<byte[]> getDistributedEquipmentForAllRFUReport() throws
+            UnsupportedEncodingException {
+        Map<RepairFormationUnit, List<EquipmentRFUDistribution>> repairFormationUnitDistributionData =
+                equipmentRFUDistributionService.listDistributedEquipment(tehoSession.getSessionId());
+        byte[] bytes = distributionPerRFUReportService.generateReport(repairFormationUnitDistributionData);
+        return ReportResponseEntity.ok("Распределение вышедшего из строя ВВСТ по РВО", bytes);
     }
 
 
@@ -123,7 +154,7 @@ public class EquipmentRFUDistributionController {
     }
 
     @GetMapping("/{formationId}/distribution/report")
-    public ResponseEntity<byte[]> getEquipmentDistributionReport(@PathVariable @Positive Long formationId) throws
+    public ResponseEntity<byte[]> getEquipmentDistributionPerFormationReport(@PathVariable @Positive Long formationId) throws
             UnsupportedEncodingException {
         List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData =
                 equipmentRFUDistributionService.listDistributionDataForFormation(tehoSession.getSessionId(),

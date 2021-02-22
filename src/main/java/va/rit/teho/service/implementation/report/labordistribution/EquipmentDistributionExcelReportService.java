@@ -18,7 +18,7 @@ public class EquipmentDistributionExcelReportService
         extends AbstractExcelReportService<EquipmentDistributionCombinedData, EquipmentPerFormationDistributionData> {
 
     @Override
-    protected List<ReportCell> populatedRowCells(
+    protected List<ReportCell> populateRowCells(
             EquipmentDistributionCombinedData data,
             EquipmentPerFormationDistributionData epfdd) {
         ReportCell eqNameCell = new ReportCell(epfdd.getEquipment().getName());

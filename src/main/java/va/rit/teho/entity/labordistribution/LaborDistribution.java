@@ -61,6 +61,26 @@ public class LaborDistribution {
         this.avgLaborInput = avgLaborInput;
     }
 
+    public LaborDistribution(LaborDistributionPK laborDistributionId,
+                             Formation formation,
+                             Equipment equipment,
+                             WorkhoursDistributionInterval workhoursDistributionInterval,
+                             RepairType repairType,
+                             double count,
+                             double avgLaborInput) {
+        this.laborDistributionId = laborDistributionId;
+        this.formation = formation;
+        this.equipment = equipment;
+        this.workhoursDistributionInterval = workhoursDistributionInterval;
+        this.repairType = repairType;
+        this.count = count;
+        this.avgLaborInput = avgLaborInput;
+    }
+
+    public RepairType getRepairType() {
+        return repairType;
+    }
+
     public double getCount() {
         return count;
     }

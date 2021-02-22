@@ -51,7 +51,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
 
             double calculatedCapability =
                     calculationService.calculateRepairCapabilities(
-                            rsec.getTotalStaff() * rsec.getRepairFormationUnit().getStationAmount(),
+                            rsec.getTotalStaff(),
                             rsec
                                     .getRepairFormationUnit()
                                     .getRepairFormation()

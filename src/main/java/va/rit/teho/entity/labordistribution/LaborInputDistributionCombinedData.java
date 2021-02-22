@@ -1,5 +1,6 @@
 package va.rit.teho.entity.labordistribution;
 
+import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.EquipmentType;
 
 import java.util.List;
@@ -8,15 +9,22 @@ import java.util.Map;
 public class LaborInputDistributionCombinedData {
 
     private final List<EquipmentType> equipmentTypes;
+    private final List<RepairType> repairTypes;
     private final List<WorkhoursDistributionInterval> workhoursDistributionIntervals;
     private final Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution;
 
     public LaborInputDistributionCombinedData(List<EquipmentType> equipmentTypes,
+                                              List<RepairType> repairTypes,
                                               Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution,
                                               List<WorkhoursDistributionInterval> workhoursDistributionIntervals) {
         this.equipmentTypes = equipmentTypes;
+        this.repairTypes = repairTypes;
         this.laborInputDistribution = laborInputDistribution;
         this.workhoursDistributionIntervals = workhoursDistributionIntervals;
+    }
+
+    public List<RepairType> getRepairTypes() {
+        return repairTypes;
     }
 
     public List<EquipmentType> getEquipmentTypes() {
