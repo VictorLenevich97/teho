@@ -7,14 +7,15 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.repository.config.BootstrapMode;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 @SpringBootApplication
-@ComponentScan("va.rit.teho.controller")
-@ComponentScan("va.rit.teho.service")
+@ComponentScan(value = "va.rit.teho.controller", lazyInit = true)
+@ComponentScan(value = "va.rit.teho.service", lazyInit = true)
 @ConfigurationPropertiesScan("va.rit.teho.server.config")
 @EntityScan("va.rit.teho.entity")
-@EnableJpaRepositories("va.rit.teho.repository")
+@EnableJpaRepositories(value = "va.rit.teho.repository", bootstrapMode = BootstrapMode.LAZY)
 public class TehoApplication {
 
     public static void main(String[] args) {
@@ -25,4 +26,5 @@ public class TehoApplication {
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
     }
+
 }

@@ -77,7 +77,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                                           stageId,
                                                                           repairTypeId,
                                                                           intensity,
-                                                                          null));
+                                                                          0.0));
 
         equipmentPerFormationFailureIntensityRepository.save(equipmentPerFormationFailureIntensity);
     }
