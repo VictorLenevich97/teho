@@ -152,8 +152,9 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                                             ld
                                                     .getRepairType()
                                                     .equals(equipmentFailurePerRepairTypeAmount.getRepairType()))
-                    .forEach(ld -> laborInputMap.put(ld.getWorkhoursDistributionInterval().getId(),
-                                                     new CountAndLaborInput(ld.getCount(), ld.getAvgLaborInput())));
+                    .forEach(ld -> laborInputMap.computeIfAbsent(ld.getWorkhoursDistributionInterval().getId(),
+                                                                 (id) -> CountAndLaborInput.empty())
+                                                .add(ld.getCount(), ld.getAvgLaborInput()));
             countAndLaborInputCombinedData = new CountAndLaborInputCombinedData(laborInputMap);
         } else {
             countAndLaborInputCombinedData = new CountAndLaborInputCombinedData(equipmentFailurePerRepairTypeAmount.getAmount());
@@ -179,11 +180,19 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                                                          WorkhoursDistributionInterval interval,
                                                          Long stageId,
                                                          Long repairTypeId) {
-        double count = calculationService.calculateEquipmentInRepairCount(interval.getUpperBound(),
-                                                                          interval.getLowerBound(),
-                                                                          avgDailyFailure,
-                                                                          standardLaborInput);
-        double laborInput = calculationService.calculateEquipmentInRepairLaborInput(count, interval.getUpperBound());
+        double count;
+        double laborInput;
+
+        if (interval.getLowerBound() != null && interval.getLowerBound() >= standardLaborInput) {
+            count = 0;
+            laborInput = 0;
+        } else {
+            count = calculationService.calculateEquipmentInRepairCount(interval.getUpperBound(),
+                                                                       interval.getLowerBound(),
+                                                                       avgDailyFailure,
+                                                                       standardLaborInput);
+            laborInput = calculationService.calculateEquipmentInRepairLaborInput(count, interval.getUpperBound());
+        }
 
         return new LaborDistribution(new LaborDistributionPK(formationId,
                                                              equipmentId,
