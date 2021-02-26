@@ -92,7 +92,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         LOGGER.debug(logLine);
         EquipmentType equipmentType = equipmentTypeService.get(typeId);
         if (equipmentRepository.findByNameIgnoreCase(name).isPresent()) {
-            throw new AlreadyExistsException("ВВСТ", "имя", name);
+            throw new AlreadyExistsException("ВВСТ", "название", name);
         }
         long newId = equipmentRepository.getMaxId() + 1;
         return equipmentRepository.save(new Equipment(newId, name, equipmentType));
@@ -130,7 +130,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         LOGGER.debug(logLine);
         equipmentRepository.findByNameIgnoreCase(name).ifPresent(e -> {
             if (!e.getId().equals(id)) {
-                throw new AlreadyExistsException("ВВСТ", "имя", name);
+                throw new AlreadyExistsException("ВВСТ", "название", name);
             }
         });
 

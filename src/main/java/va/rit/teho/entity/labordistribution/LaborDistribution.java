@@ -129,6 +129,10 @@ public class LaborDistribution {
         this.workhoursDistributionInterval = workhoursDistributionInterval;
     }
 
+    public Stage getStage() {
+        return stage;
+    }
+
     public TehoSession getTehoSession() {
         return tehoSession;
     }

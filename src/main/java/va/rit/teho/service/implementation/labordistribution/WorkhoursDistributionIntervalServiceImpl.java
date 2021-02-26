@@ -45,9 +45,10 @@ public class WorkhoursDistributionIntervalServiceImpl implements WorkhoursDistri
                                                                                                         upperBound,
                                                                                                         restorationType);
         if (existing.isPresent()) {
-            throw new AlreadyExistsException("Интервал распределения",
-                                             "(нижняя граница, верхняя граница, тип восстановления)",
-                                             "(" + lowerBound + ", " + upperBound + ", " + restorationType.getName() + ")");
+            String boundsStr =
+                    (Optional.ofNullable(lowerBound).map(v -> "от " + v + " ").orElse("") +
+                            Optional.ofNullable(upperBound).map(v -> "до " + v).orElse("")).trim();
+            throw new AlreadyExistsException("Интервал распределения [" + boundsStr + "] типа \"" + restorationType.getName() + "\" уже существует!");
         }
         long newId = workhoursDistributionIntervalRepository.getMaxId() + 1;
         WorkhoursDistributionInterval intervalToAdd = new WorkhoursDistributionInterval(newId,

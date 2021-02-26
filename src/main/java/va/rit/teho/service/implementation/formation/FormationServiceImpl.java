@@ -45,7 +45,7 @@ public class FormationServiceImpl implements FormationService {
         checkIfEmptyField(shortName);
         checkIfEmptyField(fullName);
         formationRepository.findByFullName(fullName).ifPresent(b -> {
-            throw new AlreadyExistsException("Формирование", "название", fullName);
+            throw new AlreadyExistsException("Формирование", "полное название", fullName);
         });
     }
 

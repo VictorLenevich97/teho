@@ -248,10 +248,11 @@ public class RepairCapabilitiesController {
                                     .stream()
                                     .map(equipment -> new RepairCapabilityPerEquipment(equipment.getId(),
                                                                                        equipment.getName(),
-                                                                                       calculatedRepairCapabilities
-                                                                                               .getOrDefault(
-                                                                                                       equipment,
-                                                                                                       0.0)))
+                                                                                       Formatter.formatDouble(
+                                                                                               calculatedRepairCapabilities
+                                                                                                       .getOrDefault(
+                                                                                                               equipment,
+                                                                                                               0.0))))
                                     .collect(Collectors.toList()));
                 });
     }

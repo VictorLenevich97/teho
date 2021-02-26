@@ -260,10 +260,8 @@ public class LaborInputDistributionController {
                 countMap,
                 elid.getEquipmentName(),
                 elid.getEquipmentAmount(),
-                Formatter.formatDoubleAsString(
-                        elid.getAvgDailyFailure()),
+                Formatter.formatDoubleAsString(elid.getAvgDailyFailure()),
                 elid.getStandardLaborInput(),
-                Formatter.formatDoubleAsString(
-                        elid.getTotalRepairComplexity()));
+                Formatter.formatDoubleAsString(elid.getTotalRepairComplexity()));
     }
 }

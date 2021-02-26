@@ -4,10 +4,10 @@ import java.util.Objects;
 
 public class CountAndLaborInput {
 
-    public static final CountAndLaborInput EMPTY = new CountAndLaborInput(0.0, 0.0);
+    public static final CountAndLaborInput EMPTY = empty();
 
-    private final double count;
-    private final double laborInput;
+    private double count;
+    private double laborInput;
 
     public CountAndLaborInput(double count, double laborInput) {
         this.count = count;
@@ -21,6 +21,15 @@ public class CountAndLaborInput {
         CountAndLaborInput that = (CountAndLaborInput) o;
         return Double.compare(that.count, count) == 0 &&
                 Double.compare(that.laborInput, laborInput) == 0;
+    }
+
+    public static CountAndLaborInput empty() {
+        return new CountAndLaborInput(0.0, 0.0);
+    }
+
+    public void add(double count, double laborInput) {
+        this.count += count;
+        this.laborInput += laborInput;
     }
 
     @Override

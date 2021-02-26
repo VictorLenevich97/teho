@@ -93,8 +93,7 @@ public class RepairType implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RepairType that = (RepairType) o;
-        return calculatable == that.calculatable &&
-                Objects.equals(id, that.id) &&
+        return Objects.equals(id, that.id) &&
                 Objects.equals(fullName, that.fullName) &&
                 Objects.equals(shortName, that.shortName);
     }
