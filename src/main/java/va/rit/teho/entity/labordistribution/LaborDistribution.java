@@ -77,6 +77,16 @@ public class LaborDistribution {
         this.avgLaborInput = avgLaborInput;
     }
 
+    public static LaborDistribution empty(Long formationId,
+                                   Long equipmentId,
+                                   Long workhoursDistributionIntervalId,
+                                   Long stageId,
+                                   Long repairTypeId,
+                                   UUID sessionId) {
+        return new LaborDistribution(
+                new LaborDistributionPK(formationId, equipmentId, workhoursDistributionIntervalId, stageId, repairTypeId, sessionId), 0, 0);
+    }
+
     public RepairType getRepairType() {
         return repairType;
     }
@@ -157,7 +167,7 @@ public class LaborDistribution {
     @Override
     public int hashCode() {
         return Objects.hash(laborDistributionId,
-                            formation, equipment, workhoursDistributionInterval, count, avgLaborInput);
+                formation, equipment, workhoursDistributionInterval, count, avgLaborInput);
     }
 
     public LaborDistribution copy(UUID newSessionId) {

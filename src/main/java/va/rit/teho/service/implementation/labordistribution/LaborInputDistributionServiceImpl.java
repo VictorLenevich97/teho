@@ -21,6 +21,7 @@ import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.labordistribution.WorkhoursDistributionIntervalService;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,7 +56,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         Map<Long, CountAndLaborInput> laborInputMap = new HashMap<>();
         for (LaborDistributionData eird : laborDistributionDataList) {
             if (laborInputMap.put(eird.getIntervalId(),
-                                  new CountAndLaborInput(eird.getCount(), eird.getAvgLaborInput())) != null) {
+                    new CountAndLaborInput(eird.getCount(), eird.getAvgLaborInput())) != null) {
                 throw new IllegalStateException("Duplicate key");
             }
         }
@@ -67,8 +68,8 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 .avgDailyFailure(eir.getAvgDailyFailure())
                 .standardLaborInput(eir.getLaborInput())
                 .countAndLaborInputCombinedData(Collections.singletonMap(eir.getRepairType(),
-                                                                         new CountAndLaborInputCombinedData(
-                                                                                 laborInputMap)))
+                        new CountAndLaborInputCombinedData(
+                                laborInputMap)))
                 .totalRepairComplexity(
                         laborInputMap.values().stream().mapToDouble(CountAndLaborInput::getLaborInput).sum())
                 .build();
@@ -86,8 +87,8 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
 
         grouped.forEach((equipmentType, subTypeMap) -> subTypeMap
                 .forEach((key, equipmentInRepairDataList) ->
-                                 result.computeIfAbsent(equipmentType, k -> new ArrayList<>())
-                                       .add(buildLaborInputDistribution(equipmentInRepairDataList))));
+                        result.computeIfAbsent(equipmentType, k -> new ArrayList<>())
+                                .add(buildLaborInputDistribution(equipmentInRepairDataList))));
         return result;
     }
 
@@ -95,12 +96,12 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     public Map<EquipmentType, List<EquipmentLaborInputDistribution>> getAggregatedLaborInputDistribution(
             UUID sessionId, List<Long> formationIds, List<Long> equipmentIds) {
         List<LaborDistribution> aggregated = laborDistributionRepository.findByTehoSessionIdAndFilters(sessionId,
-                                                                                                       formationIds,
-                                                                                                       equipmentIds);
+                formationIds,
+                equipmentIds);
         List<EquipmentFailurePerRepairTypeAmount> equipmentFailurePerRepairTypeAmounts =
                 equipmentPerFormationFailureIntensityRepository.listFailureDataWithLaborInputPerRepairType(sessionId,
-                                                                                                           formationIds,
-                                                                                                           equipmentIds);
+                        formationIds,
+                        equipmentIds);
 
         Map<EquipmentType, List<EquipmentLaborInputDistribution>> result = new HashMap<>();
 
@@ -109,10 +110,10 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         for (EquipmentFailurePerRepairTypeAmount equipmentFailurePerRepairTypeAmount : equipmentFailurePerRepairTypeAmounts) {
             Pair<Map<RepairType, CountAndLaborInputCombinedData>, Double> laborInputMapAndDailyFailure =
                     calculateLaborInputMapAndSumDailyFailure(aggregated,
-                                                             intermediate,
-                                                             equipmentFailurePerRepairTypeAmount);
+                            intermediate,
+                            equipmentFailurePerRepairTypeAmount);
             intermediate.put(equipmentFailurePerRepairTypeAmount.getEquipmentPerFormation(),
-                             laborInputMapAndDailyFailure);
+                    laborInputMapAndDailyFailure);
         }
 
         intermediate.forEach((equipmentPerFormation, repairTypeCountAndLaborInputCombinedDataMap) -> {
@@ -128,7 +129,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                             .build();
 
             result.computeIfAbsent(equipmentPerFormation.getEquipment().getEquipmentType(),
-                                   k -> new ArrayList<>()).add(equipmentLaborInputDistribution);
+                    k -> new ArrayList<>()).add(equipmentLaborInputDistribution);
         });
 
         return result;
@@ -143,18 +144,18 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
             aggregated
                     .stream()
                     .filter(ld ->
+                            ld
+                                    .getFormation()
+                                    .equals(equipmentFailurePerRepairTypeAmount.getFormation()) &&
                                     ld
-                                            .getFormation()
-                                            .equals(equipmentFailurePerRepairTypeAmount.getFormation()) &&
-                                            ld
-                                                    .getEquipment()
-                                                    .equals(equipmentFailurePerRepairTypeAmount.getEquipment()) &&
-                                            ld
-                                                    .getRepairType()
-                                                    .equals(equipmentFailurePerRepairTypeAmount.getRepairType()))
+                                            .getEquipment()
+                                            .equals(equipmentFailurePerRepairTypeAmount.getEquipment()) &&
+                                    ld
+                                            .getRepairType()
+                                            .equals(equipmentFailurePerRepairTypeAmount.getRepairType()))
                     .forEach(ld -> laborInputMap.computeIfAbsent(ld.getWorkhoursDistributionInterval().getId(),
-                                                                 (id) -> CountAndLaborInput.empty())
-                                                .add(ld.getCount(), ld.getAvgLaborInput()));
+                            (id) -> CountAndLaborInput.empty())
+                            .add(ld.getCount(), ld.getAvgLaborInput()));
             countAndLaborInputCombinedData = new CountAndLaborInputCombinedData(laborInputMap);
         } else {
             countAndLaborInputCombinedData = new CountAndLaborInputCombinedData(equipmentFailurePerRepairTypeAmount.getAmount());
@@ -162,7 +163,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
 
         Pair<Map<RepairType, CountAndLaborInputCombinedData>, Double> existingMapAndFailureData =
                 intermediate.getOrDefault(equipmentFailurePerRepairTypeAmount.getEquipmentPerFormation(),
-                                          Pair.of(new HashMap<>(), 0.0));
+                        Pair.of(new HashMap<>(), 0.0));
         existingMapAndFailureData
                 .getFirst()
                 .put(equipmentFailurePerRepairTypeAmount.getRepairType(), countAndLaborInputCombinedData);
@@ -188,39 +189,65 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
             laborInput = 0;
         } else {
             count = calculationService.calculateEquipmentInRepairCount(interval.getUpperBound(),
-                                                                       interval.getLowerBound(),
-                                                                       avgDailyFailure,
-                                                                       standardLaborInput);
+                    interval.getLowerBound(),
+                    avgDailyFailure,
+                    standardLaborInput);
             laborInput = calculationService.calculateEquipmentInRepairLaborInput(count, interval.getUpperBound());
         }
 
         return new LaborDistribution(new LaborDistributionPK(formationId,
-                                                             equipmentId,
-                                                             interval.getId(),
-                                                             stageId,
-                                                             repairTypeId,
-                                                             sessionId),
-                                     count,
-                                     laborInput);
+                equipmentId,
+                interval.getId(),
+                stageId,
+                repairTypeId,
+                sessionId),
+                count,
+                laborInput);
     }
 
+    /*
+     * 3 возможные ситуации:
+     * 1. Если среднесуточный выход в ремонт <= нижней границы интервала, то пустой результат (по 0)
+     * 2. Если среднесуточный выход в ремонт находится "между" верхней и нижней границей, то это "последний" интервал в данном расчете, поэтому
+     * заносим в count оставшееся количество выходящих из строя ВВСТ
+     * 3. Во всех остальных случаях используем формулу
+     * */
     private Stream<LaborDistribution> calculateEquipmentLaborInputDistribution(
             UUID sessionId,
             Long stageId,
             Long repairTypeId,
             Double avgDailyFailure,
             EquipmentPerFormationFailureIntensityAndLaborInput equipmentPerFormationAndLaborInput) {
+        AtomicReference<Double> sum = new AtomicReference<>(0.0);
+        int laborInput = equipmentPerFormationAndLaborInput.getLaborInput();
+        Long formationId = equipmentPerFormationAndLaborInput.getFormationId();
+        Long equipmentId = equipmentPerFormationAndLaborInput.getEquipmentId();
         return workhoursDistributionIntervalService
                 .list()
                 .stream()
-                .map(interval -> calculateLaborDistribution(sessionId,
-                                                            equipmentPerFormationAndLaborInput.getFormationId(),
-                                                            equipmentPerFormationAndLaborInput.getEquipmentId(),
-                                                            avgDailyFailure,
-                                                            equipmentPerFormationAndLaborInput.getLaborInput(),
-                                                            interval,
-                                                            stageId,
-                                                            repairTypeId));
+                .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
+                        Comparator.nullsFirst(Comparator.naturalOrder())))
+                .map(interval -> {
+                    LaborDistribution result;
+                    if ((interval.getLowerBound() == null || laborInput > interval.getLowerBound()) &&
+                            (interval.getUpperBound() == null || laborInput < interval.getUpperBound())) {
+                        result = new LaborDistribution(
+                                new LaborDistributionPK(formationId, equipmentId, interval.getId(), stageId, repairTypeId, sessionId),
+                                avgDailyFailure - sum.get(),
+                                0);
+                    } else {
+                        if (interval.getLowerBound() != null &&
+                                interval.getLowerBound() >= laborInput) {
+                            result = LaborDistribution.empty(
+                                    formationId, equipmentId, interval.getId(), stageId, repairTypeId, sessionId);
+                        } else {
+                            result = calculateLaborDistribution(
+                                    sessionId, formationId, equipmentId, avgDailyFailure, laborInput, interval, stageId, repairTypeId);
+                        }
+                    }
+                    sum.updateAndGet(v -> v + result.getCount());
+                    return result;
+                });
     }
 
     private void cleanupSessionData(UUID sessionId) {
@@ -234,10 +261,10 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 equipmentPerFormations
                         .stream()
                         .flatMap(epb -> this.calculateEquipmentLaborInputDistribution(sessionId,
-                                                                                      epb.getStageId(),
-                                                                                      repairTypeId,
-                                                                                      epb.getAvgDailyFailure(),
-                                                                                      epb))
+                                epb.getStageId(),
+                                repairTypeId,
+                                epb.getAvgDailyFailure(),
+                                epb))
                         .collect(Collectors.toList());
         laborDistributionRepository.saveAll(calculated);
     }
@@ -255,9 +282,9 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                 .forEach(repairType -> {
                     List<EquipmentPerFormationFailureIntensityAndLaborInput> equipmentPerFormations =
                             equipmentPerFormationService.listWithIntensityAndLaborInput(sessionId,
-                                                                                        repairType.getId(),
-                                                                                        equipmentIds,
-                                                                                        formationIds);
+                                    repairType.getId(),
+                                    equipmentIds,
+                                    formationIds);
                     calculateAndSave(repairType.getId(), sessionId, equipmentPerFormations);
                 });
     }
