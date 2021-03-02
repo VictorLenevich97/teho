@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.labordistribution.*;
 import va.rit.teho.dto.table.NestedColumnsDTO;
@@ -66,9 +67,9 @@ public class EquipmentRFUDistributionController {
     @ApiOperation(value = "Распределение вышедшего из строя ВВСТ по РВО для ремонта")
     public ResponseEntity<Object> distributeEquipmentPerRFU(@Valid @RequestBody LaborDistributionFilterData filterData) {
         equipmentRFUDistributionService.distribute(tehoSession.getSessionId(),
-                                                   nullIfEmpty(filterData.getEquipmentIds()),
-                                                   nullIfEmpty(filterData.getFormationIds()),
-                                                   nullIfEmpty(filterData.getRepairFormationUnitIds()));
+                nullIfEmpty(filterData.getEquipmentIds()),
+                nullIfEmpty(filterData.getFormationIds()),
+                nullIfEmpty(filterData.getRepairFormationUnitIds()));
         return ResponseEntity.ok().build();
     }
 
@@ -93,12 +94,12 @@ public class EquipmentRFUDistributionController {
                 .entrySet()
                 .stream()
                 .map(repairFormationUnitListEntry ->
-                             new AggregatedEquipmentRFUDistributionDTO(repairFormationUnitListEntry.getKey().getName(),
-                                                                       repairFormationUnitListEntry
-                                                                               .getValue()
-                                                                               .stream()
-                                                                               .map(EquipmentRFUDistributionDTO::from)
-                                                                               .collect(Collectors.toList())))
+                        new AggregatedEquipmentRFUDistributionDTO(repairFormationUnitListEntry.getKey().getName(),
+                                repairFormationUnitListEntry
+                                        .getValue()
+                                        .stream()
+                                        .map(EquipmentRFUDistributionDTO::from)
+                                        .collect(Collectors.toList())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(result);
     }
@@ -120,7 +121,7 @@ public class EquipmentRFUDistributionController {
     public ResponseEntity<EquipmentDistributionTableDataDTO> getEquipmentDistribution(@PathVariable @Positive Long formationId) {
         List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData =
                 equipmentRFUDistributionService.listDistributionDataForFormation(tehoSession.getSessionId(),
-                                                                                 formationId);
+                        formationId);
         List<RepairType> repairTypes = repairTypeService.list(true);
         List<RestorationType> restorationTypes = restorationTypeService.list();
 
@@ -130,18 +131,18 @@ public class EquipmentRFUDistributionController {
                     Map<String, Double> repairTypeAmountMap = new HashMap<>();
                     epfdd
                             .getAmountPerRepairType()
-                            .forEach((rt, amount) -> repairTypeAmountMap.put(rt.getId().toString(), amount));
+                            .forEach((rt, amount) -> repairTypeAmountMap.put(rt.getId().toString(), Formatter.formatDouble(amount)));
                     Map<String, Double> restorationTypeAmountMap = new HashMap<>();
                     epfdd
                             .getAmountPerRestorationType()
-                            .forEach((rt, amount) -> restorationTypeAmountMap.put(rt.getId().toString(), amount));
+                            .forEach((rt, amount) -> restorationTypeAmountMap.put(rt.getId().toString(), Formatter.formatDouble(amount)));
 
                     return new EquipmentDistributionRowData(epfdd.getEquipment().getId(),
-                                                            epfdd.getEquipment().getName(),
-                                                            epfdd.getAmount(),
-                                                            epfdd.getAvgDailyFailure(),
-                                                            repairTypeAmountMap,
-                                                            restorationTypeAmountMap);
+                            epfdd.getEquipment().getName(),
+                            epfdd.getAmount(),
+                            epfdd.getAvgDailyFailure(),
+                            repairTypeAmountMap,
+                            restorationTypeAmountMap);
                 })
                 .collect(Collectors.toList());
 
@@ -167,11 +168,11 @@ public class EquipmentRFUDistributionController {
             UnsupportedEncodingException {
         List<EquipmentPerFormationDistributionData> equipmentPerFormationDistributionData =
                 equipmentRFUDistributionService.listDistributionDataForFormation(tehoSession.getSessionId(),
-                                                                                 formationId);
+                        formationId);
         byte[] bytes = distributionReportService.generateReport(
                 new EquipmentDistributionCombinedData(repairTypeService.list(true),
-                                                      restorationTypeService.list(),
-                                                      equipmentPerFormationDistributionData));
+                        restorationTypeService.list(),
+                        equipmentPerFormationDistributionData));
 
         return ReportResponseEntity.ok("Результаты решения задачи", bytes);
     }

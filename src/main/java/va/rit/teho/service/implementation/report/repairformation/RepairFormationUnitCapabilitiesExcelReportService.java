@@ -68,7 +68,7 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
 
         equipmentSet.forEach(e -> {
             if (CollectionUtils.isEmpty(equipmentIds) || equipmentIds.contains(e.getId())) {
-                header.addSubHeader(header(e.getName(), true));
+                header.addSubHeader(header(e.getName()));
             }
         });
 
@@ -83,7 +83,7 @@ public class RepairFormationUnitCapabilitiesExcelReportService extends
 
     @Override
     protected List<ReportHeader> buildHeader(RepairFormationUnitRepairCapabilityCombinedData data) {
-        ReportHeader nameHeader = header("Наименование ремонтного органа формирования", true);
+        ReportHeader nameHeader = header("Наименование ремонтного органа формирования");
         ReportHeader topHeader = header("Производственные возможности по ремонту ВВСТ, ед./сут.");
 
         data.getEquipmentTypes().forEach(et -> populateHeader(et, data.getEquipmentIds()).ifPresent(topHeader::addSubHeader));

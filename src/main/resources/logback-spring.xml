@@ -16,13 +16,12 @@
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${user.home}/.teho/logs/teho.log</file>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${user.home}/.teho/logs/teho.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <fileNamePattern>${user.home}/.teho/logs/teho.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>10MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
                 <maxHistory>30</maxHistory>
             </rollingPolicy>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <maxFileSize>10MB</maxFileSize>
             <encoder>
                 <pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</pattern>
             </encoder>
@@ -33,13 +32,13 @@
                 <level>warn</level>
             </filter>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${user.home}/.teho/logs/teho_error.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <fileNamePattern>${user.home}/.teho/logs/teho_error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <timeBasedFileNamingAndTriggeringPolicy
+                        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    <maxFileSize>10MB</maxFileSize>
+                </timeBasedFileNamingAndTriggeringPolicy>
                 <maxHistory>30</maxHistory>
             </rollingPolicy>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
             <encoder>
                 <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%level] [%thread] %logger{10} [%file:%line] %msg%n</pattern>
             </encoder>
