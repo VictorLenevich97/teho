@@ -3,6 +3,7 @@ package va.rit.teho.service.implementation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.PageRequest;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.repository.equipment.EquipmentLaborInputPerTypeRepository;
@@ -94,7 +95,7 @@ public class EquipmentServiceImplTest {
         Map<EquipmentType, List<Equipment>> result = Collections.singletonMap(EQUIPMENT.getEquipmentType(),
                                                                               Collections.singletonList(EQUIPMENT));
 
-        when(equipmentRepository.findFiltered(null, null, null)).thenReturn(Collections.singletonList(EQUIPMENT));
+        when(equipmentRepository.findFiltered(null, null, PageRequest.of(0, 10000))).thenReturn(Collections.singletonList(EQUIPMENT));
 
         Assertions.assertEquals(result, equipmentService.listGroupedByTypes(null, null));
     }

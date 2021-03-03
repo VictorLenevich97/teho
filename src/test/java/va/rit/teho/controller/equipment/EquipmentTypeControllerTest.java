@@ -25,7 +25,7 @@ public class EquipmentTypeControllerTest extends ControllerTest {
     @Test
     public void testGetEquipmentTypes() throws Exception {
         EquipmentType eqType = new EquipmentType("s", "f");
-        when(equipmentTypeService.listTypes(Collections.emptyList())).thenReturn(Collections.singletonList(eqType));
+        when(equipmentTypeService.listTypes(null)).thenReturn(Collections.singletonList(eqType));
 
         mockMvc.perform(get("/equipment-type")).andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(1)));
     }
@@ -34,17 +34,18 @@ public class EquipmentTypeControllerTest extends ControllerTest {
     public void testGetEquipmentTypeById() throws Exception {
         EquipmentType equipmentType = new EquipmentType("stShort", "stFull");
         equipmentType.setId(1L);
+        equipmentType.setEquipmentTypes(Collections.emptySet());
 
         when(equipmentTypeService.get(equipmentType.getId())).thenReturn(equipmentType);
 
         mockMvc.perform(get("/equipment-type/{id}", equipmentType.getId())).andExpect(status().isOk())
-               .andExpect(jsonPath("$.type.shortName", is(equipmentType.getShortName())))
-               .andExpect(jsonPath("$.type.fullName", is(equipmentType.getFullName())));
+                .andExpect(jsonPath("$.shortName", is(equipmentType.getShortName())))
+                .andExpect(jsonPath("$.fullName", is(equipmentType.getFullName())));
     }
 
     @Test
     public void testAddEquipmentType() throws Exception {
-        EquipmentTypeDTO equipmentTypeDTO = new EquipmentTypeDTO(0L, "shortETName", "fullETName");
+        EquipmentTypeDTO equipmentTypeDTO = new EquipmentTypeDTO("shortETName", "fullETName", Collections.emptyList());
 
         when(equipmentTypeService.addType(equipmentTypeDTO.getShortName(),
                                           equipmentTypeDTO.getFullName())).thenReturn(new EquipmentType(

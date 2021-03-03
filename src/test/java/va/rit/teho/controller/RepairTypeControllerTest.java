@@ -38,7 +38,7 @@ public class RepairTypeControllerTest extends ControllerTest {
         List<RepairType> repairTypeList = Collections.singletonList(repairType);
         when(repairTypeService.list(true)).thenReturn(repairTypeList);
 
-        mockMvc.perform(get("/repair-type?repairable=true"))
+        mockMvc.perform(get("/repair-type?calculatable=true"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.size()", is(repairTypeList.size())));
     }

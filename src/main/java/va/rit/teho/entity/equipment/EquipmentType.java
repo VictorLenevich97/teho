@@ -56,6 +56,10 @@ public class EquipmentType implements Serializable {
         this.parentType = parentType;
     }
 
+    public void setEquipmentTypes(Set<EquipmentType> equipmentTypes) {
+        this.equipmentTypes = equipmentTypes;
+    }
+
     public EquipmentType getParentType() {
         return parentType;
     }

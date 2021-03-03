@@ -43,7 +43,9 @@ public class EquipmentTypeServiceImplTest {
     public void testAddType() {
         EquipmentType equipmentType = new EquipmentType("short", "full");
         EquipmentType addedEquipmentType = new EquipmentType(equipmentType.getShortName(), equipmentType.getFullName());
-        addedEquipmentType.setId(15L);
+        equipmentType.setId(2L);
+        when(equipmentTypeRepository.findByFullName(equipmentType.getFullName())).thenReturn(Optional.empty());
+        when(equipmentTypeRepository.getMaxId()).thenReturn(1L);
         when(equipmentTypeRepository.save(equipmentType)).thenReturn(addedEquipmentType);
 
         Assertions.assertEquals(

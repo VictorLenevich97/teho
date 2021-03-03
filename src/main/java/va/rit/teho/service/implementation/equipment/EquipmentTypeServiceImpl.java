@@ -87,13 +87,14 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     public EquipmentType updateType(Long id, String shortName, String fullName) {
         logEquipmentUpdate(id, shortName, fullName);
 
+        EquipmentType equipmentType = get(id);
+
         equipmentTypeRepository.findByFullName(fullName).ifPresent(et -> {
             if (!et.getId().equals(id)) {
                 throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
             }
         });
 
-        EquipmentType equipmentType = get(id);
         equipmentType.setShortName(shortName);
         equipmentType.setFullName(fullName);
         return equipmentTypeRepository.save(equipmentType);
