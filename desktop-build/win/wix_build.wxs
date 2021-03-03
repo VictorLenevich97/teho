@@ -62,17 +62,17 @@
         <ComponentGroup Id="ProductComponents"
                         Directory="INSTALLFOLDER">
             <Component Id="TEHO_exec"
-                       Guid="a627331e-37d6-4ced-9f8b-3a9521a150a4">
+                       Guid="baf44295-5b07-4f07-83cc-01414dbb1de4">
                 <File Source="start.vbs"/>
             </Component>
             <Component Id="TEHO"
-                       Guid="a627821e-37d6-4ced-9f8b-3a9521a150a4">
+                       Guid="cd625b0b-65a7-4e43-8f38-76a9ef3975f4">
                 <File Source="run.bat"/>
                 <File Source="teho-1.0-RELEASE.jar"/>
                 <File Source="teho.exe"/>
             </Component>
         </ComponentGroup>
-        <Component Id="cmpDesktopShortcut" Guid="4f31c5b0-cc58-4a53-a3b2-12c1983869b5" Directory="DesktopFolder">
+        <Component Id="cmpDesktopShortcut" Guid="913dcbc5-278f-42e7-91bd-a3bc4ca03ac6" Directory="DesktopFolder">
             <Shortcut Id="MyDesktopShortcut"
                       Name="TEXO"
                       Description="TEXO"
