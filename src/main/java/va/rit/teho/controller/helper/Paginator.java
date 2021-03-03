@@ -6,8 +6,8 @@ public class Paginator {
     }
 
     public static Long getPageNum(int pageSize, long rowCount) {
-        int additionalPageNum = rowCount % pageSize == 0 ? 0 : 1;
-        return (pageSize == 0 ? 1 : rowCount / pageSize + additionalPageNum);
+        int additionalPageNum = (rowCount % pageSize) == 0 ? 0 : 1;
+        return (pageSize <= 0 ? 1 : rowCount / pageSize + additionalPageNum);
     }
 
 }
