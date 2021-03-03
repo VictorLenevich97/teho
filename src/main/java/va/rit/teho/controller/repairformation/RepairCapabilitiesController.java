@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
+import va.rit.teho.controller.helper.Paginator;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.repairformation.EquipmentTypeStaffData;
 import va.rit.teho.dto.repairformation.RepairCapabilityPerEquipment;
@@ -171,8 +172,7 @@ public class RepairCapabilitiesController {
                                                                 filteredEquipmentList,
                                                                 rs))
                             .collect(Collectors.toList());
-        Long totalPageNum = (pageSize == 0 ? 1 : rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1));
-        return new TableDataDTO<>(equipmentPerTypeNestedColumns, data, totalPageNum);
+        return new TableDataDTO<>(equipmentPerTypeNestedColumns, data, Paginator.getPageNum(pageSize, rowCount));
     }
 
     private RowData<Map<String, String>> getRepairCapabilitiesRow(

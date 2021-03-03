@@ -1,14 +1,14 @@
 package va.rit.teho.dto.labordistribution;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import va.rit.teho.dto.table.GenericTableDataDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
-import va.rit.teho.dto.table.TableDataDTO;
 
 import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EquipmentDistributionTableDataDTO extends TableDataDTO<Map<String, String>> {
+public class EquipmentDistributionTableDataDTO extends GenericTableDataDTO<Map<String, String>, EquipmentDistributionRowData> {
     private final List<NestedColumnsDTO> repairTypeColumns;
     private final List<NestedColumnsDTO> restorationTypeColumns;
 

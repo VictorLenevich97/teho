@@ -13,8 +13,8 @@ import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
 import va.rit.teho.dto.equipment.EquipmentPerFormationDTO;
 import va.rit.teho.dto.equipment.IntensityAndAmountDTO;
+import va.rit.teho.dto.table.GenericTableDataDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
-import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.Equipment;
@@ -138,15 +138,15 @@ public class EquipmentPerFormationController {
     @GetMapping("/formation/{formationId}/equipment/intensity")
     @ResponseBody
     @ApiOperation(value = "Получить данные о ВВСТ в Формированиях с интенсивностью выхода в ремонт в % (в табличном виде)")
-    public TableDataDTO<Map<String, Map<String, String>>> getEquipmentPerFormationTableData(
+    public GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentPerFormationTableData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1")
             @PathVariable @Positive Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) {
         return this.getEquipmentRowData(formationId,
-                                        EquipmentPerFormationFailureIntensity::getIntensityPercentage,
-                                        0,
-                                        Object::toString,
-                                        equipmentIds);
+                EquipmentPerFormationFailureIntensity::getIntensityPercentage,
+                0,
+                Object::toString,
+                equipmentIds);
     }
 
     @GetMapping("/formation/{formationId}/equipment/intensity/report")
@@ -157,45 +157,45 @@ public class EquipmentPerFormationController {
                                                                          @RequestParam(required = false) List<Long> equipmentIds) throws
             UnsupportedEncodingException {
         byte[] bytes = generateEquipmentFailureReport(formationId,
-                                                      equipmentIds,
-                                                      EquipmentPerFormationFailureIntensity::getIntensityPercentage,
-                                                      "%");
+                equipmentIds,
+                EquipmentPerFormationFailureIntensity::getIntensityPercentage,
+                "%");
 
         return ReportResponseEntity.ok(REPORT_NAME, bytes);
     }
 
-    private <T> TableDataDTO<Map<String, Map<String, String>>> getEquipmentRowData(Long formationId,
-                                                                                   Function<EquipmentPerFormationFailureIntensity, T> getter,
-                                                                                   T defaultValue,
-                                                                                   Function<T, String> formatter,
-                                                                                   List<Long> equipmentIds) {
+    private <T> GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentRowData(Long formationId,
+                                                                                                                                    Function<EquipmentPerFormationFailureIntensity, T> getter,
+                                                                                                                                    T defaultValue,
+                                                                                                                                    Function<T, String> formatter,
+                                                                                                                                    List<Long> equipmentIds) {
         Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> failureIntensityData =
                 equipmentPerFormationService.getFailureIntensityData(tehoSession.getSessionId(),
-                                                                     formationId,
-                                                                     equipmentIds);
+                        formationId,
+                        equipmentIds);
         return getTableDataDTO(formationId,
-                               EquipmentPerFormation::getEquipment,
-                               getter,
-                               defaultValue,
-                               formatter,
-                               Collections.singletonMap(null, failureIntensityData),
-                               equipmentIds);
+                EquipmentPerFormation::getEquipment,
+                getter,
+                defaultValue,
+                formatter,
+                Collections.singletonMap(null, failureIntensityData),
+                equipmentIds);
     }
 
     @GetMapping("/formation/equipment/daily-failure")
     @ResponseBody
     @ApiOperation(value = "Таблица с интенсивностью выхода ВВСТ в ремонт (по всем Формированиям), %")
-    public TableDataDTO<Map<String, Map<String, String>>> getTotalEquipmentPerFormationDailyFailureData(
+    public GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getTotalEquipmentPerFormationDailyFailureData(
             @RequestParam(required = false) List<Long> equipmentIds) {
         Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData =
                 equipmentPerFormationService.getTotalFailureIntensityData(tehoSession.getSessionId());
         return getTableDataDTO(null,
-                               EquipmentPerFormation::getEquipment,
-                               EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
-                               0.0,
-                               va.rit.teho.controller.helper.Formatter::formatDoubleAsString,
-                               failureIntensityData,
-                               equipmentIds);
+                EquipmentPerFormation::getEquipment,
+                EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
+                0.0,
+                va.rit.teho.controller.helper.Formatter::formatDoubleAsString,
+                failureIntensityData,
+                equipmentIds);
     }
 
     @GetMapping("/formation/equipment/daily-failure/report")
@@ -257,25 +257,25 @@ public class EquipmentPerFormationController {
     @GetMapping("/formation/{formationId}/equipment/daily-failure")
     @ResponseBody
     @ApiOperation(value = "Получить данные о ВВСТ в Формированиях c интенсивностью выхода в ремонт в ед. (в табличном виде)")
-    public ResponseEntity<TableDataDTO<Map<String, Map<String, String>>>> getEquipmentPerFormationDailyFailureData(
+    public ResponseEntity<GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>>> getEquipmentPerFormationDailyFailureData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) {
         return ResponseEntity.ok(this.getEquipmentRowData(formationId,
-                                                          EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
-                                                          0.0,
-                                                          va.rit.teho.controller.helper.Formatter::formatDoubleAsString,
-                                                          nullIfEmpty(equipmentIds)));
+                EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
+                0.0,
+                va.rit.teho.controller.helper.Formatter::formatDoubleAsString,
+                nullIfEmpty(equipmentIds)));
     }
 
     @PostMapping("/formation/{formationId}/equipment/daily-failure/{coefficient}")
     @ApiOperation(value = "Обновить данные о выходе ВВСТ из строя на основе интенсивности (%)")
-    public ResponseEntity<TableDataDTO<Map<String, Map<String, String>>>> updateAvgDailyFailureData(
+    public ResponseEntity<GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>>> updateAvgDailyFailureData(
             @ApiParam(value = "Ключ формирования", required = true, example = "1") @PathVariable @Positive Long formationId,
             @ApiParam(value = "Коэффициент (k), используемый в расчетах", required = true) @PathVariable Double coefficient) {
 
         equipmentPerFormationService.calculateAndSetEquipmentPerFormationDailyFailure(tehoSession.getSessionId(),
-                                                                                      formationId,
-                                                                                      coefficient);
+                formationId,
+                coefficient);
         return getEquipmentPerFormationDailyFailureData(formationId, Collections.emptyList());
     }
 
@@ -303,13 +303,13 @@ public class EquipmentPerFormationController {
     }
 
 
-    private <K, T> TableDataDTO<Map<String, Map<String, String>>> getTableDataDTO(Long formationId,
-                                                                                  Function<EquipmentPerFormation, K> keyGetter,
-                                                                                  Function<EquipmentPerFormationFailureIntensity, T> getter,
-                                                                                  T defaultValue,
-                                                                                  Function<T, String> formatter,
-                                                                                  Map<Formation, Map<K, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
-                                                                                  List<Long> equipmentIds) {
+    private <K, T> GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getTableDataDTO(Long formationId,
+                                                                                                                                   Function<EquipmentPerFormation, K> keyGetter,
+                                                                                                                                   Function<EquipmentPerFormationFailureIntensity, T> getter,
+                                                                                                                                   T defaultValue,
+                                                                                                                                   Function<T, String> formatter,
+                                                                                                                                   Map<Formation, Map<K, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
+                                                                                                                                   List<Long> equipmentIds) {
         List<Stage> stages = stageService.list();
         List<RepairType> repairTypes = repairTypeService.list(true);
 
@@ -319,7 +319,7 @@ public class EquipmentPerFormationController {
             for (RepairType rt : repairTypes) {
                 NestedColumnsDTO repairTypeColumn =
                         new NestedColumnsDTO(Arrays.asList(s.getId().toString(), rt.getId().toString()),
-                                             rt.getShortName());
+                                rt.getShortName());
                 repairTypeColumns.add(repairTypeColumn);
             }
             NestedColumnsDTO nestedColumnsDTO = new NestedColumnsDTO(s.getStageNum().toString(), repairTypeColumns);
@@ -344,7 +344,7 @@ public class EquipmentPerFormationController {
                         .sorted(Comparator.comparing(EquipmentFailureIntensityRowData::getId,
                                                      Comparator.reverseOrder()))
                         .collect(Collectors.toList());
-        return new TableDataDTO<>(stageColumns, rowData);
+        return new GenericTableDataDTO<>(stageColumns, rowData);
     }
 
     private <K, T> EquipmentFailureIntensityRowData<String> getEquipmentFailureIntensityRowData(Map<Formation, Map<K, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,

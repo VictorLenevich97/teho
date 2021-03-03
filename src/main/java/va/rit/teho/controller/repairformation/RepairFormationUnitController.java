@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import va.rit.teho.controller.helper.Paginator;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.repairformation.*;
 import va.rit.teho.dto.table.NestedColumnsDTO;
@@ -277,8 +278,7 @@ public class RepairFormationUnitController {
                                                 columns,
                                                 rs))
                 .collect(Collectors.toList());
-        Long totalPageNum = (pageSize == 0 ? 1 : rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1));
-        return new TableDataDTO<>(nestedColumnsTotal, rows, totalPageNum);
+        return new TableDataDTO<>(nestedColumnsTotal, rows, Paginator.getPageNum(pageSize, rowCount));
     }
 
     private Stream<NestedColumnsDTO> getEquipmentStaffNestedColumnsDTO(EquipmentType equipmentType) {

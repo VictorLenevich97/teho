@@ -154,7 +154,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                                             .getRepairType()
                                             .equals(equipmentFailurePerRepairTypeAmount.getRepairType()))
                     .forEach(ld -> laborInputMap.computeIfAbsent(ld.getWorkhoursDistributionInterval().getId(),
-                            (id) -> CountAndLaborInput.empty())
+                            id -> CountAndLaborInput.createEmpty())
                             .add(ld.getCount(), ld.getAvgLaborInput()));
             countAndLaborInputCombinedData = new CountAndLaborInputCombinedData(laborInputMap);
         } else {

@@ -91,11 +91,11 @@ public class EquipmentFailureIntensityReportService
                     .getEquipmentPerFormations()
                     .entrySet()) {
                 Formation formation = entry.getKey();
-                Map<EquipmentType, List<EquipmentPerFormation>> EquipmentTypeMap = entry.getValue();
+                Map<EquipmentType, List<EquipmentPerFormation>> equipmentTypeMap = entry.getValue();
 
                 createRowWideCell(sheet, lastRowIndex, colSize, formation.getFullName(), true, true);
 
-                for (Map.Entry<EquipmentType, List<EquipmentPerFormation>> e : EquipmentTypeMap.entrySet()) {
+                for (Map.Entry<EquipmentType, List<EquipmentPerFormation>> e : equipmentTypeMap.entrySet()) {
                     EquipmentType equipmentType = e.getKey();
                     List<EquipmentPerFormation> equipmentPerFormations = e.getValue();
 

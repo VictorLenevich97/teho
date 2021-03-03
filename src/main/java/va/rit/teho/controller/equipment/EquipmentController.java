@@ -10,11 +10,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import va.rit.teho.controller.helper.Paginator;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentDTO;
 import va.rit.teho.dto.equipment.EquipmentLaborInputPerTypeRowData;
+import va.rit.teho.dto.table.GenericTableDataDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
-import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentType;
@@ -121,7 +122,7 @@ public class EquipmentController {
 
     @GetMapping("/labor-input")
     @ApiOperation(value = "Получить список ВВСТ с нормативной трудоемкостью (в табличном виде)")
-    public ResponseEntity<TableDataDTO<Map<String, Integer>>> listEquipmentWithLaborInputData(
+    public ResponseEntity<GenericTableDataDTO<Map<String, Integer>, EquipmentLaborInputPerTypeRowData>> listEquipmentWithLaborInputData(
             @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> ids,
             @ApiParam(value = "Ключи типов ВВСТ, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> typeIds,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
@@ -153,9 +154,8 @@ public class EquipmentController {
                         .sorted(Comparator.comparing(EquipmentLaborInputPerTypeRowData::getId,
                                                      Comparator.reverseOrder()))
                         .collect(Collectors.toList());
-        Long totalPageNum = (pageSize == 0 ? 1 : rowCount / pageSize + (rowCount % pageSize == 0 ? 0 : 1));
 
-        return ResponseEntity.ok(new TableDataDTO<>(columns, data, totalPageNum));
+        return ResponseEntity.ok(new GenericTableDataDTO<>(columns, data, Paginator.getPageNum(pageSize, rowCount)));
     }
 
     @GetMapping(value = "/labor-input/report", produces = "application/vnd.ms-excel")

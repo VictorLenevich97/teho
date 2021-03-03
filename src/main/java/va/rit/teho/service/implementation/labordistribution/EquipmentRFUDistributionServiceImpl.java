@@ -69,26 +69,24 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
         for (Tree<Formation> t : treeList) {
             Map<Integer, Set<LaborDistributionAggregatedData>> sentUpper = new HashMap<>();
             for (int currentLevel = t.findLowestLevel(); currentLevel > 0; currentLevel--) {
-                List<Tree.Node<Formation>> nodesWithLevel = t.findNodesWithLevel(currentLevel);
-                for (Tree.Node<Formation> formationNode : nodesWithLevel) {
+                for (Tree.Node<Formation> formationNode : t.findNodesWithLevel(currentLevel)) {
+                    Formation formation = formationNode.getData();
                     //Get formation's RepairFormations
-                    Set<RepairFormation> repFormations = formationNode.getData().getRepairFormations();
+                    Set<RepairFormation> repFormations = formation.getRepairFormations();
                     //Get formation's equipment requiring repair
                     List<LaborDistributionAggregatedData> aggregatedDataForSession =
                             laborInputDistributionService.listAggregatedDataForSessionAndFormation(sessionId,
-                                                                                                   formationNode
-                                                                                                           .getData()
-                                                                                                           .getId(),
-                                                                                                   equipmentIds);
+                                    formation.getId(),
+                                    equipmentIds);
 
                     //Include data from previous level (unrepaired equipment)
                     aggregatedDataForSession.addAll(sentUpper.getOrDefault(currentLevel + 1, Collections.emptySet()));
 
                     List<EquipmentRFUDistribution> distributed =
                             distributeEquipmentPerRFU(sessionId,
-                                                      repFormations,
-                                                      aggregatedDataForSession,
-                                                      repairFormationUnitIds);
+                                    repFormations,
+                                    aggregatedDataForSession,
+                                    repairFormationUnitIds);
 
                     List<LaborDistributionAggregatedData> undistributedData =
                             aggregatedDataForSession

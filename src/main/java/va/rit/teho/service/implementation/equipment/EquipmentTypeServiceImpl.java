@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 public class EquipmentTypeServiceImpl implements EquipmentTypeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentTypeServiceImpl.class);
+    private static final String CONST_NAME = "название";
+    private static final String CONST_EQTYPE = "Тип ВВСТ";
 
     private final EquipmentTypeRepository equipmentTypeRepository;
 
@@ -61,7 +63,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     public EquipmentType addType(String shortName, String fullName) {
         logEquipmentAdd(shortName, fullName, null);
         equipmentTypeRepository.findByFullName(fullName).ifPresent(et -> {
-            throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
+            throw new AlreadyExistsException(CONST_EQTYPE, CONST_NAME, fullName);
         });
         long newId = equipmentTypeRepository.getMaxId() + 1;
         EquipmentType equipmentType = new EquipmentType(newId, shortName, fullName);
@@ -73,7 +75,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
         logEquipmentAdd(shortName, fullName, parentTypeId);
 
         equipmentTypeRepository.findByFullName(fullName).ifPresent(et -> {
-            throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
+            throw new AlreadyExistsException(CONST_EQTYPE, CONST_NAME, fullName);
         });
 
         long newId = equipmentTypeRepository.getMaxId() + 1;
@@ -91,7 +93,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
 
         equipmentTypeRepository.findByFullName(fullName).ifPresent(et -> {
             if (!et.getId().equals(id)) {
-                throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
+                throw new AlreadyExistsException(CONST_EQTYPE, CONST_NAME, fullName);
             }
         });
 
@@ -101,10 +103,10 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
     }
 
     private void logEquipmentAdd(String shortName, String fullName, Long parentId) {
-        String formatted = String.format("Добавление типа ВВСТ: \"%s\" (\"%s\", родительский тип: " + (parentId == null ? "отсутствует" : parentId),
-                                         shortName,
-                                         fullName,
-                                         parentId);
+        String formatted = String.format("Добавление типа ВВСТ: \"%s\" (\"%s\", родительский тип: %s)",
+                shortName,
+                fullName,
+                parentId == null ? "отсутствует" : parentId.toString());
         LOGGER.debug(formatted);
     }
 
@@ -122,7 +124,7 @@ public class EquipmentTypeServiceImpl implements EquipmentTypeService {
 
         equipmentTypeRepository.findByFullName(fullName).ifPresent(et -> {
             if (!et.getId().equals(id)) {
-                throw new AlreadyExistsException("Тип ВВСТ", "название", fullName);
+                throw new AlreadyExistsException(CONST_EQTYPE, CONST_NAME, fullName);
             }
         });
 

@@ -61,16 +61,16 @@ public class EquipmentDistributionPerRFUExcelReportService extends
         int colSize = 4;
         for (Map.Entry<RepairFormationUnit, List<EquipmentRFUDistribution>> repairFormationUnitListEntry : data.entrySet()) {
             createRowWideCell(sheet,
-                              lastRowIndex,
-                              colSize,
-                              repairFormationUnitListEntry.getKey().getName(),
-                              true,
-                              true);
-            List<EquipmentRFUDistribution> EquipmentRFUDistributions = repairFormationUnitListEntry.getValue();
-            EquipmentRFUDistributions.sort(Comparator.comparing(erd -> erd.getEquipment().getName()));
-            writeRows(sheet, lastRowIndex + 1, data, EquipmentRFUDistributions);
+                    lastRowIndex,
+                    colSize,
+                    repairFormationUnitListEntry.getKey().getName(),
+                    true,
+                    true);
+            List<EquipmentRFUDistribution> equipmentRFUDistributions = repairFormationUnitListEntry.getValue();
+            equipmentRFUDistributions.sort(Comparator.comparing(erd -> erd.getEquipment().getName()));
+            writeRows(sheet, lastRowIndex + 1, data, equipmentRFUDistributions);
 
-            lastRowIndex += EquipmentRFUDistributions.size() + 1;
+            lastRowIndex += equipmentRFUDistributions.size() + 1;
         }
         return lastRowIndex;
     }

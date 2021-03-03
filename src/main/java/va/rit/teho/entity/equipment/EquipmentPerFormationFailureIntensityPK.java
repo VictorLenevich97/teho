@@ -1,6 +1,9 @@
 package va.rit.teho.entity.equipment;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -9,10 +12,8 @@ import java.util.UUID;
 public class EquipmentPerFormationFailureIntensityPK implements Serializable {
 
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "equipment_id"),
-            @JoinColumn(name = "formation_id")
-    })
+    @JoinColumn(name = "equipment_id")
+    @JoinColumn(name = "formation_id")
     private EquipmentPerFormation equipmentPerFormation;
 
     @Column(name = "stage_id")

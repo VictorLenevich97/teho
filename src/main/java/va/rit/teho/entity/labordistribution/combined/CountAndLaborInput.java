@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class CountAndLaborInput {
 
-    public static final CountAndLaborInput EMPTY = empty();
+    public static final CountAndLaborInput EMPTY = createEmpty();
 
     private double count;
     private double laborInput;
@@ -23,7 +23,7 @@ public class CountAndLaborInput {
                 Double.compare(that.laborInput, laborInput) == 0;
     }
 
-    public static CountAndLaborInput empty() {
+    public static CountAndLaborInput createEmpty() {
         return new CountAndLaborInput(0.0, 0.0);
     }
 

@@ -16,8 +16,8 @@ import va.rit.teho.dto.labordistribution.CountAndLaborInputDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionFilterData;
 import va.rit.teho.dto.labordistribution.LaborDistributionNestedColumnsDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionRowData;
+import va.rit.teho.dto.table.GenericTableDataDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
-import va.rit.teho.dto.table.TableDataDTO;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
@@ -100,25 +100,25 @@ public class LaborInputDistributionController {
     @GetMapping("/stage/{stageId}/repair-type/{repairTypeId}")
     @ResponseBody
     @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта (в табличном формате)")
-    public ResponseEntity<TableDataDTO<Map<String, CountAndLaborInputDTO>>> getDistributionData(
+    public ResponseEntity<GenericTableDataDTO<Map<String, CountAndLaborInputDTO>, LaborDistributionRowData<CountAndLaborInputDTO>>> getDistributionData(
             @ApiParam(value = "Ключ этапа", required = true) @PathVariable @Positive Long stageId,
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) {
         Map<EquipmentType, List<EquipmentLaborInputDistribution>> laborInputDistribution =
                 laborInputDistributionService.getLaborInputDistribution(tehoSession.getSessionId(),
-                                                                        repairTypeId,
-                                                                        stageId,
-                                                                        nullIfEmpty(equipmentTypeId));
+                        repairTypeId,
+                        stageId,
+                        nullIfEmpty(equipmentTypeId));
         List<NestedColumnsDTO> columns =
                 workhoursDistributionIntervalService
                         .list()
                         .stream()
                         .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
-                                                     Comparator.nullsFirst(Comparator.naturalOrder())))
+                                Comparator.nullsFirst(Comparator.naturalOrder())))
                         .map(wdi -> new LaborDistributionNestedColumnsDTO(wdi.getId(),
-                                                                          wdi.getLowerBound(),
-                                                                          wdi.getUpperBound(),
-                                                                          true))
+                                wdi.getLowerBound(),
+                                wdi.getUpperBound(),
+                                true))
                         .collect(Collectors.toList());
         List<LaborDistributionRowData<CountAndLaborInputDTO>> rows =
                 laborInputDistribution
@@ -127,18 +127,18 @@ public class LaborInputDistributionController {
                         .flatMap(rd -> rd.getValue().stream()
                                          .map(this::getLaborDistributionRowData))
                         .collect(Collectors.toList());
-        return ResponseEntity.ok(new TableDataDTO<>(columns, rows));
+        return ResponseEntity.ok(new GenericTableDataDTO<>(columns, rows));
     }
 
     @GetMapping
     @ResponseBody
     @ApiOperation(value = "Получить данные о распределении ремонтного фонда подразделения по трудоемкости ремонта по всем типам ремонта (в табличном формате)")
-    public ResponseEntity<TableDataDTO<Map<String, String>>> getDistributionDataForAllRepairTypes(@RequestParam(required = false) List<Long> formationIds,
-                                                                                                  @RequestParam(required = false) List<Long> equipmentIds) {
+    public ResponseEntity<GenericTableDataDTO<Map<String, String>, LaborDistributionRowData<String>>> getDistributionDataForAllRepairTypes(@RequestParam(required = false) List<Long> formationIds,
+                                                                                                                                           @RequestParam(required = false) List<Long> equipmentIds) {
         Map<EquipmentType, List<EquipmentLaborInputDistribution>> aggregatedLaborInputDistribution =
                 laborInputDistributionService.getAggregatedLaborInputDistribution(tehoSession.getSessionId(),
-                                                                                  nullIfEmpty(formationIds),
-                                                                                  nullIfEmpty(equipmentIds));
+                        nullIfEmpty(formationIds),
+                        nullIfEmpty(equipmentIds));
         List<RepairType> repairTypes = repairTypeService.list(true);
         repairTypes.sort(Comparator.comparing(RepairType::getShortName).reversed());
         List<NestedColumnsDTO> columns =
@@ -152,7 +152,7 @@ public class LaborInputDistributionController {
                         .stream()
                         .flatMap(rd -> rd.getValue().stream().map(v -> buildRowDataPerRepairTypes(v, repairTypes)))
                         .collect(Collectors.toList());
-        return ResponseEntity.ok(new TableDataDTO<>(columns, rows));
+        return ResponseEntity.ok(new GenericTableDataDTO<>(columns, rows));
     }
 
     @GetMapping("/report")

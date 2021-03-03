@@ -6,7 +6,6 @@ import va.rit.teho.entity.equipment.Equipment;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
-import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentDTO {
