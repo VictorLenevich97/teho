@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Bundle Name="Установщик приложения ТехО (включая Java 8)"
+            Version="1.0"
+            DisableModify="yes"
+            DisableRemove="yes"
+            Manufacturer="ВАРБ"
+            UpgradeCode="afe8f203-a2a5-464f-a965-0724f859fee6">
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+            <bal:WixStandardBootstrapperApplication
+                    LicenseUrl=""
+                    SuppressOptionsUI="yes"
+                    SuppressRepair="yes"
+                    xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"/>
+        </BootstrapperApplicationRef>
+
+        <Chain>
+            <MsiPackage Id="TEHO"
+                        DisplayName="Установка приложения ТехО..."
+                        Visible="yes"
+                        DisplayInternalUI="yes"
+                        SourceFile="TEHO_installer.msi"/>
+            <PackageGroupRef Id="Java8Runtime"/>
+        </Chain>
+    </Bundle>
+    <Fragment>
+        <util:RegistrySearch Id="JRE_CURRENT_VERSION_REGSEARCH64"
+                             Root="HKLM"
+                             Key="SOFTWARE\JavaSoft\Java Runtime Environment"
+                             Value="CurrentVersion"
+                             Win64="yes"
+                             Variable="JAVA_CURRENT_VERSION64"/>
+        <PackageGroup Id="Java8Runtime">
+            <ExePackage Id="Java8Runtime"
+                        DisplayName="Установка Java Runtime Version 8..."
+                        Cache="yes"
+                        Compressed="yes"
+                        PerMachine="yes"
+                        Permanent="yes"
+                        Vital="yes"
+                        SourceFile="jre-8u281-windows-x64.exe"
+                        InstallCondition="(NOT JAVA_CURRENT_VERSION64) OR (JAVA_CURRENT_VERSION64 &lt; &quot;1.8&quot;)"
+                        InstallCommand="/s "/>
+        </PackageGroup>
+    </Fragment>
+</Wix>

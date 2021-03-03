@@ -1,5 +1,5 @@
 @echo off
-start /b "teho-1.0" java -noverify -Dspring.jmx.enabled=false -XX:TieredStopAtLevel=1 -Dspring.profiles.active=production -Dspring.config.location=classpath:application.properties -Dspring.main.lazy-initialization=true -jar teho-1.0-RELEASE.jar
+start /b "teho-1.0" java -noverify -Dspring.jmx.enabled=false -XX:TieredStopAtLevel=1 -Dspring.profiles.active=production -Dspring.config.location=classpath:application.properties -Dspring.main.lazy-initialization=true -Dserver.port=33657 -Dspring.datasource.password=tehoadmin -jar teho-1.0-RELEASE.jar
 
 teho.exe
 

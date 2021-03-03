@@ -1,6 +1,6 @@
 %define __jar_repack %{nil}
 Name:       teho
-Version:    1.0.1
+Version:    %VERSION%
 Release:    1
 Summary:    TEHO Software
 License:    NONE
@@ -12,13 +12,13 @@ AutoReqProv: no
 
 
 %prep
-cp ~/IdeaProjects/teho-backend/target/teho-1.0-RELEASE.jar $RPM_SOURCE_DIR/teho-1.0-RELEASE.jar
-cp ~/IdeaProjects/teho-backend/desktop-build/centos/teho $RPM_SOURCE_DIR/teho
+cp %BACKENDPATH%/target/teho-1.0-RELEASE.jar $RPM_SOURCE_DIR/teho-1.0-RELEASE.jar
+cp %BACKENDPATH%/desktop-build/centos/teho $RPM_SOURCE_DIR/teho
 rm -rf $RPM_SOURCE_DIR/frontend
 mkdir $RPM_SOURCE_DIR/frontend
-cp ~/IdeaProjects/teho-frontend/dist/teho-web-0.1.0.AppImage $RPM_SOURCE_DIR/frontend/teho-web-0.1.0.AppImage
-cp ~/IdeaProjects/teho-backend/desktop-build/centos/teho-web.desktop $RPM_SOURCE_DIR/teho-web.desktop
-cp ~/IdeaProjects/teho-backend/desktop-build/centos/teho-web*.png $RPM_SOURCE_DIR/
+cp %FRONTENDPATH%/dist/%FRONTEND_NAME%-%FRONTEND_VERSION%.AppImage $RPM_SOURCE_DIR/frontend/teho-web.AppImage
+cp %BACKENDPATH%/desktop-build/centos/teho-web.desktop $RPM_SOURCE_DIR/teho-web.desktop
+cp %BACKENDPATH%/desktop-build/centos/teho-web*.png $RPM_SOURCE_DIR/
 
 
 

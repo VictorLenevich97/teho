@@ -10,6 +10,6 @@ java -cp /opt/TEHO/unpacked/BOOT-INF/classes:/opt/TEHO/unpacked/BOOT-INF/lib/* \
 
 processId=$(ps -ef | grep 'va.rit.teho.server.TehoApplication' | grep -v 'grep' | awk '{ printf $2 }')
 
-/opt/TEHO/frontend/teho-web-0.1.0.AppImage --no-sandbox
+/opt/TEHO/frontend/teho-web.AppImage --no-sandbox
 
 kill $processId
