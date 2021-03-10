@@ -1,4 +1,4 @@
-RPM_VERSION="1.1"
+RPM_VERSION="1.0"
 
 #По необходимости изменить
 BACKEND_FOLDER=~/IdeaProjects/teho-backend

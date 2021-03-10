@@ -109,9 +109,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
 
         for (EquipmentFailurePerRepairTypeAmount equipmentFailurePerRepairTypeAmount : equipmentFailurePerRepairTypeAmounts) {
             Pair<Map<RepairType, CountAndLaborInputCombinedData>, Double> laborInputMapAndDailyFailure =
-                    calculateLaborInputMapAndSumDailyFailure(aggregated,
-                            intermediate,
-                            equipmentFailurePerRepairTypeAmount);
+                    calculateLaborInputMapAndSumDailyFailure(aggregated, intermediate, equipmentFailurePerRepairTypeAmount);
             intermediate.put(equipmentFailurePerRepairTypeAmount.getEquipmentPerFormation(),
                     laborInputMapAndDailyFailure);
         }
@@ -273,11 +271,7 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
     @Transactional
     public void updateLaborInputDistribution(UUID sessionId, List<Long> equipmentIds, List<Long> formationIds) {
         cleanupSessionData(sessionId);
-        List<RepairType> repairTypeList = repairTypeService
-                .list(true)
-                .stream()
-                .filter(RepairType::includesIntervals)
-                .collect(Collectors.toList());
+        List<RepairType> repairTypeList = repairTypeService.list(true);
         repairTypeList
                 .forEach(repairType -> {
                     List<EquipmentPerFormationFailureIntensityAndLaborInput> equipmentPerFormations =

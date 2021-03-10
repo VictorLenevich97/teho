@@ -64,7 +64,7 @@ public interface LaborDistributionRepository
 
     @Query(value = "SELECT new va.rit.teho.entity.labordistribution.combined.LaborDistributionAggregatedData(ld.equipment, ld.formation, ld.workhoursDistributionInterval, sum(ld.count), avg(ld.avgLaborInput)) " +
             "FROM LaborDistribution ld " +
-            "WHERE ld.formation.id = :formationId AND ld.tehoSession.id = :sessionId AND (coalesce(:equipmentIds, null) is null or ld.equipment.id IN (:equipmentIds)) " +
+            "WHERE ld.formation.id = :formationId AND ld.tehoSession.id = :sessionId AND (coalesce(:equipmentIds, null) is null or ld.equipment.id IN (:equipmentIds)) AND ld.repairType.calculatable = TRUE " +
             "GROUP BY ld.equipment, ld.formation, ld.workhoursDistributionInterval")
     List<LaborDistributionAggregatedData> selectLaborDistributionAggregatedData(UUID sessionId,
                                                                                 Long formationId,
