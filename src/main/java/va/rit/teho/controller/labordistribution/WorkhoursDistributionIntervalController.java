@@ -30,7 +30,7 @@ public class WorkhoursDistributionIntervalController {
     public ResponseEntity<List<DistributionIntervalDTO>> getDistributionIntervals() {
         return ResponseEntity.ok(
                 workhoursDistributionIntervalService
-                        .list()
+                        .listSorted()
                         .stream()
                         .map(DistributionIntervalDTO::from)
                         .collect(Collectors.toList()));

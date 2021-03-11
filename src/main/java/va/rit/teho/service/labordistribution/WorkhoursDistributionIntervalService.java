@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface WorkhoursDistributionIntervalService {
 
-    List<WorkhoursDistributionInterval> list();
+    List<WorkhoursDistributionInterval> listSorted();
 
     WorkhoursDistributionInterval get(Long id);
 

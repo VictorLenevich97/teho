@@ -221,10 +221,8 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
         Long formationId = equipmentPerFormationAndLaborInput.getFormationId();
         Long equipmentId = equipmentPerFormationAndLaborInput.getEquipmentId();
         return workhoursDistributionIntervalService
-                .list()
+                .listSorted()
                 .stream()
-                .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
-                        Comparator.nullsFirst(Comparator.naturalOrder())))
                 .map(interval -> {
                     LaborDistribution result;
                     if ((interval.getLowerBound() == null || laborInput > interval.getLowerBound()) &&

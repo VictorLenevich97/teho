@@ -9,8 +9,11 @@ import va.rit.teho.repository.labordistribution.WorkhoursDistributionIntervalRep
 import va.rit.teho.service.labordistribution.RestorationTypeService;
 import va.rit.teho.service.labordistribution.WorkhoursDistributionIntervalService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class WorkhoursDistributionIntervalServiceImpl implements WorkhoursDistributionIntervalService {
@@ -26,8 +29,11 @@ public class WorkhoursDistributionIntervalServiceImpl implements WorkhoursDistri
     }
 
     @Override
-    public List<WorkhoursDistributionInterval> list() {
-        return (List<WorkhoursDistributionInterval>) workhoursDistributionIntervalRepository.findAll();
+    public List<WorkhoursDistributionInterval> listSorted() {
+        return StreamSupport.stream(workhoursDistributionIntervalRepository.findAll().spliterator(), false)
+                .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
+                        Comparator.nullsFirst(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
     }
 
     @Override

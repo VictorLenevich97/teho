@@ -86,7 +86,7 @@ public class LaborInputDistributionController {
                                                                         repairTypeId,
                                                                         stageId,
                                                                         nullIfEmpty(equipmentTypeId));
-        List<WorkhoursDistributionInterval> distributionIntervals = workhoursDistributionIntervalService.list();
+        List<WorkhoursDistributionInterval> distributionIntervals = workhoursDistributionIntervalService.listSorted();
 
         byte[] bytes = reportService.generateReport(new LaborInputDistributionCombinedData(
                 equipmentTypeService.listHighestLevelTypes(equipmentTypeId),
@@ -111,10 +111,8 @@ public class LaborInputDistributionController {
                         nullIfEmpty(equipmentTypeId));
         List<NestedColumnsDTO> columns =
                 workhoursDistributionIntervalService
-                        .list()
+                        .listSorted()
                         .stream()
-                        .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
-                                Comparator.nullsFirst(Comparator.naturalOrder())))
                         .map(wdi -> new LaborDistributionNestedColumnsDTO(wdi.getId(),
                                 wdi.getLowerBound(),
                                 wdi.getUpperBound(),
@@ -172,7 +170,7 @@ public class LaborInputDistributionController {
                 equipmentTypeService.listHighestLevelTypes(null),
                 repairTypes,
                 aggregatedLaborInputDistribution,
-                workhoursDistributionIntervalService.list()));
+                workhoursDistributionIntervalService.listSorted()));
 
         return ReportResponseEntity.ok("Распределение производственного фонда (по всем типам ремонта)", bytes);
     }
@@ -180,10 +178,8 @@ public class LaborInputDistributionController {
     private NestedColumnsDTO buildDistributionNestedColumnsPerRepairType(RepairType rt) {
         List<NestedColumnsDTO> intervalColumns =
                 workhoursDistributionIntervalService
-                        .list()
+                        .listSorted()
                         .stream()
-                        .sorted(Comparator.comparing(WorkhoursDistributionInterval::getLowerBound,
-                                                     Comparator.nullsFirst(Comparator.naturalOrder())))
                         .map(wdi -> new LaborDistributionNestedColumnsDTO(buildCombinedKey(rt,
                                                                                            wdi.getId()),
                                                                           wdi.getLowerBound(),
