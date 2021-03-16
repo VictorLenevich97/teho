@@ -25,6 +25,12 @@
         </Chain>
     </Bundle>
     <Fragment>
+        <util:RegistrySearch Id="JRE_CURRENT_VERSION_REGSEARCH"
+                             Root="HKLM"
+                             Key="SOFTWARE\JavaSoft\Java Runtime Environment"
+                             Value="CurrentVersion"
+                             Win64="no"
+                             Variable="JAVA_CURRENT_VERSION" />
         <util:RegistrySearch Id="JRE_CURRENT_VERSION_REGSEARCH64"
                              Root="HKLM"
                              Key="SOFTWARE\JavaSoft\Java Runtime Environment"
@@ -32,7 +38,7 @@
                              Win64="yes"
                              Variable="JAVA_CURRENT_VERSION64"/>
         <PackageGroup Id="Java8Runtime">
-            <ExePackage Id="Java8Runtime"
+            <ExePackage Id="Java8Runtime64"
                         DisplayName="Установка Java Runtime Version 8..."
                         Cache="yes"
                         Compressed="yes"
@@ -40,7 +46,17 @@
                         Permanent="yes"
                         Vital="yes"
                         SourceFile="jre-8u281-windows-x64.exe"
-                        InstallCondition="(NOT JAVA_CURRENT_VERSION64) OR (JAVA_CURRENT_VERSION64 &lt; &quot;1.8&quot;)"
+                        InstallCondition="VersionNT64 AND ((NOT JAVA_CURRENT_VERSION64) OR (JAVA_CURRENT_VERSION64 &lt; &quot;1.8&quot;))"
+                        InstallCommand="/s "/>
+            <ExePackage Id="Java8Runtime32"
+                        DisplayName="Установка Java Runtime Version 8..."
+                        Cache="yes"
+                        Compressed="yes"
+                        PerMachine="yes"
+                        Permanent="yes"
+                        Vital="yes"
+                        SourceFile="jre-8u281-windows-i586.exe"
+                        InstallCondition="NOT VersionNT64 AND ((NOT JAVA_CURRENT_VERSION) OR (JAVA_CURRENT_VERSION &lt; &quot;1.8&quot;))"
                         InstallCommand="/s "/>
         </PackageGroup>
     </Fragment>
