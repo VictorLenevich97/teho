@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
 import va.rit.teho.dto.equipment.EquipmentPerFormationDTO;
@@ -91,26 +92,6 @@ public class EquipmentPerFormationController {
         return ResponseEntity.accepted().body(EquipmentPerFormationDTO.from(equipmentPerFormation));
     }
 
-//    @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}/intensity", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    @ApiOperation(value = "Обновить данные о выходе ВВСТ в ремонт в %")
-//    public ResponseEntity<Object> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
-//                                                             @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable @Positive Long equipmentId,
-//                                                             @ApiParam(value = "Данные о выходе ВВСТ в ремонт (%) ({'ключ этапа': {'ключ типа ремонта': 'значение'}})", required = true, example = "{'1': {'1': '21', '2': '15'}}")
-//                                                             @RequestBody Map<Long, Map<Long, Double>> data) {
-//
-//        data.forEach((stageId, repairTypeIntensityMap) ->
-//                             repairTypeIntensityMap
-//                                     .forEach((repairTypeId, intensity) ->
-//                                                      equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
-//                                                              tehoSession.getSessionId(),
-//                                                              formationId,
-//                                                              equipmentId,
-//                                                              repairTypeId,
-//                                                              stageId,
-//                                                              intensity)));
-//        return ResponseEntity.accepted().build();
-//    }
-
     @DeleteMapping("/formation/{formationId}/equipment/{equipmentId}")
     @Transactional
     @ApiOperation(value = "Удалить ВВСТ из Формирования")
@@ -134,52 +115,12 @@ public class EquipmentPerFormationController {
                                          .collect(Collectors.toList()));
     }
 
-
-//    @GetMapping("/formation/{formationId}/equipment/intensity")
-//    @ResponseBody
-//    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях с интенсивностью выхода в ремонт в % (в табличном виде)")
-//    public GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentPerFormationTableData(
-//            @ApiParam(value = "Ключ ВЧ", required = true, example = "1")
-//            @PathVariable @Positive Long formationId,
-//            @RequestParam(required = false) List<Long> equipmentIds) {
-//        return this.getEquipmentRowData(formationId,
-//                EquipmentPerFormationFailureIntensity::getIntensityPercentage,
-//                0,
-//                Object::toString,
-//                equipmentIds);
-//    }
-
-//    @GetMapping("/formation/{formationId}/equipment/intensity/report")
-//    @ResponseBody
-//    @ApiOperation(value = "Получить отчет по интенсивности выхода ВВСТ в ремонт (%)")
-//    public ResponseEntity<byte[]> getEquipmentFailureIntensityDataReport(@ApiParam(value = "Ключ ВЧ", required = true, example = "1")
-//                                                                         @PathVariable @Positive Long formationId,
-//                                                                         @RequestParam(required = false) List<Long> equipmentIds) throws
-//            UnsupportedEncodingException {
-//        byte[] bytes = generateEquipmentFailureReport(formationId,
-//                equipmentIds,
-//                EquipmentPerFormationFailureIntensity::getIntensityPercentage,
-//                "%");
-//
-//        return ReportResponseEntity.ok(REPORT_NAME, bytes);
-//    }
-
-    private <T> GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentRowData(Long formationId,
-                                                                                                                                    Function<EquipmentPerFormationFailureIntensity, T> getter,
-                                                                                                                                    T defaultValue,
-                                                                                                                                    Function<T, String> formatter,
-                                                                                                                                    List<Long> equipmentIds) {
+    private GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentRowData(Long formationId, List<Long> equipmentIds) {
         Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> failureIntensityData =
                 equipmentPerFormationService.getFailureIntensityData(tehoSession.getSessionId(),
                         formationId,
                         equipmentIds);
-        return getTableDataDTO(formationId,
-                EquipmentPerFormation::getEquipment,
-                getter,
-                defaultValue,
-                formatter,
-                Collections.singletonMap(null, failureIntensityData),
-                equipmentIds);
+        return getTableDataDTO(formationId, EquipmentPerFormation::getEquipment, Collections.singletonMap(null, failureIntensityData), equipmentIds);
     }
 
     @GetMapping("/formation/equipment/daily-failure")
@@ -191,9 +132,6 @@ public class EquipmentPerFormationController {
                 equipmentPerFormationService.getTotalFailureIntensityData(tehoSession.getSessionId());
         return getTableDataDTO(null,
                 EquipmentPerFormation::getEquipment,
-                EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
-                0.0,
-                va.rit.teho.controller.helper.Formatter::formatDoubleAsString,
                 failureIntensityData,
                 equipmentIds);
     }
@@ -226,32 +164,31 @@ public class EquipmentPerFormationController {
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) throws UnsupportedEncodingException {
         byte[] bytes = generateEquipmentFailureReport(formationId,
-                                                      nullIfEmpty(equipmentIds),
-                                                      EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
-                                                      "ед.");
+                nullIfEmpty(equipmentIds),
+                EquipmentPerFormationFailureIntensity::getAvgDailyFailure
+        );
 
         return ReportResponseEntity.ok(REPORT_NAME, bytes);
     }
 
     private byte[] generateEquipmentFailureReport(Long formationId,
                                                   List<Long> equipmentIds,
-                                                  Function<EquipmentPerFormationFailureIntensity, Number> intensityFunction,
-                                                  String unitIndicator) {
+                                                  Function<EquipmentPerFormationFailureIntensity, Number> intensityFunction) {
         Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> failureIntensityData =
                 equipmentPerFormationService.getFailureIntensityData(tehoSession.getSessionId(),
-                                                                     formationId,
-                                                                     equipmentIds);
+                        formationId,
+                        equipmentIds);
         List<Stage> stages = stageService.list();
         List<RepairType> repairTypes = repairTypeService.list(true);
         Map<EquipmentType, List<EquipmentPerFormation>> totalEquipmentInFormations =
                 equipmentPerFormationService.getGroupedEquipmentInFormation(formationId, equipmentIds);
         return reportService.generateReport(
                 new EquipmentFailureIntensityCombinedData(stages,
-                                                          repairTypes,
-                                                          Collections.singletonMap(null, totalEquipmentInFormations),
-                                                          Collections.singletonMap(null, failureIntensityData),
-                                                          intensityFunction,
-                                                          unitIndicator));
+                        repairTypes,
+                        Collections.singletonMap(null, totalEquipmentInFormations),
+                        Collections.singletonMap(null, failureIntensityData),
+                        intensityFunction,
+                        "ед."));
     }
 
     @GetMapping("/formation/{formationId}/equipment/daily-failure")
@@ -260,11 +197,7 @@ public class EquipmentPerFormationController {
     public ResponseEntity<GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>>> getEquipmentPerFormationDailyFailureData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) {
-        return ResponseEntity.ok(this.getEquipmentRowData(formationId,
-                EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
-                0.0,
-                va.rit.teho.controller.helper.Formatter::formatDoubleAsString,
-                nullIfEmpty(equipmentIds)));
+        return ResponseEntity.ok(this.getEquipmentRowData(formationId, nullIfEmpty(equipmentIds)));
     }
 
     @PostMapping("/formation/{formationId}/equipment/daily-failure/{coefficient}")
@@ -303,13 +236,11 @@ public class EquipmentPerFormationController {
     }
 
 
-    private <K, T> GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getTableDataDTO(Long formationId,
-                                                                                                                                   Function<EquipmentPerFormation, K> keyGetter,
-                                                                                                                                   Function<EquipmentPerFormationFailureIntensity, T> getter,
-                                                                                                                                   T defaultValue,
-                                                                                                                                   Function<T, String> formatter,
-                                                                                                                                   Map<Formation, Map<K, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
-                                                                                                                                   List<Long> equipmentIds) {
+    private <K> GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getTableDataDTO(
+            Long formationId,
+            Function<EquipmentPerFormation, K> keyGetter,
+            Map<Formation, Map<K, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
+            List<Long> equipmentIds) {
         List<Stage> stages = stageService.list();
         List<RepairType> repairTypes = repairTypeService.list(true);
 
@@ -334,27 +265,21 @@ public class EquipmentPerFormationController {
                 equipmentPerFormations
                         .stream()
                         .map(epb -> getEquipmentFailureIntensityRowData(failureIntensityData,
-                                                                        keyGetter,
-                                                                        stages,
-                                                                        repairTypes,
-                                                                        epb,
-                                                                        getter,
-                                                                        defaultValue,
-                                                                        formatter))
+                                keyGetter,
+                                stages,
+                                repairTypes,
+                                epb))
                         .sorted(Comparator.comparing(EquipmentFailureIntensityRowData::getId,
                                                      Comparator.reverseOrder()))
                         .collect(Collectors.toList());
         return new GenericTableDataDTO<>(stageColumns, rowData);
     }
 
-    private <K, T> EquipmentFailureIntensityRowData<String> getEquipmentFailureIntensityRowData(Map<Formation, Map<K, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
+    private <K> EquipmentFailureIntensityRowData<String> getEquipmentFailureIntensityRowData(Map<Formation, Map<K, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
                                                                                                 Function<EquipmentPerFormation, K> keyGetter,
                                                                                                 List<Stage> stages,
                                                                                                 List<RepairType> repairTypes,
-                                                                                                EquipmentPerFormation epb,
-                                                                                                Function<EquipmentPerFormationFailureIntensity, T> getter,
-                                                                                                T defaultValue,
-                                                                                                Function<T, String> formatter) {
+                                                                                                EquipmentPerFormation epb) {
         Map<String, Map<String, String>> data = new HashMap<>();
 
         for (Stage s : stages) {
@@ -362,21 +287,21 @@ public class EquipmentPerFormationController {
                 EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
                         failureIntensityData
                                 .getOrDefault(epb.getFormation(),
-                                              failureIntensityData
-                                                      .values()
-                                                      .stream()
-                                                      .findFirst()
-                                                      .orElse(Collections.emptyMap()))
+                                        failureIntensityData
+                                                .values()
+                                                .stream()
+                                                .findFirst()
+                                                .orElse(Collections.emptyMap()))
                                 .getOrDefault(keyGetter.apply(epb), Collections.emptyMap())
                                 .getOrDefault(rt, Collections.emptyMap())
                                 .get(s);
 
                 data.computeIfAbsent(s.getId().toString(), e -> new HashMap<>())
-                    .put(rt.getId().toString(),
-                         formatter.apply(Optional
-                                                 .ofNullable(equipmentPerFormationFailureIntensity)
-                                                 .map(getter)
-                                                 .orElse(defaultValue)));
+                        .put(rt.getId().toString(),
+                                Formatter.formatDoubleAsString(Optional
+                                        .ofNullable(equipmentPerFormationFailureIntensity)
+                                        .map(EquipmentPerFormationFailureIntensity::getAvgDailyFailure)
+                                        .orElse(0.0)));
             }
         }
         return new EquipmentFailureIntensityRowData<>(epb.getEquipment().getId(),

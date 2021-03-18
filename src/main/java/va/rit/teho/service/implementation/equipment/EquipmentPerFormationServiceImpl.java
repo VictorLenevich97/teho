@@ -7,7 +7,7 @@ import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.*;
 import va.rit.teho.entity.equipment.combined.EquipmentPerFormationFailureIntensityAndLaborInput;
 import va.rit.teho.entity.formation.Formation;
-import va.rit.teho.entity.intensity.ActiveIntensityData;
+import va.rit.teho.entity.intensity.IntensityData;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.equipment.EquipmentPerFormationFailureIntensityRepository;
@@ -121,7 +121,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     public void calculateAndSetEquipmentPerFormationDailyFailure(UUID sessionId,
                                                                  Long formationId,
                                                                  double coefficient) {
-        ActiveIntensityData activeIntensitiesGrouped = intensityService.getActiveIntensitiesGrouped();
+        IntensityData activeIntensitiesGrouped = intensityService.getActiveIntensitiesGrouped();
         List<EquipmentPerFormationFailureIntensity> updatedWithAvgDailyFailureData =
                 equipmentPerFormationFailureIntensityRepository
                         .findAllByTehoSessionIdAndFormationId(sessionId, formationId, null)
