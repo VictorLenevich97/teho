@@ -18,6 +18,7 @@ import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.intensity.IntensityData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.common.StageService;
+import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.intensity.IntensityService;
 
 import javax.validation.constraints.Positive;
@@ -32,11 +33,13 @@ public class IntensityController {
     private final IntensityService intensityService;
     private final RepairTypeService repairTypeService;
     private final StageService stageService;
+    private final EquipmentService equipmentService;
 
-    public IntensityController(IntensityService intensityService, RepairTypeService repairTypeService, StageService stageService) {
+    public IntensityController(IntensityService intensityService, RepairTypeService repairTypeService, StageService stageService, EquipmentService equipmentService) {
         this.intensityService = intensityService;
         this.repairTypeService = repairTypeService;
         this.stageService = stageService;
+        this.equipmentService = equipmentService;
     }
 
     @PutMapping(path = "/operation/{operationId}/intensity/{equipmentId}")
@@ -59,7 +62,7 @@ public class IntensityController {
         List<Stage> stages = stageService.list();
         List<RepairType> repairTypes = repairTypeService.list(true);
         IntensityData intensitiesForOperation = intensityService.getIntensitiesForOperation(operationId);
-        Set<Equipment> equipmentSet = intensitiesForOperation.getEquipmentSet();
+        List<Equipment> equipmentList = equipmentService.list();
 
         List<NestedColumnsDTO> stageColumns = new ArrayList<>();
         for (Stage s : stages) {
@@ -76,7 +79,7 @@ public class IntensityController {
 
         List<EquipmentFailureIntensityRowData<String>> intensityRowData = new ArrayList<>();
 
-        for (Equipment equipment : equipmentSet) {
+        for (Equipment equipment : equipmentList) {
             for (Stage s : stages) {
                 for (RepairType rt : repairTypes) {
                     Map<String, Map<String, String>> data = new HashMap<>();
