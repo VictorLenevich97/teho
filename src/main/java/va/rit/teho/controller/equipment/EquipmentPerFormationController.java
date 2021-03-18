@@ -91,25 +91,25 @@ public class EquipmentPerFormationController {
         return ResponseEntity.accepted().body(EquipmentPerFormationDTO.from(equipmentPerFormation));
     }
 
-    @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}/intensity", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Обновить данные о выходе ВВСТ в ремонт в %")
-    public ResponseEntity<Object> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
-                                                             @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable @Positive Long equipmentId,
-                                                             @ApiParam(value = "Данные о выходе ВВСТ в ремонт (%) ({'ключ этапа': {'ключ типа ремонта': 'значение'}})", required = true, example = "{'1': {'1': '21', '2': '15'}}")
-                                                             @RequestBody Map<Long, Map<Long, Integer>> data) {
-
-        data.forEach((stageId, repairTypeIntensityMap) ->
-                             repairTypeIntensityMap
-                                     .forEach((repairTypeId, intensity) ->
-                                                      equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
-                                                              tehoSession.getSessionId(),
-                                                              formationId,
-                                                              equipmentId,
-                                                              repairTypeId,
-                                                              stageId,
-                                                              intensity)));
-        return ResponseEntity.accepted().build();
-    }
+//    @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}/intensity", consumes = MediaType.APPLICATION_JSON_VALUE)
+//    @ApiOperation(value = "Обновить данные о выходе ВВСТ в ремонт в %")
+//    public ResponseEntity<Object> updateEquipmentInFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
+//                                                             @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @PathVariable @Positive Long equipmentId,
+//                                                             @ApiParam(value = "Данные о выходе ВВСТ в ремонт (%) ({'ключ этапа': {'ключ типа ремонта': 'значение'}})", required = true, example = "{'1': {'1': '21', '2': '15'}}")
+//                                                             @RequestBody Map<Long, Map<Long, Double>> data) {
+//
+//        data.forEach((stageId, repairTypeIntensityMap) ->
+//                             repairTypeIntensityMap
+//                                     .forEach((repairTypeId, intensity) ->
+//                                                      equipmentPerFormationService.setEquipmentPerFormationFailureIntensity(
+//                                                              tehoSession.getSessionId(),
+//                                                              formationId,
+//                                                              equipmentId,
+//                                                              repairTypeId,
+//                                                              stageId,
+//                                                              intensity)));
+//        return ResponseEntity.accepted().build();
+//    }
 
     @DeleteMapping("/formation/{formationId}/equipment/{equipmentId}")
     @Transactional
@@ -135,34 +135,34 @@ public class EquipmentPerFormationController {
     }
 
 
-    @GetMapping("/formation/{formationId}/equipment/intensity")
-    @ResponseBody
-    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях с интенсивностью выхода в ремонт в % (в табличном виде)")
-    public GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentPerFormationTableData(
-            @ApiParam(value = "Ключ ВЧ", required = true, example = "1")
-            @PathVariable @Positive Long formationId,
-            @RequestParam(required = false) List<Long> equipmentIds) {
-        return this.getEquipmentRowData(formationId,
-                EquipmentPerFormationFailureIntensity::getIntensityPercentage,
-                0,
-                Object::toString,
-                equipmentIds);
-    }
+//    @GetMapping("/formation/{formationId}/equipment/intensity")
+//    @ResponseBody
+//    @ApiOperation(value = "Получить данные о ВВСТ в Формированиях с интенсивностью выхода в ремонт в % (в табличном виде)")
+//    public GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentPerFormationTableData(
+//            @ApiParam(value = "Ключ ВЧ", required = true, example = "1")
+//            @PathVariable @Positive Long formationId,
+//            @RequestParam(required = false) List<Long> equipmentIds) {
+//        return this.getEquipmentRowData(formationId,
+//                EquipmentPerFormationFailureIntensity::getIntensityPercentage,
+//                0,
+//                Object::toString,
+//                equipmentIds);
+//    }
 
-    @GetMapping("/formation/{formationId}/equipment/intensity/report")
-    @ResponseBody
-    @ApiOperation(value = "Получить отчет по интенсивности выхода ВВСТ в ремонт (%)")
-    public ResponseEntity<byte[]> getEquipmentFailureIntensityDataReport(@ApiParam(value = "Ключ ВЧ", required = true, example = "1")
-                                                                         @PathVariable @Positive Long formationId,
-                                                                         @RequestParam(required = false) List<Long> equipmentIds) throws
-            UnsupportedEncodingException {
-        byte[] bytes = generateEquipmentFailureReport(formationId,
-                equipmentIds,
-                EquipmentPerFormationFailureIntensity::getIntensityPercentage,
-                "%");
-
-        return ReportResponseEntity.ok(REPORT_NAME, bytes);
-    }
+//    @GetMapping("/formation/{formationId}/equipment/intensity/report")
+//    @ResponseBody
+//    @ApiOperation(value = "Получить отчет по интенсивности выхода ВВСТ в ремонт (%)")
+//    public ResponseEntity<byte[]> getEquipmentFailureIntensityDataReport(@ApiParam(value = "Ключ ВЧ", required = true, example = "1")
+//                                                                         @PathVariable @Positive Long formationId,
+//                                                                         @RequestParam(required = false) List<Long> equipmentIds) throws
+//            UnsupportedEncodingException {
+//        byte[] bytes = generateEquipmentFailureReport(formationId,
+//                equipmentIds,
+//                EquipmentPerFormationFailureIntensity::getIntensityPercentage,
+//                "%");
+//
+//        return ReportResponseEntity.ok(REPORT_NAME, bytes);
+//    }
 
     private <T> GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentRowData(Long formationId,
                                                                                                                                     Function<EquipmentPerFormationFailureIntensity, T> getter,

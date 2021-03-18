@@ -21,13 +21,6 @@ public interface EquipmentPerFormationService {
 
     EquipmentPerFormation updateEquipmentInFormation(Long formationId, Long equipmentId, int amount);
 
-    void setEquipmentPerFormationFailureIntensity(UUID sessionId,
-                                                  Long formationId,
-                                                  Long equipmentId,
-                                                  Long repairTypeId,
-                                                  Long stageId,
-                                                  Integer intensity);
-
     void setEquipmentPerFormationDailyFailure(UUID sessionId,
                                               Long formationId,
                                               Long equipmentId,

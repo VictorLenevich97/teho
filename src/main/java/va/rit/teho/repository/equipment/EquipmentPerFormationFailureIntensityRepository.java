@@ -16,7 +16,7 @@ import java.util.UUID;
 public interface EquipmentPerFormationFailureIntensityRepository
         extends CrudRepository<EquipmentPerFormationFailureIntensity, EquipmentPerFormationFailureIntensityPK> {
 
-    @Query("SELECT new va.rit.teho.entity.equipment.combined.EquipmentPerFormationFailureIntensityAndLaborInput(epbfi.formation.id, epbfi.equipment.id, epbfi.stage.id, elipt.repairType.id, epbfi.intensityPercentage, epbfi.avgDailyFailure, elipt.amount) FROM " +
+    @Query("SELECT new va.rit.teho.entity.equipment.combined.EquipmentPerFormationFailureIntensityAndLaborInput(epbfi.formation.id, epbfi.equipment.id, epbfi.stage.id, elipt.repairType.id, epbfi.avgDailyFailure, elipt.amount) FROM " +
             "EquipmentPerFormationFailureIntensity epbfi INNER JOIN EquipmentLaborInputPerType elipt ON elipt.repairType.id = epbfi.repairType.id AND epbfi.equipment.id = elipt.equipment.id " +
             "WHERE (coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds)) AND " +
             "(coalesce(:formationIds, null) IS NULL OR epbfi.formation.id IN (:formationIds)) AND " +

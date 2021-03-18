@@ -5,7 +5,6 @@ public class EquipmentPerFormationFailureIntensityAndLaborInput {
     private final Long equipmentId;
     private final Long stageId;
     private final Long repairTypeId;
-    private final int failureIntensity;
     private final Double avgDailyFailure;
     private final int laborInput;
 
@@ -13,14 +12,12 @@ public class EquipmentPerFormationFailureIntensityAndLaborInput {
                                                               Long equipmentId,
                                                               Long stageId,
                                                               Long repairTypeId,
-                                                              int failureIntensity,
                                                               Double avgDailyFailure,
                                                               int laborInput) {
         this.formationId = formationId;
         this.equipmentId = equipmentId;
         this.stageId = stageId;
         this.repairTypeId = repairTypeId;
-        this.failureIntensity = failureIntensity;
         this.avgDailyFailure = avgDailyFailure;
         this.laborInput = laborInput;
     }
@@ -39,10 +36,6 @@ public class EquipmentPerFormationFailureIntensityAndLaborInput {
 
     public Long getStageId() {
         return stageId;
-    }
-
-    public int getFailureIntensity() {
-        return failureIntensity;
     }
 
     public Long getRepairTypeId() {

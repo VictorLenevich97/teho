@@ -7,6 +7,7 @@ import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.*;
 import va.rit.teho.entity.equipment.combined.EquipmentPerFormationFailureIntensityAndLaborInput;
 import va.rit.teho.entity.formation.Formation;
+import va.rit.teho.entity.intensity.ActiveIntensityData;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.equipment.EquipmentPerFormationFailureIntensityRepository;
@@ -15,6 +16,7 @@ import va.rit.teho.service.common.CalculationService;
 import va.rit.teho.service.equipment.EquipmentPerFormationService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.formation.FormationService;
+import va.rit.teho.service.intensity.IntensityService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
 
     private final FormationService formationService;
     private final EquipmentService equipmentService;
+    private final IntensityService intensityService;
 
     private final EquipmentPerFormationRepository equipmentPerFormationRepository;
     private final EquipmentPerFormationFailureIntensityRepository equipmentPerFormationFailureIntensityRepository;
@@ -37,11 +40,13 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     public EquipmentPerFormationServiceImpl(CalculationService calculationService,
                                             FormationService formationService,
                                             EquipmentService equipmentService,
+                                            IntensityService intensityService,
                                             EquipmentPerFormationRepository equipmentPerFormationRepository,
                                             EquipmentPerFormationFailureIntensityRepository equipmentPerFormationFailureIntensityRepository) {
         this.calculationService = calculationService;
         this.formationService = formationService;
         this.equipmentService = equipmentService;
+        this.intensityService = intensityService;
         this.equipmentPerFormationRepository = equipmentPerFormationRepository;
         this.equipmentPerFormationFailureIntensityRepository = equipmentPerFormationFailureIntensityRepository;
     }
@@ -56,30 +61,6 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                         .orElseThrow(() -> new NotFoundException("ВЧ (id = " + formationId + ") не содержит ВВСТ (id = " + equipmentId + ")!"));
         epb.setAmount(amount);
         return equipmentPerFormationRepository.save(epb);
-    }
-
-    @Override
-    public void setEquipmentPerFormationFailureIntensity(
-            UUID sessionId,
-            Long formationId,
-            Long equipmentId,
-            Long repairTypeId,
-            Long stageId,
-            Integer intensity) {
-
-        EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
-                equipmentPerFormationFailureIntensityRepository
-                        .find(sessionId, formationId, equipmentId, stageId, repairTypeId)
-                        .map(epffi -> epffi.setIntensityPercentage(intensity))
-                        .orElse(new EquipmentPerFormationFailureIntensity(sessionId,
-                                                                          formationId,
-                                                                          equipmentId,
-                                                                          stageId,
-                                                                          repairTypeId,
-                                                                          intensity,
-                                                                          0.0));
-
-        equipmentPerFormationFailureIntensityRepository.save(equipmentPerFormationFailureIntensity);
     }
 
     @Override
@@ -102,7 +83,6 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                                           equipmentId,
                                                                           stageId,
                                                                           repairTypeId,
-                                                                          0,
                                                                           dailyFailure));
 
 
@@ -141,6 +121,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     public void calculateAndSetEquipmentPerFormationDailyFailure(UUID sessionId,
                                                                  Long formationId,
                                                                  double coefficient) {
+        ActiveIntensityData activeIntensitiesGrouped = intensityService.getActiveIntensitiesGrouped();
         List<EquipmentPerFormationFailureIntensity> updatedWithAvgDailyFailureData =
                 equipmentPerFormationFailureIntensityRepository
                         .findAllByTehoSessionIdAndFormationId(sessionId, formationId, null)
@@ -152,7 +133,10 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                     .getEquipmentPerFormationWithRepairTypeId()
                                                     .getEquipmentPerFormation()
                                                     .getAmount(),
-                                            equipmentPerFormationFailureIntensity.getIntensityPercentage(),
+                                            activeIntensitiesGrouped.get(
+                                                    equipmentPerFormationFailureIntensity.getEquipment(),
+                                                    equipmentPerFormationFailureIntensity.getRepairType(),
+                                                    equipmentPerFormationFailureIntensity.getStage()),
                                             coefficient);
                             return equipmentPerFormationFailureIntensity.setAvgDailyFailure(avgDailyFailure);
                         })

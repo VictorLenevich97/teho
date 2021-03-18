@@ -10,7 +10,7 @@ public interface CalculationService {
      * @param k           поправочный коэффициент
      * @return значение среднесуточного выхода в ремонт (в единицах, штуках, комплектах)
      */
-    double calculateAvgDailyFailure(int totalAmount, int intensity, double k);
+    double calculateAvgDailyFailure(int totalAmount, double intensity, double k);
 
     /**
      * Расчет количества образцов ВВСТ, требующих ремонта в данном диапазоне

@@ -40,15 +40,11 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
     @JoinColumn(name = "session_id")
     private TehoSession tehoSession;
 
-    @Column(nullable = false)
-    private Integer intensityPercentage;
-
     private Double avgDailyFailure;
 
     public EquipmentPerFormationFailureIntensity(EquipmentPerFormationFailureIntensityPK id,
-                                                 Integer intensityPercentage, Double avgDailyFailure) {
+                                                 Double avgDailyFailure) {
         this.id = id;
-        this.intensityPercentage = intensityPercentage;
         this.avgDailyFailure = avgDailyFailure;
     }
 
@@ -57,14 +53,12 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
                                                  Long equipmentId,
                                                  Long stageId,
                                                  Long repairTypeId,
-                                                 int intensity,
                                                  Double avgDailyFailure) {
         this.id = new EquipmentPerFormationFailureIntensityPK(formationId,
                                                               equipmentId,
                                                               stageId,
                                                               repairTypeId,
                                                               sessionId);
-        this.intensityPercentage = intensity;
         this.avgDailyFailure = avgDailyFailure;
     }
 
@@ -83,10 +77,6 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
         return equipment;
     }
 
-    public int getIntensityPercentage() {
-        return intensityPercentage;
-    }
-
     public Stage getStage() {
         return stage;
     }
@@ -103,11 +93,6 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
         return avgDailyFailure;
     }
 
-    public EquipmentPerFormationFailureIntensity setIntensityPercentage(Integer intensityPercentage) {
-        this.intensityPercentage = intensityPercentage;
-        return this;
-    }
-
     public EquipmentPerFormationFailureIntensity setAvgDailyFailure(Double avgDailyFailure) {
         this.avgDailyFailure = avgDailyFailure;
         return this;
@@ -115,7 +100,6 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
 
     public EquipmentPerFormationFailureIntensity copy(UUID newSessionId) {
         return new EquipmentPerFormationFailureIntensity(getEquipmentPerFormationWithRepairTypeId().copy(newSessionId),
-                                                         intensityPercentage,
                                                          avgDailyFailure);
     }
 
@@ -128,7 +112,6 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
                 ", stage=" + stage +
                 ", repairType=" + repairType +
                 ", tehoSession=" + tehoSession +
-                ", intensityPercentage=" + intensityPercentage +
                 ", avgDailyFailure=" + avgDailyFailure +
                 '}';
     }
