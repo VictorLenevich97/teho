@@ -80,16 +80,14 @@ public class IntensityController {
         List<EquipmentFailureIntensityRowData<String>> intensityRowData = new ArrayList<>();
 
         for (Equipment equipment : equipmentList) {
+            Map<String, Map<String, String>> data = new HashMap<>();
             for (Stage s : stages) {
                 for (RepairType rt : repairTypes) {
-                    Map<String, Map<String, String>> data = new HashMap<>();
-
                     data.computeIfAbsent(s.getId().toString(), e -> new HashMap<>())
                             .put(rt.getId().toString(), Formatter.formatDoubleAsString(intensitiesForOperation.get(equipment, rt, s)));
-
-                    intensityRowData.add(new EquipmentFailureIntensityRowData<>(equipment.getId(), equipment.getName(), data));
                 }
             }
+            intensityRowData.add(new EquipmentFailureIntensityRowData<>(equipment.getId(), equipment.getName(), data));
         }
 
         return new GenericTableDataDTO<>(stageColumns, intensityRowData);
