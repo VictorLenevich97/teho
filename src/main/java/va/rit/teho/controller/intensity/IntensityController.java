@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.controller.helper.Formatter;
+import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
 import va.rit.teho.dto.table.GenericTableDataDTO;
 import va.rit.teho.dto.table.NestedColumnsDTO;
@@ -16,12 +17,15 @@ import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.intensity.IntensityData;
+import va.rit.teho.entity.intensity.combined.EquipmentIntensityCombinedData;
 import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.common.StageService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.intensity.IntensityService;
+import va.rit.teho.service.report.ReportService;
 
 import javax.validation.constraints.Positive;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @Controller
@@ -34,12 +38,14 @@ public class IntensityController {
     private final RepairTypeService repairTypeService;
     private final StageService stageService;
     private final EquipmentService equipmentService;
+    private final ReportService<EquipmentIntensityCombinedData> reportService;
 
-    public IntensityController(IntensityService intensityService, RepairTypeService repairTypeService, StageService stageService, EquipmentService equipmentService) {
+    public IntensityController(IntensityService intensityService, RepairTypeService repairTypeService, StageService stageService, EquipmentService equipmentService, ReportService<EquipmentIntensityCombinedData> reportService) {
         this.intensityService = intensityService;
         this.repairTypeService = repairTypeService;
         this.stageService = stageService;
         this.equipmentService = equipmentService;
+        this.reportService = reportService;
     }
 
     @PutMapping(path = "/operation/{operationId}/intensity/{equipmentId}")
@@ -56,7 +62,7 @@ public class IntensityController {
     @GetMapping("/operation/{operationId}/intensity")
     @ResponseBody
     @ApiOperation(value = "Получить данные о ВВСТ с интенсивностью выхода в ремонт в % (в табличном виде)")
-    public GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentPerFormationTableData(
+    public GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentIntensityData(
             @ApiParam(value = "Ключ Операции", required = true, example = "1")
             @PathVariable @Positive Long operationId) {
         List<Stage> stages = stageService.list();
@@ -90,25 +96,25 @@ public class IntensityController {
             intensityRowData.add(new EquipmentFailureIntensityRowData<>(equipment.getId(), equipment.getName(), data));
         }
 
-        intensityRowData.sort(Comparator.comparing(EquipmentFailureIntensityRowData::getId, Comparator.reverseOrder()));
-
         return new GenericTableDataDTO<>(stageColumns, intensityRowData);
     }
 
-//    @GetMapping("/formation/{formationId}/equipment/intensity/report")
-//    @ResponseBody
-//    @ApiOperation(value = "Получить отчет по интенсивности выхода ВВСТ в ремонт (%)")
-//    public ResponseEntity<byte[]> getEquipmentFailureIntensityDataReport(@ApiParam(value = "Ключ ВЧ", required = true, example = "1")
-//                                                                         @PathVariable @Positive Long formationId,
-//                                                                         @RequestParam(required = false) List<Long> equipmentIds) throws
-//            UnsupportedEncodingException {
-//        byte[] bytes = generateEquipmentFailureReport(formationId,
-//                equipmentIds,
-//                EquipmentPerFormationFailureIntensity::getIntensityPercentage,
-//                "%");
-//
-//        return ReportResponseEntity.ok(REPORT_NAME, bytes);
-//    }
+    @GetMapping("/operation/{operationId}/intensity/report")
+    @ResponseBody
+    @ApiOperation(value = "Получить отчет по интенсивности выхода ВВСТ в ремонт (%)")
+    public ResponseEntity<byte[]> getEquipmentIntensityReport(
+            @ApiParam(value = "Ключ Операции", required = true, example = "1")
+            @PathVariable @Positive Long operationId) throws
+            UnsupportedEncodingException {
+        List<Stage> stages = stageService.list();
+        List<RepairType> repairTypes = repairTypeService.list(true);
+        IntensityData intensitiesForOperation = intensityService.getIntensitiesForOperation(operationId);
+        List<Equipment> equipmentList = equipmentService.list();
+
+        byte[] report = reportService.generateReport(new EquipmentIntensityCombinedData(stages, repairTypes, intensitiesForOperation, equipmentList));
+
+        return ReportResponseEntity.ok("Интенсивность выхода ВВСТ в ремонт", report);
+    }
 
 
 }

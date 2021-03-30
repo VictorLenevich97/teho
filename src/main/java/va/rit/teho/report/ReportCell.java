@@ -32,7 +32,7 @@ public class ReportCell {
     }
 
     public String getNumericValue() {
-        return new DecimalFormat("#.##").format(Double.parseDouble(value.toString()));
+        return new DecimalFormat("#.###").format(Double.parseDouble(value.toString()));
     }
 
     public String getValue() {

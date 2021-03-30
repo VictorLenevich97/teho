@@ -16,13 +16,15 @@ public interface EquipmentPerFormationRepository
     @Query("SELECT new va.rit.teho.entity.equipment.EquipmentPerFormation(epb.equipment, epb.formation, SUM(epb.amount)) " +
             "FROM EquipmentPerFormation epb " +
             "WHERE (coalesce(:equipmentIds, null) IS NULL OR epb.equipment.id IN (:equipmentIds)) " +
-            "GROUP BY epb.formation.id, epb.equipment.id")
+            "GROUP BY epb.formation.id, epb.equipment.id " +
+            "ORDER BY epb.equipment.id ASC")
     List<EquipmentPerFormation> findTotal(List<Long> equipmentIds);
 
     @Query("SELECT epb " +
             "FROM EquipmentPerFormation epb " +
             "WHERE epb.formation.id = :formationId AND (" +
-            "coalesce(:equipmentIds, null) IS NULL OR epb.equipment.id IN (:equipmentIds))")
+            "coalesce(:equipmentIds, null) IS NULL OR epb.equipment.id IN (:equipmentIds)) " +
+            "ORDER BY epb.equipment.id ASC")
     List<EquipmentPerFormation> findAllByFormationId(Long formationId, List<Long> equipmentIds);
 
 }

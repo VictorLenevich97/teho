@@ -19,6 +19,8 @@ public interface EquipmentRepository extends PagingAndSortingRepository<Equipmen
             "(coalesce(:typeIds, null) is null or e.equipmentType.id in (:typeIds)) ")
     Long countFiltered(List<Long> ids, List<Long> typeIds);
 
+    List<Equipment> findAllByOrderByIdAsc();
+
     @Query("SELECT e from Equipment e WHERE (coalesce(:ids, null) is null or e.id in (:ids)) AND " +
             "(coalesce(:typeIds, null) is null or e.equipmentType.id in (:typeIds)) " +
             "ORDER BY e.equipmentType.id ASC, e.id ASC")

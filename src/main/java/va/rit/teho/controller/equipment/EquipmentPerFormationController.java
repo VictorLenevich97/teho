@@ -22,7 +22,7 @@ import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
 import va.rit.teho.entity.equipment.EquipmentType;
-import va.rit.teho.entity.equipment.combined.EquipmentFailureIntensityCombinedData;
+import va.rit.teho.entity.equipment.combined.EquipmentAvgDailyFailureCombinedData;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.common.RepairTypeService;
@@ -51,7 +51,7 @@ public class EquipmentPerFormationController {
     private final StageService stageService;
     private final RepairTypeService repairTypeService;
     private final EquipmentPerFormationService equipmentPerFormationService;
-    private final ReportService<EquipmentFailureIntensityCombinedData> reportService;
+    private final ReportService<EquipmentAvgDailyFailureCombinedData> reportService;
 
     @Resource
     private TehoSessionData tehoSession;
@@ -59,7 +59,7 @@ public class EquipmentPerFormationController {
     public EquipmentPerFormationController(StageService stageService,
                                            RepairTypeService repairTypeService,
                                            EquipmentPerFormationService equipmentPerFormationService,
-                                           ReportService<EquipmentFailureIntensityCombinedData> reportService) {
+                                           ReportService<EquipmentAvgDailyFailureCombinedData> reportService) {
         this.stageService = stageService;
         this.repairTypeService = repairTypeService;
         this.equipmentPerFormationService = equipmentPerFormationService;
@@ -110,8 +110,6 @@ public class EquipmentPerFormationController {
                                          .getEquipmentInFormation(formationId, null)
                                          .stream()
                                          .map(EquipmentPerFormationDTO::from)
-                                         .sorted(Comparator.comparing(EquipmentPerFormationDTO::getEquipmentId,
-                                                                      Comparator.reverseOrder()))
                                          .collect(Collectors.toList()));
     }
 
@@ -147,13 +145,8 @@ public class EquipmentPerFormationController {
         List<RepairType> repairTypes = repairTypeService.list(true);
         Map<Formation, Map<EquipmentType, List<EquipmentPerFormation>>> totalEquipmentInFormations =
                 equipmentPerFormationService.getTotalGroupedEquipmentInFormations(equipmentIds);
-        byte[] bytes = reportService.generateReport(new EquipmentFailureIntensityCombinedData(stages,
-                                                                                              repairTypes,
-                                                                                              totalEquipmentInFormations,
-                                                                                              failureIntensityData,
-                                                                                              EquipmentPerFormationFailureIntensity::getAvgDailyFailure,
-                                                                                              "ед."));
-
+        byte[] bytes = reportService.generateReport(
+                new EquipmentAvgDailyFailureCombinedData(stages, repairTypes, totalEquipmentInFormations, failureIntensityData));
         return ReportResponseEntity.ok(REPORT_NAME, bytes);
     }
 
@@ -163,17 +156,13 @@ public class EquipmentPerFormationController {
     public ResponseEntity<byte[]> getEquipmentPerFormationDailyFailureDataReport(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
             @RequestParam(required = false) List<Long> equipmentIds) throws UnsupportedEncodingException {
-        byte[] bytes = generateEquipmentFailureReport(formationId,
-                nullIfEmpty(equipmentIds),
-                EquipmentPerFormationFailureIntensity::getAvgDailyFailure
-        );
+        byte[] bytes = generateEquipmentFailureReport(formationId, nullIfEmpty(equipmentIds));
 
         return ReportResponseEntity.ok(REPORT_NAME, bytes);
     }
 
     private byte[] generateEquipmentFailureReport(Long formationId,
-                                                  List<Long> equipmentIds,
-                                                  Function<EquipmentPerFormationFailureIntensity, Number> intensityFunction) {
+                                                  List<Long> equipmentIds) {
         Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> failureIntensityData =
                 equipmentPerFormationService.getFailureIntensityData(tehoSession.getSessionId(),
                         formationId,
@@ -183,12 +172,10 @@ public class EquipmentPerFormationController {
         Map<EquipmentType, List<EquipmentPerFormation>> totalEquipmentInFormations =
                 equipmentPerFormationService.getGroupedEquipmentInFormation(formationId, equipmentIds);
         return reportService.generateReport(
-                new EquipmentFailureIntensityCombinedData(stages,
+                new EquipmentAvgDailyFailureCombinedData(stages,
                         repairTypes,
                         Collections.singletonMap(null, totalEquipmentInFormations),
-                        Collections.singletonMap(null, failureIntensityData),
-                        intensityFunction,
-                        "ед."));
+                        Collections.singletonMap(null, failureIntensityData)));
     }
 
     @GetMapping("/formation/{formationId}/equipment/daily-failure")
@@ -270,8 +257,6 @@ public class EquipmentPerFormationController {
                                 stages,
                                 repairTypes,
                                 epb))
-                        .sorted(Comparator.comparing(EquipmentFailureIntensityRowData::getId,
-                                                     Comparator.reverseOrder()))
                         .collect(Collectors.toList());
         return new GenericTableDataDTO<>(stageColumns, rowData);
     }

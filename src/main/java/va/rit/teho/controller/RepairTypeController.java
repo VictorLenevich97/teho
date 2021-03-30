@@ -13,7 +13,6 @@ import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.service.common.RepairTypeService;
 
 import javax.validation.constraints.Positive;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,7 +44,6 @@ public class RepairTypeController {
                                          .stream()
                                          .filter(rt -> repairable == null || (rt.isRepairable() == repairable))
                                          .map(RepairTypeDTO::from)
-                                         .sorted(Comparator.comparing(RepairTypeDTO::getId))
                                          .collect(Collectors.toList()));
     }
 
