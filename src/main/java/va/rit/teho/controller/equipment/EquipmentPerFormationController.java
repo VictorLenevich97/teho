@@ -264,6 +264,7 @@ public class EquipmentPerFormationController {
         List<EquipmentFailureIntensityRowData<String>> rowData =
                 equipmentPerFormations
                         .stream()
+                        .filter(epb -> epb.getAmount() > 0)
                         .map(epb -> getEquipmentFailureIntensityRowData(failureIntensityData,
                                 keyGetter,
                                 stages,

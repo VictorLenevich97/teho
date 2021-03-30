@@ -90,6 +90,8 @@ public class IntensityController {
             intensityRowData.add(new EquipmentFailureIntensityRowData<>(equipment.getId(), equipment.getName(), data));
         }
 
+        intensityRowData.sort(Comparator.comparing(EquipmentFailureIntensityRowData::getId, Comparator.reverseOrder()));
+
         return new GenericTableDataDTO<>(stageColumns, intensityRowData);
     }
 

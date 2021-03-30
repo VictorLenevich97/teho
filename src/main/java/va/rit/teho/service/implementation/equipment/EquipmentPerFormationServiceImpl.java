@@ -18,10 +18,7 @@ import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.intensity.IntensityService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,6 +102,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
         return equipmentPerFormationRepository
                 .findAllByFormationId(formationId, equipmentIds)
                 .stream()
+                .filter(equipmentPerFormation -> equipmentPerFormation.getAmount() > 0)
                 .collect(Collectors.groupingBy(epf -> epf.getEquipment().getEquipmentType()));
     }
 
@@ -122,25 +120,27 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                                  Long formationId,
                                                                  double coefficient) {
         IntensityData activeIntensitiesGrouped = intensityService.getActiveIntensitiesGrouped();
-        List<EquipmentPerFormationFailureIntensity> updatedWithAvgDailyFailureData =
-                equipmentPerFormationFailureIntensityRepository
-                        .findAllByTehoSessionIdAndFormationId(sessionId, formationId, null)
-                        .stream()
-                        .map(equipmentPerFormationFailureIntensity -> {
-                            double avgDailyFailure =
-                                    calculationService.calculateAvgDailyFailure(
-                                            equipmentPerFormationFailureIntensity
-                                                    .getEquipmentPerFormationWithRepairTypeId()
-                                                    .getEquipmentPerFormation()
-                                                    .getAmount(),
-                                            activeIntensitiesGrouped.get(
-                                                    equipmentPerFormationFailureIntensity.getEquipment(),
-                                                    equipmentPerFormationFailureIntensity.getRepairType(),
-                                                    equipmentPerFormationFailureIntensity.getStage()),
-                                            coefficient);
-                            return equipmentPerFormationFailureIntensity.setAvgDailyFailure(avgDailyFailure);
-                        })
-                        .collect(Collectors.toList());
+        List<EquipmentPerFormationFailureIntensity> updatedWithAvgDailyFailureData = new ArrayList<>();
+        activeIntensitiesGrouped.getData().forEach((equipment, stageMap) ->
+                stageMap.forEach((stage, repairTypeMap) ->
+                        repairTypeMap.forEach((repairType, intensity) ->
+                                equipmentPerFormationRepository
+                                        .findById(new EquipmentPerFormationPK(formationId, equipment.getId()))
+                                        .ifPresent(equipmentPerFormation -> {
+                                            if (equipmentPerFormation.getAmount() > 0) {
+                                                EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
+                                                        equipmentPerFormationFailureIntensityRepository
+                                                                .find(sessionId, formationId, equipment.getId(), stage.getId(), repairType.getId())
+                                                                .orElse(new EquipmentPerFormationFailureIntensity(sessionId, formationId, equipment.getId(), stage.getId(), repairType.getId(), 0.0));
+
+                                                double avgDailyFailure =
+                                                        calculationService.calculateAvgDailyFailure(equipmentPerFormation.getAmount(), intensity, coefficient);
+
+                                                equipmentPerFormationFailureIntensity.setAvgDailyFailure(avgDailyFailure);
+
+                                                updatedWithAvgDailyFailureData.add(equipmentPerFormationFailureIntensity);
+                                            }
+                                        }))));
         equipmentPerFormationFailureIntensityRepository.saveAll(updatedWithAvgDailyFailureData);
     }
 
