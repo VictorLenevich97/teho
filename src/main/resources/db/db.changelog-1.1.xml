@@ -1,0 +1,107 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="tehoadmin (generated)" id="1617183756140-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="intensity"/>
+            </not>
+        </preConditions>
+        <createTable tableName="intensity">
+            <column name="equipment_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="intensityPK"/>
+            </column>
+            <column name="operation_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="intensityPK"/>
+            </column>
+            <column name="repair_type_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="intensityPK"/>
+            </column>
+            <column name="stage_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="intensityPK"/>
+            </column>
+            <column name="value" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1617183756140-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="operation"/>
+            </not>
+        </preConditions>
+        <createTable tableName="operation">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="operationPK"/>
+            </column>
+            <column name="active" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1617183756140-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) FROM information_schema.constraints WHERE CONSTRAINT_NAME='UC_OPERATIONNAME_COL'
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <addUniqueConstraint columnNames="name" constraintName="UC_OPERATIONNAME_COL" tableName="operation"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1617183756140-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKb42wmlugedc77tx34u6gktcdj"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="stage_id" baseTableName="intensity"
+                                 constraintName="FKb42wmlugedc77tx34u6gktcdj" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="stage"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1617183756140-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKktns08pbnpg5ingui1ttfsdxa"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="equipment_id" baseTableName="intensity"
+                                 constraintName="FKktns08pbnpg5ingui1ttfsdxa" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="equipment"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1617183756140-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKqli65cb7nuxrcgt0hs2fhk4ye"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="operation_id" baseTableName="intensity"
+                                 constraintName="FKqli65cb7nuxrcgt0hs2fhk4ye" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="operation"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1617183756140-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="FKtm3i90o300k42sbtk1wxq2crl"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="repair_type_id" baseTableName="intensity"
+                                 constraintName="FKtm3i90o300k42sbtk1wxq2crl" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="repair_type"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1617183756140-8">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="INTENSITY_PERCENTAGE" tableName="EQUIPMENT_PER_FORMATION_FAILURE_INTENSITY"/>
+        </preConditions>
+        <dropColumn columnName="INTENSITY_PERCENTAGE" tableName="EQUIPMENT_PER_FORMATION_FAILURE_INTENSITY"/>
+    </changeSet>
+</databaseChangeLog>
