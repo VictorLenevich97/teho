@@ -48,7 +48,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public Long count(String nameFilter) {
-        return nameFilter == null || nameFilter.isEmpty() ? equipmentRepository.count() : equipmentRepository.countByNameLike("%" + nameFilter + "%");
+        return nameFilter == null || nameFilter.isEmpty() ? equipmentRepository.count() : equipmentRepository.countByNameLikeIgnoreCase("%" + nameFilter + "%");
     }
 
     @Override
@@ -57,7 +57,7 @@ public class EquipmentServiceImpl implements EquipmentService {
                                                                               Integer pageSize) {
         List<Equipment> equipmentList = nameFilter == null || nameFilter.isEmpty() ?
                 equipmentRepository.findByOrderByEquipmentTypeIdAscIdAsc(PageRequest.of(pageNum - 1, pageSize)) :
-                equipmentRepository.findByNameLikeOrderByEquipmentTypeIdAscIdAsc("%" + nameFilter + "%", PageRequest.of(pageNum - 1, pageSize));
+                equipmentRepository.findByNameLikeIgnoreCaseOrderByEquipmentTypeIdAscIdAsc("%" + nameFilter + "%", PageRequest.of(pageNum - 1, pageSize));
 
         Map<RepairType, Integer> defaultLaborInputData =
                 repairTypeService

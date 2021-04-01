@@ -27,6 +27,6 @@ public interface EquipmentPerFormationRepository
             "ORDER BY epb.equipment.id ASC")
     List<EquipmentPerFormation> findAllByFormationId(Long formationId, List<Long> equipmentIds);
 
-    List<EquipmentPerFormation> findAllByFormationIdAndEquipmentNameLike(Long formationId, String name);
+    List<EquipmentPerFormation> findAllByFormationIdAndEquipmentNameLikeIgnoreCase(Long formationId, String name);
 
 }

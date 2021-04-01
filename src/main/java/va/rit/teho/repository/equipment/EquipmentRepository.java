@@ -18,11 +18,11 @@ public interface EquipmentRepository extends PagingAndSortingRepository<Equipmen
 
     List<Equipment> findAllByOrderByIdAsc();
 
-    Long countByNameLike(String name);
+    Long countByNameLikeIgnoreCase(String name);
 
     List<Equipment> findByOrderByEquipmentTypeIdAscIdAsc(Pageable pageable);
 
-    List<Equipment> findByNameLikeOrderByEquipmentTypeIdAscIdAsc(String name, Pageable pageable);
+    List<Equipment> findByNameLikeIgnoreCaseOrderByEquipmentTypeIdAscIdAsc(String name, Pageable pageable);
 
     Optional<Equipment> findByNameIgnoreCase(String name);
 }
