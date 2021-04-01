@@ -73,9 +73,9 @@ public class EquipmentPerFormationController {
                                                           @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @Positive @PathVariable @Positive Long equipmentId,
                                                           @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @Valid @RequestBody IntensityAndAmountDTO amount) {
         EquipmentPerFormation equipmentPerFormation = equipmentPerFormationService.addEquipmentToFormation(formationId,
-                                                                                                           equipmentId,
-                                                                                                           (long) amount
-                                                                                                                   .getAmount());
+                equipmentId,
+                (long) amount
+                        .getAmount());
         return ResponseEntity.ok().body(EquipmentPerFormationDTO.from(equipmentPerFormation));
     }
 
@@ -105,12 +105,12 @@ public class EquipmentPerFormationController {
     @ResponseBody
     @ApiOperation(value = "Получить список ВВСТ в Формированиях")
     public ResponseEntity<List<EquipmentPerFormationDTO>> getEquipmentPerFormationData(
-            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId) {
-        return ResponseEntity.ok(equipmentPerFormationService
-                                         .getEquipmentInFormation(formationId, null)
-                                         .stream()
-                                         .map(EquipmentPerFormationDTO::from)
-                                         .collect(Collectors.toList()));
+            @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
+            @RequestParam(value = "Фильтр наименования ВВСТ", required = false, defaultValue = "") String search) {
+        List<EquipmentPerFormation> result =
+                search == null || search.isEmpty() ? equipmentPerFormationService.getEquipmentInFormation(formationId, (List<Long>) null) :
+                        equipmentPerFormationService.getEquipmentInFormation(formationId, search);
+        return ResponseEntity.ok(result.stream().map(EquipmentPerFormationDTO::from).collect(Collectors.toList()));
     }
 
     private GenericTableDataDTO<Map<String, Map<String, String>>, EquipmentFailureIntensityRowData<String>> getEquipmentRowData(Long formationId, List<Long> equipmentIds) {
@@ -209,16 +209,16 @@ public class EquipmentPerFormationController {
                     required = true,
                     example = "{'1': {'1': '1.2', '2': '4.3'}}") @RequestBody Map<Long, Map<Long, Double>> data) {
         data.forEach((stageId, repairTypeIntensityMap) ->
-                             repairTypeIntensityMap
-                                     .forEach((repairTypeId, dailyFailure) ->
-                                                      equipmentPerFormationService
-                                                              .setEquipmentPerFormationDailyFailure(
-                                                                      tehoSession.getSessionId(),
-                                                                      formationId,
-                                                                      equipmentId,
-                                                                      repairTypeId,
-                                                                      stageId,
-                                                                      dailyFailure)));
+                repairTypeIntensityMap
+                        .forEach((repairTypeId, dailyFailure) ->
+                                equipmentPerFormationService
+                                        .setEquipmentPerFormationDailyFailure(
+                                                tehoSession.getSessionId(),
+                                                formationId,
+                                                equipmentId,
+                                                repairTypeId,
+                                                stageId,
+                                                dailyFailure)));
         return ResponseEntity.accepted().build();
     }
 
@@ -262,10 +262,10 @@ public class EquipmentPerFormationController {
     }
 
     private <K> EquipmentFailureIntensityRowData<String> getEquipmentFailureIntensityRowData(Map<Formation, Map<K, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData,
-                                                                                                Function<EquipmentPerFormation, K> keyGetter,
-                                                                                                List<Stage> stages,
-                                                                                                List<RepairType> repairTypes,
-                                                                                                EquipmentPerFormation epb) {
+                                                                                             Function<EquipmentPerFormation, K> keyGetter,
+                                                                                             List<Stage> stages,
+                                                                                             List<RepairType> repairTypes,
+                                                                                             EquipmentPerFormation epb) {
         Map<String, Map<String, String>> data = new HashMap<>();
 
         for (Stage s : stages) {
@@ -291,13 +291,13 @@ public class EquipmentPerFormationController {
             }
         }
         return new EquipmentFailureIntensityRowData<>(epb.getEquipment().getId(),
-                                                      Optional
-                                                              .ofNullable(epb.getFormation())
-                                                              .map(Formation::getShortName)
-                                                              .orElse(""),
-                                                      epb.getEquipment().getName(),
-                                                      epb.getAmount(),
-                                                      data);
+                Optional
+                        .ofNullable(epb.getFormation())
+                        .map(Formation::getShortName)
+                        .orElse(""),
+                epb.getEquipment().getName(),
+                epb.getAmount(),
+                data);
     }
 
 }

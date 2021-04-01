@@ -123,14 +123,11 @@ public class EquipmentController {
     @GetMapping("/labor-input")
     @ApiOperation(value = "Получить список ВВСТ с нормативной трудоемкостью (в табличном виде)")
     public ResponseEntity<GenericTableDataDTO<Map<String, Integer>, EquipmentLaborInputPerTypeRowData>> listEquipmentWithLaborInputData(
-            @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> ids,
-            @ApiParam(value = "Ключи типов ВВСТ, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> typeIds,
+            @RequestParam(required = false, defaultValue = "") String search,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
-        List<Long> idsFilter = nullIfEmpty(ids);
-        List<Long> typeIdsFilter = nullIfEmpty(typeIds);
 
-        Long rowCount = equipmentService.count(idsFilter, typeIdsFilter);
+        Long rowCount = equipmentService.count(search);
         List<NestedColumnsDTO> columns =
                 repairTypeService.list(true)
                                  .stream()
@@ -139,7 +136,7 @@ public class EquipmentController {
                                  .collect(Collectors.toList());
         List<EquipmentLaborInputPerTypeRowData> data =
                 equipmentService
-                        .listWithLaborInputPerType(idsFilter, typeIdsFilter, pageNum, pageSize)
+                        .listWithLaborInputPerType(search, pageNum, pageSize)
                         .entrySet()
                         .stream()
                         .map(equipmentMapEntry ->

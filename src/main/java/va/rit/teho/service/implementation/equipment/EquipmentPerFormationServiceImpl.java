@@ -145,6 +145,11 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
+    public List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, String nameFilter) {
+        return equipmentPerFormationRepository.findAllByFormationIdAndEquipmentNameLike(formationId, nameFilter);
+    }
+
+    @Override
     public Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> getTotalFailureIntensityData(
             UUID sessionId) {
         List<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensityList =

@@ -33,6 +33,8 @@ public interface EquipmentPerFormationService {
                                                           double coefficient);
 
 
+    List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, String nameFilter);
+
     List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, List<Long> equipmentIds);
 
     List<EquipmentPerFormation> getEquipmentInAllFormations(List<Long> equipmentIds);

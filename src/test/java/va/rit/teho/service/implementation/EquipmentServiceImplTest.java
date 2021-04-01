@@ -89,15 +89,4 @@ public class EquipmentServiceImplTest {
         Assertions.assertEquals(update.getId(), addedEquipment.getId());
         Assertions.assertEquals(update.getName(), equipmentToAdd.getName());
     }
-
-    @Test
-    public void testListGroupedByTypes() {
-        Map<EquipmentType, List<Equipment>> result = Collections.singletonMap(EQUIPMENT.getEquipmentType(),
-                                                                              Collections.singletonList(EQUIPMENT));
-
-        when(equipmentRepository.findFiltered(null, null, PageRequest.of(0, 10000))).thenReturn(Collections.singletonList(EQUIPMENT));
-
-        Assertions.assertEquals(result, equipmentService.listGroupedByTypes(null, null));
-    }
-
 }
