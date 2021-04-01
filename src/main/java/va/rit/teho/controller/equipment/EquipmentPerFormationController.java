@@ -106,10 +106,10 @@ public class EquipmentPerFormationController {
     @ApiOperation(value = "Получить список ВВСТ в Формированиях")
     public ResponseEntity<List<EquipmentPerFormationDTO>> getEquipmentPerFormationData(
             @ApiParam(value = "Ключ ВЧ", required = true, example = "1") @PathVariable @Positive Long formationId,
-            @RequestParam(value = "Фильтр наименования ВВСТ", required = false, defaultValue = "") String search) {
+            @RequestParam(required = false, defaultValue = "") String equipmentName) {
         List<EquipmentPerFormation> result =
-                search == null || search.isEmpty() ? equipmentPerFormationService.getEquipmentInFormation(formationId, (List<Long>) null) :
-                        equipmentPerFormationService.getEquipmentInFormation(formationId, search);
+                equipmentName == null || equipmentName.isEmpty() ? equipmentPerFormationService.getEquipmentInFormation(formationId, (List<Long>) null) :
+                        equipmentPerFormationService.getEquipmentInFormation(formationId, equipmentName);
         return ResponseEntity.ok(result.stream().map(EquipmentPerFormationDTO::from).collect(Collectors.toList()));
     }
 

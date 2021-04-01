@@ -146,7 +146,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
 
     @Override
     public List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, String nameFilter) {
-        return equipmentPerFormationRepository.findAllByFormationIdAndEquipmentNameLikeIgnoreCase(formationId, nameFilter);
+        return equipmentPerFormationRepository.findAllByFormationIdAndEquipmentNameLikeIgnoreCase(formationId, "%" + nameFilter + "%");
     }
 
     @Override

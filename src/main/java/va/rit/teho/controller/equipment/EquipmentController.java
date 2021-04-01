@@ -31,8 +31,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
-
 @Controller
 @RequestMapping(path = "equipment", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "ВВСТ")
@@ -123,11 +121,11 @@ public class EquipmentController {
     @GetMapping("/labor-input")
     @ApiOperation(value = "Получить список ВВСТ с нормативной трудоемкостью (в табличном виде)")
     public ResponseEntity<GenericTableDataDTO<Map<String, Integer>, EquipmentLaborInputPerTypeRowData>> listEquipmentWithLaborInputData(
-            @RequestParam(required = false, defaultValue = "") String search,
+            @RequestParam(required = false, defaultValue = "") String equipmentName,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
 
-        Long rowCount = equipmentService.count(search);
+        Long rowCount = equipmentService.count(equipmentName);
         List<NestedColumnsDTO> columns =
                 repairTypeService.list(true)
                                  .stream()
@@ -136,7 +134,7 @@ public class EquipmentController {
                                  .collect(Collectors.toList());
         List<EquipmentLaborInputPerTypeRowData> data =
                 equipmentService
-                        .listWithLaborInputPerType(search, pageNum, pageSize)
+                        .listWithLaborInputPerType(equipmentName, pageNum, pageSize)
                         .entrySet()
                         .stream()
                         .map(equipmentMapEntry ->
