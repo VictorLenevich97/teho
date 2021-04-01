@@ -1,10 +1,12 @@
 package va.rit.teho.controller.helper;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
 public class Formatter {
 
-    private static final DecimalFormat DECIMAL_FORMATTER = new DecimalFormat("#.###");
+    private static final DecimalFormat DECIMAL_FORMATTER =
+            new DecimalFormat("#" + DecimalFormatSymbols.getInstance().getDecimalSeparator() + "###");
 
     private Formatter() {
     }

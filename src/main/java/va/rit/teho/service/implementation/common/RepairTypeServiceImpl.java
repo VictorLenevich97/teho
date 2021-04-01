@@ -21,7 +21,7 @@ public class RepairTypeServiceImpl implements RepairTypeService {
 
     @Override
     public List<RepairType> list(boolean calculatable) {
-        return repairTypeRepository.findAllByCalculatable(calculatable);
+        return repairTypeRepository.findByCalculatableOrderByIdAsc(calculatable);
     }
 
     @Override

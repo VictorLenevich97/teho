@@ -5,8 +5,9 @@ import org.springframework.stereotype.Service;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.common.Stage;
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
+import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
 import va.rit.teho.entity.equipment.EquipmentType;
-import va.rit.teho.entity.equipment.combined.EquipmentFailureIntensityCombinedData;
+import va.rit.teho.entity.equipment.combined.EquipmentAvgDailyFailureCombinedData;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.report.ReportCell;
 import va.rit.teho.report.ReportHeader;
@@ -16,16 +17,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class EquipmentFailureIntensityReportService
-        extends AbstractExcelReportService<EquipmentFailureIntensityCombinedData, EquipmentPerFormation> {
+public class EquipmentDailyFailureReportService
+        extends AbstractExcelReportService<EquipmentAvgDailyFailureCombinedData, EquipmentPerFormation> {
 
     @Override
     protected List<ReportCell> populateRowCells(
-            EquipmentFailureIntensityCombinedData data,
+            EquipmentAvgDailyFailureCombinedData data,
             EquipmentPerFormation epf) {
         List<ReportCell> cellFunctions =
                 new ArrayList<>(Arrays.asList(new ReportCell(epf.getEquipment().getName()),
-                                              new ReportCell(epf.getAmount())));
+                        new ReportCell(epf.getAmount())));
         List<ReportCell> avgDailyFailureFunctions =
                 data
                         .getStages()
@@ -40,19 +41,19 @@ public class EquipmentFailureIntensityReportService
     }
 
     private ReportCell getAvgDailyFailureFunction(EquipmentPerFormation epf,
-                                                  EquipmentFailureIntensityCombinedData data,
+                                                  EquipmentAvgDailyFailureCombinedData data,
                                                   Stage s,
                                                   RepairType rt) {
         Formation key = data.getFailureIntensityData().get(null) != null ? null : epf.getFormation();
         return new ReportCell(Optional.ofNullable(data
-                                                          .getFailureIntensityData()
-                                                          .getOrDefault(key, Collections.emptyMap())
-                                                          .getOrDefault(epf.getEquipment(), Collections.emptyMap())
-                                                          .getOrDefault(rt, Collections.emptyMap())
-                                                          .getOrDefault(s, null))
-                                      .map(data.getIntensityFunction())
-                                      .orElse(0.0),
-                              ReportCell.CellType.NUMERIC);
+                .getFailureIntensityData()
+                .getOrDefault(key, Collections.emptyMap())
+                .getOrDefault(epf.getEquipment(), Collections.emptyMap())
+                .getOrDefault(rt, Collections.emptyMap())
+                .getOrDefault(s, null))
+                .map(EquipmentPerFormationFailureIntensity::getAvgDailyFailure)
+                .orElse(0.0),
+                ReportCell.CellType.NUMERIC);
     }
 
     @Override
@@ -61,10 +62,10 @@ public class EquipmentFailureIntensityReportService
     }
 
     @Override
-    protected List<ReportHeader> buildHeader(EquipmentFailureIntensityCombinedData data) {
+    protected List<ReportHeader> buildHeader(EquipmentAvgDailyFailureCombinedData data) {
         ReportHeader nameHeader = header("Наименование ВВСТ");
         ReportHeader countHeader = header("Количество, ед.");
-        ReportHeader topHeader = header("Среднесуточный выход в текущий и средний ремонты на этапах операции, " + data.getUnitIndicator());
+        ReportHeader topHeader = header("Среднесуточный выход в текущий и средний ремонты на этапах операции, ед.");
         data.getStages().forEach(stage -> {
             ReportHeader stageHeader = header(stage.getStageNum() + " этап");
             data.getRepairTypes().forEach(rt -> stageHeader.addSubHeader(header(rt.getShortName())));
@@ -74,7 +75,7 @@ public class EquipmentFailureIntensityReportService
     }
 
     @Override
-    protected int writeData(EquipmentFailureIntensityCombinedData data, Sheet sheet, int lastRowIndex) {
+    protected int writeData(EquipmentAvgDailyFailureCombinedData data, Sheet sheet, int lastRowIndex) {
         if (data.getEquipmentPerFormations().size() == 1) {
             List<EquipmentPerFormation> equipmentPerFormations = data
                     .getEquipmentPerFormations()

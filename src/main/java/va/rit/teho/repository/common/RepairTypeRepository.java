@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface RepairTypeRepository extends CrudRepository<RepairType, Long> {
-    List<RepairType> findAllByCalculatable(boolean calculatable);
+    List<RepairType> findByCalculatableOrderByIdAsc(boolean calculatable);
 }

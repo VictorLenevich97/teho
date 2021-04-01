@@ -30,7 +30,7 @@ public class RepairTypeServiceImplTest {
     public void testListRepairableTrue() {
         List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true, false, false));
 
-        when(repairTypeRepository.findAllByCalculatable(true)).thenReturn(repairTypeList);
+        when(repairTypeRepository.findByCalculatableOrderByIdAsc(true)).thenReturn(repairTypeList);
 
         Assertions.assertEquals(repairTypeList, repairTypeService.list(true));
     }
@@ -39,7 +39,7 @@ public class RepairTypeServiceImplTest {
     public void testListRepairableFalse() {
         List<RepairType> repairTypeList = Collections.singletonList(new RepairType("a", "", true, false, false));
 
-        when(repairTypeRepository.findAllByCalculatable(false)).thenReturn(repairTypeList);
+        when(repairTypeRepository.findByCalculatableOrderByIdAsc(false)).thenReturn(repairTypeList);
 
         Assertions.assertEquals(repairTypeList, repairTypeService.list(false));
     }

@@ -1,13 +1,24 @@
 package va.rit.teho.dto.equipment;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import va.rit.teho.dto.table.RowData;
 
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EquipmentFailureIntensityRowData<T> extends RowData<Map<String, Map<String, T>>> {
     private final Long id;
     private final String equipmentName;
     private final Integer amount;
+
+    public EquipmentFailureIntensityRowData(Long id,
+                                            String equipmentName,
+                                            Map<String, Map<String, T>> data) {
+        super(null, null, data);
+        this.equipmentName = equipmentName;
+        this.amount = null;
+        this.id = id;
+    }
 
     public EquipmentFailureIntensityRowData(Long id,
                                             String formationName,

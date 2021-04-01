@@ -46,7 +46,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     public List<Equipment> list() {
-        return (List<Equipment>) equipmentRepository.findAll();
+        return equipmentRepository.findAllByOrderByIdAsc();
     }
 
     @Override

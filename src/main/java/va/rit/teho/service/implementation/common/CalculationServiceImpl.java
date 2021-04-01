@@ -7,7 +7,7 @@ import va.rit.teho.service.common.CalculationService;
 public class CalculationServiceImpl implements CalculationService {
 
     @Override
-    public double calculateAvgDailyFailure(int totalAmount, int intensity, double k) {
+    public double calculateAvgDailyFailure(int totalAmount, double intensity, double k) {
         return (totalAmount * intensity * k) / 100;
     }
 
