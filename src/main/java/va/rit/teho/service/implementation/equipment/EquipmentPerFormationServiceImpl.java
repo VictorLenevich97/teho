@@ -1,5 +1,6 @@
 package va.rit.teho.service.implementation.equipment;
 
+import org.apache.commons.collections4.map.MultiKeyMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.RepairType;
@@ -19,7 +20,9 @@ import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.intensity.IntensityService;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -70,17 +73,16 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
         formationService.get(formationId);
         equipmentService.get(equipmentId);
 
-
         EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
                 equipmentPerFormationFailureIntensityRepository
                         .find(sessionId, formationId, equipmentId, stageId, repairTypeId)
                         .map(epffi -> epffi.setAvgDailyFailure(dailyFailure))
                         .orElse(new EquipmentPerFormationFailureIntensity(sessionId,
-                                                                          formationId,
-                                                                          equipmentId,
-                                                                          stageId,
-                                                                          repairTypeId,
-                                                                          dailyFailure));
+                                formationId,
+                                equipmentId,
+                                stageId,
+                                repairTypeId,
+                                dailyFailure));
 
 
         equipmentPerFormationFailureIntensityRepository.save(equipmentPerFormationFailureIntensity);
@@ -112,7 +114,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                 .findTotal(equipmentIds)
                 .stream()
                 .collect(Collectors.groupingBy(EquipmentPerFormation::getFormation,
-                                               Collectors.groupingBy(epf -> epf.getEquipment().getEquipmentType())));
+                        Collectors.groupingBy(epf -> epf.getEquipment().getEquipmentType())));
     }
 
     @Override
@@ -120,28 +122,72 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                                  Long formationId,
                                                                  double coefficient) {
         IntensityData activeIntensitiesGrouped = intensityService.getActiveIntensitiesGrouped();
+
+        List<Long> equipmentIds =
+                activeIntensitiesGrouped.getEquipmentSet().stream().map(Equipment::getId).collect(Collectors.toList());
+
+        MultiKeyMap<Long, EquipmentPerFormationFailureIntensity> epfMap = getFailureIntensitiesAsMap(sessionId, formationId, equipmentIds);
+
+        Map<Long, Integer> equipmentAmountMap = getEquipmentAmountData(formationId, activeIntensitiesGrouped);
+
         List<EquipmentPerFormationFailureIntensity> updatedWithAvgDailyFailureData = new ArrayList<>();
+
+        activeIntensitiesGrouped
+                .getData()
+                .entrySet()
+                .stream()
+                .filter(equipmentStageMapEntry ->
+                        equipmentAmountMap.containsKey(equipmentStageMapEntry.getKey().getId()) &&
+                                equipmentAmountMap.get(equipmentStageMapEntry.getKey().getId()) > 0)
+                .forEach(equipmentStageMapEntry ->
+                        equipmentStageMapEntry.getValue().forEach((stage, repairTypeMap) ->
+                                repairTypeMap.forEach((repairType, intensity) -> {
+                                    Long equipmentId = equipmentStageMapEntry.getKey().getId();
+                                    Integer equipmentAmount = equipmentAmountMap.get(equipmentId);
+                                    Long stageId = stage.getId();
+                                    Long repairTypeId = repairType.getId();
+
+
+                                    double avgDailyFailure =
+                                            calculationService.calculateAvgDailyFailure(equipmentAmount, intensity, coefficient);
+
+                                    EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
+                                            Optional.ofNullable(epfMap.get(equipmentId, stageId, repairTypeId))
+                                                    .map(epffi -> epffi.setAvgDailyFailure(avgDailyFailure))
+                                                    .orElse(new EquipmentPerFormationFailureIntensity(
+                                                            sessionId,
+                                                            formationId,
+                                                            equipmentId,
+                                                            stageId,
+                                                            repairTypeId,
+                                                            avgDailyFailure));
+
+                                    updatedWithAvgDailyFailureData.add(equipmentPerFormationFailureIntensity);
+                                })));
+        equipmentPerFormationFailureIntensityRepository.saveAll(updatedWithAvgDailyFailureData);
+    }
+
+    private Map<Long, Integer> getEquipmentAmountData(Long formationId, IntensityData activeIntensitiesGrouped) {
+        List<EquipmentPerFormationPK> epfKeys = new ArrayList<>();
+
         activeIntensitiesGrouped.getData().forEach((equipment, stageMap) ->
                 stageMap.forEach((stage, repairTypeMap) ->
                         repairTypeMap.forEach((repairType, intensity) ->
-                                equipmentPerFormationRepository
-                                        .findById(new EquipmentPerFormationPK(formationId, equipment.getId()))
-                                        .ifPresent(equipmentPerFormation -> {
-                                            if (equipmentPerFormation.getAmount() > 0) {
-                                                EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity =
-                                                        equipmentPerFormationFailureIntensityRepository
-                                                                .find(sessionId, formationId, equipment.getId(), stage.getId(), repairType.getId())
-                                                                .orElse(new EquipmentPerFormationFailureIntensity(sessionId, formationId, equipment.getId(), stage.getId(), repairType.getId(), 0.0));
+                                epfKeys.add(new EquipmentPerFormationPK(formationId, equipment.getId())))));
 
-                                                double avgDailyFailure =
-                                                        calculationService.calculateAvgDailyFailure(equipmentPerFormation.getAmount(), intensity, coefficient);
+        return StreamSupport
+                .stream(equipmentPerFormationRepository.findAllById(epfKeys).spliterator(), true)
+                .collect(Collectors.toMap(epf -> epf.getEquipment().getId(), EquipmentPerFormation::getAmount));
+    }
 
-                                                equipmentPerFormationFailureIntensity.setAvgDailyFailure(avgDailyFailure);
-
-                                                updatedWithAvgDailyFailureData.add(equipmentPerFormationFailureIntensity);
-                                            }
-                                        }))));
-        equipmentPerFormationFailureIntensityRepository.saveAll(updatedWithAvgDailyFailureData);
+    private MultiKeyMap<Long, EquipmentPerFormationFailureIntensity> getFailureIntensitiesAsMap(UUID sessionId, Long formationId, List<Long> equipmentIds) {
+        MultiKeyMap<Long, EquipmentPerFormationFailureIntensity> epfMap = new MultiKeyMap<>();
+        List<EquipmentPerFormationFailureIntensity> intensities =
+                equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionIdAndFormationId(sessionId, formationId, equipmentIds);
+        for (EquipmentPerFormationFailureIntensity intensity : intensities) {
+            epfMap.put(intensity.getEquipment().getId(), intensity.getStage().getId(), intensity.getRepairType().getId(), intensity);
+        }
+        return epfMap;
     }
 
     @Override
@@ -154,17 +200,13 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
             UUID sessionId) {
         List<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensityList =
                 equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionId(sessionId);
-        Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> result = new HashMap<>();
 
-        for (EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity : equipmentPerFormationFailureIntensityList) {
-            result
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getFormation(), e -> new HashMap<>())
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getEquipment(), e -> new HashMap<>())
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), e -> new HashMap<>())
-                    .put(equipmentPerFormationFailureIntensity.getStage(), equipmentPerFormationFailureIntensity);
-
-        }
-        return result;
+        return equipmentPerFormationFailureIntensityList
+                .stream()
+                .collect(Collectors.groupingBy(EquipmentPerFormationFailureIntensity::getFormation,
+                        Collectors.groupingBy(EquipmentPerFormationFailureIntensity::getEquipment,
+                                Collectors.groupingBy(EquipmentPerFormationFailureIntensity::getRepairType,
+                                        Collectors.toMap(EquipmentPerFormationFailureIntensity::getStage, Function.identity())))));
     }
 
     @Override
@@ -175,8 +217,8 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                 .findById(new EquipmentPerFormationPK(formationId, equipmentId))
                 .ifPresent(epb -> {
                     throw new AlreadyExistsException("ВВСТ в ВЧ",
-                                                     "(id ВЧ, id ВВСТ)",
-                                                     "(" + formationId + ", " + equipmentId + ")");
+                            "(id ВЧ, id ВВСТ)",
+                            "(" + formationId + ", " + equipmentId + ")");
                 });
 
         return this.equipmentPerFormationRepository.save(new EquipmentPerFormation(equipment, formation, amount));
@@ -199,17 +241,14 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
             List<Long> equipmentIds) {
         List<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensityList =
                 equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionIdAndFormationId(sessionId,
-                                                                                                     formationId,
-                                                                                                     equipmentIds);
-        Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> result = new HashMap<>();
+                        formationId,
+                        equipmentIds);
 
-        for (EquipmentPerFormationFailureIntensity equipmentPerFormationFailureIntensity : equipmentPerFormationFailureIntensityList) {
-            result
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getEquipment(), e -> new HashMap<>())
-                    .computeIfAbsent(equipmentPerFormationFailureIntensity.getRepairType(), e -> new HashMap<>())
-                    .put(equipmentPerFormationFailureIntensity.getStage(), equipmentPerFormationFailureIntensity);
-        }
-        return result;
+        return equipmentPerFormationFailureIntensityList
+                .stream()
+                .collect(Collectors.groupingBy(EquipmentPerFormationFailureIntensity::getEquipment,
+                        Collectors.groupingBy(EquipmentPerFormationFailureIntensity::getRepairType,
+                                Collectors.toMap(EquipmentPerFormationFailureIntensity::getStage, Function.identity()))));
     }
 
     @Override
@@ -217,10 +256,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                                                                                                    Long repairTypeId,
                                                                                                    List<Long> equipmentIds,
                                                                                                    List<Long> formationIds) {
-        return equipmentPerFormationFailureIntensityRepository.findAllWithLaborInput(sessionId,
-                                                                                     repairTypeId,
-                                                                                     equipmentIds,
-                                                                                     formationIds);
+        return equipmentPerFormationFailureIntensityRepository.findAllWithLaborInput(sessionId, repairTypeId, equipmentIds, formationIds);
     }
 
     @Override
@@ -229,8 +265,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                 equipmentPerFormationFailureIntensityRepository
                         .findAllByTehoSessionId(originalSessionId)
                         .stream()
-                        .map(equipmentPerFormationFailureIntensity ->
-                                     equipmentPerFormationFailureIntensity.copy(newSessionId))
+                        .map(epffi -> epffi.copy(newSessionId))
                         .collect(Collectors.toList());
 
         equipmentPerFormationFailureIntensityRepository.saveAll(equipmentPerFormationFailureIntensities);
