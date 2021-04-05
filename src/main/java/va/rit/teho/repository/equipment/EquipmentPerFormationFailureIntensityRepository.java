@@ -29,10 +29,16 @@ public interface EquipmentPerFormationFailureIntensityRepository
     List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionId(UUID sessionId);
 
     @Query("SELECT epbfi from EquipmentPerFormationFailureIntensity epbfi WHERE epbfi.tehoSession.id = :sessionId AND epbfi.formation.id = :formationId AND " +
-            "(coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds))")
+            "(coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds)) ")
     List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionIdAndFormationId(UUID sessionId,
                                                                                      Long formationId,
                                                                                      List<Long> equipmentIds);
+    @Query("SELECT epbfi from EquipmentPerFormationFailureIntensity epbfi WHERE epbfi.tehoSession.id = :sessionId AND epbfi.formation.id = :formationId AND " +
+            "(coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds)) AND " +
+            "lower(epbfi.equipment.name) like lower(concat('%', :nameFilter, '%'))")
+    List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionIdAndFormationId(UUID sessionId,
+                                                                                     Long formationId,
+                                                                                     String nameFilter);
 
     @Query("SELECT epbfi from EquipmentPerFormationFailureIntensity epbfi WHERE " +
             "epbfi.tehoSession.id = :sessionId AND " +

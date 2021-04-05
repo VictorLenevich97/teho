@@ -89,20 +89,23 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, List<Long> equipmentIds) {
-        return equipmentPerFormationRepository.findAllByFormationId(formationId, equipmentIds);
+    public List<EquipmentPerFormation> getEquipmentInFormation(Long formationId) {
+        return equipmentPerFormationRepository.findAllByFormationIdOrderByEquipmentIdAsc(formationId);
     }
 
     @Override
-    public List<EquipmentPerFormation> getEquipmentInAllFormations(List<Long> equipmentIds) {
-        return equipmentPerFormationRepository.findTotal(equipmentIds);
+    public List<EquipmentPerFormation> getEquipmentInAllFormations() {
+        return StreamSupport.stream(equipmentPerFormationRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
     @Override
     public Map<EquipmentType, List<EquipmentPerFormation>> getGroupedEquipmentInFormation(Long formationId,
-                                                                                          List<Long> equipmentIds) {
-        return equipmentPerFormationRepository
-                .findAllByFormationId(formationId, equipmentIds)
+                                                                                          String equipmentName) {
+        List<EquipmentPerFormation> equipmentInFormations =
+                equipmentName == null || equipmentName.isEmpty() ?
+                        equipmentPerFormationRepository.findAllByFormationIdOrderByEquipmentIdAsc(formationId) :
+                        equipmentPerFormationRepository.findByFormationIdAndEquipmentNameLikeIgnoreCaseOrderByEquipmentIdAsc(formationId, equipmentName);
+        return equipmentInFormations
                 .stream()
                 .filter(equipmentPerFormation -> equipmentPerFormation.getAmount() > 0)
                 .collect(Collectors.groupingBy(epf -> epf.getEquipment().getEquipmentType()));
@@ -192,7 +195,11 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
 
     @Override
     public List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, String nameFilter) {
-        return equipmentPerFormationRepository.findAllByFormationIdAndEquipmentNameLikeIgnoreCase(formationId, "%" + nameFilter + "%");
+        if (nameFilter == null || nameFilter.isEmpty()) {
+            return getEquipmentInFormation(formationId);
+        } else {
+            return equipmentPerFormationRepository.findByFormationIdAndEquipmentNameLikeIgnoreCaseOrderByEquipmentIdAsc(formationId, "%" + nameFilter + "%");
+        }
     }
 
     @Override
@@ -238,11 +245,11 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     public Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getFailureIntensityData(
             UUID sessionId,
             Long formationId,
-            List<Long> equipmentIds) {
+            String equipmentName) {
         List<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensityList =
-                equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionIdAndFormationId(sessionId,
-                        formationId,
-                        equipmentIds);
+                equipmentName == null || equipmentName.isEmpty() ?
+                        equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionIdAndFormationId(sessionId, formationId, (List<Long>) null) :
+                        equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionIdAndFormationId(sessionId, formationId, equipmentName);
 
         return equipmentPerFormationFailureIntensityList
                 .stream()

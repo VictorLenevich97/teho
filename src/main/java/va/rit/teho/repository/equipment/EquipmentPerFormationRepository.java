@@ -20,6 +20,8 @@ public interface EquipmentPerFormationRepository
             "ORDER BY epb.equipment.id ASC")
     List<EquipmentPerFormation> findTotal(List<Long> equipmentIds);
 
+    List<EquipmentPerFormation> findAllByFormationIdOrderByEquipmentIdAsc(Long formationId);
+
     @Query("SELECT epb " +
             "FROM EquipmentPerFormation epb " +
             "WHERE epb.formation.id = :formationId AND (" +
@@ -27,6 +29,6 @@ public interface EquipmentPerFormationRepository
             "ORDER BY epb.equipment.id ASC")
     List<EquipmentPerFormation> findAllByFormationId(Long formationId, List<Long> equipmentIds);
 
-    List<EquipmentPerFormation> findAllByFormationIdAndEquipmentNameLikeIgnoreCase(Long formationId, String name);
+    List<EquipmentPerFormation> findByFormationIdAndEquipmentNameLikeIgnoreCaseOrderByEquipmentIdAsc(Long formationId, String equipmentName);
 
 }
