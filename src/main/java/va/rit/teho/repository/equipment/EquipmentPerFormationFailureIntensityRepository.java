@@ -34,7 +34,6 @@ public interface EquipmentPerFormationFailureIntensityRepository
                                                                                      Long formationId,
                                                                                      List<Long> equipmentIds);
     @Query("SELECT epbfi from EquipmentPerFormationFailureIntensity epbfi WHERE epbfi.tehoSession.id = :sessionId AND epbfi.formation.id = :formationId AND " +
-            "(coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds)) AND " +
             "lower(epbfi.equipment.name) like lower(concat('%', :nameFilter, '%'))")
     List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionIdAndFormationId(UUID sessionId,
                                                                                      Long formationId,

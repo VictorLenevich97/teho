@@ -70,10 +70,8 @@ public class EquipmentPerFormationController {
     public ResponseEntity<Object> addEquipmentToFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @Positive @PathVariable @Positive Long formationId,
                                                           @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @Positive @PathVariable @Positive Long equipmentId,
                                                           @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @Valid @RequestBody IntensityAndAmountDTO amount) {
-        EquipmentPerFormation equipmentPerFormation = equipmentPerFormationService.addEquipmentToFormation(formationId,
-                equipmentId,
-                (long) amount
-                        .getAmount());
+        EquipmentPerFormation equipmentPerFormation =
+                equipmentPerFormationService.addEquipmentToFormation(formationId, equipmentId, (long) amount.getAmount());
         return ResponseEntity.ok().body(EquipmentPerFormationDTO.from(equipmentPerFormation));
     }
 
