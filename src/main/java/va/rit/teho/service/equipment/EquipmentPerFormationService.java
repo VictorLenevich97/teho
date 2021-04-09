@@ -32,20 +32,20 @@ public interface EquipmentPerFormationService {
                                                           Long formationId,
                                                           double coefficient);
 
+    List<EquipmentPerFormation> getEquipmentInFormation(Long formationId);
 
-    List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, List<Long> equipmentIds);
+    List<EquipmentPerFormation> getEquipmentInFormation(Long formationId, String nameFilter);
 
-    List<EquipmentPerFormation> getEquipmentInAllFormations(List<Long> equipmentIds);
+    List<EquipmentPerFormation> getEquipmentInAllFormations();
 
-    Map<EquipmentType, List<EquipmentPerFormation>> getGroupedEquipmentInFormation(Long formationId,
-                                                                                   List<Long> equipmentIds);
+    Map<EquipmentType, List<EquipmentPerFormation>> getGroupedEquipmentInFormation(Long formationId, String equipmentName);
 
     Map<Formation, Map<EquipmentType, List<EquipmentPerFormation>>> getTotalGroupedEquipmentInFormations(List<Long> equipmentIds);
 
     Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>> getFailureIntensityData(
             UUID sessionId,
             Long formationId,
-            List<Long> equipmentIds);
+            String equipmentName);
 
 
     Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> getTotalFailureIntensityData(

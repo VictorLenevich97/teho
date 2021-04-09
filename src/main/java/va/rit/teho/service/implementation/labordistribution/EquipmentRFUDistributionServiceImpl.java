@@ -130,7 +130,7 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
     @Override
     public List<EquipmentPerFormationDistributionData> listDistributionDataForFormation(UUID sessionId,
                                                                                         Long formationId) {
-        List<EquipmentPerFormation> list = equipmentPerFormationService.getEquipmentInFormation(formationId, null);
+        List<EquipmentPerFormation> list = equipmentPerFormationService.getEquipmentInFormation(formationId);
         Map<Equipment, Map<RepairType, Double>> equipmentFailurePerRepairTypes =
                 getEquipmentFailurePerRepairTypeMap(sessionId, formationId);
 

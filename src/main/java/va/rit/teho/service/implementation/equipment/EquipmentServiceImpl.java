@@ -17,10 +17,7 @@ import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,18 +47,17 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Long count(List<Long> ids, List<Long> typeIds) {
-        return equipmentRepository.countFiltered(ids, typeIds);
+    public Long count(String nameFilter) {
+        return nameFilter == null || nameFilter.isEmpty() ? equipmentRepository.count() : equipmentRepository.countByNameLikeIgnoreCase("%" + nameFilter + "%");
     }
 
     @Override
-    public Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(List<Long> ids,
-                                                                              List<Long> typeIds,
+    public Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(String nameFilter,
                                                                               Integer pageNum,
                                                                               Integer pageSize) {
-        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids,
-                                                                         typeIds,
-                                                                         PageRequest.of(pageNum - 1, pageSize));
+        List<Equipment> equipmentList = nameFilter == null || nameFilter.isEmpty() ?
+                equipmentRepository.findByOrderByEquipmentTypeIdAscIdAsc(PageRequest.of(pageNum - 1, pageSize)) :
+                equipmentRepository.findByNameLikeIgnoreCaseOrderByEquipmentTypeIdAscIdAsc("%" + nameFilter + "%", PageRequest.of(pageNum - 1, pageSize));
 
         Map<RepairType, Integer> defaultLaborInputData =
                 repairTypeService
@@ -73,12 +69,12 @@ public class EquipmentServiceImpl implements EquipmentService {
         return equipmentList
                 .stream()
                 .collect(Collectors.toMap(e -> e,
-                                          e -> e.getLaborInputPerTypes().isEmpty() ? defaultLaborInputData :
-                                                  e.getLaborInputPerTypes()
-                                                   .stream()
-                                                   .collect(Collectors.toMap(
-                                                           EquipmentLaborInputPerType::getRepairType,
-                                                           EquipmentLaborInputPerType::getAmount))));
+                        e -> e.getLaborInputPerTypes().isEmpty() ? defaultLaborInputData :
+                                e.getLaborInputPerTypes()
+                                        .stream()
+                                        .collect(Collectors.toMap(
+                                                EquipmentLaborInputPerType::getRepairType,
+                                                EquipmentLaborInputPerType::getAmount))));
     }
 
     @Override
@@ -113,13 +109,13 @@ public class EquipmentServiceImpl implements EquipmentService {
                 .entrySet()
                 .stream()
                 .map(repairTypeIdLaborInputEntry ->
-                             equipmentLaborInputPerTypeRepository
-                                     .findByEquipmentIdAndRepairTypeId(equipment.getId(),
-                                                                       repairTypeIdLaborInputEntry.getKey())
-                                     .map(eliptr -> eliptr.setAmount(repairTypeIdLaborInputEntry.getValue()))
-                                     .orElse(new EquipmentLaborInputPerType(equipment.getId(),
-                                                                            repairTypeIdLaborInputEntry.getKey(),
-                                                                            repairTypeIdLaborInputEntry.getValue())))
+                        equipmentLaborInputPerTypeRepository
+                                .findByEquipmentIdAndRepairTypeId(equipment.getId(),
+                                        repairTypeIdLaborInputEntry.getKey())
+                                .map(eliptr -> eliptr.setAmount(repairTypeIdLaborInputEntry.getValue()))
+                                .orElse(new EquipmentLaborInputPerType(equipment.getId(),
+                                        repairTypeIdLaborInputEntry.getKey(),
+                                        repairTypeIdLaborInputEntry.getValue())))
                 .collect(Collectors.toList());
         equipmentLaborInputPerTypeRepository.saveAll(equipmentLaborInputPerTypes);
     }
@@ -149,19 +145,5 @@ public class EquipmentServiceImpl implements EquipmentService {
     public void delete(Long id) {
         equipmentRepository.deleteById(id);
     }
-
-    @Override
-    public Map<EquipmentType, List<Equipment>> listGroupedByTypes(List<Long> ids,
-                                                                  List<Long> typeIds) {
-        List<Equipment> equipmentList = equipmentRepository.findFiltered(ids,
-                                                                         typeIds,
-                                                                         PageRequest.of(0, 10000));
-        Map<EquipmentType, List<Equipment>> result = new HashMap<>();
-        for (Equipment equipment : equipmentList) {
-            result.computeIfAbsent(equipment.getEquipmentType(), k -> new ArrayList<>()).add(equipment);
-        }
-        return result;
-    }
-
 
 }

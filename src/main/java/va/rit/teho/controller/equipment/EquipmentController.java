@@ -31,8 +31,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static va.rit.teho.controller.helper.FilterConverter.nullIfEmpty;
-
 @Controller
 @RequestMapping(path = "equipment", produces = MediaType.APPLICATION_JSON_VALUE)
 @Api(tags = "ВВСТ")
@@ -123,14 +121,11 @@ public class EquipmentController {
     @GetMapping("/labor-input")
     @ApiOperation(value = "Получить список ВВСТ с нормативной трудоемкостью (в табличном виде)")
     public ResponseEntity<GenericTableDataDTO<Map<String, Integer>, EquipmentLaborInputPerTypeRowData>> listEquipmentWithLaborInputData(
-            @ApiParam(value = "Ключи ВВСТ, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> ids,
-            @ApiParam(value = "Ключи типов ВВСТ, по которым осуществляется фильтр") @RequestParam(required = false) List<Long> typeIds,
+            @RequestParam(required = false, defaultValue = "") String equipmentName,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
-        List<Long> idsFilter = nullIfEmpty(ids);
-        List<Long> typeIdsFilter = nullIfEmpty(typeIds);
 
-        Long rowCount = equipmentService.count(idsFilter, typeIdsFilter);
+        Long rowCount = equipmentService.count(equipmentName);
         List<NestedColumnsDTO> columns =
                 repairTypeService.list(true)
                                  .stream()
@@ -139,7 +134,7 @@ public class EquipmentController {
                                  .collect(Collectors.toList());
         List<EquipmentLaborInputPerTypeRowData> data =
                 equipmentService
-                        .listWithLaborInputPerType(idsFilter, typeIdsFilter, pageNum, pageSize)
+                        .listWithLaborInputPerType(equipmentName, pageNum, pageSize)
                         .entrySet()
                         .stream()
                         .map(equipmentMapEntry ->
