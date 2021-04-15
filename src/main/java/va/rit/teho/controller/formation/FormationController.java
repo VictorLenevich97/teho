@@ -56,7 +56,7 @@ public class FormationController {
                                      formationModel.getFullName(),
                                      formationModel.getParentFormation().getId());
         List<Long> equipment = equipmentService.list().stream().map(Equipment::getId).collect(Collectors.toList());
-        equipmentPerFormationService.addEquipmentToFormation(addedFormation.getId(), equipment, 0);
+        equipmentPerFormationService.addEquipmentToFormation(addedFormation.getId(), equipment, 0L);
         return ResponseEntity.status(HttpStatus.CREATED).body(FormationDTO.from(addedFormation, false));
     }
 

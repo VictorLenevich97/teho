@@ -17,7 +17,8 @@ import va.rit.teho.service.common.RepairTypeService;
 import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +50,11 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public Long count(String nameFilter) {
         return nameFilter == null || nameFilter.isEmpty() ? equipmentRepository.count() : equipmentRepository.countByNameLikeIgnoreCase("%" + nameFilter + "%");
+    }
+
+    @Override
+    public List<Equipment> list(List<Long> ids) {
+        return equipmentRepository.findByIdIn(ids);
     }
 
     @Override

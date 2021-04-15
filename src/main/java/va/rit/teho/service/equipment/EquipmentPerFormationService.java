@@ -17,7 +17,7 @@ public interface EquipmentPerFormationService {
 
     EquipmentPerFormation addEquipmentToFormation(Long formationId, Long equipmentId, Long amount);
 
-    void addEquipmentToFormation(Long formationId, List<Long> equipmentId, int amount);
+    List<EquipmentPerFormation> addEquipmentToFormation(Long formationId, List<Long> equipmentId, Long amount);
 
     EquipmentPerFormation updateEquipmentInFormation(Long formationId, Long equipmentId, int amount);
 

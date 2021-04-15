@@ -1,6 +1,5 @@
 package va.rit.teho.repository.equipment;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -17,6 +16,8 @@ public interface EquipmentRepository extends PagingAndSortingRepository<Equipmen
     Long getMaxId();
 
     List<Equipment> findAllByOrderByIdAsc();
+
+    List<Equipment> findByIdIn(List<Long> ids);
 
     Long countByNameLikeIgnoreCase(String name);
 
