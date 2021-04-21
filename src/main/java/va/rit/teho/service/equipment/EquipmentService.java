@@ -10,6 +10,8 @@ public interface EquipmentService {
 
     List<Equipment> list();
 
+    List<Equipment> list(List<Long> ids);
+
     Long count(String nameFilter);
 
     Map<Equipment, Map<RepairType, Integer>> listWithLaborInputPerType(String nameFilter,

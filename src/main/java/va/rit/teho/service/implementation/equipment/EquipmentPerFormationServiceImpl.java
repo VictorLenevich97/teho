@@ -10,6 +10,7 @@ import va.rit.teho.entity.equipment.combined.EquipmentPerFormationFailureIntensi
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.intensity.IntensityData;
 import va.rit.teho.exception.AlreadyExistsException;
+import va.rit.teho.exception.IncorrectParamException;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.equipment.EquipmentPerFormationFailureIntensityRepository;
 import va.rit.teho.repository.equipment.EquipmentPerFormationRepository;
@@ -223,22 +224,44 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
         equipmentPerFormationRepository
                 .findById(new EquipmentPerFormationPK(formationId, equipmentId))
                 .ifPresent(epb -> {
-                    throw new AlreadyExistsException("ВВСТ в ВЧ",
-                            "(id ВЧ, id ВВСТ)",
-                            "(" + formationId + ", " + equipmentId + ")");
+                    throw equipmentIsPresentInFormation(epb.getFormation(), epb.getEquipment());
                 });
 
         return this.equipmentPerFormationRepository.save(new EquipmentPerFormation(equipment, formation, amount));
     }
 
-    @Override
-    public void addEquipmentToFormation(Long formationId, List<Long> equipmentId, int amount) {
-        List<EquipmentPerFormation> equipmentPerFormationList = equipmentId
-                .stream()
-                .map(id -> new EquipmentPerFormation(formationId, id, (long) amount))
-                .collect(Collectors.toList());
+    private AlreadyExistsException equipmentIsPresentInFormation(Formation formation, Equipment equipment) {
+        return new AlreadyExistsException("ВВСТ \"" + equipment.getName() + "\" уже существует в Формировании \"" + formation.getFullName() + "\"");
+    }
 
-        equipmentPerFormationRepository.saveAll(equipmentPerFormationList);
+    @Override
+    public List<EquipmentPerFormation> addEquipmentToFormation(Long formationId, List<Long> equipmentIds, Long amount) {
+        Formation formation = formationService.get(formationId);
+        List<Equipment> equipmentList = equipmentService.list(equipmentIds);
+
+        if (equipmentList.size() != equipmentIds.size()) {
+            throw new IncorrectParamException("Невозможно добавить: один (или более) ВВСТ не существуют в БД!");
+        }
+
+        equipmentPerFormationRepository
+                .findAllByFormationId(formationId, equipmentIds)
+                .stream()
+                .findAny()
+                .ifPresent(epf -> {
+                    throw equipmentIsPresentInFormation(epf.getFormation(), epf.getEquipment());
+                });
+
+        List<EquipmentPerFormation> equipmentPerFormationList =
+                equipmentList
+                        .stream()
+                        .map(equipment -> new EquipmentPerFormation(equipment, formation, amount))
+                        .collect(Collectors.toList());
+
+        Iterable<EquipmentPerFormation> saved = equipmentPerFormationRepository.saveAll(equipmentPerFormationList);
+
+        return StreamSupport
+                .stream(saved.spliterator(), true)
+                .collect(Collectors.toList());
     }
 
     @Override

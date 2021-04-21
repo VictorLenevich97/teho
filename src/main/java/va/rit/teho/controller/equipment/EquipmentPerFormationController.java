@@ -64,15 +64,13 @@ public class EquipmentPerFormationController {
         this.reportService = reportService;
     }
 
-
-    @PostMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/formation/{formationId}/equipment", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Добавить ВВСТ в Формирование")
-    public ResponseEntity<Object> addEquipmentToFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @Positive @PathVariable @Positive Long formationId,
-                                                          @ApiParam(value = "Ключ ВВСТ", required = true, example = "1") @Positive @PathVariable @Positive Long equipmentId,
-                                                          @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @Valid @RequestBody IntensityAndAmountDTO amount) {
-        EquipmentPerFormation equipmentPerFormation =
-                equipmentPerFormationService.addEquipmentToFormation(formationId, equipmentId, (long) amount.getAmount());
-        return ResponseEntity.ok().body(EquipmentPerFormationDTO.from(equipmentPerFormation));
+    public ResponseEntity<List<EquipmentPerFormationDTO>> addEquipmentToFormation(@ApiParam(value = "Ключ ВЧ", required = true, example = "1") @Positive @PathVariable @Positive Long formationId,
+                                                                                  @ApiParam(value = "Количество ВВСТ в Формировании", required = true) @Valid @RequestBody IntensityAndAmountDTO equipmentIdsAndAmount) {
+        List<EquipmentPerFormation> equipmentPerFormations =
+                equipmentPerFormationService.addEquipmentToFormation(formationId, equipmentIdsAndAmount.getEquipmentIds(), (long) equipmentIdsAndAmount.getAmount());
+        return ResponseEntity.ok().body(equipmentPerFormations.stream().map(EquipmentPerFormationDTO::from).collect(Collectors.toList()));
     }
 
     @PutMapping(path = "/formation/{formationId}/equipment/{equipmentId}", consumes = MediaType.APPLICATION_JSON_VALUE)

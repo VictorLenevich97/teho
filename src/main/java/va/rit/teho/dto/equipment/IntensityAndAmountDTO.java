@@ -1,10 +1,14 @@
 package va.rit.teho.dto.equipment;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class IntensityAndAmountDTO {
+    private List<Long> equipmentIds;
     private List<IntensityPerRepairTypeAndStageDTO> intensities;
 
     @Positive
@@ -33,6 +37,14 @@ public class IntensityAndAmountDTO {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public List<Long> getEquipmentIds() {
+        return equipmentIds;
+    }
+
+    public void setEquipmentIds(List<Long> equipmentIds) {
+        this.equipmentIds = equipmentIds;
     }
 
     public static final class IntensityPerRepairTypeAndStageDTO {
