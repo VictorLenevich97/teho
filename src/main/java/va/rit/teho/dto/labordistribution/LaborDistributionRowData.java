@@ -9,17 +9,17 @@ import java.util.Map;
 public class LaborDistributionRowData<T> extends RowData<Map<String, T>> {
     private final String equipmentName;
     private final Integer equipmentAmount;
-    private final String avgDailyFailure;
+    private final Double avgDailyFailure;
     private final Integer standardLaborInput;
-    private final String totalLaborInput;
+    private final Double totalLaborInput;
 
     public LaborDistributionRowData(String name,
                                     Map<String, T> data,
                                     String equipmentName,
                                     Integer equipmentAmount,
-                                    String avgDailyFailure,
+                                    Double avgDailyFailure,
                                     Integer standardLaborInput,
-                                    String totalLaborInput) {
+                                    Double totalLaborInput) {
         super(null, name, data);
         this.equipmentName = equipmentName;
         this.equipmentAmount = equipmentAmount;
@@ -40,11 +40,11 @@ public class LaborDistributionRowData<T> extends RowData<Map<String, T>> {
         return standardLaborInput;
     }
 
-    public String getAvgDailyFailure() {
+    public Double getAvgDailyFailure() {
         return avgDailyFailure;
     }
 
-    public String getTotalLaborInput() {
+    public Double getTotalLaborInput() {
         return totalLaborInput;
     }
 }

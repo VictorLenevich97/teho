@@ -218,9 +218,9 @@ public class LaborInputDistributionController {
                 countAndLaborInputDTOMap,
                 elid.getEquipmentName(),
                 elid.getEquipmentAmount(),
-                elid.getAvgDailyFailure().toString(),
+                elid.getAvgDailyFailure(),
                 elid.getStandardLaborInput(),
-                elid.getTotalRepairComplexity().toString());
+                elid.getTotalRepairComplexity());
     }
 
     @PostMapping
@@ -254,8 +254,8 @@ public class LaborInputDistributionController {
                 countMap,
                 elid.getEquipmentName(),
                 elid.getEquipmentAmount(),
-                elid.getAvgDailyFailure().toString(),
+                elid.getAvgDailyFailure(),
                 elid.getStandardLaborInput(),
-                elid.getTotalRepairComplexity().toString());
+                elid.getTotalRepairComplexity());
     }
 }

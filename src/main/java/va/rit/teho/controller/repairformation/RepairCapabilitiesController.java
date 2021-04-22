@@ -71,15 +71,15 @@ public class RepairCapabilitiesController {
     @ResponseBody
     @Transactional
     @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для всех РВО по всем ВВСТ)")
-    public ResponseEntity<TableDataDTO<Map<String, String>>> calculateAndGet(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId) {
+    public ResponseEntity<TableDataDTO<Map<String, Double>>> calculateAndGet(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilities(tehoSession.getSessionId(),
-                                                                            repairTypeId);
+                repairTypeId);
         return getCalculatedRepairCapabilities(repairTypeId,
-                                               Collections.emptyList(),
-                                               Collections.emptyList(),
-                                               Collections.emptyList(),
-                                               1,
-                                               100);
+                Collections.emptyList(),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                1,
+                100);
     }
 
     @PostMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -147,14 +147,14 @@ public class RepairCapabilitiesController {
         }
     }
 
-    private TableDataDTO<Map<String, String>> buildRepairCapabilitiesDTO(RepairFormationUnitRepairCapabilityCombinedData combinedData,
+    private TableDataDTO<Map<String, Double>> buildRepairCapabilitiesDTO(RepairFormationUnitRepairCapabilityCombinedData combinedData,
                                                                          long rowCount,
                                                                          int pageSize) {
         List<NestedColumnsDTO> equipmentPerTypeNestedColumns =
                 combinedData.getEquipmentTypes()
-                            .stream()
-                            .flatMap(et -> getRepairCapabilitiesNestedColumnsDTO(et, combinedData.getEquipmentIds()))
-                            .collect(Collectors.toList());
+                        .stream()
+                        .flatMap(et -> getRepairCapabilitiesNestedColumnsDTO(et, combinedData.getEquipmentIds()))
+                        .collect(Collectors.toList());
 
         List<Equipment> filteredEquipmentList =
                 combinedData.getEquipmentTypes()
@@ -164,17 +164,17 @@ public class RepairCapabilitiesController {
                                     et.collectRelatedEquipment(combinedData.getEquipmentIds()))
                             .collect(Collectors.toList());
 
-        List<RowData<Map<String, String>>> data =
+        List<RowData<Map<String, Double>>> data =
                 combinedData.getRepairFormationUnitList()
-                            .stream()
-                            .map(rs -> getRepairCapabilitiesRow(combinedData.getCalculatedRepairCapabilities(),
-                                                                filteredEquipmentList,
-                                                                rs))
-                            .collect(Collectors.toList());
+                        .stream()
+                        .map(rs -> getRepairCapabilitiesRow(combinedData.getCalculatedRepairCapabilities(),
+                                filteredEquipmentList,
+                                rs))
+                        .collect(Collectors.toList());
         return new TableDataDTO<>(equipmentPerTypeNestedColumns, data, Paginator.getPageNum(pageSize, rowCount));
     }
 
-    private RowData<Map<String, String>> getRepairCapabilitiesRow(
+    private RowData<Map<String, Double>> getRepairCapabilitiesRow(
             Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities,
             List<Equipment> columns,
             RepairFormationUnit rs) {
@@ -186,8 +186,7 @@ public class RepairCapabilitiesController {
                         .collect(Collectors.toMap(equipment -> equipment.getId().toString(),
                                 equipment -> calculatedRepairCapabilities
                                         .getOrDefault(rs, Collections.emptyMap())
-                                        .getOrDefault(equipment, 0.0)
-                                        .toString())));
+                                        .getOrDefault(equipment, 0.0))));
     }
 
     @GetMapping("/{repairFormationUnitId}/capabilities/repair-type/{repairTypeId}")
@@ -257,7 +256,7 @@ public class RepairCapabilitiesController {
     @ResponseBody
     @Transactional
     @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
-    public ResponseEntity<TableDataDTO<Map<String, String>>> getCalculatedRepairCapabilities(
+    public ResponseEntity<TableDataDTO<Map<String, Double>>> getCalculatedRepairCapabilities(
             @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
             @ApiParam(value = "Ключи ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentId,
@@ -272,9 +271,9 @@ public class RepairCapabilitiesController {
                 pageNum,
                 pageSize);
         Long rowCount = repairFormationUnitService.count(repairFormationUnitId);
-        TableDataDTO<Map<String, String>> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(combinedData,
-                                                                                                 rowCount,
-                                                                                                 pageSize);
+        TableDataDTO<Map<String, Double>> repairCapabilitiesFullDTO = buildRepairCapabilitiesDTO(combinedData,
+                rowCount,
+                pageSize);
         return ResponseEntity.ok(repairCapabilitiesFullDTO);
     }
 
