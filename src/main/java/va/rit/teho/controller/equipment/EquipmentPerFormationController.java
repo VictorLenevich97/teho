@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
 import va.rit.teho.dto.equipment.EquipmentPerFormationDTO;
@@ -267,11 +266,11 @@ public class EquipmentPerFormationController {
                                 .get(s);
 
                 data.computeIfAbsent(s.getId().toString(), e -> new HashMap<>())
-                        .put(rt.getId().toString(),
-                                Formatter.formatDoubleAsString(Optional
-                                        .ofNullable(equipmentPerFormationFailureIntensity)
-                                        .map(EquipmentPerFormationFailureIntensity::getAvgDailyFailure)
-                                        .orElse(0.0)));
+                        .put(rt.getId().toString(), Optional
+                                .ofNullable(equipmentPerFormationFailureIntensity)
+                                .map(EquipmentPerFormationFailureIntensity::getAvgDailyFailure)
+                                .orElse(0.0)
+                                .toString());
             }
         }
         return new EquipmentFailureIntensityRowData<>(epb.getEquipment().getId(),

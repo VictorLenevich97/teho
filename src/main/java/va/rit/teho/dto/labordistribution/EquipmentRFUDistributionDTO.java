@@ -1,6 +1,5 @@
 package va.rit.teho.dto.labordistribution;
 
-import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
 
 public class EquipmentRFUDistributionDTO {
@@ -30,8 +29,8 @@ public class EquipmentRFUDistributionDTO {
                                                        .getWorkhoursDistributionInterval()
                                                        .getRestorationType()
                                                        .getName(),
-                                               Formatter.formatDouble(equipmentRFUDistribution.getRepairing()),
-                                               Formatter.formatDouble(equipmentRFUDistribution.getUnable()));
+                                               equipmentRFUDistribution.getRepairing(),
+                                               equipmentRFUDistribution.getUnable());
     }
 
     public String getFormationName() {

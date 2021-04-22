@@ -10,10 +10,10 @@ public class EquipmentLaborInputDistribution {
     private final String formationName;
     private final String equipmentName;
     private final int equipmentAmount;
-    private final double avgDailyFailure;
+    private final Double avgDailyFailure;
     private final int standardLaborInput;
     private final Map<RepairType, CountAndLaborInputCombinedData> countAndLaborInputCombinedData;
-    private final double totalRepairComplexity;
+    private final Double totalRepairComplexity;
 
     public EquipmentLaborInputDistribution(
             String formationName,
@@ -40,7 +40,7 @@ public class EquipmentLaborInputDistribution {
         return new Builder();
     }
 
-    public double getTotalRepairComplexity() {
+    public Double getTotalRepairComplexity() {
         return totalRepairComplexity;
     }
 
@@ -52,7 +52,7 @@ public class EquipmentLaborInputDistribution {
         return equipmentName;
     }
 
-    public double getAvgDailyFailure() {
+    public Double getAvgDailyFailure() {
         return avgDailyFailure;
     }
 

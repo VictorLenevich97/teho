@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.equipment.EquipmentFailureIntensityRowData;
 import va.rit.teho.dto.table.GenericTableDataDTO;
@@ -90,7 +89,7 @@ public class IntensityController {
             for (Stage s : stages) {
                 for (RepairType rt : repairTypes) {
                     data.computeIfAbsent(s.getId().toString(), e -> new HashMap<>())
-                            .put(rt.getId().toString(), Formatter.formatDoubleAsString(intensitiesForOperation.get(equipment, rt, s)));
+                            .put(rt.getId().toString(), intensitiesForOperation.get(equipment, rt, s).toString());
                 }
             }
             intensityRowData.add(new EquipmentFailureIntensityRowData<>(equipment.getId(), equipment.getName(), data));

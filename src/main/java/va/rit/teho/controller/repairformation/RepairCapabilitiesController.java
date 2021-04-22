@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.Paginator;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.repairformation.EquipmentTypeStaffData;
@@ -185,10 +184,10 @@ public class RepairCapabilitiesController {
                 columns
                         .stream()
                         .collect(Collectors.toMap(equipment -> equipment.getId().toString(),
-                                                  equipment -> Formatter.formatDoubleAsString(
-                                                          calculatedRepairCapabilities
-                                                                  .getOrDefault(rs, Collections.emptyMap())
-                                                                  .getOrDefault(equipment, 0.0)))));
+                                equipment -> calculatedRepairCapabilities
+                                        .getOrDefault(rs, Collections.emptyMap())
+                                        .getOrDefault(equipment, 0.0)
+                                        .toString())));
     }
 
     @GetMapping("/{repairFormationUnitId}/capabilities/repair-type/{repairTypeId}")
@@ -247,12 +246,8 @@ public class RepairCapabilitiesController {
                                     .getEquipmentSet()
                                     .stream()
                                     .map(equipment -> new RepairCapabilityPerEquipment(equipment.getId(),
-                                                                                       equipment.getName(),
-                                                                                       Formatter.formatDouble(
-                                                                                               calculatedRepairCapabilities
-                                                                                                       .getOrDefault(
-                                                                                                               equipment,
-                                                                                                               0.0))))
+                                            equipment.getName(),
+                                            calculatedRepairCapabilities.getOrDefault(equipment, 0.0)))
                                     .collect(Collectors.toList()));
                 });
     }
