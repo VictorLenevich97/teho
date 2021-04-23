@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.labordistribution.*;
 import va.rit.teho.dto.table.NestedColumnsDTO;
@@ -131,11 +130,11 @@ public class EquipmentRFUDistributionController {
                     Map<String, Double> repairTypeAmountMap = new HashMap<>();
                     epfdd
                             .getAmountPerRepairType()
-                            .forEach((rt, amount) -> repairTypeAmountMap.put(rt.getId().toString(), Formatter.formatDouble(amount)));
+                            .forEach((rt, amount) -> repairTypeAmountMap.put(rt.getId().toString(), amount));
                     Map<String, Double> restorationTypeAmountMap = new HashMap<>();
                     epfdd
                             .getAmountPerRestorationType()
-                            .forEach((rt, amount) -> restorationTypeAmountMap.put(rt.getId().toString(), Formatter.formatDouble(amount)));
+                            .forEach((rt, amount) -> restorationTypeAmountMap.put(rt.getId().toString(), amount));
 
                     return new EquipmentDistributionRowData(epfdd.getEquipment().getId(),
                             epfdd.getEquipment().getName(),

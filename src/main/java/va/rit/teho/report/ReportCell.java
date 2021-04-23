@@ -5,6 +5,9 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import java.text.DecimalFormat;
 
 public class ReportCell {
+
+    private static final DecimalFormat DOUBLE_FORMATTER = new DecimalFormat("#.###");
+
     private final Object value;
     private final CellType cellType;
     private final HorizontalAlignment alignment;
@@ -32,7 +35,7 @@ public class ReportCell {
     }
 
     public String getNumericValue() {
-        return new DecimalFormat("#.###").format(Double.parseDouble(value.toString()));
+        return DOUBLE_FORMATTER.format(Double.parseDouble(value.toString()));
     }
 
     public String getValue() {

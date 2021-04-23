@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import va.rit.teho.controller.helper.Formatter;
 import va.rit.teho.controller.helper.ReportResponseEntity;
 import va.rit.teho.dto.labordistribution.CountAndLaborInputDTO;
 import va.rit.teho.dto.labordistribution.LaborDistributionFilterData;
@@ -209,18 +208,19 @@ public class LaborInputDistributionController {
                                 .entrySet()
                                 .stream())
                         .collect(Collectors.toMap(e -> e.getKey().toString(),
-                                                  e -> new CountAndLaborInputDTO(
-                                                          Formatter.formatDoubleAsString(e.getValue().getCount()),
-                                                          Formatter.formatDoubleAsString(e
-                                                                                                 .getValue()
-                                                                                                 .getLaborInput()))));
+                                e -> new CountAndLaborInputDTO(
+                                        e.getValue().getCount().toString(),
+                                        e
+                                                .getValue()
+                                                .getLaborInput()
+                                                .toString())));
         return new LaborDistributionRowData<>(elid.getFormationName(),
-                                              countAndLaborInputDTOMap,
-                                              elid.getEquipmentName(),
-                                              elid.getEquipmentAmount(),
-                                              Formatter.formatDoubleAsString(elid.getAvgDailyFailure()),
-                                              elid.getStandardLaborInput(),
-                                              Formatter.formatDoubleAsString(elid.getTotalRepairComplexity()));
+                countAndLaborInputDTOMap,
+                elid.getEquipmentName(),
+                elid.getEquipmentAmount(),
+                elid.getAvgDailyFailure(),
+                elid.getStandardLaborInput(),
+                elid.getTotalRepairComplexity());
     }
 
     @PostMapping
@@ -245,19 +245,17 @@ public class LaborInputDistributionController {
                 countAndLaborInputMap
                         .forEach((key, countAndLaborInput) -> countMap.put(
                                 buildCombinedKey(repairType, key),
-                                Formatter.formatDoubleAsString(
-                                        countAndLaborInput.getCount())));
+                                countAndLaborInput.getCount().toString()));
             }
-            countMap.put("rt_" + repairType.getId(),
-                         Formatter.formatDoubleAsString(countAndLaborInputCombinedData.getTotalFailureAmount()));
+            countMap.put("rt_" + repairType.getId(), countAndLaborInputCombinedData.getTotalFailureAmount().toString());
         });
         return new LaborDistributionRowData<>(
                 elid.getFormationName(),
                 countMap,
                 elid.getEquipmentName(),
                 elid.getEquipmentAmount(),
-                Formatter.formatDoubleAsString(elid.getAvgDailyFailure()),
+                elid.getAvgDailyFailure(),
                 elid.getStandardLaborInput(),
-                Formatter.formatDoubleAsString(elid.getTotalRepairComplexity()));
+                elid.getTotalRepairComplexity());
     }
 }

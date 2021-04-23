@@ -6,8 +6,8 @@ public class CountAndLaborInput {
 
     public static final CountAndLaborInput EMPTY = createEmpty();
 
-    private double count;
-    private double laborInput;
+    private Double count;
+    private Double laborInput;
 
     public CountAndLaborInput(double count, double laborInput) {
         this.count = count;
@@ -37,11 +37,11 @@ public class CountAndLaborInput {
         return Objects.hash(count, laborInput);
     }
 
-    public double getCount() {
+    public Double getCount() {
         return count;
     }
 
-    public double getLaborInput() {
+    public Double getLaborInput() {
         return laborInput;
     }
 
