@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-    <Product Id="*"
+    <Product Id="63fdab7a-756f-4276-8738-6cc9f1911cf2"
              Name="ТЕХО"
              Language="1049"
              Manufacturer="ВАРБ"
-             Version="1.0.0.0"
+             Version="1.0.1.0"
              UpgradeCode="b0f67ca3-c7a1-41c8-9ee3-a109a3160dd4">
 
         <Package InstallerVersion="200"
                  Compressed="yes"
                  InstallScope="perMachine"/>
         <Icon Id="teho.ico" SourceFile="teho.ico"/>
-        <MajorUpgrade DowngradeErrorMessage="Более новая версия [ProductName] уже установлена."/>
+        <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="Более новая версия [ProductName] уже установлена."/>
         <MediaTemplate EmbedCab="yes"/>
 
         <Property Id="ARPPRODUCTICON" Value="teho.ico"/>

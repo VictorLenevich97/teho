@@ -1,10 +1,16 @@
-//teho-1.0-RELEASE.jar и teho.exe (билд electron) должны быть в этой же папке
-//{WIX} - путь к Wix Toolkit
+@echo off
+REM teho-1.0-RELEASE.jar и teho.exe (билд electron) должны быть в этой же папке
+REM {WIX} - путь к Wix Toolkit
+@echo on
 
-{WIX}\bin\candle.exe" *.wxs -o obj\
+set wix_location="C:\Program Files (x86)\WiX Toolset v3.11
 
-{WIX}\bin\light.exe" obj\*.wixobj -ext WixUIExtension -cultures:ru-RU  -o bin\TEHO_installer.msi
+%wix_location%\bin\candle.exe" wix_build.wxs -o obj\
 
-{WIX}\bin\candle.exe" *.wxs -ext WixBalExtension -ext WixUtilExtension -o obj\
+%wix_location%\bin\light.exe" obj\wix_build.wixobj -ext WixUIExtension -cultures:ru-RU  -o bin\TEHO_installer.msi
 
-{WIX}\bin\light.exe" obj\*.wixobj -ext WixUIExtension -cultures:ru-RU  -ext WixBalExtension -o bin\TEHO_installer_w_java.exe
+xcopy /Y bin\TEHO_installer.msi TEHO_installer.msi
+
+%wix_location%\bin\candle.exe" wix_build_with_java.wxs -ext WixBalExtension -ext WixUtilExtension -o obj\
+
+%wix_location%\bin\light.exe" obj\wix_build_with_java.wixobj -ext WixUIExtension -cultures:ru-RU  -ext WixBalExtension -o bin\TEHO_installer_w_java.exe
