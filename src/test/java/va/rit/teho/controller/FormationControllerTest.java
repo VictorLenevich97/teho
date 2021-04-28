@@ -45,9 +45,9 @@ public class FormationControllerTest extends ControllerTest {
         when(formationService.get(formationId)).thenReturn(formation);
 
         mockMvc.perform(get("/formation/{id}", formationId))
-               .andExpect(status().isOk()).andExpect(jsonPath("$.id", is(formationId.intValue())))
-               .andExpect(jsonPath("$.shortName", is(formation.getShortName())))
-               .andExpect(jsonPath("$.fullName", is(formation.getFullName())));
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id", is(formationId.intValue())))
+                .andExpect(jsonPath("$.shortName", is(formation.getShortName())))
+                .andExpect(jsonPath("$.fullName", is(formation.getFullName())));
     }
 
     @Test
@@ -72,7 +72,7 @@ public class FormationControllerTest extends ControllerTest {
                 post("/formation")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(base)))
-               .andExpect(status().isCreated());
+                .andExpect(status().isCreated());
 
         verify(formationService).add(base.getShortName(), base.getFullName());
     }
@@ -89,8 +89,8 @@ public class FormationControllerTest extends ControllerTest {
 
         mockMvc.perform(
                 put("/formation/{id}", formationId).contentType(MediaType.APPLICATION_JSON)
-                                                   .content(objectMapper.writeValueAsString(base)))
-               .andExpect(status().isAccepted());
+                        .content(objectMapper.writeValueAsString(base)))
+                .andExpect(status().isAccepted());
 
         verify(formationService).update(formationId, base.getShortName(), base.getFullName());
     }
@@ -100,23 +100,24 @@ public class FormationControllerTest extends ControllerTest {
         Long formationId = 1L;
         Long equipmentId = 2L;
         IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(Collections.emptyList(), 10);
+        intensityAndAmountDTO.setEquipmentIds(Collections.singletonList(equipmentId));
 
         when(equipmentPerFormationService.addEquipmentToFormation(formationId,
-                                                                  equipmentId,
-                                                                  Long.valueOf(intensityAndAmountDTO.getAmount()))).thenReturn(
-                new EquipmentPerFormation(new Equipment(equipmentId, "", null),
-                                          new Formation(formationId, "", ""),
-                                          Long.valueOf(intensityAndAmountDTO.getAmount())));
+                Collections.singletonList(equipmentId),
+                Long.valueOf(intensityAndAmountDTO.getAmount()))).thenReturn(
+                Collections.singletonList(new EquipmentPerFormation(new Equipment(equipmentId, "", null),
+                        new Formation(formationId, "", ""),
+                        Long.valueOf(intensityAndAmountDTO.getAmount()))));
 
         mockMvc
-                .perform(post("/formation/{formationId}/equipment/{equipmentId}", formationId, equipmentId)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
+                .perform(post("/formation/{formationId}/equipment", formationId, equipmentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
                 .andExpect(status().isOk());
 
         verify(equipmentPerFormationService).addEquipmentToFormation(formationId,
-                                                                     equipmentId,
-                                                                     Long.valueOf(intensityAndAmountDTO.getAmount()));
+                Collections.singletonList(equipmentId),
+                Long.valueOf(intensityAndAmountDTO.getAmount()));
     }
 
     @Test
@@ -128,20 +129,20 @@ public class FormationControllerTest extends ControllerTest {
                 1L,
                 1)), 10);
         when(equipmentPerFormationService.updateEquipmentInFormation(formationId,
-                                                                     equipmentId,
-                                                                     intensityAndAmountDTO.getAmount())).thenReturn(
+                equipmentId,
+                intensityAndAmountDTO.getAmount())).thenReturn(
                 new EquipmentPerFormation(new Equipment(equipmentId, "", null),
-                                          new Formation(formationId, "", ""),
-                                          Long.valueOf(intensityAndAmountDTO.getAmount())));
+                        new Formation(formationId, "", ""),
+                        Long.valueOf(intensityAndAmountDTO.getAmount())));
         mockMvc
                 .perform(put("/formation/{formationId}/equipment/{equipmentId}", formationId, equipmentId)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(intensityAndAmountDTO)))
                 .andExpect(status().isAccepted());
 
         verify(equipmentPerFormationService).updateEquipmentInFormation(formationId,
-                                                                        equipmentId,
-                                                                        intensityAndAmountDTO.getAmount());
+                equipmentId,
+                intensityAndAmountDTO.getAmount());
     }
 
 

@@ -16,6 +16,8 @@ import va.rit.teho.service.equipment.EquipmentService;
 import va.rit.teho.service.equipment.EquipmentTypeService;
 import va.rit.teho.service.formation.FormationService;
 import va.rit.teho.service.implementation.common.RepairTypeServiceImpl;
+import va.rit.teho.service.intensity.IntensityService;
+import va.rit.teho.service.intensity.OperationService;
 import va.rit.teho.service.labordistribution.EquipmentRFUDistributionService;
 import va.rit.teho.service.labordistribution.LaborInputDistributionService;
 import va.rit.teho.service.labordistribution.RestorationTypeService;
@@ -80,6 +82,12 @@ public abstract class ControllerTest {
 
     @MockBean
     protected WorkhoursDistributionIntervalService workhoursDistributionIntervalService;
+
+    @MockBean
+    protected IntensityService intensityService;
+
+    @MockBean
+    protected OperationService operationService;
 
     protected Equipment equipment(Long id, String name) {
         return new Equipment(id, name, null);

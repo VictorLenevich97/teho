@@ -44,7 +44,7 @@ public class EquipmentServiceImplTest {
     @Test
     public void testList() {
         List<Equipment> equipmentList = Collections.singletonList(EQUIPMENT);
-        when(equipmentRepository.findAll()).thenReturn(equipmentList);
+        when(equipmentRepository.findAllByOrderByIdAsc()).thenReturn(equipmentList);
 
         Assertions.assertEquals(equipmentList, equipmentService.list());
     }
