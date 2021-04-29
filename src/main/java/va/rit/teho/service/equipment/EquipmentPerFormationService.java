@@ -19,7 +19,7 @@ public interface EquipmentPerFormationService {
 
     List<EquipmentPerFormation> addEquipmentToFormation(Long formationId, List<Long> equipmentId, Long amount);
 
-    EquipmentPerFormation updateEquipmentInFormation(Long formationId, Long equipmentId, int amount);
+    EquipmentPerFormation updateEquipmentInFormation(Long formationId, Long equipmentId, Long amount);
 
     void setEquipmentPerFormationDailyFailure(UUID sessionId,
                                               Long formationId,

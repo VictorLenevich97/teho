@@ -19,8 +19,12 @@ public class CountAndLaborInput {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CountAndLaborInput that = (CountAndLaborInput) o;
-        return Double.compare(that.count, count) == 0 &&
-                Double.compare(that.laborInput, laborInput) == 0;
+        return Objects.equals(count, that.count) && Objects.equals(laborInput, that.laborInput);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(count, laborInput);
     }
 
     public static CountAndLaborInput createEmpty() {
@@ -30,11 +34,6 @@ public class CountAndLaborInput {
     public void add(double count, double laborInput) {
         this.count += count;
         this.laborInput += laborInput;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(count, laborInput);
     }
 
     public Double getCount() {

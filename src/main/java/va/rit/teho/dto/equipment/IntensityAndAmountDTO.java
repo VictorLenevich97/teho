@@ -13,9 +13,9 @@ public class IntensityAndAmountDTO {
 
     @Positive
     @Max(10000)
-    private int amount;
+    private Long amount;
 
-    public IntensityAndAmountDTO(List<IntensityPerRepairTypeAndStageDTO> intensities, int amount) {
+    public IntensityAndAmountDTO(List<IntensityPerRepairTypeAndStageDTO> intensities, Long amount) {
         this.intensities = intensities;
         this.amount = amount;
     }
@@ -31,11 +31,11 @@ public class IntensityAndAmountDTO {
         this.intensities = intensities;
     }
 
-    public int getAmount() {
+    public Long getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 

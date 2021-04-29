@@ -47,7 +47,7 @@ public class EquipmentPerFormation {
         this.amount = amount.intValue();
     }
 
-    public EquipmentPerFormation(Equipment equipment, Formation formation, Long amount) {
+    public EquipmentPerFormation(Formation formation, Equipment equipment, Long amount) {
         this.id = new EquipmentPerFormationPK(formation.getId(), equipment.getId());
         this.formation = formation;
         this.equipment = equipment;
@@ -98,7 +98,7 @@ public class EquipmentPerFormation {
         return amount;
     }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
+    public void setAmount(Long amount) {
+        this.amount = amount.intValue();
     }
 }

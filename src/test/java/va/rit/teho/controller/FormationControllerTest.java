@@ -99,15 +99,16 @@ public class FormationControllerTest extends ControllerTest {
     public void testAddEquipmentToBase() throws Exception {
         Long formationId = 1L;
         Long equipmentId = 2L;
-        IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(Collections.emptyList(), 10);
+        IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(Collections.emptyList(), 10L);
         intensityAndAmountDTO.setEquipmentIds(Collections.singletonList(equipmentId));
 
         when(equipmentPerFormationService.addEquipmentToFormation(formationId,
                 Collections.singletonList(equipmentId),
-                Long.valueOf(intensityAndAmountDTO.getAmount()))).thenReturn(
-                Collections.singletonList(new EquipmentPerFormation(new Equipment(equipmentId, "", null),
+                intensityAndAmountDTO.getAmount())).thenReturn(
+                Collections.singletonList(new EquipmentPerFormation(
                         new Formation(formationId, "", ""),
-                        Long.valueOf(intensityAndAmountDTO.getAmount()))));
+                        new Equipment(equipmentId, "", null),
+                        intensityAndAmountDTO.getAmount())));
 
         mockMvc
                 .perform(post("/formation/{formationId}/equipment", formationId, equipmentId)
@@ -117,7 +118,7 @@ public class FormationControllerTest extends ControllerTest {
 
         verify(equipmentPerFormationService).addEquipmentToFormation(formationId,
                 Collections.singletonList(equipmentId),
-                Long.valueOf(intensityAndAmountDTO.getAmount()));
+                intensityAndAmountDTO.getAmount());
     }
 
     @Test
@@ -127,13 +128,14 @@ public class FormationControllerTest extends ControllerTest {
         IntensityAndAmountDTO intensityAndAmountDTO = new IntensityAndAmountDTO(Collections.singletonList(new IntensityAndAmountDTO.IntensityPerRepairTypeAndStageDTO(
                 1L,
                 1L,
-                1)), 10);
+                1)), 10L);
         when(equipmentPerFormationService.updateEquipmentInFormation(formationId,
                 equipmentId,
                 intensityAndAmountDTO.getAmount())).thenReturn(
-                new EquipmentPerFormation(new Equipment(equipmentId, "", null),
+                new EquipmentPerFormation(
                         new Formation(formationId, "", ""),
-                        Long.valueOf(intensityAndAmountDTO.getAmount())));
+                        new Equipment(equipmentId, "", null),
+                        intensityAndAmountDTO.getAmount()));
         mockMvc
                 .perform(put("/formation/{formationId}/equipment/{equipmentId}", formationId, equipmentId)
                         .contentType(MediaType.APPLICATION_JSON)

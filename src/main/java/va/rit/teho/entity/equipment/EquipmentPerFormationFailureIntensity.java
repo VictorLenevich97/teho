@@ -7,6 +7,7 @@ import va.rit.teho.entity.session.TehoSession;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -101,6 +102,25 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
     public EquipmentPerFormationFailureIntensity copy(UUID newSessionId) {
         return new EquipmentPerFormationFailureIntensity(getEquipmentPerFormationWithRepairTypeId().copy(newSessionId),
                                                          avgDailyFailure);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EquipmentPerFormationFailureIntensity that = (EquipmentPerFormationFailureIntensity) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(formation, that.formation) &&
+                Objects.equals(equipment, that.equipment) &&
+                Objects.equals(stage, that.stage) &&
+                Objects.equals(repairType, that.repairType) &&
+                Objects.equals(tehoSession, that.tehoSession) &&
+                Objects.equals(avgDailyFailure, that.avgDailyFailure);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, formation, equipment, stage, repairType, tehoSession, avgDailyFailure);
     }
 
     @Override

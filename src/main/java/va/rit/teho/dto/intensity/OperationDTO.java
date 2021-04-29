@@ -15,9 +15,6 @@ public class OperationDTO {
 
     private Boolean active;
 
-    public OperationDTO() {
-    }
-
     public OperationDTO(Long id, String name, Boolean active) {
         this.id = id;
         this.name = name;

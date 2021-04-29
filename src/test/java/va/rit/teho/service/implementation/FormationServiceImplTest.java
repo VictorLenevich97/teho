@@ -25,11 +25,6 @@ public class FormationServiceImplTest {
 
     private final FormationRepository formationRepository = Mockito.mock(FormationRepository.class);
 
-    private final EquipmentRepository equipmentRepository = Mockito.mock(EquipmentRepository.class);
-
-    private final EquipmentPerFormationRepository equipmentPerFormationRepository = Mockito.mock(
-            EquipmentPerFormationRepository.class);
-
     private final FormationService service = new FormationServiceImpl(formationRepository);
 
     @Test
@@ -65,56 +60,6 @@ public class FormationServiceImplTest {
 
         verify(formationRepository).save(FORMATION);
     }
-//
-//    @Test
-//    public void testAddEquipmentToBase() {
-//        Long formationId = 1L;
-//        Long equipmentId = 1L;
-//        int intensity = 10;
-//        int amount = 15;
-//        Equipment e = new Equipment("n", new EquipmentSubType("", "", new EquipmentType("", "")));
-//        when(baseRepository.findById(formationId)).thenReturn(Optional.of(BASE));
-//        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(e));
-//        EquipmentPerBase epb = new EquipmentPerBase(BASE.getId(), e.getId(), amount);
-//
-//        service.addEquipmentToBase(formationId, equipmentId, amount);
-//
-//        verify(equipmentPerBaseRepository).save(epb);
-//    }
-//
-//    @Test
-//    public void testAddEquipmentToBaseBaseNotFound() {
-//        Long formationId = 1L;
-//        when(baseRepository.findById(formationId)).thenReturn(Optional.empty());
-//        Assertions.assertThrows(BaseNotFoundException.class, () -> service.addEquipmentToBase(1L, 1L, 0));
-//    }
-//
-//    @Test
-//    public void testAddEquipmentToBaseEquipmentNotFound() {
-//        Long formationId = 1L;
-//        Long equipmentId = 1L;
-//        when(baseRepository.findById(formationId)).thenReturn(Optional.of(BASE));
-//        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.empty());
-//        Assertions.assertThrows(EquipmentNotFoundException.class, () -> service.addEquipmentToBase(1L, 1L, 0));
-//    }
-//
-//    @Test
-//    public void testUpdateEquipmentInBase() {
-//        Long formationId = 1L;
-//        Long equipmentId = 1L;
-//        int intensity = 10;
-//        int amount = 15;
-//        Equipment e = new Equipment("n", new EquipmentSubType("", "", new EquipmentType("", "")));
-//        when(baseRepository.findById(formationId)).thenReturn(Optional.of(BASE));
-//        when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(e));
-//        EquipmentPerBase epb = new EquipmentPerBase(BASE.getId(), e.getId(), amount);
-//        when(equipmentPerBaseRepository.findById(new EquipmentPerformationId(formationId,
-//                                                                        equipmentId))).thenReturn(Optional.of(epb));
-//
-//        service.updateEquipmentInBase(formationId, equipmentId, amount);
-//
-//        verify(equipmentPerBaseRepository).save(epb);
-//    }
 
     @Test
     public void testGet() {

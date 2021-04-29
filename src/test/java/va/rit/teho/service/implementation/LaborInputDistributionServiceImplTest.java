@@ -1,237 +1,105 @@
-//package va.rit.teho.service.implementation;
-//
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.Mockito;
-//import org.mockito.stubbing.OngoingStubbing;
-//import va.rit.teho.entity.*;
-//import va.rit.teho.enums.RepairTypeEnum;
-//import va.rit.teho.enums.RestorationTypeEnum;
-//
-//import va.rit.teho.repository.*;
-//import va.rit.teho.service.common.CalculationService;
-//import va.rit.teho.service.labordistribution.LaborInputDistributionService;
-//
-//import java.util.*;
-//import java.util.function.Function;
-//
-//import static org.mockito.Mockito.verify;
-//import static org.mockito.Mockito.when;
-//
-//public class LaborInputDistributionServiceImplTest {
-//
-//    private final CalculationService calculationService = Mockito.mock(CalculationService.class);
-//
-//    private final EquipmentTypeRepository equipmentTypeRepository = Mockito.mock(EquipmentTypeRepository.class);
-//    private final EquipmentPerBaseRepository equipmentPerBaseRepository = Mockito.mock(EquipmentPerBaseRepository.class);
-//    private final EquipmentInRepairRepository equipmentInRepairRepository = Mockito.mock(EquipmentInRepairRepository.class);
-//    private final RepairTypeRepository repairTypeRepository = Mockito.mock(RepairTypeRepository.class);
-//    private final WorkhoursDistributionIntervalRepository workhoursDistributionIntervalRepository =
-//            Mockito.mock(WorkhoursDistributionIntervalRepository.class);
-//
-//    private final LaborInputDistributionService laborInputDistributionService =
-//            new LaborInputDistributionServiceImpl(
-//                    equipmentTypeRepository,
-//                    equipmentPerBaseRepository,
-//                    workhoursDistributionIntervalRepository,
-//                    calculationService,
-//                    equipmentInRepairRepository,
-//                    repairTypeRepository);
-//
-//    @Test
-//    public void testGetDistributionIntervals() {
-//        List<WorkhoursDistributionInterval> intervals =
-//                Collections.singletonList(
-//                        new WorkhoursDistributionInterval(
-//                                1,
-//                                10,
-//                                new RestorationType(RestorationTypeEnum.TACTICAL.getName())));
-//        when(workhoursDistributionIntervalRepository.findAll()).thenReturn(intervals);
-//
-//        Assertions.assertEquals(intervals, laborInputDistributionService.getDistributionIntervals());
-//    }
-//
-//    @Test
-//    public void testGetLaborInputDistribution() {
-//        testInternalGetLaborInputDistribution(Collections.emptyList());
-//    }
-//
-//    @Test
-//    public void testGetLaborInputDistributionFiltered() {
-//        testInternalGetLaborInputDistribution(Arrays.asList(1L, 2L));
-//    }
-//
-//    private void testInternalGetLaborInputDistribution(List<Long> equipmentTypeIds) {
-//        RepairType repairType = new RepairType(1L);
-//        when(repairTypeRepository.findByName(RepairTypeEnum.CURRENT_REPAIR.getName()))
-//                .thenReturn(Optional.of(repairType));
-//        EquipmentType equipmentType = new EquipmentType("s", "f");
-//        equipmentType.setId(2L);
-//        EquipmentSubType equipmentSubType = new EquipmentSubType("short", "full", equipmentType);
-//        Equipment e = new Equipment("eq", equipmentSubType);
-//        e.setId(3L);
-//        if (equipmentTypeIds.isEmpty()) {
-//            when(equipmentTypeRepository.findAll()).thenReturn(Collections.singletonList(equipmentType));
-//        }
-//        EquipmentInRepairData equipmentInRepairData = new EquipmentInRepairData(equipmentSubType,
-//                                                                                "formationName",
-//                                                                                e.getId(),
-//                                                                                e.getName(),
-//                                                                                100,
-//                                                                                1L,
-//                                                                                12.1,
-//                                                                                120.2);
-//        Map<EquipmentType, Map<EquipmentSubType, Map<EquipmentInRepairData.CompositeKey, List<EquipmentInRepairData>>>> grouped =
-//                Collections.singletonMap(equipmentType,
-//                                         Collections.singletonMap(equipmentSubType,
-//                                                                  Collections.singletonMap(new EquipmentInRepairData.CompositeKey(
-//                                                                                                   equipmentSubType,
-//                                                                                                   e.getId()),
-//                                                                                           Collections.singletonList(
-//                                                                                                   equipmentInRepairData))));
-//        when(equipmentInRepairRepository.findAllGrouped(repairType.getId(),
-//                                                        equipmentTypeIds.isEmpty() ? Collections.singletonList(
-//                                                                equipmentType.getId()) : equipmentTypeIds)).thenReturn(
-//                grouped);
-//        EquipmentLaborInputDistribution elid =
-//                EquipmentLaborInputDistribution.builder()
-//                                               .avgDailyFailure(equipmentInRepairData.getCount())
-//                                               .formationName(equipmentInRepairData.getformationName())
-//                                               .equipmentName(e.getName())
-//                                               .equipmentSubType(equipmentSubType)
-//                                               .equipmentType(equipmentType)
-//                                               .intervalCountAndLaborInputMap(Collections.singletonMap(
-//                                                       equipmentInRepairData.getIntervalId(),
-//                                                       new CountAndLaborInput(equipmentInRepairData.getCount(),
-//                                                                              equipmentInRepairData.getAvgLaborInput())))
-//                                               .standardLaborInput(equipmentInRepairData.getLaborInput())
-//                                               .totalRepairComplexity(equipmentInRepairData.getAvgLaborInput())
-//                                               .build();
-//        Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> result = Collections.singletonMap(
-//                equipmentType,
-//                Collections.singletonMap(equipmentSubType, Collections.singletonList(elid)));
-//        Map<EquipmentType, Map<EquipmentSubType, List<EquipmentLaborInputDistribution>>> laborInputDistribution = laborInputDistributionService
-//                .getLaborInputDistribution(equipmentTypeIds);
-//        Assertions.assertEquals(result, laborInputDistribution);
-//    }
-//
-//    @Test
-//    public void testUpdateLaborInputDistribution() {
-//        testInternalUpdateLaborInputDistribution(3L,
-//                                                 1L,
-//                                                 0L,
-//                                                 0L,
-//                                                 l -> when(equipmentPerBaseRepository.findAllWithLaborInput(l)),
-//                                                 laborInputDistributionService::updateLaborInputDistribution);
-//    }
-//
-//    @Test
-//    public void testUpdateLaborInputDistributionPerBase() {
-//        long repairTypeId = 2L;
-//        long formationId = 3L;
-//        testInternalUpdateLaborInputDistribution(formationId,
-//                                                 repairTypeId,
-//                                                 0L,
-//                                                 0L,
-//                                                 l -> when(equipmentPerBaseRepository.findAllWithLaborInputAndBase(
-//                                                         repairTypeId,
-//                                                         formationId)),
-//                                                 () -> laborInputDistributionService.updateLaborInputDistributionPerBase(
-//                                                         formationId));
-//    }
-//
-//    @Test
-//    public void testUpdateLaborInputDistributionPerEquipmentSubType() {
-//        long repairTypeId = 2L;
-//        long formationId = 3L;
-//        long subTypeId = 5L;
-//        testInternalUpdateLaborInputDistribution(formationId,
-//                                                 repairTypeId,
-//                                                 subTypeId,
-//                                                 0L,
-//                                                 l -> when(equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentSubType(
-//                                                         repairTypeId,
-//                                                         subTypeId)),
-//                                                 () -> laborInputDistributionService.updateLaborInputDistributionPerEquipmentSubType(
-//                                                         subTypeId));
-//    }
-//
-//    @Test
-//    public void testUpdateLaborInputDistributionPerEquipmentType() {
-//        long repairTypeId = 2L;
-//        long formationId = 3L;
-//        long subTypeId = 5L;
-//        long typeId = 7L;
-//        testInternalUpdateLaborInputDistribution(formationId,
-//                                                 repairTypeId,
-//                                                 subTypeId,
-//                                                 typeId,
-//                                                 l -> when(equipmentPerBaseRepository.findAllWithLaborInputAndEquipmentType(
-//                                                         repairTypeId,
-//                                                         typeId)),
-//                                                 () -> laborInputDistributionService.updateLaborInputDistributionPerEquipmentType(
-//                                                         typeId));
-//    }
-//
-//    private void testInternalUpdateLaborInputDistribution(Long formationId,
-//                                                          Long repairTypeId,
-//                                                          Long subTypeId,
-//                                                          Long typeId,
-//                                                          Function<Long, OngoingStubbing<List<AbstractMap.SimpleEntry<EquipmentPerBase, Integer>>>> repositoryFunctionStub,
-//                                                          Runnable updateDistribution) {
-//        RepairType repairType = new RepairType(repairTypeId);
-//        when(repairTypeRepository.findByName(RepairTypeEnum.CURRENT_REPAIR.getName()))
-//                .thenReturn(Optional.of(repairType));
-//        Base base = new Base("s", "f");
-//        base.setId(formationId);
-//        EquipmentType equipmentType = new EquipmentType("s", "f");
-//        equipmentType.setId(typeId);
-//        EquipmentSubType equipmentSubType = new EquipmentSubType("s", "f", equipmentType);
-//        equipmentSubType.setId(subTypeId);
-//        Equipment e = new Equipment("eqName", equipmentSubType);
-//        e.setId(5L);
-//        EquipmentPerBase equipmentPerBase = new EquipmentPerBase(base, e, 50, 20);
-//        AbstractMap.SimpleEntry<EquipmentPerBase, Integer> equipmentPerBaseWithLaborInput = Pair.of(equipmentPerBase, 120);
-//        repositoryFunctionStub.apply(repairType.getId())
-//                              .thenReturn(Collections.singletonList(equipmentPerBaseWithLaborInput));
-//        double avgDailyFailure = 123.12;
-//        when(calculationService.calculateEquipmentFailureAmount(equipmentPerBase.getAmount(),
-//                                                                equipmentPerBase.getIntensity(),
-//                                                                2.2)).thenReturn(avgDailyFailure);
-//
-//        WorkhoursDistributionInterval interval = new WorkhoursDistributionInterval(
-//                1,
-//                10,
-//                new RestorationType(RestorationTypeEnum.TACTICAL.getName()));
-//        interval.setId(2L);
-//        List<WorkhoursDistributionInterval> intervals =
-//                Collections.singletonList(
-//                        interval);
-//        when(workhoursDistributionIntervalRepository.findAll()).thenReturn(intervals);
-//
-//        double count = 1.24;
-//
-//        when(calculationService.calculateEquipmentRequiringRepair(interval.getUpperBound(),
-//                                                                  interval.getLowerBound(),
-//                                                                  avgDailyFailure,
-//                                                                  equipmentPerBaseWithLaborInput.getRight())).thenReturn(
-//                count);
-//
-//        double laborInput = 12.12;
-//
-//        when(calculationService.calculateEquipmentRepairComplexity(count, interval.getUpperBound())).thenReturn(
-//                laborInput);
-//
-//        EquipmentInRepair equipmentInRepair = new EquipmentInRepair(
-//                new EquipmentInRepairId(base.getId(), e.getId(), interval.getId()),
-//                base,
-//                e,
-//                interval,
-//                count,
-//                laborInput);
-//
-//        updateDistribution.run();
-//
-//        verify(equipmentInRepairRepository).saveAll(Collections.singletonList(equipmentInRepair));
-//    }
-//}
+package va.rit.teho.service.implementation;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import va.rit.teho.entity.common.RepairType;
+import va.rit.teho.entity.equipment.Equipment;
+import va.rit.teho.entity.equipment.EquipmentPerFormation;
+import va.rit.teho.entity.equipment.EquipmentType;
+import va.rit.teho.entity.formation.Formation;
+import va.rit.teho.entity.labordistribution.combined.CountAndLaborInput;
+import va.rit.teho.entity.labordistribution.combined.CountAndLaborInputCombinedData;
+import va.rit.teho.entity.labordistribution.combined.EquipmentLaborInputDistribution;
+import va.rit.teho.entity.labordistribution.combined.LaborDistributionData;
+import va.rit.teho.repository.equipment.EquipmentPerFormationFailureIntensityRepository;
+import va.rit.teho.repository.labordistribution.LaborDistributionRepository;
+import va.rit.teho.service.common.CalculationService;
+import va.rit.teho.service.common.RepairTypeService;
+import va.rit.teho.service.equipment.EquipmentPerFormationService;
+import va.rit.teho.service.implementation.labordistribution.LaborInputDistributionServiceImpl;
+import va.rit.teho.service.labordistribution.LaborInputDistributionService;
+import va.rit.teho.service.labordistribution.WorkhoursDistributionIntervalService;
+
+import java.util.*;
+
+import static org.mockito.Mockito.*;
+
+public class LaborInputDistributionServiceImplTest {
+
+    private final CalculationService calculationService = Mockito.mock(CalculationService.class);
+    private final EquipmentPerFormationService equipmentPerFormationService = Mockito.mock(EquipmentPerFormationService.class);
+    private final RepairTypeService repairTypeService = Mockito.mock(RepairTypeService.class);
+    private final LaborDistributionRepository laborDistributionRepository = Mockito.mock(LaborDistributionRepository.class);
+    private final EquipmentPerFormationFailureIntensityRepository equipmentPerFormationFailureIntensityRepository = Mockito.mock(EquipmentPerFormationFailureIntensityRepository.class);
+    private final WorkhoursDistributionIntervalService workhoursDistributionIntervalService = Mockito.mock(WorkhoursDistributionIntervalService.class);
+
+    private final LaborInputDistributionService laborInputDistributionService =
+            new LaborInputDistributionServiceImpl(
+                    workhoursDistributionIntervalService,
+                    calculationService,
+                    equipmentPerFormationService,
+                    repairTypeService,
+                    laborDistributionRepository,
+                    equipmentPerFormationFailureIntensityRepository);
+
+    @Test
+    public void testGetLaborInputDistribution() {
+        UUID sessionId = UUID.randomUUID();
+        Long repairTypeId = 12L;
+        Long stageId = 13L;
+
+        Formation formation = new Formation(1L, "short", "full");
+        EquipmentType equipmentType = new EquipmentType("shortET", "fullET");
+        Equipment equipment = new Equipment(2L, "eqName", equipmentType);
+        EquipmentPerFormation equipmentPerFormation = new EquipmentPerFormation(formation, equipment, 10L);
+        RepairType repairType = new RepairType(repairTypeId, "full", "short", true, false, false);
+
+        double avgDailyFailure = 123.123;
+        int standardLaborInput = 100;
+        double count = 2.2;
+        long intervalId = 1L;
+        double avgLaborInput = 22.2;
+        LaborDistributionData laborDistributionData1 = new LaborDistributionData(equipmentPerFormation, repairType, standardLaborInput, intervalId, count, avgLaborInput, avgDailyFailure);
+
+        long secondIntervalId = 2L;
+        double secondCount = 3.3;
+        double secondAvgLaborInput = 33.3;
+
+        LaborDistributionData laborDistributionData2 = new LaborDistributionData(equipmentPerFormation, repairType, standardLaborInput, secondIntervalId, secondCount, secondAvgLaborInput, avgDailyFailure);
+
+        Map<EquipmentPerFormation, List<LaborDistributionData>> equipmentPerFormationListMap =
+                Collections.singletonMap(equipmentPerFormation, Arrays.asList(laborDistributionData1, laborDistributionData2));
+
+        Map<EquipmentType, Map<EquipmentPerFormation, List<LaborDistributionData>>> equipmentTypeMap =
+                Collections.singletonMap(equipmentType, equipmentPerFormationListMap);
+
+        when(laborDistributionRepository.findAllGrouped(sessionId, repairTypeId, stageId, null)).thenReturn(equipmentTypeMap);
+
+        Map<Long, CountAndLaborInput> laborInputMap = new HashMap<>();
+        laborInputMap.put(intervalId, new CountAndLaborInput(count, avgLaborInput));
+        laborInputMap.put(secondIntervalId, new CountAndLaborInput(secondCount, secondAvgLaborInput));
+
+        EquipmentLaborInputDistribution expectedLID =
+                EquipmentLaborInputDistribution
+                        .builder()
+                        .formationName(formation.getFullName())
+                        .equipmentName(equipment.getName())
+                        .avgDailyFailure(avgDailyFailure)
+                        .standardLaborInput(standardLaborInput)
+                        .countAndLaborInputCombinedData(Collections.singletonMap(repairType,
+                                new CountAndLaborInputCombinedData(laborInputMap)))
+                        .totalRepairComplexity(
+                                laborInputMap.values().stream().mapToDouble(CountAndLaborInput::getLaborInput).sum())
+                        .build();
+
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> expectedResult = Collections.singletonMap(equipmentType, Collections.singletonList(expectedLID));
+
+        Map<EquipmentType, List<EquipmentLaborInputDistribution>> result = laborInputDistributionService.getLaborInputDistribution(sessionId, repairTypeId, stageId, null);
+
+        Assertions.assertEquals(expectedResult, result);
+
+        verify(laborDistributionRepository).findAllGrouped(sessionId, repairTypeId, stageId, null);
+        verifyNoMoreInteractions(laborDistributionRepository);
+    }
+}

@@ -53,7 +53,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public EquipmentPerFormation updateEquipmentInFormation(Long formationId, Long equipmentId, int amount) {
+    public EquipmentPerFormation updateEquipmentInFormation(Long formationId, Long equipmentId, Long amount) {
         formationService.get(formationId);
         equipmentService.get(equipmentId);
         EquipmentPerFormation epb =
@@ -227,7 +227,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
                     throw equipmentIsPresentInFormation(epb.getFormation(), epb.getEquipment());
                 });
 
-        return this.equipmentPerFormationRepository.save(new EquipmentPerFormation(equipment, formation, amount));
+        return this.equipmentPerFormationRepository.save(new EquipmentPerFormation(formation, equipment, amount));
     }
 
     private AlreadyExistsException equipmentIsPresentInFormation(Formation formation, Equipment equipment) {
@@ -254,7 +254,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
         List<EquipmentPerFormation> equipmentPerFormationList =
                 equipmentList
                         .stream()
-                        .map(equipment -> new EquipmentPerFormation(equipment, formation, amount))
+                        .map(equipment -> new EquipmentPerFormation(formation, equipment, amount))
                         .collect(Collectors.toList());
 
         Iterable<EquipmentPerFormation> saved = equipmentPerFormationRepository.saveAll(equipmentPerFormationList);
