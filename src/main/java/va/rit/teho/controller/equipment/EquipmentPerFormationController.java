@@ -106,7 +106,7 @@ public class EquipmentPerFormationController {
 
     @GetMapping("/formation/equipment/daily-failure")
     @ResponseBody
-    @ApiOperation(value = "Таблица с интенсивностью выхода ВВСТ в ремонт (по всем Формированиям), %")
+    @ApiOperation(value = "Таблица с интенсивностью выхода ВВСТ в ремонт (по всем Формированиям), ед")
     public GenericTableDataDTO<Map<String, Map<String, Double>>, EquipmentFailureIntensityRowData<Double>> getTotalEquipmentPerFormationDailyFailureData() {
         Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData =
                 equipmentPerFormationService.getTotalFailureIntensityData(tehoSession.getSessionId());
@@ -115,7 +115,7 @@ public class EquipmentPerFormationController {
 
     @GetMapping("/formation/equipment/daily-failure/report")
     @ResponseBody
-    @ApiOperation(value = "Получить очтет с интенсивностью выхода ВВСТ в ремонт (по всем Формированиям), %")
+    @ApiOperation(value = "Получить очтет с интенсивностью выхода ВВСТ в ремонт (по всем Формированиям), ед")
     public ResponseEntity<byte[]> getTotalEquipmentPerFormationDailyFailureDataReport(
             @RequestParam(required = false) List<Long> equipmentIds) throws UnsupportedEncodingException {
         Map<Formation, Map<Equipment, Map<RepairType, Map<Stage, EquipmentPerFormationFailureIntensity>>>> failureIntensityData =
