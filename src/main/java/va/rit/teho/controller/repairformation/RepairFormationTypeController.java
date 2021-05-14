@@ -57,6 +57,7 @@ public class RepairFormationTypeController {
     public ResponseEntity<RepairFormationTypeDTO> updateRepairFormationType(@ApiParam(value = "Ключ типа Ремонтного Формирования", required = true) @PathVariable @Positive Long typeId,
                                                                             @ApiParam(value = "Данные о типе Ремонтного Формирования", required = true) @Valid @RequestBody RepairFormationTypeDTO repairFormationTypeDTO) {
         RepairFormationType repairFormationType = repairFormationTypeService.updateType(typeId,
+                                                                                        repairFormationTypeDTO.getRestorationType().getId(),
                                                                                         repairFormationTypeDTO.getName(),
                                                                                         repairFormationTypeDTO.getWorkingHoursMin(),
                                                                                         repairFormationTypeDTO.getWorkingHoursMax());

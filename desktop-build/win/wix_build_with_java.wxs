@@ -2,11 +2,11 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Bundle Name="Установщик приложения ТехО (включая Java 8)"
-            Version="1.0.1.0"
+            Version="1.0.1.1"
             DisableModify="yes"
             DisableRemove="yes"
             Manufacturer="ВАРБ"
-            UpgradeCode="77f1482e-1b19-4793-993c-390b51618204">
+            UpgradeCode="1665a0f2-a96c-434a-b936-2afda50ba30d">
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
             <bal:WixStandardBootstrapperApplication
                     LicenseUrl=""

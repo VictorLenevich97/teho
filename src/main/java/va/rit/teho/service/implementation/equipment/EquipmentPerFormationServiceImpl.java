@@ -243,6 +243,10 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
             throw new IncorrectParamException("Невозможно добавить: один (или более) ВВСТ не существуют в БД!");
         }
 
+        if (equipmentIds.size() == 0) {
+           equipmentIds = null;
+        }
+
         equipmentPerFormationRepository
                 .findAllByFormationId(formationId, equipmentIds)
                 .stream()

@@ -10,7 +10,7 @@ public interface RepairFormationTypeService {
 
     RepairFormationType addType(String name, Long restorationTypeId, int workingHoursMin, int workingHoursMax);
 
-    RepairFormationType updateType(Long id, String name, int workingHoursMin, int workingHoursMax);
+    RepairFormationType updateType(Long id, Long restorationTypeId, String name, int workingHoursMin, int workingHoursMax);
 
     void deleteType(Long id);
 

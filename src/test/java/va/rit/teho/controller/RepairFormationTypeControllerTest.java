@@ -28,85 +28,88 @@ public class RepairFormationTypeControllerTest extends ControllerTest {
     @Test
     public void testListRepairFormationTypes() throws Exception {
         List<RepairFormationType> repairFormationTypes = Collections.singletonList(new RepairFormationType(null,
-                                                                                                           "",
-                                                                                                           new RestorationType(
-                                                                                                                   1L,
-                                                                                                                   "",
-                                                                                                                   1),
-                                                                                                           0,
-                                                                                                           0));
+                "",
+                new RestorationType(
+                        1L,
+                        "",
+                        1),
+                0,
+                0));
         when(repairFormationTypeService.listTypes()).thenReturn(repairFormationTypes);
 
         mockMvc.perform(get("/formation/repair-formation/type"))
-               .andExpect(status().isOk())
-               .andExpect(jsonPath("$.size()", is(repairFormationTypes.size())));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(repairFormationTypes.size())));
     }
 
     @Test
     public void testAddRepairFormationType() throws Exception {
         RepairFormationType repairFormationType = new RepairFormationType(2L,
-                                                                          "name",
-                                                                          new RestorationType(1L, "", 1),
-                                                                          2,
-                                                                          16);
+                "name",
+                new RestorationType(1L, "", 1),
+                2,
+                16);
         RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(null,
-                                                                                   repairFormationType.getName(),
-                                                                                   new IdAndNameDTO(repairFormationType
-                                                                                                            .getRestorationType()
-                                                                                                            .getId(),
-                                                                                                    repairFormationType
-                                                                                                            .getRestorationType()
-                                                                                                            .getName()),
-                                                                                   repairFormationType.getWorkingHoursMin(),
-                                                                                   repairFormationType.getWorkingHoursMax());
+                repairFormationType.getName(),
+                new IdAndNameDTO(repairFormationType
+                        .getRestorationType()
+                        .getId(),
+                        repairFormationType
+                                .getRestorationType()
+                                .getName()),
+                repairFormationType.getWorkingHoursMin(),
+                repairFormationType.getWorkingHoursMax());
 
         when(repairFormationTypeService
-                     .addType(repairFormationTypeDTO.getName(),
-                              repairFormationType.getRestorationType().getId(),
-                              repairFormationTypeDTO.getWorkingHoursMin(),
-                              repairFormationTypeDTO.getWorkingHoursMax())).thenReturn(repairFormationType);
+                .addType(repairFormationTypeDTO.getName(),
+                        repairFormationType.getRestorationType().getId(),
+                        repairFormationTypeDTO.getWorkingHoursMin(),
+                        repairFormationTypeDTO.getWorkingHoursMax())).thenReturn(repairFormationType);
 
         mockMvc.perform(post("/formation/repair-formation/type").contentType(MediaType.APPLICATION_JSON)
-                                                                .content(objectMapper.writeValueAsString(
-                                                                        repairFormationTypeDTO)))
-               .andExpect(status().isCreated());
+                .content(objectMapper.writeValueAsString(
+                        repairFormationTypeDTO)))
+                .andExpect(status().isCreated());
         verify(repairFormationTypeService).addType(repairFormationTypeDTO.getName(),
-                                                   repairFormationType.getRestorationType().getId(),
-                                                   repairFormationTypeDTO.getWorkingHoursMin(),
-                                                   repairFormationTypeDTO.getWorkingHoursMax());
+                repairFormationType.getRestorationType().getId(),
+                repairFormationTypeDTO.getWorkingHoursMin(),
+                repairFormationTypeDTO.getWorkingHoursMax());
     }
 
     @Test
     public void testUpdateRepairFormationType() throws Exception {
+        RestorationType restorationType = new RestorationType(1L, "", 1);
         RepairFormationType repairFormationType = new RepairFormationType(2L,
-                                                                          "name",
-                                                                          new RestorationType(1L, "", 1),
-                                                                          2,
-                                                                          16);
+                "name",
+                restorationType,
+                2,
+                16);
         RepairFormationTypeDTO repairFormationTypeDTO = new RepairFormationTypeDTO(repairFormationType.getId(),
-                                                                                   repairFormationType.getName(),
-                                                                                   new IdAndNameDTO(repairFormationType
-                                                                                                            .getRestorationType()
-                                                                                                            .getId(),
-                                                                                                    repairFormationType
-                                                                                                            .getRestorationType()
-                                                                                                            .getName()),
-                                                                                   repairFormationType.getWorkingHoursMin(),
-                                                                                   repairFormationType.getWorkingHoursMax());
+                repairFormationType.getName(),
+                new IdAndNameDTO(repairFormationType
+                        .getRestorationType()
+                        .getId(),
+                        repairFormationType
+                                .getRestorationType()
+                                .getName()),
+                repairFormationType.getWorkingHoursMin(),
+                repairFormationType.getWorkingHoursMax());
         when(repairFormationTypeService.updateType(repairFormationTypeDTO.getId(),
-                                                   repairFormationTypeDTO.getName(),
-                                                   repairFormationTypeDTO.getWorkingHoursMin(),
-                                                   repairFormationTypeDTO.getWorkingHoursMax())).thenReturn(
+                restorationType.getId(),
+                repairFormationTypeDTO.getName(),
+                repairFormationTypeDTO.getWorkingHoursMin(),
+                repairFormationTypeDTO.getWorkingHoursMax())).thenReturn(
                 repairFormationType);
 
         mockMvc.perform(put("/formation/repair-formation/type/{id}",
-                            repairFormationTypeDTO.getId().intValue()).contentType(MediaType.APPLICATION_JSON)
-                                                                      .content(objectMapper.writeValueAsString(
-                                                                              repairFormationTypeDTO)))
-               .andExpect(status().isAccepted());
+                repairFormationTypeDTO.getId().intValue()).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                        repairFormationTypeDTO)))
+                .andExpect(status().isAccepted());
         verify(repairFormationTypeService).updateType(repairFormationTypeDTO.getId(),
-                                                      repairFormationTypeDTO.getName(),
-                                                      repairFormationTypeDTO.getWorkingHoursMin(),
-                                                      repairFormationTypeDTO.getWorkingHoursMax());
+                restorationType.getId(),
+                repairFormationTypeDTO.getName(),
+                repairFormationTypeDTO.getWorkingHoursMin(),
+                repairFormationTypeDTO.getWorkingHoursMax());
     }
 }
