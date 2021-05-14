@@ -43,6 +43,10 @@ public class RepairFormationType {
         return restorationType;
     }
 
+    public void setRestorationType(RestorationType restorationType) {
+        this.restorationType = restorationType;
+    }
+
     public Long getId() {
         return id;
     }

@@ -5,8 +5,8 @@
              Name="ТЕХО"
              Language="1049"
              Manufacturer="ВАРБ"
-             Version="1.0.1.0"
-             UpgradeCode="b0f67ca3-c7a1-41c8-9ee3-a109a3160dd4">
+             Version="1.0.1.1"
+             UpgradeCode="090c16a2-e0fc-46c0-88d3-1f54d7aeadf9">
 
         <Package InstallerVersion="200"
                  Compressed="yes"

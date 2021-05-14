@@ -2,6 +2,7 @@ package va.rit.teho.service.implementation.repairformation;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import va.rit.teho.entity.labordistribution.RestorationType;
 import va.rit.teho.entity.repairformation.RepairFormationType;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.IncorrectParamException;
@@ -28,7 +29,7 @@ public class RepairFormationTypeServiceImpl implements RepairFormationTypeServic
     @Override
     public RepairFormationType get(Long id) {
         return repairFormationTypeRepository.findById(id)
-                                            .orElseThrow(() -> new NotFoundException("Тип РВО с id = " + id + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Тип РВО с id = " + id + " не найден"));
     }
 
     @Override
@@ -41,30 +42,38 @@ public class RepairFormationTypeServiceImpl implements RepairFormationTypeServic
         }
         long newId = repairFormationTypeRepository.getMaxId() + 1;
         RepairFormationType repairFormationType = new RepairFormationType(newId,
-                                                                          name,
-                                                                          restorationTypeRepository
-                                                                                  .findById(restorationTypeId)
-                                                                                  .orElseThrow(() -> new NotFoundException(
-                                                                                          "Типа восстановления не существует")),
-                                                                          workingHoursMin,
-                                                                          workingHoursMax);
+                name,
+                getRestorationTypeOrThrow(restorationTypeId),
+                workingHoursMin,
+                workingHoursMax);
 
         return repairFormationTypeRepository.save(repairFormationType);
     }
 
     @Override
-    public RepairFormationType updateType(Long id, String name, int workingHoursMin, int workingHoursMax) {
-        RepairFormationType repairFormationType =
-                repairFormationTypeRepository
-                        .findById(id)
-                        .orElseThrow(() -> new NotFoundException("Тип РВО с id = " + id + " не найден!"));
+    public RepairFormationType updateType(Long id, Long restorationTypeId, String name, int workingHoursMin, int workingHoursMax) {
+        RepairFormationType repairFormationType = get(id);
+        RestorationType restorationType = getRestorationTypeOrThrow(restorationTypeId);
+        repairFormationTypeRepository.findByName(name).ifPresent(rst -> {
+            if (!rst.getId().equals(id)) {
+                throw new AlreadyExistsException("Тип РВО", "название", name);
+            }
+        });
         if (workingHoursMax < workingHoursMin) {
             throw new IncorrectParamException("Верхний предел рабочего времени производственником меньше нижнего!");
         }
+
         repairFormationType.setName(name);
+        repairFormationType.setRestorationType(restorationType);
         repairFormationType.setWorkingHoursMax(workingHoursMax);
         repairFormationType.setWorkingHoursMin(workingHoursMin);
         return repairFormationTypeRepository.save(repairFormationType);
+    }
+
+    private RestorationType getRestorationTypeOrThrow(Long restorationTypeId) {
+        return restorationTypeRepository
+                .findById(restorationTypeId)
+                .orElseThrow(() -> new NotFoundException("Типа восстановления не существует"));
     }
 
     @Override
