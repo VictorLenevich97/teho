@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
 public class SessionServiceImpl implements SessionService {
 
     private final SessionRepository sessionRepository;
@@ -59,6 +58,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    @Transactional
     public TehoSession copy(UUID sessionId, String name) {
         get(sessionId); //проверка на существование
         TehoSession newSession = create(name);
@@ -78,6 +78,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID sessionId) {
         sessionRepository.deleteById(sessionId);
     }
