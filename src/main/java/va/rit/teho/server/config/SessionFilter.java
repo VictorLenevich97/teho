@@ -36,15 +36,17 @@ public class SessionFilter extends OncePerRequestFilter {
         if (sessionId == null || sessionId.equals("null")) {
             prepareSessionErrorResponse(httpServletResponse, "Missing Session-Id header!");
         } else {
-            UUID sessionUUID = UUID.fromString(sessionId);
-            TehoSession session;
             try {
-                session = sessionService.get(sessionUUID);
+                UUID sessionUUID = UUID.fromString(sessionId);
+                TehoSession session = sessionService.get(sessionUUID);
+                tehoSession.saveSession(session);
+            } catch (NumberFormatException e) {
+                prepareSessionErrorResponse(httpServletResponse, "Session ID \"" + sessionId + "\" is not valid!");
+                return;
             } catch (NotFoundException e) {
-                prepareSessionErrorResponse(httpServletResponse, "Session \"" + sessionUUID + "\" not found!");
+                prepareSessionErrorResponse(httpServletResponse, "Session \"" + sessionId + "\" not found!");
                 return;
             }
-            tehoSession.saveSession(session);
 
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         }
