@@ -2,6 +2,7 @@ package va.rit.teho.server.config;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import va.rit.teho.entity.session.TehoSession;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -15,16 +16,20 @@ import static org.springframework.web.context.WebApplicationContext.SCOPE_SESSIO
 @Scope(value = SCOPE_SESSION, proxyMode = TARGET_CLASS)
 public class TehoSessionData implements Serializable {
 
-    private static final String SESSION_ID_FIELD = "session-id";
+    private static final String SESSION_FIELD = "teho-session";
 
     @Resource
     private transient HttpSession httpSession;
 
-    public void saveSessionId(UUID sessionUUID) {
-        httpSession.setAttribute(SESSION_ID_FIELD, sessionUUID);
+    public void saveSession(TehoSession tehoSession) {
+        httpSession.setAttribute(SESSION_FIELD, tehoSession);
     }
 
     public UUID getSessionId() {
-        return (UUID) httpSession.getAttribute(SESSION_ID_FIELD);
+        return ((TehoSession) httpSession.getAttribute(SESSION_FIELD)).getId();
+    }
+
+    public TehoSession getSession() {
+        return (TehoSession) httpSession.getAttribute(SESSION_FIELD);
     }
 }

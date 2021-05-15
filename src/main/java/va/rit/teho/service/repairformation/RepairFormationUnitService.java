@@ -13,9 +13,9 @@ public interface RepairFormationUnitService {
 
     Long count(List<Long> filterIds);
 
-    List<RepairFormationUnit> list(List<Long> filterIds, Integer pageNum, Integer pageSize);
+    List<RepairFormationUnit> list(UUID sessionId, List<Long> filterIds, Integer pageNum, Integer pageSize);
 
-    List<RepairFormationUnit> list(Long repairFormationId, List<Long> filterIds, Integer pageNum, Integer pageSize);
+    List<RepairFormationUnit> list(UUID sessionId, Long repairFormationId, List<Long> filterIds, Integer pageNum, Integer pageSize);
 
     RepairFormationUnit get(Long id);
 

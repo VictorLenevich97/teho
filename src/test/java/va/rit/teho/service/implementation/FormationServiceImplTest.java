@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 
 public class FormationServiceImplTest {
 
-    private final static Formation FORMATION = new Formation(1L, "short", "full");
+    private final static Formation FORMATION = new Formation(1L, null, "short", "full");
 
     private final FormationRepository formationRepository = Mockito.mock(FormationRepository.class);
 
@@ -34,17 +34,17 @@ public class FormationServiceImplTest {
         when(formationRepository.getMaxId()).thenReturn(1L);
         when(formationRepository.save(any())).thenReturn(FORMATION);
 
-        Assertions.assertEquals(service.add(FORMATION.getShortName(), FORMATION.getFullName()).getId(),
+        Assertions.assertEquals(service.add(null, FORMATION.getShortName(), FORMATION.getFullName()).getId(),
                                 FORMATION.getId());
 
-        verify(formationRepository).save(new Formation(2L, FORMATION.getShortName(), FORMATION.getFullName()));
+        verify(formationRepository).save(new Formation(2L,null, FORMATION.getShortName(), FORMATION.getFullName()));
     }
 
     @Test
     public void testAddEmptyField() {
         FORMATION.setId(1L);
 
-        Assertions.assertThrows(EmptyFieldException.class, () -> service.add(null, FORMATION.getFullName()));
+        Assertions.assertThrows(EmptyFieldException.class, () -> service.add(null, null, FORMATION.getFullName()));
 
         verifyNoInteractions(formationRepository);
     }
@@ -80,7 +80,7 @@ public class FormationServiceImplTest {
     @Test
     public void testList() {
         when(formationRepository.findAll()).thenReturn(Collections.singletonList(FORMATION));
-        Assertions.assertEquals(Collections.singletonList(FORMATION), service.list());
+        Assertions.assertEquals(Collections.singletonList(FORMATION), service.list(null));
     }
 
 }

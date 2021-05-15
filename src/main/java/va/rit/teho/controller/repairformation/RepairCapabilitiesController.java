@@ -88,8 +88,8 @@ public class RepairCapabilitiesController {
     public ResponseEntity<Object> calculateAndGetPerStation(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId,
                                                             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilitiesPerStation(tehoSession.getSessionId(),
-                                                                                      repairFormationUnitId,
-                                                                                      repairTypeId);
+                repairFormationUnitId,
+                repairTypeId);
         return ResponseEntity.accepted().build();
     }
 
@@ -99,9 +99,9 @@ public class RepairCapabilitiesController {
                                                                 @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
                                                                 @ApiParam(value = "Данные в виде {'ключ ВВСТ': 'произв. возможности (ед./сут.)'}", required = true, example = "{'1': '2.15', '2': '3.14'}") @RequestBody Map<Long, Double> data) {
         repairCapabilitiesService.updateRepairCapabilities(tehoSession.getSessionId(),
-                                                           repairFormationUnitId,
-                                                           repairTypeId,
-                                                           data);
+                repairFormationUnitId,
+                repairTypeId,
+                data);
         return ResponseEntity.accepted().build();
     }
 
@@ -119,10 +119,10 @@ public class RepairCapabilitiesController {
                         repairCapabilityPerEquipment.getCapability());
         return ResponseEntity.accepted().body(
                 new RepairCapabilityPerEquipment(repairFormationUnitRepairCapability
-                                                         .getEquipmentPerRepairFormationUnitPK()
-                                                         .getEquipmentId(),
-                                                 repairCapabilityPerEquipment.getName(),
-                                                 repairFormationUnitRepairCapability.getCapability()));
+                        .getEquipmentPerRepairFormationUnitPK()
+                        .getEquipmentId(),
+                        repairCapabilityPerEquipment.getName(),
+                        repairFormationUnitRepairCapability.getCapability()));
     }
 
     private Stream<NestedColumnsDTO> getRepairCapabilitiesNestedColumnsDTO(EquipmentType equipmentType,
@@ -141,9 +141,9 @@ public class RepairCapabilitiesController {
             Stream<NestedColumnsDTO> subTypesColumns =
                     subTypes.stream().flatMap(st -> getRepairCapabilitiesNestedColumnsDTO(st, equipmentIds));
             return Stream.of(new NestedColumnsDTO(equipmentType.getShortName(),
-                                                  Stream
-                                                          .concat(equipmentSubColumns, subTypesColumns)
-                                                          .collect(Collectors.toList())));
+                    Stream
+                            .concat(equipmentSubColumns, subTypesColumns)
+                            .collect(Collectors.toList())));
         }
     }
 
@@ -158,11 +158,11 @@ public class RepairCapabilitiesController {
 
         List<Equipment> filteredEquipmentList =
                 combinedData.getEquipmentTypes()
-                            .stream()
-                            .flatMap(et -> CollectionUtils.isEmpty(combinedData.getEquipmentIds()) ?
-                                    et.collectRelatedEquipment() :
-                                    et.collectRelatedEquipment(combinedData.getEquipmentIds()))
-                            .collect(Collectors.toList());
+                        .stream()
+                        .flatMap(et -> CollectionUtils.isEmpty(combinedData.getEquipmentIds()) ?
+                                et.collectRelatedEquipment() :
+                                et.collectRelatedEquipment(combinedData.getEquipmentIds()))
+                        .collect(Collectors.toList());
 
         List<RowData<Map<String, Double>>> data =
                 combinedData.getRepairFormationUnitList()
@@ -181,8 +181,7 @@ public class RepairCapabilitiesController {
         return new RowData<>(
                 rs.getId(),
                 rs.getName(),
-                columns
-                        .stream()
+                columns.stream()
                         .collect(Collectors.toMap(equipment -> equipment.getId().toString(),
                                 equipment -> calculatedRepairCapabilities
                                         .getOrDefault(rs, Collections.emptyMap())
@@ -206,8 +205,8 @@ public class RepairCapabilitiesController {
                         equipmentTypeService.listTypes(filteredEquipmentTypeIds);
         Map<EquipmentType, RepairFormationUnitEquipmentStaff> equipmentStaff =
                 repairFormationUnitService.getEquipmentStaffPerType(tehoSession.getSessionId(),
-                                                                    repairFormationUnitId,
-                                                                    filteredEquipmentTypeIds);
+                        repairFormationUnitId,
+                        filteredEquipmentTypeIds);
         Map<Equipment, Double> calculatedRepairCapabilities =
                 repairCapabilitiesService.getCalculatedRepairCapabilities(
                         tehoSession.getSessionId(),
@@ -218,8 +217,8 @@ public class RepairCapabilitiesController {
 
         List<EquipmentTypeStaffData> result =
                 getEquipmentTypeStaffData(equipmentTypes,
-                                          equipmentStaff,
-                                          calculatedRepairCapabilities)
+                        equipmentStaff,
+                        calculatedRepairCapabilities)
                         .collect(Collectors.toList());
 
         return ResponseEntity.ok(result);
@@ -232,15 +231,15 @@ public class RepairCapabilitiesController {
                 .stream()
                 .map(equipmentType -> {
                     RepairFormationUnitEquipmentStaff staff = equipmentStaff.getOrDefault(equipmentType,
-                                                                                          RepairFormationUnitEquipmentStaff.EMPTY);
+                            RepairFormationUnitEquipmentStaff.EMPTY);
                     return new EquipmentTypeStaffData(
                             equipmentType.getId(),
                             equipmentType.getShortName(),
                             staff.getTotalStaff(),
                             staff.getAvailableStaff(),
                             getEquipmentTypeStaffData(equipmentType.getEquipmentTypes(),
-                                                      equipmentStaff,
-                                                      calculatedRepairCapabilities).collect(Collectors.toList()),
+                                    equipmentStaff,
+                                    calculatedRepairCapabilities).collect(Collectors.toList()),
                             equipmentType
                                     .getEquipmentSet()
                                     .stream()
@@ -264,6 +263,7 @@ public class RepairCapabilitiesController {
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
         RepairFormationUnitRepairCapabilityCombinedData combinedData = getCapabilityCombinedData(
+                tehoSession.getSessionId(),
                 repairTypeId,
                 repairFormationUnitId,
                 equipmentId,
@@ -289,6 +289,7 @@ public class RepairCapabilitiesController {
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) throws UnsupportedEncodingException {
         RepairFormationUnitRepairCapabilityCombinedData combinedData = getCapabilityCombinedData(
+                tehoSession.getSessionId(),
                 repairTypeId,
                 repairFormationUnitId,
                 equipmentId,
@@ -299,23 +300,25 @@ public class RepairCapabilitiesController {
         return ReportResponseEntity.ok("Производственные возможности", reportService.generateReport(combinedData));
     }
 
-    private RepairFormationUnitRepairCapabilityCombinedData getCapabilityCombinedData(Long repairTypeId,
+    private RepairFormationUnitRepairCapabilityCombinedData getCapabilityCombinedData(UUID sessionId,
+                                                                                      Long repairTypeId,
                                                                                       List<Long> repairFormationUnitId,
                                                                                       List<Long> equipmentId,
                                                                                       List<Long> equipmentTypeId,
                                                                                       int pageNum,
                                                                                       int pageSize) {
         List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(
+                sessionId,
                 nullIfEmpty(repairFormationUnitId),
                 pageNum,
                 pageSize);
         List<Long> equipmentTypeIdsFilter = nullIfEmpty(equipmentTypeId);
         Map<RepairFormationUnit, Map<Equipment, Double>> calculatedRepairCapabilities =
                 repairCapabilitiesService.getCalculatedRepairCapabilities(tehoSession.getSessionId(),
-                                                                          repairTypeId,
-                                                                          nullIfEmpty(repairFormationUnitId),
-                                                                          nullIfEmpty(equipmentId),
-                                                                          equipmentTypeIdsFilter);
+                        repairTypeId,
+                        nullIfEmpty(repairFormationUnitId),
+                        nullIfEmpty(equipmentId),
+                        equipmentTypeIdsFilter);
         return new RepairFormationUnitRepairCapabilityCombinedData(
                 repairFormationUnitList,
                 Optional

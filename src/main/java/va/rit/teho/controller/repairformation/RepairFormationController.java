@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.formation.FormationDTO;
 import va.rit.teho.dto.repairformation.RepairFormationDTO;
 import va.rit.teho.entity.repairformation.RepairFormation;
+import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.repairformation.RepairFormationService;
 
+import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -28,6 +30,9 @@ import java.util.stream.Collectors;
 public class RepairFormationController {
 
     private final RepairFormationService repairFormationService;
+
+    @Resource
+    private TehoSessionData tehoSession;
 
     public RepairFormationController(RepairFormationService repairFormationService) {
         this.repairFormationService = repairFormationService;
@@ -50,7 +55,7 @@ public class RepairFormationController {
     @ApiOperation(value = "Получить список всех Ремонтных Формирований, сгруппированый по Формированиям, которым они принадлежат")
     public ResponseEntity<List<FormationDTO>> listRepairFormationsGroupedByFormation() {
         List<FormationDTO> formationDTOList = repairFormationService
-                .list()
+                .list(tehoSession.getSessionId())
                 .stream()
                 .collect(Collectors.groupingBy(RepairFormation::getFormation))
                 .entrySet()
@@ -68,7 +73,7 @@ public class RepairFormationController {
     @ApiOperation(value = "Получить список всех Ремонтных Формирований")
     public ResponseEntity<List<RepairFormationDTO>> listRepairFormations() {
         List<RepairFormationDTO> repairFormationDTOList = repairFormationService
-                .list()
+                .list(tehoSession.getSessionId())
                 .stream()
                 .map(rf -> RepairFormationDTO.from(rf, true))
                 .collect(Collectors.toList());

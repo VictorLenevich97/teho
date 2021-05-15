@@ -58,18 +58,20 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public List<RepairFormationUnit> list(List<Long> filterIds, Integer pageNum, Integer pageSize) {
-        return repairFormationUnitRepository.findSorted(filterIds, PageRequest.of(pageNum - 1, pageSize));
+    public List<RepairFormationUnit> list(UUID sessionId, List<Long> filterIds, Integer pageNum, Integer pageSize) {
+        return repairFormationUnitRepository.findSorted(sessionId, filterIds, PageRequest.of(pageNum - 1, pageSize));
     }
 
     @Override
-    public List<RepairFormationUnit> list(Long repairFormationId,
+    public List<RepairFormationUnit> list(UUID sessionId,
+                                          Long repairFormationId,
                                           List<Long> filterIds,
                                           Integer pageNum,
                                           Integer pageSize) {
-        return repairFormationUnitRepository.findSorted(repairFormationId,
-                                                        filterIds,
-                                                        PageRequest.of(pageNum - 1, pageSize));
+        return repairFormationUnitRepository.findSorted(sessionId,
+                repairFormationId,
+                filterIds,
+                PageRequest.of(pageNum - 1, pageSize));
     }
 
     @Override
@@ -81,8 +83,8 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     public Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(Long repairFormationUntId,
                                                                                            UUID sessionId) {
         return Pair.of(getRepairFormationUnitOrThrow(repairFormationUntId),
-                       repairFormationUnitEquipmentStaffRepository.findAllByRepairFormationUnitIdAndTehoSessionId(
-                               repairFormationUntId, sessionId));
+                repairFormationUnitEquipmentStaffRepository.findAllByRepairFormationUnitIdAndTehoSessionId(
+                        repairFormationUntId, sessionId));
     }
 
     @Override
@@ -98,10 +100,10 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
         });
         long newId = repairFormationUnitRepository.getMaxId() + 1;
         RepairFormationUnit repairFormationUnit = new RepairFormationUnit(newId,
-                                                                          name,
-                                                                          repairStationType,
-                                                                          amount,
-                                                                          repairFormation);
+                name,
+                repairStationType,
+                amount,
+                repairFormation);
         return repairFormationUnitRepository.save(repairFormationUnit);
     }
 
@@ -131,11 +133,11 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
 
     private void checkEquipmentStaffPreconditions(RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff) {
         getRepairFormationUnitOrThrow(repairFormationUnitEquipmentStaff
-                                              .getEquipmentPerRepairFormationUnit()
-                                              .getRepairFormationUnitId());
+                .getEquipmentPerRepairFormationUnit()
+                .getRepairFormationUnitId());
         equipmentTypeService.get(repairFormationUnitEquipmentStaff
-                                         .getEquipmentPerRepairFormationUnit()
-                                         .getEquipmentTypeId()); //Проверка на существование
+                .getEquipmentPerRepairFormationUnit()
+                .getEquipmentTypeId()); //Проверка на существование
         if (repairFormationUnitEquipmentStaff.getTotalStaff() < repairFormationUnitEquipmentStaff.getAvailableStaff()) {
             throw new IncorrectParamException(
                     "Всего производственников < доступно производственников (" + repairFormationUnitEquipmentStaff.getTotalStaff() + " < " + repairFormationUnitEquipmentStaff
@@ -152,12 +154,12 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
                 repairFormationUnitEquipmentStaffList
                         .stream()
                         .map(repairFormationUnitEquipmentStaff ->
-                                     repairFormationUnitEquipmentStaffRepository
-                                             .findById(repairFormationUnitEquipmentStaff.getEquipmentPerRepairFormationUnit())
-                                             .map(rfues -> rfues
-                                                     .setAvailableStaff(repairFormationUnitEquipmentStaff.getAvailableStaff())
-                                                     .setTotalStaff(repairFormationUnitEquipmentStaff.getTotalStaff()))
-                                             .orElse(repairFormationUnitEquipmentStaff))
+                                repairFormationUnitEquipmentStaffRepository
+                                        .findById(repairFormationUnitEquipmentStaff.getEquipmentPerRepairFormationUnit())
+                                        .map(rfues -> rfues
+                                                .setAvailableStaff(repairFormationUnitEquipmentStaff.getAvailableStaff())
+                                                .setTotalStaff(repairFormationUnitEquipmentStaff.getTotalStaff()))
+                                        .orElse(repairFormationUnitEquipmentStaff))
                         .collect(Collectors.toList());
 
         Iterable<RepairFormationUnitEquipmentStaff> result = repairFormationUnitEquipmentStaffRepository
@@ -173,9 +175,9 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
                                                                                           List<Long> equipmentTypeIds) {
         RepairFormationUnit repairFormationUnit = getRepairFormationUnitOrThrow(repairFormationUnitId);
         return listEquipmentStaffPerType(sessionId,
-                                         Collections.singletonList(repairFormationUnitId),
-                                         equipmentTypeIds).getOrDefault(repairFormationUnit,
-                                                                        Collections.emptyMap());
+                Collections.singletonList(repairFormationUnitId),
+                equipmentTypeIds).getOrDefault(repairFormationUnit,
+                Collections.emptyMap());
     }
 
     @Override
@@ -185,15 +187,15 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
             List<Long> equipmentTypeIds) {
         List<RepairFormationUnitEquipmentStaff> equipmentStaffList =
                 repairFormationUnitEquipmentStaffRepository.findFiltered(sessionId,
-                                                                         repairFormationUnitIds,
-                                                                         equipmentTypeIds);
+                        repairFormationUnitIds,
+                        equipmentTypeIds);
 
         Map<RepairFormationUnit, Map<EquipmentType, RepairFormationUnitEquipmentStaff>> result = new HashMap<>();
         for (RepairFormationUnitEquipmentStaff repairFormationUnitEquipmentStaff : equipmentStaffList) {
             RepairFormationUnit repairFormationUnit = repairFormationUnitEquipmentStaff.getRepairFormationUnit();
             result.computeIfAbsent(repairFormationUnit, rs -> new HashMap<>());
             result.get(repairFormationUnit).put(repairFormationUnitEquipmentStaff.getEquipmentType(),
-                                                repairFormationUnitEquipmentStaff);
+                    repairFormationUnitEquipmentStaff);
         }
         return result;
     }

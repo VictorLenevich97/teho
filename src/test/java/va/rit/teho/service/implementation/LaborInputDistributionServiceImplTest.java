@@ -49,7 +49,7 @@ public class LaborInputDistributionServiceImplTest {
         Long repairTypeId = 12L;
         Long stageId = 13L;
 
-        Formation formation = new Formation(1L, "short", "full");
+        Formation formation = new Formation(1L, null, "short", "full");
         EquipmentType equipmentType = new EquipmentType("shortET", "fullET");
         Equipment equipment = new Equipment(2L, "eqName", equipmentType);
         EquipmentPerFormation equipmentPerFormation = new EquipmentPerFormation(formation, equipment, 10L);

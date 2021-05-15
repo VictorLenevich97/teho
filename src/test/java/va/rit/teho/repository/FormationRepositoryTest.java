@@ -20,7 +20,7 @@ public class FormationRepositoryTest {
 
     @Test
     public void testAddBase() {
-        Formation b = new Formation(1L, "short", "full");
+        Formation b = new Formation(1L, null, "short", "full");
         Formation saved = formationRepository.save(b);
 
         Optional<Formation> optionalBase = formationRepository.findById(saved.getId());
@@ -30,7 +30,7 @@ public class FormationRepositoryTest {
 
     @Test
     public void testFindByFullName() {
-        Formation b = new Formation(1L, "short", "full");
+        Formation b = new Formation(1L, null, "short", "full");
         Formation saved = formationRepository.save(b);
 
         Optional<Formation> optionalBase = formationRepository.findByFullName(b.getFullName());

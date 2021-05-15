@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.Tree;
 import va.rit.teho.entity.formation.Formation;
+import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.EmptyFieldException;
 import va.rit.teho.exception.FormationNotFoundException;
@@ -11,17 +12,13 @@ import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.formation.FormationRepository;
 import va.rit.teho.service.formation.FormationService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
 public class FormationServiceImpl implements FormationService {
 
     private final FormationRepository formationRepository;
-
 
     public FormationServiceImpl(FormationRepository formationRepository) {
         this.formationRepository = formationRepository;
@@ -35,10 +32,10 @@ public class FormationServiceImpl implements FormationService {
 
     @Override
     @Transactional
-    public Formation add(String shortName, String fullName) {
+    public Formation add(TehoSession session, String shortName, String fullName) {
         checkPreRequisites(shortName, fullName);
         Long newId = formationRepository.getMaxId() + 1;
-        return formationRepository.save(new Formation(newId, shortName, fullName));
+        return formationRepository.save(new Formation(newId, session, shortName, fullName));
     }
 
     private void checkPreRequisites(String shortName, String fullName) {
@@ -50,7 +47,7 @@ public class FormationServiceImpl implements FormationService {
     }
 
     @Override
-    public Formation add(String shortName, String fullName, Long parentFormationId) {
+    public Formation add(TehoSession session, String shortName, String fullName, Long parentFormationId) {
         checkPreRequisites(shortName, fullName);
         Formation parentFormation = null;
         if (parentFormationId != null) {
@@ -61,7 +58,7 @@ public class FormationServiceImpl implements FormationService {
             parentFormation = optionalFormation.get();
         }
         long newId = formationRepository.getMaxId() + 1;
-        return formationRepository.save(new Formation(newId, shortName, fullName, parentFormation));
+        return formationRepository.save(new Formation(newId, session, shortName, fullName, parentFormation));
     }
 
     @Override
@@ -100,8 +97,8 @@ public class FormationServiceImpl implements FormationService {
     }
 
     @Override
-    public List<Formation> list() {
-        return (List<Formation>) formationRepository.findAll();
+    public List<Formation> list(UUID sessionId) {
+        return formationRepository.findFormationByTehoSessionId(sessionId);
     }
 
     private void populateTree(Tree.Node<Formation> node, Set<Formation> formations, List<Long> formationIds) {
@@ -116,11 +113,11 @@ public class FormationServiceImpl implements FormationService {
     }
 
     @Override
-    public List<Tree<Formation>> listHierarchy(List<Long> formationIds) {
+    public List<Tree<Formation>> listHierarchy(UUID sessionId, List<Long> formationIds) {
         List<Formation> rootFormations =
                 formationIds == null ?
-                        formationRepository.findFormationByParentFormationIsNull() :
-                        formationRepository.findFormationByParentFormationIsNullAndIdIn(formationIds);
+                        formationRepository.findFormationByParentFormationIsNullAndTehoSessionIdEquals(sessionId) :
+                        formationRepository.findFormationByParentFormationIsNullAndTehoSessionIdEqualsAndIdIn(sessionId, formationIds);
         List<Tree<Formation>> treeList = new ArrayList<>();
         for (Formation formation : rootFormations) {
             Tree<Formation> formationTree = new Tree<>(formation);

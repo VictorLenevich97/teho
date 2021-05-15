@@ -4,12 +4,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.WebUtils;
+import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.service.session.SessionService;
 
 import javax.annotation.Resource;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,20 +37,26 @@ public class SessionFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse httpServletResponse,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String sessionId = httpServletRequest.getHeader("Session-Id");
-        if (sessionId == null || sessionId.equals("null")) {
-            prepareBadRequestResponse(httpServletResponse, "Missing Session-Id header!");
+        TehoSession session;
+        Cookie cookie = WebUtils.getCookie(httpServletRequest, "TEHO_SESSION_ID");
+        if(cookie != null) {
+            session = sessionService.get(UUID.fromString(cookie.getValue()));
+            tehoSession.saveSession(session);
+        } else if (sessionId == null || sessionId.equals("null")) {
+            //prepareBadRequestResponse(httpServletResponse, "Missing Session-Id header!");
         } else {
             UUID sessionUUID = UUID.fromString(sessionId);
             try {
-                sessionService.get(sessionUUID);
+                session = sessionService.get(sessionUUID);
+                Cookie newCookie = new Cookie("TEHO_SESSION_ID", sessionId);
+                httpServletResponse.addCookie(newCookie);
+                tehoSession.saveSession(session);
             } catch (NotFoundException e) {
                 prepareBadRequestResponse(httpServletResponse, "Session \"" + sessionUUID + "\" not found!");
                 return;
             }
-            tehoSession.saveSessionId(sessionUUID);
-
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
         }
+        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 
     private void prepareBadRequestResponse(HttpServletResponse httpServletResponse, String message) throws
@@ -61,19 +70,6 @@ public class SessionFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        List<String> filterPaths = Arrays.asList("/formation/repair-formation/unit/equipment",
-                                                 "/formation/repair-formation/unit/capabilities",
-                                                 "/labor-distribution",
-                                                 "/equipment-per-base");
-        String path = request.getServletPath();
-        boolean rfuStaffPath = !(path.contains("/formation/repair-formation/unit") && path.contains("staff"));
-        boolean rfuCapabilitiesPath = !(path.contains("/formation/repair-formation/unit") && path.contains(
-                "capabilities"));
-        boolean formationDistribution = !(path.contains("/formation") && path.contains("/distribution"));
-        boolean equipmentPerFormationPath = !(path.contains("/formation") && path.contains("/equipment") && (path.contains(
-                "/table") || path.contains("/daily-failure") || path.contains("/intensity")));
-        return filterPaths
-                .stream()
-                .noneMatch(path::contains) && equipmentPerFormationPath && rfuStaffPath && rfuCapabilitiesPath && formationDistribution;
+        return request.getServletPath().contains("session");
     }
 }
