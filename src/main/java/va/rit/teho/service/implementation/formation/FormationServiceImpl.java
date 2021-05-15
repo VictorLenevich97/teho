@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.Tree;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.session.TehoSession;
-import va.rit.teho.exception.AlreadyExistsException;
 import va.rit.teho.exception.EmptyFieldException;
 import va.rit.teho.exception.FormationNotFoundException;
 import va.rit.teho.exception.NotFoundException;
@@ -41,25 +40,16 @@ public class FormationServiceImpl implements FormationService {
     private void checkPreRequisites(String shortName, String fullName) {
         checkIfEmptyField(shortName);
         checkIfEmptyField(fullName);
-        formationRepository.findByFullName(fullName).ifPresent(b -> {
-            throw new AlreadyExistsException("Формирование", "полное название", fullName);
-        });
     }
 
     @Override
     public Formation add(TehoSession session, String shortName, String fullName, Long parentFormationId) {
         checkPreRequisites(shortName, fullName);
-        Formation parentFormation = null;
-        if (parentFormationId != null) {
-            Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
-            if (!optionalFormation.isPresent()) {
-                throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
-            }
-            parentFormation = optionalFormation.get();
-        }
+        Formation parentFormation = get(parentFormationId);
         long newId = formationRepository.getMaxId() + 1;
         return formationRepository.save(new Formation(newId, session, shortName, fullName, parentFormation));
     }
+
 
     @Override
     public Formation update(Long formationId, String shortName, String fullName) {
@@ -72,14 +62,7 @@ public class FormationServiceImpl implements FormationService {
     @Override
     public Formation update(Long formationId, String shortName, String fullName, Long parentFormationId) {
         Formation formation = getFormationOrThrow(formationId);
-        Formation parentFormation = null;
-        if (parentFormationId != null) {
-            Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
-            if (!optionalFormation.isPresent()) {
-                throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
-            }
-            parentFormation = optionalFormation.get();
-        }
+        Formation parentFormation = get(parentFormationId);
 
         formation.setFullName(fullName);
         formation.setShortName(shortName);

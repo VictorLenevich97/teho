@@ -24,8 +24,7 @@ public class Formation implements Serializable {
     private String fullName;
 
     @ManyToOne
-    @MapsId("session_id")
-    @JoinColumn(name = "session_id")
+    @JoinColumn(name = "session_id", nullable = false)
     private TehoSession tehoSession;
     
     @ManyToOne
