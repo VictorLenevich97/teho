@@ -2,6 +2,7 @@ package va.rit.teho.entity.session;
 
 import org.hibernate.annotations.GenericGenerator;
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
+import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.labordistribution.EquipmentRFUDistribution;
 import va.rit.teho.entity.labordistribution.LaborDistribution;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
@@ -26,6 +27,9 @@ public class TehoSession implements Serializable {
     private UUID id;
 
     private String name;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "tehoSession", orphanRemoval = true)
+    private Set<Formation> formations;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "tehoSession", orphanRemoval = true)
     private Set<LaborDistribution> laborDistributionSet;

@@ -45,15 +45,6 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
     }
 
-    @PostMapping("/{sessionId}/start")
-    @ApiOperation(value = "Начать сессию")
-    public ResponseEntity<SessionDTO> startSession(@ApiParam(value = "Ключ оригинальной сессии", required = true) @PathVariable UUID sessionId,
-                                                   HttpServletResponse response) {
-        SessionDTO session = SessionDTO.from(sessionService.get(sessionId));
-        response.addCookie(new Cookie("TEHO_SESSION_ID", sessionId.toString()));
-        return ResponseEntity.ok(session);
-    }
-
     @PutMapping(path = "/{sessionId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Скопировать сессию")
     public ResponseEntity<SessionDTO> copySession(@ApiParam(value = "Ключ оригинальной сессии", required = true) @PathVariable UUID sessionId,

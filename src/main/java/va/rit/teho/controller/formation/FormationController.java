@@ -34,11 +34,12 @@ public class FormationController {
     private final FormationService formationService;
     private final EquipmentService equipmentService;
 
-    @Resource
-    private TehoSessionData tehoSession;
-
     private final RepairFormationService repairFormationService;
     private final EquipmentPerFormationService equipmentPerFormationService;
+
+
+    @Resource
+    private TehoSessionData tehoSession;
 
     public FormationController(FormationService formationService,
                                EquipmentService equipmentService,
@@ -54,7 +55,7 @@ public class FormationController {
     @Transactional
     @ApiOperation(value = "Добавить Формирование")
     public ResponseEntity<FormationDTO> addFormation(@Valid @RequestBody FormationDTO formationModel) {
-        Formation addedFormation = formationModel.getParentFormation() == null ?
+        Formation addedFormation = formationModel.getParentFormation() == null || formationModel.getParentFormation().getId() == null ?
                 formationService.add(tehoSession.getSession(),
                         formationModel.getShortName(),
                         formationModel.getFullName()) :
