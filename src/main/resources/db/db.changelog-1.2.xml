@@ -1,0 +1,18 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="tehoadmin (generated)" id="1621003288946-1">
+        <addColumn tableName="formation">
+            <column name="session_id" type="binary"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1621003288946-2">
+        <addForeignKeyConstraint baseColumnNames="session_id" baseTableName="formation" constraintName="FKawvqy0anftsueqjw9dijdokk5" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="teho_session" validate="true"/>
+    </changeSet>
+    <changeSet id="update session_id with first session's id" author="tehoadmin">
+        <sql>update FORMATION set session_id = (SELECT ID FROM TEHO_SESSION LIMIT 1)</sql>
+    </changeSet>
+    <changeSet id="add not null constraint" author="tehoadmin">
+        <addNotNullConstraint tableName="formation" columnName="session_id" columnDataType="binary"/>
+    </changeSet>
+
+</databaseChangeLog>
