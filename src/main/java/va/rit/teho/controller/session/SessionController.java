@@ -13,6 +13,8 @@ import va.rit.teho.dto.session.SessionDTO;
 import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.service.session.SessionService;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -41,6 +43,15 @@ public class SessionController {
     public ResponseEntity<SessionDTO> createSession(@ApiParam(value = "Данные о сессии", required = true) @Valid @RequestBody SessionDTO sessionDTO) {
         TehoSession tehoSession = sessionService.create(sessionDTO.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
+    }
+
+    @PostMapping("/{sessionId}/start")
+    @ApiOperation(value = "Начать сессию")
+    public ResponseEntity<SessionDTO> startSession(@ApiParam(value = "Ключ оригинальной сессии", required = true) @PathVariable UUID sessionId,
+                                                   HttpServletResponse response) {
+        SessionDTO session = SessionDTO.from(sessionService.get(sessionId));
+        response.addCookie(new Cookie("TEHO_SESSION_ID", sessionId.toString()));
+        return ResponseEntity.ok(session);
     }
 
     @PutMapping(path = "/{sessionId}", consumes = MediaType.APPLICATION_JSON_VALUE)
