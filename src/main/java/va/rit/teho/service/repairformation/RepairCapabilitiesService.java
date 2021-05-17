@@ -15,31 +15,44 @@ public interface RepairCapabilitiesService {
 
     void copyRepairCapabilities(UUID originalSessionId, UUID newSessionId);
 
-    void calculateAndUpdateRepairCapabilities(UUID sessionId, Long repairTypeId);
+    void calculateAndUpdateRepairCapabilities(UUID sessionId);
 
-    void calculateAndUpdateRepairCapabilitiesPerStation(UUID sessionId, Long repairFormationUnitId, Long repairTypeId);
+    /**
+     * Произвести расчет произв. возможностей для конкретного РВО
+     * @param sessionId - ID сессии
+     * @param repairFormationUnitId - ID РВО
+     */
+    void calculateAndUpdateRepairCapabilitiesPerRFU(UUID sessionId, Long repairFormationUnitId);
 
+    /**
+     * Ручное обновление произв. возможностей конкретного РВО (для многих ВВСТ)
+     * @param sessionId - ID сессии
+     * @param repairFormationUnitId - ID РВО
+     * @param capabilitiesMap - Map, где ключи это ID ВВСТ, а значения - произв. возможности по ремонту (ед./сут.), заданные вручную
+     */
     void updateRepairCapabilities(UUID sessionId,
                                   Long repairFormationUnitId,
-                                  Long repairTypeId,
                                   Map<Long, Double> capabilitiesMap);
-
+    /**
+     * Ручное обновление произв. возможностей конкретного РВО (для одного ВВСТ)
+     * @param sessionId - ID сессии
+     * @param repairFormationUnitId - ID РВО
+     * @param equipmentId - ID ВВСТ
+     * @param capability - произв. возможности по ремонту (ед./сут.)
+     */
     RepairFormationUnitRepairCapability updateRepairCapabilities(UUID sessionId,
                                                                  Long repairFormationUnitId,
-                                                                 Long repairTypeId,
                                                                  Long equipmentId,
                                                                  Double capability);
 
     Map<Equipment, Double> getCalculatedRepairCapabilities(
             UUID sessionId,
             Long repairFormationUnitId,
-            Long repairTypeId,
             List<Long> equipmentIds,
             List<Long> equipmentTypeIds);
 
     Map<RepairFormationUnit, Map<Equipment, Double>> getCalculatedRepairCapabilities(
             UUID sessionId,
-            Long repairTypeId,
             List<Long> repairFormationUnitIds,
             List<Long> equipmentIds,
             List<Long> equipmentTypeIds);

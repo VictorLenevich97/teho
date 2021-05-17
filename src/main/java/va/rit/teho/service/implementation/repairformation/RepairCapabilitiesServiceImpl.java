@@ -3,7 +3,6 @@ package va.rit.teho.service.implementation.repairformation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.equipment.Equipment;
-import va.rit.teho.entity.equipment.EquipmentLaborInputPerType;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
@@ -38,16 +37,8 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     }
 
     private Function<Equipment, RepairFormationUnitRepairCapability> getCalculatedRepairCapabilitesPerDay(UUID sessionId,
-                                                                                                          Long repairTypeId,
                                                                                                           RepairFormationUnitEquipmentStaff rsec) {
         return equipment -> {
-            Integer laborInput = equipment
-                    .getLaborInputPerTypes()
-                    .stream()
-                    .filter(lipt -> lipt.getRepairType().getId().equals(repairTypeId))
-                    .findFirst()
-                    .map(EquipmentLaborInputPerType::getAmount)
-                    .orElse(0);
 
             double calculatedCapability =
                     calculationService.calculateRepairCapabilities(
@@ -57,18 +48,17 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                                     .getRepairFormation()
                                     .getRepairFormationType()
                                     .getWorkingHoursMax(),
-                            laborInput);
+                            rsec.getRepairFormationUnit().getWorkhoursDistributionInterval().getUpperBound());
             Long repairFormationUnitId = rsec.getEquipmentPerRepairFormationUnit().getRepairFormationUnitId();
             Long equipmentId = equipment.getId();
 
             return calculatedRepairCapabilitiesPerDayRepository
-                    .find(sessionId, repairFormationUnitId, equipmentId, repairTypeId)
+                    .find(sessionId, repairFormationUnitId, equipmentId)
                     .map(crcpd -> crcpd.setCapability(calculatedCapability))
                     .orElse(new RepairFormationUnitRepairCapability(repairFormationUnitId,
-                                                                    equipmentId,
-                                                                    repairTypeId,
-                                                                    sessionId,
-                                                                    calculatedCapability));
+                            equipmentId,
+                            sessionId,
+                            calculatedCapability));
         };
     }
 
@@ -76,10 +66,9 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     public void copyRepairCapabilities(UUID originalSessionId, UUID newSessionId) {
         List<RepairFormationUnitRepairCapability> repairCapabilities =
                 calculatedRepairCapabilitiesPerDayRepository.findFiltered(originalSessionId,
-                                                                          null,
-                                                                          null,
-                                                                          null,
-                                                                          null);
+                        null,
+                        null,
+                        null);
 
         List<RepairFormationUnitRepairCapability> updatedRepairCapabilitesPerDayList =
                 repairCapabilities.stream().map(crcpd -> crcpd.copy(newSessionId)).collect(Collectors.toList());
@@ -88,44 +77,39 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     }
 
     @Override
-    public void calculateAndUpdateRepairCapabilities(UUID sessionId, Long repairTypeId) {
+    public void calculateAndUpdateRepairCapabilities(UUID sessionId) {
         List<RepairFormationUnitEquipmentStaff> repairFormationStaff =
                 repairFormationUnitService.listEquipmentStaff(sessionId);
-        calculateAndUpdateRepairCapabilities(sessionId, repairFormationStaff, repairTypeId);
+        calculateAndUpdateRepairCapabilities(sessionId, repairFormationStaff);
     }
 
     private void calculateAndUpdateRepairCapabilities(UUID sessionId,
-                                                      List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList,
-                                                      Long repairTypeId) {
+                                                      List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList) {
         List<RepairFormationUnitRepairCapability> capabilitesPerDayList =
                 repairFormationUnitEquipmentStaffList
                         .stream()
                         .flatMap(repairFormationEquipmentStaff ->
-                                         repairFormationEquipmentStaff
-                                                 .getEquipmentType()
-                                                 .getEquipmentSet()
-                                                 .stream()
-                                                 .map(getCalculatedRepairCapabilitesPerDay(sessionId,
-                                                                                           repairTypeId,
-                                                                                           repairFormationEquipmentStaff)))
+                                repairFormationEquipmentStaff
+                                        .getEquipmentType()
+                                        .getEquipmentSet()
+                                        .stream()
+                                        .map(getCalculatedRepairCapabilitesPerDay(sessionId, repairFormationEquipmentStaff)))
                         .collect(Collectors.toList());
         calculatedRepairCapabilitiesPerDayRepository.saveAll(capabilitesPerDayList);
     }
 
     @Override
-    public void calculateAndUpdateRepairCapabilitiesPerStation(UUID sessionId,
-                                                               Long repairFormationUnitId,
-                                                               Long repairTypeId) {
+    public void calculateAndUpdateRepairCapabilitiesPerRFU(UUID sessionId,
+                                                           Long repairFormationUnitId) {
         List<RepairFormationUnitEquipmentStaff> repairFormationUnitStaff =
-                repairFormationUnitService.listEquipmentStaff(repairFormationUnitId, sessionId);
+                repairFormationUnitService.listEquipmentStaff(sessionId, repairFormationUnitId);
 
-        calculateAndUpdateRepairCapabilities(sessionId, repairFormationUnitStaff, repairTypeId);
+        calculateAndUpdateRepairCapabilities(sessionId, repairFormationUnitStaff);
     }
 
     @Override
     public void updateRepairCapabilities(UUID sessionId,
                                          Long repairFormationUnitId,
-                                         Long repairTypeId,
                                          Map<Long, Double> capabilitiesMap) {
         List<RepairFormationUnitRepairCapability> repairFormationUnitRepairCapabilities =
                 capabilitiesMap
@@ -136,12 +120,11 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
                             Double capability = equipmentIdCapabilityEntry.getValue();
 
                             return calculatedRepairCapabilitiesPerDayRepository
-                                    .find(sessionId, repairFormationUnitId, equipmentId, repairTypeId)
+                                    .find(sessionId, repairFormationUnitId, equipmentId)
                                     .map(crcpd -> crcpd.setCapability(capability))
                                     .orElse(new RepairFormationUnitRepairCapability(
                                             repairFormationUnitId,
                                             equipmentId,
-                                            repairTypeId,
                                             sessionId,
                                             capability));
                         })
@@ -152,15 +135,14 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
 
     @Override
     public RepairFormationUnitRepairCapability updateRepairCapabilities(
-            UUID sessionId, Long repairFormationUnitId, Long repairTypeId, Long equipmentId, Double capability) {
+            UUID sessionId, Long repairFormationUnitId, Long equipmentId, Double capability) {
         RepairFormationUnitRepairCapability updated =
                 calculatedRepairCapabilitiesPerDayRepository
-                        .find(sessionId, repairFormationUnitId, equipmentId, repairTypeId)
+                        .find(sessionId, repairFormationUnitId, equipmentId)
                         .map(crcpd -> crcpd.setCapability(capability))
                         .orElse(new RepairFormationUnitRepairCapability(
                                 repairFormationUnitId,
                                 equipmentId,
-                                repairTypeId,
                                 sessionId,
                                 capability));
 
@@ -170,12 +152,11 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     @Override
     public Map<Equipment, Double> getCalculatedRepairCapabilities(UUID sessionId,
                                                                   Long repairFormationUnitId,
-                                                                  Long repairTypeId,
                                                                   List<Long> equipmentIds,
                                                                   List<Long> equipmentTypeIds) {
         RepairFormationUnit repairFormationUnit = repairFormationUnitService.get(repairFormationUnitId);
         Map<RepairFormationUnit, Map<Equipment, Double>> result = internalGetCalculatedRepairCapabilities(
-                sessionId, repairTypeId,
+                sessionId,
                 Collections.singletonList(repairFormationUnitId), equipmentIds, equipmentTypeIds);
         return result.getOrDefault(repairFormationUnit, Collections.emptyMap());
     }
@@ -183,24 +164,21 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     @Override
     public Map<RepairFormationUnit, Map<Equipment, Double>> getCalculatedRepairCapabilities(
             UUID sessionId,
-            Long repairTypeId,
             List<Long> repairFormationUnitIds,
             List<Long> equipmentIds,
             List<Long> equipmentTypeIds) {
         return internalGetCalculatedRepairCapabilities(
-                sessionId, repairTypeId, repairFormationUnitIds, equipmentIds, equipmentTypeIds);
+                sessionId, repairFormationUnitIds, equipmentIds, equipmentTypeIds);
     }
 
 
     private Map<RepairFormationUnit, Map<Equipment, Double>> internalGetCalculatedRepairCapabilities(UUID sessionId,
-                                                                                                     Long repairTypeId,
                                                                                                      List<Long> repairFormationUnitIds,
                                                                                                      List<Long> equipmentIds,
                                                                                                      List<Long> equipmentTypeIds) {
         List<RepairFormationUnitRepairCapability> calculatedRepairCapabilitesPerDays =
                 calculatedRepairCapabilitiesPerDayRepository.findFiltered(
                         sessionId,
-                        repairTypeId,
                         repairFormationUnitIds,
                         equipmentIds,
                         equipmentTypeIds);
@@ -208,7 +186,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
         return calculatedRepairCapabilitesPerDays
                 .stream()
                 .collect(Collectors.groupingBy(RepairFormationUnitRepairCapability::getRepairFormationUnit,
-                                               Collectors.toMap(RepairFormationUnitRepairCapability::getEquipment,
-                                                                RepairFormationUnitRepairCapability::getCapability)));
+                        Collectors.toMap(RepairFormationUnitRepairCapability::getEquipment,
+                                RepairFormationUnitRepairCapability::getCapability)));
     }
 }

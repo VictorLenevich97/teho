@@ -16,14 +16,12 @@ public interface RepairFormationUnitRepairCapabilityRepository
 
     @Query("SELECT c FROM RepairFormationUnitRepairCapability c WHERE " +
             "c.tehoSession.id = :sessionId AND " +
-            "c.repairType.id = :repairTypeId AND " +
             "(coalesce(:repairFormationUnitIds, null) is null or c.repairFormationUnit.id in (:repairFormationUnitIds)) AND " +
             "(coalesce(:equipmentIds, null) is null or c.equipment.id in (:equipmentIds)) AND " +
             "(coalesce(:equipmentTypeIds, null) is null or c.equipment.equipmentType.id in (:equipmentTypeIds) or " +
             "(c.equipment.equipmentType.parentType IS NOT NULL AND c.equipment.equipmentType.parentType.id IN (:equipmentTypeIds))) " +
             "ORDER BY c.repairFormationUnit.id ASC, c.equipment.equipmentType.id ASC, c.equipment.id ASC")
     List<RepairFormationUnitRepairCapability> findFiltered(UUID sessionId,
-                                                           Long repairTypeId,
                                                            List<Long> repairFormationUnitIds,
                                                            List<Long> equipmentIds,
                                                            List<Long> equipmentTypeIds);
@@ -31,11 +29,9 @@ public interface RepairFormationUnitRepairCapabilityRepository
     @Query("SELECT c FROM RepairFormationUnitRepairCapability c WHERE " +
             "c.tehoSession.id = :sessionId AND " +
             "c.repairFormationUnit.id = :repairFormationUnitId AND " +
-            "c.equipment.id = :equipmentId AND " +
-            "c.repairType.id = :repairTypeId")
+            "c.equipment.id = :equipmentId")
     Optional<RepairFormationUnitRepairCapability> find(UUID sessionId,
                                                        Long repairFormationUnitId,
-                                                       Long equipmentId,
-                                                       Long repairTypeId);
+                                                       Long equipmentId);
 
 }

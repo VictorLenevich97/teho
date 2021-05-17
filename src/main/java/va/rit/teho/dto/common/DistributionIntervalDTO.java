@@ -1,7 +1,6 @@
-package va.rit.teho.dto.labordistribution;
+package va.rit.teho.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import va.rit.teho.dto.common.IdAndNameDTO;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

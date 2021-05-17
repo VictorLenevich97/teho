@@ -50,7 +50,7 @@ public class CalculationServiceImplTest {
     public void testCalculateRepairCapabilities() {
         int totalStaff = 10;
         int workingTime = 20;
-        long avgLaborInput = 25;
+        Integer avgLaborInput = 25;
         double expectedResult = (totalStaff * workingTime * 0.78) / avgLaborInput;
         Assertions.assertEquals(
                 expectedResult,

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
+import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public interface RepairFormationUnitRepository extends PagingAndSortingRepositor
             "ORDER BY rdu.id ASC")
     List<RepairFormationUnit> findSorted(UUID sessionId, List<Long> repairFormationUnitIds, Pageable pageable);
 
+    Optional<RepairFormation> findByNameIgnoreCase(String name);
 
     @Query("SELECT rdu from RepairFormationUnit rdu WHERE rdu.repairFormation.id = :repairFormationId AND " +
             "(coalesce(:repairFormationUnitIds, null) is null or rdu.id in (:repairFormationUnitIds)) AND " +
