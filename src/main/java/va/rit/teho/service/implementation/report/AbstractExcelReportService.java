@@ -105,6 +105,14 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
 
     protected abstract List<ReportCell> populateRowCells(T combinedData, R row);
 
+    protected void populateCellValue(ReportCell source, Cell target) {
+        if (source.getCellType().equals(ReportCell.CellType.TEXT)) {
+            target.setCellValue(source.getTextValue());
+        } else {
+            target.setCellValue(source.getNumericValue());
+        }
+    }
+
     protected void createRowWideCell(Sheet sheet, int index, int colSize, String data, boolean bold, boolean centered) {
         Row row = sheet.createRow(index);
         Cell rowWideCell = row.createCell(0);
@@ -200,7 +208,7 @@ public abstract class AbstractExcelReportService<T, R> implements ReportService<
             for (int j = 0; j < reportCells.size(); j++) {
                 Cell cell = row.createCell(j);
                 ReportCell reportCell = reportCells.get(j);
-                cell.setCellValue(reportCell.getValue());
+                populateCellValue(reportCell, cell);
                 if (reportCell.getAlignment().equals(HorizontalAlignment.CENTER)) {
                     alignCellCenter(cell);
                 }
