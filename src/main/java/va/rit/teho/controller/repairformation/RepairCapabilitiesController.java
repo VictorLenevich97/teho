@@ -92,10 +92,9 @@ public class RepairCapabilitiesController {
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}/batch", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{repairFormationUnitId}/capabilities/batch", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Ручное обновление производственных возможностей РВО по ремонту (для указанного РВО), сразу для многих ВВСТ")
     public ResponseEntity<Object> updateRepairCapabilitiesBatch(@ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
-                                                                @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
                                                                 @ApiParam(value = "Данные в виде {'ключ ВВСТ': 'произв. возможности (ед./сут.)'}", required = true, example = "{'1': '2.15', '2': '3.14'}") @RequestBody Map<Long, Double> data) {
         repairCapabilitiesService.updateRepairCapabilities(tehoSession.getSessionId(),
                 repairFormationUnitId,
@@ -103,10 +102,9 @@ public class RepairCapabilitiesController {
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping(path = "/{repairFormationUnitId}/capabilities/repair-type/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{repairFormationUnitId}/capabilities", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Ручное обновление производственных возможностей РВО по ремонту (для указанного РВО)")
     public ResponseEntity<Object> updateRepairCapabilities(@ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
-                                                           @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
                                                            @ApiParam(value = "Данные по произв. возможностям", required = true) @Valid @RequestBody RepairCapabilityPerEquipment repairCapabilityPerEquipment) {
         RepairFormationUnitRepairCapability repairFormationUnitRepairCapability =
                 repairCapabilitiesService.updateRepairCapabilities(
@@ -185,13 +183,12 @@ public class RepairCapabilitiesController {
                                         .getOrDefault(equipment, 0.0))));
     }
 
-    @GetMapping("/{repairFormationUnitId}/capabilities/repair-type/{repairTypeId}")
+    @GetMapping("/{repairFormationUnitId}/capabilities")
     @ResponseBody
     @Transactional
     @ApiOperation(value = "Получить производственные возможности данного РВО по ремонту ВВСТ (для конкретного типа ремонта)")
     public ResponseEntity<List<EquipmentTypeStaffData>> getCalculatedRepairCapabilitiesForUnit(
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
-            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable @Positive Long repairTypeId,
             @ApiParam(value = "Ключи ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId) {
         List<Long> filteredEquipmentIds = nullIfEmpty(equipmentId);
@@ -247,7 +244,7 @@ public class RepairCapabilitiesController {
     }
 
 
-    @GetMapping("/capabilities/repair-type/{id}")
+    @GetMapping("/capabilities")
     @ResponseBody
     @Transactional
     @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
@@ -271,12 +268,11 @@ public class RepairCapabilitiesController {
         return ResponseEntity.ok(repairCapabilitiesFullDTO);
     }
 
-    @GetMapping("/capabilities/repair-type/{id}/report")
+    @GetMapping("/capabilities/report")
     @ResponseBody
     @Transactional
     @ApiOperation(value = "Получение расчитанных производственных возможностей РВО по ремонту ВВСТ")
     public ResponseEntity<byte[]> getCalculatedRepairCapabilitiesReport(
-            @ApiParam(value = "Ключ типа ремонта", required = true) @PathVariable("id") Long repairTypeId,
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> repairFormationUnitId,
             @ApiParam(value = "Ключи ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentId,
             @ApiParam(value = "Ключи типов ВВСТ (для фильтрации)") @RequestParam(required = false) List<Long> equipmentTypeId,
