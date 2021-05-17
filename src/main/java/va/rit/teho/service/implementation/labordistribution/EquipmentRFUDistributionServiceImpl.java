@@ -124,13 +124,16 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
     @Override
     public List<EquipmentRFUDistribution> listRFUDistributedEquipment(Long repairFormationUnitId, UUID sessionId) {
         return equipmentRFUDistributionRepository.findByRepairFormationUnitIdAndTehoSessionId(repairFormationUnitId,
-                                                                                              sessionId);
+                sessionId);
     }
 
     @Override
     public List<EquipmentPerFormationDistributionData> listDistributionDataForFormation(UUID sessionId,
                                                                                         Long formationId) {
-        List<EquipmentPerFormation> list = equipmentPerFormationService.getEquipmentInFormation(formationId);
+        List<EquipmentPerFormation> list = equipmentPerFormationService.getEquipmentInFormation(formationId)
+                .stream()
+                .filter(equipmentPerFormation -> equipmentPerFormation.getAmount() > 0)
+                .collect(Collectors.toList());
         Map<Equipment, Map<RepairType, Double>> equipmentFailurePerRepairTypes =
                 getEquipmentFailurePerRepairTypeMap(sessionId, formationId);
 
@@ -140,8 +143,8 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
         return list
                 .stream()
                 .map(epf -> getEquipmentPerFormationDistributionData(epf,
-                                                                     equipmentFailurePerRepairTypes,
-                                                                     equipmentInRepairPerRestorationType))
+                        equipmentFailurePerRepairTypes,
+                        equipmentInRepairPerRestorationType))
                 .collect(Collectors.toList());
     }
 
@@ -166,10 +169,10 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                 .listRepairingAmountPerRestorationType(sessionId, formationId)
                 .stream()
                 .collect(Collectors.groupingBy(EquipmentPerRestorationTypeAmount::getEquipment,
-                                               Collectors.groupingBy(EquipmentPerRestorationTypeAmount::getRestorationType,
-                                                                     Collectors.mapping(
-                                                                             EquipmentPerRestorationTypeAmount::getAmount,
-                                                                             Collectors.averagingDouble(Double::doubleValue)))));
+                        Collectors.groupingBy(EquipmentPerRestorationTypeAmount::getRestorationType,
+                                Collectors.mapping(
+                                        EquipmentPerRestorationTypeAmount::getAmount,
+                                        Collectors.averagingDouble(Double::doubleValue)))));
     }
 
     private Map<Equipment, Map<RepairType, Double>> getEquipmentFailurePerRepairTypeMap(UUID sessionId,
@@ -178,10 +181,10 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                 .listFailureDataPerRepairType(sessionId, formationId)
                 .stream()
                 .collect(Collectors.groupingBy(EquipmentFailurePerRepairTypeAmount::getEquipment,
-                                               Collectors.groupingBy(EquipmentFailurePerRepairTypeAmount::getRepairType,
-                                                                     Collectors.mapping(
-                                                                             EquipmentFailurePerRepairTypeAmount::getAmount,
-                                                                             Collectors.averagingDouble(Double::doubleValue)))));
+                        Collectors.groupingBy(EquipmentFailurePerRepairTypeAmount::getRepairType,
+                                Collectors.mapping(
+                                        EquipmentFailurePerRepairTypeAmount::getAmount,
+                                        Collectors.averagingDouble(Double::doubleValue)))));
     }
 
 
@@ -200,10 +203,10 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                         .getWeight() <= rf.getRepairFormationType().getRestorationType().getWeight()) {
                     EquipmentRFUDistribution distribution =
                             findCapableRFUAndDistributeEquipment(sessionId,
-                                                                 repairFormationUnitCapabilityMap,
-                                                                 distributionAggregatedData,
-                                                                 rf,
-                                                                 repairFormationUnitIds);
+                                    repairFormationUnitCapabilityMap,
+                                    distributionAggregatedData,
+                                    rf,
+                                    repairFormationUnitIds);
                     if (distribution != null) {
                         distributed.add(distribution);
                     }
@@ -228,14 +231,14 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                                 .getRepairCapabilities()
                                 .stream()
                                 .filter(rc -> rc.getEquipment()
-                                                .equals(distributionAggregatedData.getEquipment()) &&
+                                        .equals(distributionAggregatedData.getEquipment()) &&
                                         rc.getCapability() > 0))
                         .findFirst();
         return capableRFU
                 .flatMap(repairFormationUnitRepairCapability -> distributeEquipmentToRFU(sessionId,
-                                                                                         repairFormationUnitCapabilityMap,
-                                                                                         distributionAggregatedData,
-                                                                                         repairFormationUnitRepairCapability))
+                        repairFormationUnitCapabilityMap,
+                        distributionAggregatedData,
+                        repairFormationUnitRepairCapability))
                 .orElse(null);
     }
 
@@ -247,9 +250,9 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
         Double capability =
                 repairFormationUnitCapabilityMap
                         .computeIfAbsent(repairFormationUnitRepairCapability.getRepairFormationUnit(),
-                                         rfu -> new HashMap<>())
+                                rfu -> new HashMap<>())
                         .computeIfAbsent(repairFormationUnitRepairCapability.getEquipment(),
-                                         k -> repairFormationUnitRepairCapability.getCapability());
+                                k -> repairFormationUnitRepairCapability.getCapability());
         if (capability > 0 && distributionAggregatedData.getCount() > 0) {
             double repairing = distributionAggregatedData.getCount();
             double unable = 0.0;
@@ -273,10 +276,10 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
             return Optional.of(
                     new EquipmentRFUDistribution(
                             new EquipmentRFUDistributionPK(formation.getId(),
-                                                           equipment.getId(),
-                                                           repairFormationUnit.getId(),
-                                                           interval.getId(),
-                                                           sessionId),
+                                    equipment.getId(),
+                                    repairFormationUnit.getId(),
+                                    interval.getId(),
+                                    sessionId),
                             formation,
                             equipment,
                             repairFormationUnit,
