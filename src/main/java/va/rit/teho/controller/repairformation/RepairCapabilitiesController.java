@@ -85,8 +85,7 @@ public class RepairCapabilitiesController {
     @PostMapping(path = "/{repairFormationUnitId}/capabilities", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ApiOperation(value = "Расчет производственных возможностей РВО по ремонту (для указанного РВО)")
-    public ResponseEntity<Object> calculateAndGetPerStation(@ApiParam(value = "Ключ типа ремонта, по которому производится расчет", required = true) @PathVariable("id") Long repairTypeId,
-                                                            @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId) {
+    public ResponseEntity<Object> calculateAndGetPerStation(@ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId) {
         this.repairCapabilitiesService.calculateAndUpdateRepairCapabilitiesPerRFU(
                 tehoSession.getSessionId(), repairFormationUnitId);
         return ResponseEntity.accepted().build();
