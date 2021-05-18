@@ -19,6 +19,4 @@ public interface RepairFormationRepository extends CrudRepository<RepairFormatio
 
     List<RepairFormation> findAllByFormationTehoSessionId(UUID sessionId);
 
-    Optional<RepairFormation> findByNameIgnoreCase(String name);
-
 }

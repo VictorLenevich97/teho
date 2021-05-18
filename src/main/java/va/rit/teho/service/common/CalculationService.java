@@ -40,8 +40,8 @@ public interface CalculationService {
      *
      * @param totalStaff    общее количество специалистов-ремонтников
      * @param workingTime   время работы ремонтника, часы
-     * @param avgLaborInput средняя трудоемкость ремонта, чел-часы
+     * @param intervalUpperBound верхняя граница диапазона трудоемкости, в котором работает данное РВО (используется для расчета средней трудоемкости: нужно умножить верхнюю границу на 0.75)
      * @return производственные возможности по ремонту, ед./сут.
      */
-    double calculateRepairCapabilities(int totalStaff, int workingTime, long avgLaborInput);
+    double calculateRepairCapabilities(int totalStaff, int workingTime, Integer intervalUpperBound);
 }

@@ -227,13 +227,14 @@ public class LaborInputDistributionServiceImpl implements LaborInputDistribution
                     LaborDistribution result;
                     if ((interval.getLowerBound() == null || laborInput > interval.getLowerBound()) &&
                             (interval.getUpperBound() == null || laborInput < interval.getUpperBound())) {
+                        double count = avgDailyFailure - sum.get();
+                        double avgLaborInput = calculationService.calculateEquipmentInRepairLaborInput(count, interval.getUpperBound());
                         result = new LaborDistribution(
                                 new LaborDistributionPK(formationId, equipmentId, interval.getId(), stageId, repairTypeId, sessionId),
-                                avgDailyFailure - sum.get(),
-                                0);
+                                count,
+                                avgLaborInput);
                     } else {
-                        if (interval.getLowerBound() != null &&
-                                interval.getLowerBound() >= laborInput) {
+                        if (interval.getLowerBound() != null && interval.getLowerBound() >= laborInput) {
                             result = LaborDistribution.empty(
                                     formationId, equipmentId, interval.getId(), stageId, repairTypeId, sessionId);
                         } else {

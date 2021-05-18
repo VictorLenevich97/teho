@@ -63,6 +63,7 @@ public class SessionFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().contains("session");
+        String servletPath = request.getServletPath();
+        return servletPath.contains("session") || servletPath.contains("swagger") || servletPath.contains("api-docs");
     }
 }

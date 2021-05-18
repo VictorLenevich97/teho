@@ -33,8 +33,8 @@ public class CalculationServiceImpl implements CalculationService {
         return 0.75 * count * (upperBound == null ? 1000 : upperBound);
     }
 
-    public double calculateRepairCapabilities(int totalStaff, int workingTime, long avgLaborInput) {
+    public double calculateRepairCapabilities(int totalStaff, int workingTime, Integer intervalUpperBound) {
         //0.78 - коэффициент использования рабочего времени на основные работы. Находится в интервале 0.75 - 0.8
-        return avgLaborInput == 0 ? 0 : (totalStaff * workingTime * 0.78) / avgLaborInput;
+        return intervalUpperBound == 0 ? 0 : (totalStaff * workingTime * 0.78) / (0.75 * intervalUpperBound);
     }
 }

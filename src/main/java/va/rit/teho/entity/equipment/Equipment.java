@@ -1,5 +1,6 @@
 package va.rit.teho.entity.equipment;
 
+import va.rit.teho.entity.intensity.Intensity;
 import va.rit.teho.entity.repairformation.RepairFormationUnitRepairCapability;
 
 import javax.persistence.*;
@@ -23,6 +24,9 @@ public class Equipment implements Serializable {
 
     @OneToMany(mappedBy = "equipment", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<EquipmentLaborInputPerType> laborInputPerTypes;
+
+    @OneToMany(mappedBy = "equipment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Intensity> intensities;
 
     @OneToMany(mappedBy = "equipment", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<EquipmentPerFormation> equipmentPerFormations;

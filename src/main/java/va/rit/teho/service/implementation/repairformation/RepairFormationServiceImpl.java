@@ -2,6 +2,7 @@ package va.rit.teho.service.implementation.repairformation;
 
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.repairformation.RepairFormation;
+import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.repairformation.RepairFormationRepository;
 import va.rit.teho.service.formation.FormationService;

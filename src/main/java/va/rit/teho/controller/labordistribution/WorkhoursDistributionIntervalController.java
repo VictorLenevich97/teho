@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import va.rit.teho.dto.labordistribution.DistributionIntervalDTO;
+import va.rit.teho.dto.common.DistributionIntervalDTO;
 import va.rit.teho.service.labordistribution.WorkhoursDistributionIntervalService;
 
 import java.util.List;

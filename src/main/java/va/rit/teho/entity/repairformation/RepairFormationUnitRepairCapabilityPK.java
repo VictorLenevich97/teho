@@ -18,25 +18,20 @@ public class RepairFormationUnitRepairCapabilityPK implements Serializable {
     @Column(name = "session_id")
     private UUID sessionId;
 
-    @Column(name = "repair_type_id")
-    private Long repairTypeId;
-
     public RepairFormationUnitRepairCapabilityPK() {
     }
 
     public RepairFormationUnitRepairCapabilityPK(Long repairFormationUnitId,
                                                  Long equipmentId,
-                                                 Long repairTypeId,
                                                  UUID sessionId) {
         this.repairFormationUnitId = repairFormationUnitId;
         this.equipmentId = equipmentId;
-        this.repairTypeId = repairTypeId;
         this.sessionId = sessionId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(repairFormationUnitId, equipmentId, repairTypeId);
+        return Objects.hash(repairFormationUnitId, equipmentId);
     }
 
     @Override
@@ -46,7 +41,6 @@ public class RepairFormationUnitRepairCapabilityPK implements Serializable {
         RepairFormationUnitRepairCapabilityPK that = (RepairFormationUnitRepairCapabilityPK) o;
         return Objects.equals(repairFormationUnitId, that.repairFormationUnitId) &&
                 Objects.equals(equipmentId, that.equipmentId) &&
-                Objects.equals(repairTypeId, that.repairTypeId) &&
                 Objects.equals(sessionId, that.sessionId);
     }
 
@@ -66,14 +60,9 @@ public class RepairFormationUnitRepairCapabilityPK implements Serializable {
         this.sessionId = sessionId;
     }
 
-    public Long getRepairTypeId() {
-        return repairTypeId;
-    }
-
     public RepairFormationUnitRepairCapabilityPK copy(UUID sessionId) {
         return new RepairFormationUnitRepairCapabilityPK(getRepairFormationUnitId(),
                                                          getEquipmentId(),
-                                                         getRepairTypeId(),
                                                          sessionId);
     }
 }

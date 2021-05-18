@@ -22,7 +22,7 @@ import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.entity.repairformation.combined.RepairFormationUnitCombinedData;
 import va.rit.teho.server.config.TehoSessionData;
 import va.rit.teho.service.equipment.EquipmentTypeService;
-import va.rit.teho.service.repairformation.RepairFormationUnitService;
+import va.rit.teho.service.repairformation.RepairFormationUnitServiceFacade;
 import va.rit.teho.service.report.ReportService;
 
 import javax.annotation.Resource;
@@ -53,17 +53,17 @@ public class RepairFormationUnitController {
         STAFF_KEYS_AND_TEXT.put(KEY_AVAILABLE_STAFF, "В наличии, чел.");
     }
 
-    private final RepairFormationUnitService repairFormationUnitService;
+    private final RepairFormationUnitServiceFacade repairFormationUnitServiceFacade;
     private final EquipmentTypeService equipmentTypeService;
     private final ReportService<RepairFormationUnitCombinedData> reportService;
 
     @Resource
     private TehoSessionData tehoSession;
 
-    public RepairFormationUnitController(RepairFormationUnitService repairFormationUnitService,
+    public RepairFormationUnitController(RepairFormationUnitServiceFacade repairFormationUnitServiceFacade,
                                          EquipmentTypeService equipmentTypeService,
                                          ReportService<RepairFormationUnitCombinedData> reportService) {
-        this.repairFormationUnitService = repairFormationUnitService;
+        this.repairFormationUnitServiceFacade = repairFormationUnitServiceFacade;
         this.equipmentTypeService = equipmentTypeService;
         this.reportService = reportService;
     }
@@ -76,7 +76,7 @@ public class RepairFormationUnitController {
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
         List<RepairFormationUnitDTO> repairFormationUnitDTOList =
-                repairFormationUnitService.list(tehoSession.getSessionId(), nullIfEmpty(ids), pageNum, pageSize)
+                repairFormationUnitServiceFacade.list(tehoSession.getSessionId(), nullIfEmpty(ids), pageNum, pageSize)
                         .stream()
                         .map(RepairFormationUnitDTO::from)
                         .collect(Collectors.toList());
@@ -104,14 +104,14 @@ public class RepairFormationUnitController {
                                                                                List<Long> equipmentTypeId,
                                                                                int pageNum,
                                                                                int pageSize) {
-        List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitService.list(
+        List<RepairFormationUnit> repairFormationUnitList = repairFormationUnitServiceFacade.list(
                 tehoSession.getSessionId(),
                 nullIfEmpty(repairFormationUnitId),
                 pageNum,
                 pageSize);
         List<EquipmentType> equipmentTypes = equipmentTypeService.listHighestLevelTypes(nullIfEmpty(equipmentTypeId));
         Map<RepairFormationUnit, Map<EquipmentType, RepairFormationUnitEquipmentStaff>> repairFormationUnitEquipmentStaff =
-                repairFormationUnitService.listEquipmentStaffPerType(tehoSession.getSessionId(),
+                repairFormationUnitServiceFacade.listEquipmentStaffPerType(tehoSession.getSessionId(),
                         nullIfEmpty(repairFormationUnitId),
                         nullIfEmpty(equipmentTypeId));
         return new RepairFormationUnitCombinedData(repairFormationUnitList,
@@ -132,7 +132,7 @@ public class RepairFormationUnitController {
                 pageNum,
                 pageSize);
 
-        Long rowCount = repairFormationUnitService.count(repairFormationUnitId);
+        Long rowCount = repairFormationUnitServiceFacade.count(repairFormationUnitId);
 
         TableDataDTO<Map<String, RepairFormationUnitEquipmentStaffDTO>> equipmentStaffDTO =
                 buildEquipmentStaffDTO(repairFormationUnitCombinedData, rowCount, pageSize);
@@ -168,7 +168,7 @@ public class RepairFormationUnitController {
                         .map(equipmentTypeService::listTypes)
                         .orElse(equipmentTypeService.listHighestLevelTypes(null));
         Map<EquipmentType, RepairFormationUnitEquipmentStaff> equipmentStaff =
-                repairFormationUnitService.getEquipmentStaffPerType(tehoSession.getSessionId(),
+                repairFormationUnitServiceFacade.getEquipmentStaffPerType(tehoSession.getSessionId(),
                         repairFormationUnitId,
                         nullIfEmpty(equipmentTypeId));
 
@@ -185,7 +185,7 @@ public class RepairFormationUnitController {
     public ResponseEntity<RepairFormationUnitDTO> getRepairFormationUnit(
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId) {
         Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> repairFormationUnitListPair =
-                repairFormationUnitService.getWithStaff(repairFormationUnitId, tehoSession.getSessionId());
+                repairFormationUnitServiceFacade.getWithStaff(tehoSession.getSessionId(), repairFormationUnitId);
         RepairFormationUnitDTO repairFormationUnitDTO = RepairFormationUnitDTO
                 .from(repairFormationUnitListPair.getFirst())
                 .setStaff(repairFormationUnitListPair
@@ -203,7 +203,7 @@ public class RepairFormationUnitController {
             @ApiParam(value = "Ключи РВО (для фильтрации)") @RequestParam(required = false) List<Long> ids,
             @RequestParam(required = false, defaultValue = "1") int pageNum,
             @RequestParam(required = false, defaultValue = "100") int pageSize) {
-        return ResponseEntity.ok(repairFormationUnitService.list(tehoSession.getSessionId(), repairFormationId, ids, pageNum, pageSize)
+        return ResponseEntity.ok(repairFormationUnitServiceFacade.list(tehoSession.getSessionId(), repairFormationId, ids, pageNum, pageSize)
                 .stream()
                 .map(RepairFormationUnitDTO::from)
                 .collect(Collectors.toList()));
@@ -214,8 +214,10 @@ public class RepairFormationUnitController {
     public ResponseEntity<RepairFormationUnitDTO> addRepairFormationUnit(
             @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable @Positive Long repairFormationId,
             @ApiParam(value = "Данные по РВО", required = true) @Valid @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
-        RepairFormationUnit repairFormationUnit = repairFormationUnitService.add(repairFormationUnitDTO.getName(),
+        RepairFormationUnit repairFormationUnit = repairFormationUnitServiceFacade.add(repairFormationUnitDTO.getName(),
                 repairFormationId,
+                repairFormationUnitDTO.getDistributionInterval().getId(),
+                repairFormationUnitDTO.getRepairType().getId(),
                 repairFormationUnitDTO
                         .getStationType()
                         .getId(),
@@ -229,9 +231,11 @@ public class RepairFormationUnitController {
             @ApiParam(value = "Ключ ремонтного формирования", required = true) @PathVariable @Positive Long repairFormationId,
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId,
             @ApiParam(value = "Данные по РВО", required = true) @Valid @RequestBody RepairFormationUnitDTO repairFormationUnitDTO) {
-        RepairFormationUnit repairFormationUnit = repairFormationUnitService.update(repairFormationUnitId,
+        RepairFormationUnit repairFormationUnit = repairFormationUnitServiceFacade.update(repairFormationUnitId,
                 repairFormationUnitDTO.getName(),
                 repairFormationId,
+                repairFormationUnitDTO.getDistributionInterval().getId(),
+                repairFormationUnitDTO.getRepairType().getId(),
                 repairFormationUnitDTO
                         .getStationType()
                         .getId(),
@@ -250,7 +254,7 @@ public class RepairFormationUnitController {
                         .collect(Collectors.toList());
 
         return ResponseEntity.accepted().body(
-                repairFormationUnitService
+                repairFormationUnitServiceFacade
                         .updateEquipmentStaff(list)
                         .stream()
                         .map(EquipmentStaffPerType::from)
@@ -322,7 +326,7 @@ public class RepairFormationUnitController {
     @Transactional
     @ApiOperation(value = "Удалить РВО и все связанные сущности/рассчитанные данные")
     public ResponseEntity<Object> deleteRepairFormationUnit(@ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId) {
-        repairFormationUnitService.delete(repairFormationUnitId);
+        repairFormationUnitServiceFacade.delete(repairFormationUnitId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,11 +1,9 @@
 package va.rit.teho.entity.intensity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "operation")
@@ -19,6 +17,9 @@ public class Operation implements Serializable {
 
     @Column(nullable = false)
     private boolean active;
+
+    @OneToMany(mappedBy = "operation", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Intensity> intensities;
 
     public Operation() {
     }

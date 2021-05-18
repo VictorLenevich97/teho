@@ -1,6 +1,5 @@
 package va.rit.teho.entity.repairformation;
 
-import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.session.TehoSession;
 
@@ -25,11 +24,6 @@ public class RepairFormationUnitRepairCapability {
     private Equipment equipment;
 
     @ManyToOne
-    @MapsId("repair_type_id")
-    @JoinColumn(name = "repair_type_id")
-    private RepairType repairType;
-
-    @ManyToOne
     @MapsId("session_id")
     @JoinColumn(name = "session_id")
     private TehoSession tehoSession;
@@ -41,13 +35,11 @@ public class RepairFormationUnitRepairCapability {
 
     public RepairFormationUnitRepairCapability(Long repairFormationUnitId,
                                                Long equipmentId,
-                                               Long repairTypeId,
                                                UUID sessionId,
                                                double capability) {
         this.equipmentPerRepairFormationUnitWithRepairType = new RepairFormationUnitRepairCapabilityPK(
                 repairFormationUnitId,
                 equipmentId,
-                repairTypeId,
                 sessionId);
         this.capability = capability;
     }
@@ -58,14 +50,6 @@ public class RepairFormationUnitRepairCapability {
         this.capability = capability;
     }
 
-    public RepairType getRepairType() {
-        return repairType;
-    }
-
-    public void setRepairType(RepairType repairType) {
-        this.repairType = repairType;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -73,10 +57,9 @@ public class RepairFormationUnitRepairCapability {
         RepairFormationUnitRepairCapability that = (RepairFormationUnitRepairCapability) o;
         return Double.compare(that.capability, capability) == 0 &&
                 Objects.equals(equipmentPerRepairFormationUnitWithRepairType,
-                               that.equipmentPerRepairFormationUnitWithRepairType) &&
+                        that.equipmentPerRepairFormationUnitWithRepairType) &&
                 Objects.equals(repairFormationUnit, that.repairFormationUnit) &&
                 Objects.equals(equipment, that.equipment) &&
-                Objects.equals(repairType, that.repairType) &&
                 Objects.equals(tehoSession, that.tehoSession);
     }
 
@@ -87,11 +70,10 @@ public class RepairFormationUnitRepairCapability {
     @Override
     public int hashCode() {
         return Objects.hash(equipmentPerRepairFormationUnitWithRepairType,
-                            repairFormationUnit,
-                            equipment,
-                            repairType,
-                            capability,
-                            tehoSession);
+                repairFormationUnit,
+                equipment,
+                capability,
+                tehoSession);
     }
 
     public RepairFormationUnitRepairCapabilityPK getEquipmentPerRepairFormationUnitPK() {
@@ -129,6 +111,6 @@ public class RepairFormationUnitRepairCapability {
 
     public RepairFormationUnitRepairCapability copy(UUID newSessionId) {
         return new RepairFormationUnitRepairCapability(getEquipmentPerRepairFormationUnitPK().copy(newSessionId),
-                                                       getCapability());
+                getCapability());
     }
 }

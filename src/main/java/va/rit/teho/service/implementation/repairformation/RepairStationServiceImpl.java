@@ -20,6 +20,13 @@ public class RepairStationServiceImpl implements RepairStationService {
     }
 
     @Override
+    public RepairStationType get(Long id) {
+        return repairStationTypeRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Тип мастерской с id = \"" + id + "\" не найден!"));
+    }
+
+    @Override
     public List<RepairStationType> listTypes() {
         return (List<RepairStationType>) repairStationTypeRepository.findAll();
     }
