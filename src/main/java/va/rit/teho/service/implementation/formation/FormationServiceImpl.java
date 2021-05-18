@@ -4,24 +4,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import va.rit.teho.entity.common.Tree;
 import va.rit.teho.entity.formation.Formation;
-import va.rit.teho.exception.AlreadyExistsException;
+import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.exception.EmptyFieldException;
 import va.rit.teho.exception.FormationNotFoundException;
-import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.formation.FormationRepository;
 import va.rit.teho.service.formation.FormationService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
 public class FormationServiceImpl implements FormationService {
 
     private final FormationRepository formationRepository;
-
 
     public FormationServiceImpl(FormationRepository formationRepository) {
         this.formationRepository = formationRepository;
@@ -35,34 +30,25 @@ public class FormationServiceImpl implements FormationService {
 
     @Override
     @Transactional
-    public Formation add(String shortName, String fullName) {
+    public Formation add(TehoSession session, String shortName, String fullName) {
         checkPreRequisites(shortName, fullName);
         Long newId = formationRepository.getMaxId() + 1;
-        return formationRepository.save(new Formation(newId, shortName, fullName));
+        return formationRepository.save(new Formation(newId, session, shortName, fullName));
     }
 
     private void checkPreRequisites(String shortName, String fullName) {
         checkIfEmptyField(shortName);
         checkIfEmptyField(fullName);
-        formationRepository.findByFullName(fullName).ifPresent(b -> {
-            throw new AlreadyExistsException("Формирование", "полное название", fullName);
-        });
     }
 
     @Override
-    public Formation add(String shortName, String fullName, Long parentFormationId) {
+    public Formation add(TehoSession session, String shortName, String fullName, Long parentFormationId) {
         checkPreRequisites(shortName, fullName);
-        Formation parentFormation = null;
-        if (parentFormationId != null) {
-            Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
-            if (!optionalFormation.isPresent()) {
-                throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
-            }
-            parentFormation = optionalFormation.get();
-        }
+        Formation parentFormation = get(parentFormationId);
         long newId = formationRepository.getMaxId() + 1;
-        return formationRepository.save(new Formation(newId, shortName, fullName, parentFormation));
+        return formationRepository.save(new Formation(newId, session, shortName, fullName, parentFormation));
     }
+
 
     @Override
     public Formation update(Long formationId, String shortName, String fullName) {
@@ -75,14 +61,7 @@ public class FormationServiceImpl implements FormationService {
     @Override
     public Formation update(Long formationId, String shortName, String fullName, Long parentFormationId) {
         Formation formation = getFormationOrThrow(formationId);
-        Formation parentFormation = null;
-        if (parentFormationId != null) {
-            Optional<Formation> optionalFormation = formationRepository.findById(parentFormationId);
-            if (!optionalFormation.isPresent()) {
-                throw new NotFoundException("Формирование не найдено (id = " + parentFormationId + ")");
-            }
-            parentFormation = optionalFormation.get();
-        }
+        Formation parentFormation = get(parentFormationId);
 
         formation.setFullName(fullName);
         formation.setShortName(shortName);
@@ -100,32 +79,33 @@ public class FormationServiceImpl implements FormationService {
     }
 
     @Override
-    public List<Formation> list() {
-        return (List<Formation>) formationRepository.findAll();
+    public List<Formation> list(UUID sessionId) {
+        return formationRepository.findFormationByTehoSessionId(sessionId);
     }
 
-    private void populateTree(Tree.Node<Formation> node, Set<Formation> formations, List<Long> formationIds) {
+    private void populateTree(Tree.Node<Formation> node, List<Formation> formations, List<Long> formationIds) {
         for (Formation formation : formations) {
             if (formationIds == null || formationIds.contains(formation.getId())) {
                 Tree.Node<Formation> childrenFormationNode = node.addChildren(formation);
-                if (!formation.getChildFormations().isEmpty()) {
-                    populateTree(childrenFormationNode, formation.getChildFormations(), formationIds);
+                List<Formation> childrenFormation = formationRepository.findFormationByParentFormationIdOrderByIdAsc(formation.getId());
+                if (!childrenFormation.isEmpty()) {
+                    populateTree(childrenFormationNode, childrenFormation, formationIds);
                 }
             }
         }
     }
 
     @Override
-    public List<Tree<Formation>> listHierarchy(List<Long> formationIds) {
+    public List<Tree<Formation>> listHierarchy(UUID sessionId, List<Long> formationIds) {
         List<Formation> rootFormations =
                 formationIds == null ?
-                        formationRepository.findFormationByParentFormationIsNull() :
-                        formationRepository.findFormationByParentFormationIsNullAndIdIn(formationIds);
+                        formationRepository.findFormationByParentFormationIsNullAndTehoSessionIdEquals(sessionId) :
+                        formationRepository.findFormationByParentFormationIsNullAndTehoSessionIdEqualsAndIdIn(sessionId, formationIds);
         List<Tree<Formation>> treeList = new ArrayList<>();
         for (Formation formation : rootFormations) {
             Tree<Formation> formationTree = new Tree<>(formation);
             treeList.add(formationTree);
-            populateTree(formationTree.getRoot(), formation.getChildFormations(), formationIds);
+            populateTree(formationTree.getRoot(), formationRepository.findFormationByParentFormationIdOrderByIdAsc(formation.getId()), formationIds);
         }
         return treeList;
     }

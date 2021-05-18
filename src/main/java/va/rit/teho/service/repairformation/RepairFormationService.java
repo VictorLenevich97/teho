@@ -3,10 +3,11 @@ package va.rit.teho.service.repairformation;
 import va.rit.teho.entity.repairformation.RepairFormation;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface RepairFormationService {
 
-    List<RepairFormation> list();
+    List<RepairFormation> list(UUID sessionId);
 
     List<RepairFormation> list(Long formationId);
 

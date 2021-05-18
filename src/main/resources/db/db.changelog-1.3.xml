@@ -1,0 +1,50 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="tehoadmin (generated)" id="1621241019779-3">
+        <addColumn tableName="repair_formation_unit">
+            <column name="repair_type_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1621241019779-4">
+        <addColumn tableName="repair_formation_unit">
+            <column name="workhours_distribution_interval_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="update repair_type_id with first repair type's id" author="tehoadmin">
+        <sql>update repair_formation_unit set repair_type_id = (SELECT ID FROM REPAIR_TYPE LIMIT 1)</sql>
+    </changeSet>
+    <changeSet id="update workhours_distribution_interval_id with first interval's id" author="tehoadmin">
+        <sql>update repair_formation_unit set workhours_distribution_interval_id = (SELECT ID FROM WORKHOURS_DISTRIBUTION_INTERVAL LIMIT 1)</sql>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1621241019779-6">
+        <addForeignKeyConstraint baseColumnNames="workhours_distribution_interval_id"
+                                 baseTableName="repair_formation_unit" constraintName="FK5jr13nbpg13h0jw97o6flhy9l"
+                                 deferrable="false" initiallyDeferred="false" referencedColumnNames="id"
+                                 referencedTableName="workhours_distribution_interval" validate="true"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1621241019779-7">
+        <addForeignKeyConstraint baseColumnNames="repair_type_id" baseTableName="repair_formation_unit"
+                                 constraintName="FKo691wgucdnlwg99nmyimx1f19" deferrable="false"
+                                 initiallyDeferred="false" referencedColumnNames="id" referencedTableName="repair_type"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1621241019779-8">
+        <dropForeignKeyConstraint baseTableName="REPAIR_FORMATION_UNIT_REPAIR_CAPABILITY"
+                                  constraintName="FK2XWL9YXAVOJXWK2JV63HFMG2K"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1621241019779-1">
+        <dropPrimaryKey tableName="repair_formation_unit_repair_capability"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1621241019779-9">
+        <dropColumn columnName="REPAIR_TYPE_ID" tableName="repair_formation_unit_repair_capability"/>
+    </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1621241019779-11">
+        <dropUniqueConstraint tableName="FORMATION" uniqueColumns="SHORT_NAME" constraintName="UK_DWEP4MY9EM7BD7BNW2B9U1J58"/>
+        <dropUniqueConstraint tableName="FORMATION" uniqueColumns="FULL_NAME" constraintName="UK_G1L2GBCQEQVGRPROSJRUVGFCE"/>
+        <dropUniqueConstraint tableName="REPAIR_FORMATION" uniqueColumns="NAME" constraintName="UK_RL2HY5RUJR2O7WJQ10YO8410A"/>
+        <dropUniqueConstraint tableName="REPAIR_FORMATION_UNIT" uniqueColumns="NAME" constraintName="UK_J6XW1Y6HLHBVHH7SLUIGWJ7S4"/>
+    </changeSet>
+</databaseChangeLog>

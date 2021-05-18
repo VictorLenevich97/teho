@@ -7,6 +7,7 @@ import va.rit.teho.entity.formation.Formation;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface FormationRepository extends CrudRepository<Formation, Long> {
@@ -16,8 +17,12 @@ public interface FormationRepository extends CrudRepository<Formation, Long> {
 
     Optional<Formation> findByFullName(String fullName);
 
-    List<Formation> findFormationByParentFormationIsNull();
+    List<Formation> findFormationByTehoSessionId(UUID sessionId);
 
-    List<Formation> findFormationByParentFormationIsNullAndIdIn(List<Long> formationIds);
+    List<Formation> findFormationByParentFormationIdOrderByIdAsc(Long parentFormationId);
+
+    List<Formation> findFormationByParentFormationIsNullAndTehoSessionIdEquals(UUID sessionId);
+
+    List<Formation> findFormationByParentFormationIsNullAndTehoSessionIdEqualsAndIdIn(UUID sessionId, List<Long> formationIds);
 
 }

@@ -1,10 +1,9 @@
 package va.rit.teho.service.repairformation;
 
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.util.Pair;
 import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
-import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
@@ -14,29 +13,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public interface RepairFormationUnitService {
+public interface RepairFormationUnitServiceFacade {
 
     Long count(List<Long> filterIds);
 
-    List<RepairFormationUnit> list(UUID sessionId, List<Long> filterIds, PageRequest pagination);
+    List<RepairFormationUnit> list(UUID sessionId, List<Long> filterIds, Integer pageNum, Integer pageSize);
 
-    List<RepairFormationUnit> list(UUID sessionId, RepairFormation repairFormation, List<Long> filterIds, PageRequest pagination);
+    List<RepairFormationUnit> list(UUID sessionId, Long repairFormationId, List<Long> filterIds, Integer pageNum, Integer pageSize);
 
     RepairFormationUnit get(Long id);
 
+    Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(Long repairFormationUntId);
+
     RepairFormationUnit add(String name,
-                            RepairFormation repairFormation,
-                            WorkhoursDistributionInterval interval,
-                            RepairType repairType,
-                            RepairStationType repairStationType,
+                            Long repairFormationId,
+                            Long intervalId,
+                            Long repairTypeId,
+                            Long repairStationTypeId,
                             int stationAmount);
 
     RepairFormationUnit update(Long id,
                                String name,
-                               RepairFormation repairFormation,
-                               WorkhoursDistributionInterval interval,
-                               RepairType repairType,
-                               RepairStationType repairStationType,
+                               Long repairFormationId,
+                               Long intervalId,
+                               Long repairTypeId,
+                               Long repairStationTypeId,
                                int amount);
 
     List<RepairFormationUnitEquipmentStaff> updateEquipmentStaff(List<RepairFormationUnitEquipmentStaff> repairFormationUnitEquipmentStaffList);
@@ -54,8 +55,5 @@ public interface RepairFormationUnitService {
 
     List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(UUID sessionId);
 
-    void copyRFUAndStaff(UUID originalSessionId, UUID newSessionId, RepairFormation originalRepairFormation, RepairFormation newRepairFormation);
-
     void delete(Long id);
-
 }

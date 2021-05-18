@@ -2,11 +2,13 @@ package va.rit.teho.entity.formation;
 
 import va.rit.teho.entity.equipment.EquipmentPerFormation;
 import va.rit.teho.entity.repairformation.RepairFormation;
+import va.rit.teho.entity.session.TehoSession;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "formation")
@@ -15,12 +17,16 @@ public class Formation implements Serializable {
     @Id
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String shortName;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String fullName;
 
+    @ManyToOne
+    @JoinColumn(name = "session_id", nullable = false)
+    private TehoSession tehoSession;
+    
     @ManyToOne
     @JoinColumn(name = "parent_formation_id")
     private Formation parentFormation;
@@ -37,14 +43,16 @@ public class Formation implements Serializable {
     public Formation() {
     }
 
-    public Formation(Long id, String shortName, String fullName) {
+    public Formation(Long id, TehoSession session, String shortName, String fullName) {
         this.id = id;
+        this.tehoSession = session;
         this.shortName = shortName;
         this.fullName = fullName;
     }
 
-    public Formation(Long id, String shortName, String fullName, Formation parentFormation) {
+    public Formation(Long id, TehoSession session, String shortName, String fullName, Formation parentFormation) {
         this.id = id;
+        this.tehoSession = session;
         this.shortName = shortName;
         this.fullName = fullName;
         this.parentFormation = parentFormation;
@@ -96,6 +104,14 @@ public class Formation implements Serializable {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public TehoSession getTehoSession() {
+        return tehoSession;
+    }
+
+    public Formation copy(TehoSession newSession) {
+        return new Formation(null, newSession, getShortName(), getFullName(), getParentFormation());
     }
 
     @Override

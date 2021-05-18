@@ -65,7 +65,7 @@ public class EquipmentRFUDistributionServiceImpl implements EquipmentRFUDistribu
                            List<Long> formationIds,
                            List<Long> repairFormationUnitIds) {
         cleanupDistributionForSession(sessionId);
-        List<Tree<Formation>> treeList = formationService.listHierarchy(formationIds);
+        List<Tree<Formation>> treeList = formationService.listHierarchy(sessionId, formationIds);
         for (Tree<Formation> t : treeList) {
             Map<Integer, Set<LaborDistributionAggregatedData>> sentUpper = new HashMap<>();
             for (int currentLevel = t.findLowestLevel(); currentLevel > 0; currentLevel--) {

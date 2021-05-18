@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface RepairTypeService {
 
+    RepairType get(Long id);
+
     List<RepairType> list(boolean calculatable);
 
     List<RepairType> list();

@@ -110,9 +110,9 @@ public class RepairFormationUnitEquipmentStaff {
         return tehoSession;
     }
 
-    public RepairFormationUnitEquipmentStaff copy(UUID newSessionId) {
+    public RepairFormationUnitEquipmentStaff copy(Long newRepairFormationUnitId, UUID newSessionId) {
         return new RepairFormationUnitEquipmentStaff(
-                getEquipmentPerRepairFormationUnit().copy(newSessionId),
+                getEquipmentPerRepairFormationUnit().copy(newRepairFormationUnitId, newSessionId),
                 getTotalStaff(),
                 getAvailableStaff());
     }

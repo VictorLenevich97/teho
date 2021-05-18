@@ -65,6 +65,10 @@ public class EquipmentPerFormation {
                 Objects.equals(equipment, that.equipment);
     }
 
+    public EquipmentPerFormation copy(Long newFormationId) {
+        return new EquipmentPerFormation(newFormationId, getEquipment().getId(), Long.valueOf(getAmount()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, formation, equipment, amount);

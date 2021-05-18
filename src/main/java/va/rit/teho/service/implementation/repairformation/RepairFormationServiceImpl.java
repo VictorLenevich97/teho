@@ -2,6 +2,7 @@ package va.rit.teho.service.implementation.repairformation;
 
 import org.springframework.stereotype.Service;
 import va.rit.teho.entity.repairformation.RepairFormation;
+import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.repairformation.RepairFormationRepository;
 import va.rit.teho.service.formation.FormationService;
@@ -9,6 +10,7 @@ import va.rit.teho.service.repairformation.RepairFormationService;
 import va.rit.teho.service.repairformation.RepairFormationTypeService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class RepairFormationServiceImpl implements RepairFormationService {
@@ -27,8 +29,8 @@ public class RepairFormationServiceImpl implements RepairFormationService {
     }
 
     @Override
-    public List<RepairFormation> list() {
-        return (List<RepairFormation>) repairFormationRepository.findAll();
+    public List<RepairFormation> list(UUID sessionId) {
+        return repairFormationRepository.findAllByFormationTehoSessionId(sessionId);
     }
 
     @Override

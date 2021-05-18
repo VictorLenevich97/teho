@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.service.session.SessionService;
 
@@ -13,8 +14,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -35,25 +34,28 @@ public class SessionFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String sessionId = httpServletRequest.getHeader("Session-Id");
         if (sessionId == null || sessionId.equals("null")) {
-            prepareBadRequestResponse(httpServletResponse, "Missing Session-Id header!");
+            prepareSessionErrorResponse(httpServletResponse, "Missing Session-Id header!");
         } else {
-            UUID sessionUUID = UUID.fromString(sessionId);
             try {
-                sessionService.get(sessionUUID);
+                UUID sessionUUID = UUID.fromString(sessionId);
+                TehoSession session = sessionService.get(sessionUUID);
+                tehoSession.saveSession(session);
+            } catch (NumberFormatException e) {
+                prepareSessionErrorResponse(httpServletResponse, "Session ID \"" + sessionId + "\" is not valid!");
+                return;
             } catch (NotFoundException e) {
-                prepareBadRequestResponse(httpServletResponse, "Session \"" + sessionUUID + "\" not found!");
+                prepareSessionErrorResponse(httpServletResponse, "Session \"" + sessionId + "\" not found!");
                 return;
             }
-            tehoSession.saveSessionId(sessionUUID);
 
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         }
     }
 
-    private void prepareBadRequestResponse(HttpServletResponse httpServletResponse, String message) throws
+    private void prepareSessionErrorResponse(HttpServletResponse httpServletResponse, String message) throws
             IOException {
         httpServletResponse.resetBuffer();
-        httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        httpServletResponse.setStatus(HttpStatus.PRECONDITION_FAILED.value());
         httpServletResponse.setHeader("Content-Type", "application/json");
         httpServletResponse.getOutputStream().print("{\"message\": \"" + message + "\"}");
         httpServletResponse.flushBuffer();
@@ -61,19 +63,7 @@ public class SessionFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        List<String> filterPaths = Arrays.asList("/formation/repair-formation/unit/equipment",
-                                                 "/formation/repair-formation/unit/capabilities",
-                                                 "/labor-distribution",
-                                                 "/equipment-per-base");
-        String path = request.getServletPath();
-        boolean rfuStaffPath = !(path.contains("/formation/repair-formation/unit") && path.contains("staff"));
-        boolean rfuCapabilitiesPath = !(path.contains("/formation/repair-formation/unit") && path.contains(
-                "capabilities"));
-        boolean formationDistribution = !(path.contains("/formation") && path.contains("/distribution"));
-        boolean equipmentPerFormationPath = !(path.contains("/formation") && path.contains("/equipment") && (path.contains(
-                "/table") || path.contains("/daily-failure") || path.contains("/intensity")));
-        return filterPaths
-                .stream()
-                .noneMatch(path::contains) && equipmentPerFormationPath && rfuStaffPath && rfuCapabilitiesPath && formationDistribution;
+        String servletPath = request.getServletPath();
+        return servletPath.contains("session") || servletPath.contains("swagger") || servletPath.contains("api-docs");
     }
 }

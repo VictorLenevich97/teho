@@ -30,8 +30,8 @@ public class FormationControllerTest extends ControllerTest {
 
     @Test
     public void testListBases() throws Exception {
-        List<Formation> bases = Arrays.asList(new Formation(1L, "s", "f"), new Formation(1L, "s2", "f2"));
-        when(formationService.list()).thenReturn(bases);
+        List<Formation> bases = Arrays.asList(new Formation(1L, null,"s", "f"), new Formation(1L, null,"s2", "f2"));
+        when(formationService.list(null)).thenReturn(bases);
 
         mockMvc.perform(get("/formation")).andExpect(status().isOk()).andExpect(jsonPath("$.size()", is(bases.size())));
     }
@@ -39,7 +39,7 @@ public class FormationControllerTest extends ControllerTest {
     @Test
     public void testGetBaseById() throws Exception {
         Long formationId = 1L;
-        Formation formation = new Formation(1L, "s", "f");
+        Formation formation = new Formation(1L, null,"s", "f");
         formation.setId(formationId);
         formation.setEquipmentPerFormations(Collections.emptySet());
         when(formationService.get(formationId)).thenReturn(formation);
@@ -66,7 +66,7 @@ public class FormationControllerTest extends ControllerTest {
         Long formationId = 1L;
         formation.setId(formationId);
         FormationDTO base = new FormationDTO(formationId, "short", "full", null, Collections.emptyList());
-        when(formationService.add(base.getShortName(), base.getFullName())).thenReturn(formation);
+        when(formationService.add(null,base.getShortName(), base.getFullName())).thenReturn(formation);
 
         mockMvc.perform(
                 post("/formation")
@@ -74,7 +74,7 @@ public class FormationControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(base)))
                 .andExpect(status().isCreated());
 
-        verify(formationService).add(base.getShortName(), base.getFullName());
+        verify(formationService).add(null,base.getShortName(), base.getFullName());
     }
 
     @Test
@@ -106,7 +106,7 @@ public class FormationControllerTest extends ControllerTest {
                 Collections.singletonList(equipmentId),
                 intensityAndAmountDTO.getAmount())).thenReturn(
                 Collections.singletonList(new EquipmentPerFormation(
-                        new Formation(formationId, "", ""),
+                        new Formation(formationId, null,"", ""),
                         new Equipment(equipmentId, "", null),
                         intensityAndAmountDTO.getAmount())));
 
@@ -133,7 +133,7 @@ public class FormationControllerTest extends ControllerTest {
                 equipmentId,
                 intensityAndAmountDTO.getAmount())).thenReturn(
                 new EquipmentPerFormation(
-                        new Formation(formationId, "", ""),
+                        new Formation(formationId,null, "", ""),
                         new Equipment(equipmentId, "", null),
                         intensityAndAmountDTO.getAmount()));
         mockMvc

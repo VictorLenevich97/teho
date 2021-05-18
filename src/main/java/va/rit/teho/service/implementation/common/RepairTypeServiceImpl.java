@@ -20,6 +20,11 @@ public class RepairTypeServiceImpl implements RepairTypeService {
     }
 
     @Override
+    public RepairType get(Long id) {
+        return repairTypeRepository.findById(id).orElseThrow(() -> new NotFoundException("Тип ремонта с id = \"" + id + "\" не найден!"));
+    }
+
+    @Override
     public List<RepairType> list(boolean calculatable) {
         return repairTypeRepository.findByCalculatableOrderByIdAsc(calculatable);
     }

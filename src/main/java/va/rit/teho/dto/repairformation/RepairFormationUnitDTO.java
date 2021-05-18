@@ -1,7 +1,9 @@
 package va.rit.teho.dto.repairformation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import va.rit.teho.dto.common.DistributionIntervalDTO;
 import va.rit.teho.dto.common.IdAndNameDTO;
+import va.rit.teho.dto.common.RepairTypeDTO;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 
 import javax.validation.constraints.Positive;
@@ -19,6 +21,10 @@ public class RepairFormationUnitDTO {
     private String name;
 
     private RepairFormationDTO repairFormation;
+
+    private DistributionIntervalDTO distributionInterval;
+
+    private RepairTypeDTO repairType;
 
     private IdAndNameDTO stationType;
 
@@ -38,22 +44,28 @@ public class RepairFormationUnitDTO {
     public RepairFormationUnitDTO(Long id,
                                   String name,
                                   RepairFormationDTO repairFormation,
+                                  DistributionIntervalDTO distributionInterval,
+                                  RepairTypeDTO repairTypeDTO,
                                   IdAndNameDTO stationType,
                                   Integer amount) {
         this.id = id;
         this.name = name;
         this.repairFormation = repairFormation;
+        this.distributionInterval = distributionInterval;
+        this.repairType = repairTypeDTO;
         this.stationType = stationType;
         this.amount = amount;
     }
 
     public static RepairFormationUnitDTO from(RepairFormationUnit repairFormationUnit) {
         return new RepairFormationUnitDTO(repairFormationUnit.getId(),
-                                          repairFormationUnit.getName(),
-                                          RepairFormationDTO.from(repairFormationUnit.getRepairFormation(), false),
-                                          new IdAndNameDTO(repairFormationUnit.getRepairStationType().getId(),
-                                                           repairFormationUnit.getRepairStationType().getName()),
-                                          repairFormationUnit.getStationAmount());
+                repairFormationUnit.getName(),
+                RepairFormationDTO.from(repairFormationUnit.getRepairFormation(), false),
+                DistributionIntervalDTO.from(repairFormationUnit.getWorkhoursDistributionInterval()),
+                RepairTypeDTO.from(repairFormationUnit.getRepairType()),
+                new IdAndNameDTO(repairFormationUnit.getRepairStationType().getId(),
+                        repairFormationUnit.getRepairStationType().getName()),
+                repairFormationUnit.getStationAmount());
     }
 
     public IdAndNameDTO getStationType() {
@@ -67,6 +79,14 @@ public class RepairFormationUnitDTO {
     public RepairFormationUnitDTO setStaff(List<RepairFormationUnitEquipmentStaffDTO> staff) {
         this.staff = staff;
         return this;
+    }
+
+    public DistributionIntervalDTO getDistributionInterval() {
+        return distributionInterval;
+    }
+
+    public RepairTypeDTO getRepairType() {
+        return repairType;
     }
 
     public Long getId() {

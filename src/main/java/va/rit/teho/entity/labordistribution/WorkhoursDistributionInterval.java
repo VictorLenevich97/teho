@@ -1,5 +1,7 @@
 package va.rit.teho.entity.labordistribution;
 
+import va.rit.teho.entity.repairformation.RepairFormationUnit;
+
 import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
@@ -17,6 +19,9 @@ public class WorkhoursDistributionInterval {
     @ManyToOne
     @JoinColumn(name = "restoration_type_id", nullable = false)
     private RestorationType restorationType;
+
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "workhoursDistributionInterval", orphanRemoval = true)
+    private Set<RepairFormationUnit> repairFormationUnits;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "workhoursDistributionInterval", orphanRemoval = true)
     private Set<LaborDistribution> laborDistributions;

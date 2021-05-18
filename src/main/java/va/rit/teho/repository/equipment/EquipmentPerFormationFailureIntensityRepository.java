@@ -28,6 +28,8 @@ public interface EquipmentPerFormationFailureIntensityRepository
 
     List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionId(UUID sessionId);
 
+    List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionIdAndFormationId(UUID sessionId, Long formationId);
+
     @Query("SELECT epbfi from EquipmentPerFormationFailureIntensity epbfi WHERE epbfi.tehoSession.id = :sessionId AND epbfi.formation.id = :formationId AND " +
             "(coalesce(:equipmentIds, null) IS NULL OR epbfi.equipment.id IN (:equipmentIds)) ")
     List<EquipmentPerFormationFailureIntensity> findAllByTehoSessionIdAndFormationId(UUID sessionId,

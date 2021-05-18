@@ -7,6 +7,7 @@ import va.rit.teho.entity.repairformation.RepairFormation;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface RepairFormationRepository extends CrudRepository<RepairFormation, Long> {
@@ -16,6 +17,6 @@ public interface RepairFormationRepository extends CrudRepository<RepairFormatio
 
     List<RepairFormation> findAllByFormationId(Long formationId);
 
-    Optional<RepairFormation> findByNameIgnoreCase(String name);
+    List<RepairFormation> findAllByFormationTehoSessionId(UUID sessionId);
 
 }

@@ -5,6 +5,9 @@ import va.rit.teho.entity.repairformation.RepairStationType;
 import java.util.List;
 
 public interface RepairStationService {
+
+    RepairStationType get(Long id);
+
     List<RepairStationType> listTypes();
 
     RepairStationType addType(String name);

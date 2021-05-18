@@ -7,6 +7,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import va.rit.teho.entity.equipment.Equipment;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.formation.Formation;
+import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
+import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairStationType;
 import va.rit.teho.server.config.TehoSessionData;
@@ -102,8 +104,8 @@ public abstract class ControllerTest {
         EquipmentType equipmentType = new EquipmentType("short" + typeName, "full" + typeName);
         equipmentType.setId(typeId);
         EquipmentType equipmentSubType = new EquipmentType("short" + subTypeName,
-                                                                 "full" + subTypeName,
-                                                                 equipmentType);
+                "full" + subTypeName,
+                equipmentType);
         equipmentSubType.setId(subTypeId);
         return new Equipment(id, name, equipmentSubType);
     }
@@ -114,14 +116,17 @@ public abstract class ControllerTest {
         return rst;
     }
 
+
     protected RepairFormationUnit repairStation(Long id,
                                                 String name,
                                                 Long typeId,
                                                 String typeName) {
         return new RepairFormationUnit(id,
-                                       name,
-                                       repairStationType(typeId, typeName),
-                                       0,
-                                       null);
+                name,
+                repairStationType(typeId, typeName),
+                0,
+                new RepairFormation(1L, name, null, null),
+                new WorkhoursDistributionInterval(1L, 0, 100, null),
+                null);
     }
 }

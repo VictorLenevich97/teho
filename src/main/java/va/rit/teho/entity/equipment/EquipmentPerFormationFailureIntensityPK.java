@@ -79,8 +79,8 @@ public class EquipmentPerFormationFailureIntensityPK implements Serializable {
         return sessionId;
     }
 
-    public EquipmentPerFormationFailureIntensityPK copy(UUID newSessionId) {
-        return new EquipmentPerFormationFailureIntensityPK(getFormationId(),
+    public EquipmentPerFormationFailureIntensityPK copy(UUID newSessionId, Long newFormationId) {
+        return new EquipmentPerFormationFailureIntensityPK(newFormationId,
                                                            getEquipmentId(),
                                                            stageId,
                                                            repairTypeId,

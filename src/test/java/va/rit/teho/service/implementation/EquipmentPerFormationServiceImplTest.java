@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 
 public class EquipmentPerFormationServiceImplTest {
 
-    private final static Formation FORMATION = new Formation(1L, "short", "full");
+    private final static Formation FORMATION = new Formation(1L, null, "short", "full");
 
     private final CalculationService calculationService = Mockito.mock(CalculationService.class);
     private final FormationService formationService = Mockito.mock(FormationService.class);

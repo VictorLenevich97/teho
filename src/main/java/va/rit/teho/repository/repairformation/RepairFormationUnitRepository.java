@@ -4,10 +4,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
+import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface RepairFormationUnitRepository extends PagingAndSortingRepository<RepairFormationUnit, Long> {
@@ -15,17 +17,20 @@ public interface RepairFormationUnitRepository extends PagingAndSortingRepositor
     @Query("SELECT COALESCE(max(rfu.id), 0) FROM RepairFormationUnit rfu")
     Long getMaxId();
 
-    Optional<RepairFormationUnit> findByName(String name);
-
-    @Query("SELECT rdu from RepairFormationUnit rdu WHERE (coalesce(:repairFormationUnitIds, null) is null or rdu.id in (:repairFormationUnitIds)) " +
+    @Query("SELECT rdu from RepairFormationUnit rdu WHERE (coalesce(:repairFormationUnitIds, null) is null or rdu.id in (:repairFormationUnitIds)) AND " +
+            "rdu.repairFormation.formation.tehoSession.id = :sessionId " +
             "ORDER BY rdu.id ASC")
-    List<RepairFormationUnit> findSorted(List<Long> repairFormationUnitIds, Pageable pageable);
+    List<RepairFormationUnit> findSorted(UUID sessionId, List<Long> repairFormationUnitIds, Pageable pageable);
 
+    Optional<RepairFormation> findByNameIgnoreCase(String name);
+
+    List<RepairFormationUnit> findAllByRepairFormationId(Long repairFormationId);
 
     @Query("SELECT rdu from RepairFormationUnit rdu WHERE rdu.repairFormation.id = :repairFormationId AND " +
-            "(coalesce(:repairFormationUnitIds, null) is null or rdu.id in (:repairFormationUnitIds)) " +
+            "(coalesce(:repairFormationUnitIds, null) is null or rdu.id in (:repairFormationUnitIds)) AND " +
+            "rdu.repairFormation.formation.tehoSession.id = :sessionId " +
             "ORDER BY rdu.id ASC")
-    List<RepairFormationUnit> findSorted(Long repairFormationId, List<Long> repairFormationUnitIds, Pageable pageable);
+    List<RepairFormationUnit> findSorted(UUID sessionId, Long repairFormationId, List<Long> repairFormationUnitIds, Pageable pageable);
 
     Long countByIdIn(List<Long> ids);
 
