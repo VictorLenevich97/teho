@@ -2,6 +2,7 @@ package va.rit.teho.service.implementation.session;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import va.rit.teho.entity.common.Tree;
 import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.session.TehoSession;
@@ -49,30 +50,42 @@ public class SessionCopyServiceImpl implements SessionCopyService {
         return newSession;
     }
 
+    private void copyFormationData(UUID sessionId, TehoSession newSession, Tree.Node<Formation> formationNode, Formation newParent) {
+        for (Tree.Node<Formation> child : formationNode.getChildren()) {
+            Formation newFormation = formationService.add(newSession, child.getData().getShortName(), child.getData().getFullName(), newParent.getId());
+            moveToNewFormationAndSession(sessionId, newSession, child.getData(), newFormation);
+            copyFormationData(sessionId, newSession, child, newFormation);
+        }
+    }
+
     @Transactional
     public TehoSession copySessionData(UUID sessionId, String name) {
         sessionService.get(sessionId); //проверка на существование
         TehoSession newSession = sessionService.create(name);
-        List<Formation> formationList = formationService.list(sessionId);
-        for (Formation formation : formationList) {
-            Formation newFormation;
-            if (formation.getParentFormation() == null || formation.getParentFormation().getId() == null) {
-                newFormation = formationService.add(newSession, formation.getShortName(), formation.getFullName());
-            } else {
-                newFormation = formationService.add(newSession, formation.getShortName(), formation.getFullName(), formation.getParentFormation().getId());
-            }
-            equipmentPerFormationService.copyEquipmentPerFormationWithIntensityData(sessionId, newSession.getId(), formation, newFormation);
+        List<Tree<Formation>> formationHierarchy = formationService.listHierarchy(sessionId, null);
 
-            List<RepairFormation> originalRepairFormations = repairFormationService.list(formation.getId());
+        for (Tree<Formation> formationTree : formationHierarchy) {
+            Tree.Node<Formation> root = formationTree.getRoot();
+            Formation newFormation = formationService.add(newSession, root.getData().getShortName(), root.getData().getFullName());
+            moveToNewFormationAndSession(sessionId, newSession, root.getData(), newFormation);
 
-            for (RepairFormation originalRepairFormation : originalRepairFormations) {
-                RepairFormation newRepairFormation =
-                        repairFormationService.add(originalRepairFormation.getName(), originalRepairFormation.getRepairFormationType().getId(), newFormation.getId());
-
-                repairFormationUnitService.copyRFUAndStaff(sessionId, newSession.getId(), originalRepairFormation, newRepairFormation);
-            }
+            copyFormationData(sessionId, newSession, root, newFormation);
         }
+
         return newSession;
+    }
+
+    private void moveToNewFormationAndSession(UUID sessionId, TehoSession newSession, Formation originalFormation, Formation newFormation) {
+        equipmentPerFormationService.copyEquipmentPerFormationWithIntensityData(sessionId, newSession.getId(), originalFormation, newFormation);
+
+        List<RepairFormation> originalRepairFormations = repairFormationService.list(originalFormation.getId());
+
+        for (RepairFormation originalRepairFormation : originalRepairFormations) {
+            RepairFormation newRepairFormation =
+                    repairFormationService.add(originalRepairFormation.getName(), originalRepairFormation.getRepairFormationType().getId(), newFormation.getId());
+
+            repairFormationUnitService.copyRFUAndStaff(sessionId, newSession.getId(), originalRepairFormation, newRepairFormation);
+        }
     }
 
     private void recalculate(UUID sessionId) {

@@ -7,7 +7,6 @@ import va.rit.teho.entity.formation.Formation;
 import va.rit.teho.entity.session.TehoSession;
 import va.rit.teho.exception.EmptyFieldException;
 import va.rit.teho.exception.FormationNotFoundException;
-import va.rit.teho.exception.NotFoundException;
 import va.rit.teho.repository.formation.FormationRepository;
 import va.rit.teho.service.formation.FormationService;
 
@@ -84,12 +83,13 @@ public class FormationServiceImpl implements FormationService {
         return formationRepository.findFormationByTehoSessionId(sessionId);
     }
 
-    private void populateTree(Tree.Node<Formation> node, Set<Formation> formations, List<Long> formationIds) {
+    private void populateTree(Tree.Node<Formation> node, List<Formation> formations, List<Long> formationIds) {
         for (Formation formation : formations) {
             if (formationIds == null || formationIds.contains(formation.getId())) {
                 Tree.Node<Formation> childrenFormationNode = node.addChildren(formation);
-                if (!formation.getChildFormations().isEmpty()) {
-                    populateTree(childrenFormationNode, formation.getChildFormations(), formationIds);
+                List<Formation> childrenFormation = formationRepository.findFormationByParentFormationIdOrderByIdAsc(formation.getId());
+                if (!childrenFormation.isEmpty()) {
+                    populateTree(childrenFormationNode, childrenFormation, formationIds);
                 }
             }
         }
@@ -105,7 +105,7 @@ public class FormationServiceImpl implements FormationService {
         for (Formation formation : rootFormations) {
             Tree<Formation> formationTree = new Tree<>(formation);
             treeList.add(formationTree);
-            populateTree(formationTree.getRoot(), formation.getChildFormations(), formationIds);
+            populateTree(formationTree.getRoot(), formationRepository.findFormationByParentFormationIdOrderByIdAsc(formation.getId()), formationIds);
         }
         return treeList;
     }

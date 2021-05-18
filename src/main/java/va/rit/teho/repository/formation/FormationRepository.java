@@ -19,6 +19,8 @@ public interface FormationRepository extends CrudRepository<Formation, Long> {
 
     List<Formation> findFormationByTehoSessionId(UUID sessionId);
 
+    List<Formation> findFormationByParentFormationIdOrderByIdAsc(Long parentFormationId);
+
     List<Formation> findFormationByParentFormationIsNullAndTehoSessionIdEquals(UUID sessionId);
 
     List<Formation> findFormationByParentFormationIsNullAndTehoSessionIdEqualsAndIdIn(UUID sessionId, List<Long> formationIds);
