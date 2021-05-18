@@ -24,6 +24,8 @@ public interface RepairFormationUnitRepository extends PagingAndSortingRepositor
 
     Optional<RepairFormation> findByNameIgnoreCase(String name);
 
+    List<RepairFormationUnit> findAllByRepairFormationId(Long repairFormationId);
+
     @Query("SELECT rdu from RepairFormationUnit rdu WHERE rdu.repairFormation.id = :repairFormationId AND " +
             "(coalesce(:repairFormationUnitIds, null) is null or rdu.id in (:repairFormationUnitIds)) AND " +
             "rdu.repairFormation.formation.tehoSession.id = :sessionId " +

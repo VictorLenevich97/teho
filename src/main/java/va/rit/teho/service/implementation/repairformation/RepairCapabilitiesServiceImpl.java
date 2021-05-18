@@ -99,7 +99,7 @@ public class RepairCapabilitiesServiceImpl implements RepairCapabilitiesService 
     public void calculateAndUpdateRepairCapabilitiesPerRFU(UUID sessionId,
                                                            Long repairFormationUnitId) {
         List<RepairFormationUnitEquipmentStaff> repairFormationUnitStaff =
-                repairFormationUnitService.listEquipmentStaff(sessionId, repairFormationUnitId);
+                repairFormationUnitService.listEquipmentStaff(repairFormationUnitId);
 
         calculateAndUpdateRepairCapabilities(sessionId, repairFormationUnitStaff);
     }

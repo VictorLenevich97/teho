@@ -124,6 +124,10 @@ public class RepairFormationUnit {
         return workhoursDistributionInterval;
     }
 
+    public RepairFormationUnit copy(Long newId, RepairFormation newRepairFormation) {
+        return new RepairFormationUnit(newId, getName(), getRepairStationType(), getStationAmount(), newRepairFormation, getWorkhoursDistributionInterval(), getRepairType());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

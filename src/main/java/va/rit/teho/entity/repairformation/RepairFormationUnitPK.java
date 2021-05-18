@@ -54,7 +54,7 @@ public class RepairFormationUnitPK implements Serializable {
         return equipmentTypeId;
     }
 
-    public RepairFormationUnitPK copy(UUID sessionId) {
-        return new RepairFormationUnitPK(getRepairFormationUnitId(), getEquipmentTypeId(), sessionId);
+    public RepairFormationUnitPK copy(Long newRepairFormationUnitId, UUID sessionId) {
+        return new RepairFormationUnitPK(newRepairFormationUnitId, getEquipmentTypeId(), sessionId);
     }
 }

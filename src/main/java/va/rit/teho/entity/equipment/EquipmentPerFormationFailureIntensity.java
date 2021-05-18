@@ -99,8 +99,8 @@ public class EquipmentPerFormationFailureIntensity implements Serializable {
         return this;
     }
 
-    public EquipmentPerFormationFailureIntensity copy(UUID newSessionId) {
-        return new EquipmentPerFormationFailureIntensity(getEquipmentPerFormationWithRepairTypeId().copy(newSessionId),
+    public EquipmentPerFormationFailureIntensity copy(UUID newSessionId, Formation newFormation) {
+        return new EquipmentPerFormationFailureIntensity(getEquipmentPerFormationWithRepairTypeId().copy(newSessionId, newFormation.getId()),
                                                          avgDailyFailure);
     }
 

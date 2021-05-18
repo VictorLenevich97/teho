@@ -110,6 +110,10 @@ public class Formation implements Serializable {
         return tehoSession;
     }
 
+    public Formation copy(TehoSession newSession) {
+        return new Formation(null, newSession, getShortName(), getFullName(), getParentFormation());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

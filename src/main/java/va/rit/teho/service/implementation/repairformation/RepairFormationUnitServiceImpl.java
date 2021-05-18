@@ -157,9 +157,8 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(UUID sessionId, Long repairFormationUnitId) {
-        return repairFormationUnitEquipmentStaffRepository.findAllByRepairFormationUnitIdAndTehoSessionId(
-                repairFormationUnitId, sessionId);
+    public List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(Long repairFormationUnitId) {
+        return repairFormationUnitEquipmentStaffRepository.findAllByRepairFormationUnitId(repairFormationUnitId);
     }
 
     @Override
@@ -168,13 +167,18 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId) {
-        List<RepairFormationUnitEquipmentStaff> equipmentStaffList =
-                repairFormationUnitEquipmentStaffRepository.findFiltered(originalSessionId, null, null);
-        List<RepairFormationUnitEquipmentStaff> updatedRepairFormationUnitEquipmentStaffList =
-                equipmentStaffList.stream().map(rses -> rses.copy(newSessionId)).collect(Collectors.toList());
+    public void copyRFUAndStaff(UUID originalSessionId, UUID newSessionId, RepairFormation originalRepairFormation, RepairFormation newRepairFormation) {
+        List<RepairFormationUnit> originalRFUs = repairFormationUnitRepository.findAllByRepairFormationId(originalRepairFormation.getId());
+        int counter = 1;
+        for (RepairFormationUnit rfu : originalRFUs) {
+            RepairFormationUnit newRFU = repairFormationUnitRepository.save(rfu.copy(repairFormationUnitRepository.getMaxId() + counter, newRepairFormation));
 
-        repairFormationUnitEquipmentStaffRepository.saveAll(updatedRepairFormationUnitEquipmentStaffList);
+            List<RepairFormationUnitEquipmentStaff> rfuEquipmentStaff =
+                    repairFormationUnitEquipmentStaffRepository.findAllByRepairFormationUnitId(rfu.getId());
+
+            repairFormationUnitEquipmentStaffRepository.saveAll(rfuEquipmentStaff.stream().map(rfues -> rfues.copy(newRFU.getId(), newSessionId)).collect(Collectors.toList()));
+            counter++;
+        }
     }
 
     @Override

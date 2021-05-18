@@ -244,7 +244,7 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
         }
 
         if (equipmentIds.size() == 0) {
-           equipmentIds = null;
+            equipmentIds = null;
         }
 
         equipmentPerFormationRepository
@@ -294,13 +294,19 @@ public class EquipmentPerFormationServiceImpl implements EquipmentPerFormationSe
     }
 
     @Override
-    public void copyEquipmentPerFormationData(UUID originalSessionId, UUID newSessionId) {
-        List<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensities =
-                equipmentPerFormationFailureIntensityRepository
-                        .findAllByTehoSessionId(originalSessionId)
+    public void copyEquipmentPerFormationWithIntensityData(UUID originalSessionId, UUID newSessionId, Formation original, Formation newFormation) {
+        List<EquipmentPerFormation> updatedEPF =
+                equipmentPerFormationRepository.findAllByFormationId(original.getId(), null)
                         .stream()
-                        .map(epffi -> epffi.copy(newSessionId))
+                        .map(epf -> epf.copy(newFormation.getId()))
                         .collect(Collectors.toList());
+
+        equipmentPerFormationRepository.saveAll(updatedEPF);
+
+        List<EquipmentPerFormationFailureIntensity> equipmentPerFormationFailureIntensities = equipmentPerFormationFailureIntensityRepository.findAllByTehoSessionIdAndFormationId(originalSessionId, original.getId())
+                .stream()
+                .map(epffi -> epffi.copy(newSessionId, newFormation))
+                .collect(Collectors.toList());
 
         equipmentPerFormationFailureIntensityRepository.saveAll(equipmentPerFormationFailureIntensities);
     }

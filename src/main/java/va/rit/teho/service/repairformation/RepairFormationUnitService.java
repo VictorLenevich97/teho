@@ -5,6 +5,7 @@ import va.rit.teho.entity.common.RepairType;
 import va.rit.teho.entity.equipment.EquipmentType;
 import va.rit.teho.entity.labordistribution.WorkhoursDistributionInterval;
 import va.rit.teho.entity.repairformation.RepairFormation;
+import va.rit.teho.entity.repairformation.RepairFormation;
 import va.rit.teho.entity.repairformation.RepairFormationUnit;
 import va.rit.teho.entity.repairformation.RepairFormationUnitEquipmentStaff;
 import va.rit.teho.entity.repairformation.RepairStationType;
@@ -49,11 +50,11 @@ public interface RepairFormationUnitService {
             List<Long> repairFormationUnitIds,
             List<Long> equipmentTypeIds);
 
-    List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(UUID sessionId, Long repairFormationUnitId);
+    List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(Long repairFormationUnitId);
 
     List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(UUID sessionId);
 
-    void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId);
+    void copyRFUAndStaff(UUID originalSessionId, UUID newSessionId, RepairFormation originalRepairFormation, RepairFormation newRepairFormation);
 
     void delete(Long id);
 

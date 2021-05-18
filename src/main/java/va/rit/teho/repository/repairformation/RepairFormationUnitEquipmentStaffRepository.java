@@ -14,11 +14,10 @@ public interface RepairFormationUnitEquipmentStaffRepository
         extends CrudRepository<RepairFormationUnitEquipmentStaff, RepairFormationUnitPK> {
     List<RepairFormationUnitEquipmentStaff> findAllByTehoSessionId(UUID sessionId);
 
-    List<RepairFormationUnitEquipmentStaff> findAllByRepairFormationUnitIdAndTehoSessionId(Long repairFormationUnitId,
-                                                                                           UUID sessionId);
+    List<RepairFormationUnitEquipmentStaff> findAllByRepairFormationUnitId(Long repairFormationUnitId);
 
     @Query("SELECT rses from RepairFormationUnitEquipmentStaff rses WHERE " +
-            "rses.tehoSession.id = :sessionId AND " +
+            "rses.repairFormationUnit.repairFormation.formation.tehoSession.id = :sessionId AND " +
             "(coalesce(:repairFormationUnitIds, null) is null or rses.repairFormationUnit.id in (:repairFormationUnitIds)) AND " +
             "(coalesce(:equipmentTypeIds, null) is null or rses.equipmentType.id in (:equipmentTypeIds) or " +
             "(rses.equipmentType.parentType IS NOT NULL AND rses.equipmentType.parentType.id IN (:equipmentTypeIds)))")

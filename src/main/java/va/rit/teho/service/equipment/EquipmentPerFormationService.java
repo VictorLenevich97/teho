@@ -56,7 +56,9 @@ public interface EquipmentPerFormationService {
                                                                                             List<Long> equipmentIds,
                                                                                             List<Long> formationIds);
 
-    void copyEquipmentPerFormationData(UUID originalSessionId, UUID newSessionId);
+    void copyEquipmentPerFormationWithIntensityData(UUID originalSessionId, UUID newSessionId, Formation original, Formation newFormation);
+
+//    void copyEquipmentPerFormationData(UUID originalSessionId, UUID newSessionId);
 
     void deleteEquipmentFromFormation(Long formationId, Long equipmentId);
 
