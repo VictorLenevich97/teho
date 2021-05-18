@@ -1,6 +1,7 @@
 package va.rit.teho.entity.common;
 
 import va.rit.teho.entity.equipment.EquipmentPerFormationFailureIntensity;
+import va.rit.teho.entity.intensity.Intensity;
 import va.rit.teho.entity.labordistribution.LaborDistribution;
 
 import javax.persistence.*;
@@ -23,6 +24,9 @@ public class Stage implements Serializable {
 
     @OneToMany(mappedBy = "stage", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<LaborDistribution> laborDistributionSet;
+
+    @OneToMany(mappedBy = "stage", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Set<Intensity> intensities;
 
     public Stage() {
         //Для инициализации
