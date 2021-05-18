@@ -185,7 +185,7 @@ public class RepairFormationUnitController {
     public ResponseEntity<RepairFormationUnitDTO> getRepairFormationUnit(
             @ApiParam(value = "Ключ РВО", required = true) @PathVariable @Positive Long repairFormationUnitId) {
         Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> repairFormationUnitListPair =
-                repairFormationUnitServiceFacade.getWithStaff(tehoSession.getSessionId(), repairFormationUnitId);
+                repairFormationUnitServiceFacade.getWithStaff(repairFormationUnitId);
         RepairFormationUnitDTO repairFormationUnitDTO = RepairFormationUnitDTO
                 .from(repairFormationUnitListPair.getFirst())
                 .setStaff(repairFormationUnitListPair

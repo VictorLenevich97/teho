@@ -26,7 +26,7 @@ public class RepairFormationUnit {
     @JoinColumn(name = "repair_type_id")
     private RepairType repairType;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
 
     private int stationAmount;

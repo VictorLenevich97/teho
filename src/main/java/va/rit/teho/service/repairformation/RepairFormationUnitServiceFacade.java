@@ -23,7 +23,7 @@ public interface RepairFormationUnitServiceFacade {
 
     RepairFormationUnit get(Long id);
 
-    Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(UUID sessionId, Long repairFormationUntId);
+    Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(Long repairFormationUntId);
 
     RepairFormationUnit add(String name,
                             Long repairFormationId,
@@ -51,11 +51,9 @@ public interface RepairFormationUnitServiceFacade {
             List<Long> repairFormationUnitIds,
             List<Long> equipmentTypeIds);
 
-    List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(UUID sessionId, Long repairFormationUnitId);
+    List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(Long repairFormationUnitId);
 
     List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(UUID sessionId);
-
-    void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId);
 
     void delete(Long id);
 }

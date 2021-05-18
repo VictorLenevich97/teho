@@ -12,7 +12,7 @@ public class RepairFormation {
     @Id
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
 
     @ManyToOne

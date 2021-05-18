@@ -17,10 +17,10 @@ public class Formation implements Serializable {
     @Id
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String shortName;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String fullName;
 
     @ManyToOne
@@ -37,7 +37,7 @@ public class Formation implements Serializable {
     @OneToMany(mappedBy = "formation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<RepairFormation> repairFormations;
 
-    @OneToMany(mappedBy = "parentFormation")
+    @OneToMany(mappedBy = "parentFormation", fetch = FetchType.EAGER)
     private Set<Formation> childFormations;
 
     public Formation() {

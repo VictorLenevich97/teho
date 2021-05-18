@@ -41,4 +41,10 @@
     <changeSet author="tehoadmin (generated)" id="1621241019779-9">
         <dropColumn columnName="REPAIR_TYPE_ID" tableName="repair_formation_unit_repair_capability"/>
     </changeSet>
+    <changeSet author="tehoadmin (generated)" id="1621241019779-11">
+        <dropUniqueConstraint tableName="FORMATION" uniqueColumns="SHORT_NAME" constraintName="UK_DWEP4MY9EM7BD7BNW2B9U1J58"/>
+        <dropUniqueConstraint tableName="FORMATION" uniqueColumns="FULL_NAME" constraintName="UK_G1L2GBCQEQVGRPROSJRUVGFCE"/>
+        <dropUniqueConstraint tableName="REPAIR_FORMATION" uniqueColumns="NAME" constraintName="UK_RL2HY5RUJR2O7WJQ10YO8410A"/>
+        <dropUniqueConstraint tableName="REPAIR_FORMATION_UNIT" uniqueColumns="NAME" constraintName="UK_J6XW1Y6HLHBVHH7SLUIGWJ7S4"/>
+    </changeSet>
 </databaseChangeLog>

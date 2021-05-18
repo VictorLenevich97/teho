@@ -63,8 +63,8 @@ public class RepairFormationUnitServiceFacadeImpl implements RepairFormationUnit
     }
 
     @Override
-    public Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(UUID sessionId, Long repairFormationUntId) {
-        return Pair.of(repairFormationUnitService.get(repairFormationUntId), repairFormationUnitService.getStaff(sessionId, repairFormationUntId));
+    public Pair<RepairFormationUnit, List<RepairFormationUnitEquipmentStaff>> getWithStaff(Long repairFormationUntId) {
+        return Pair.of(repairFormationUnitService.get(repairFormationUntId), repairFormationUnitService.listEquipmentStaff(repairFormationUntId));
     }
 
     @Override
@@ -117,18 +117,13 @@ public class RepairFormationUnitServiceFacadeImpl implements RepairFormationUnit
     }
 
     @Override
-    public List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(UUID sessionId, Long repairFormationUnitId) {
-        return repairFormationUnitService.listEquipmentStaff(sessionId, repairFormationUnitId);
+    public List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(Long repairFormationUnitId) {
+        return repairFormationUnitService.listEquipmentStaff(repairFormationUnitId);
     }
 
     @Override
     public List<RepairFormationUnitEquipmentStaff> listEquipmentStaff(UUID sessionId) {
         return repairFormationUnitService.listEquipmentStaff(sessionId);
-    }
-
-    @Override
-    public void copyEquipmentStaff(UUID originalSessionId, UUID newSessionId) {
-        repairFormationUnitService.copyEquipmentStaff(originalSessionId, newSessionId);
     }
 
     @Override

@@ -23,8 +23,6 @@ public interface RepairFormationUnitService {
 
     RepairFormationUnit get(Long id);
 
-    List<RepairFormationUnitEquipmentStaff> getStaff(UUID sessionId, Long repairFormationUntId);
-
     RepairFormationUnit add(String name,
                             RepairFormation repairFormation,
                             WorkhoursDistributionInterval interval,

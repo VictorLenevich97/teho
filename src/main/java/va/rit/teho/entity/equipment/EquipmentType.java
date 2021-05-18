@@ -26,7 +26,7 @@ public class EquipmentType implements Serializable {
     @OneToMany(mappedBy = "parentType", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<EquipmentType> equipmentTypes;
 
-    @OneToMany(mappedBy = "equipmentType", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "equipmentType", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Equipment> equipmentSet;
 
     public EquipmentType() {
@@ -108,12 +108,12 @@ public class EquipmentType implements Serializable {
 
     public Stream<Equipment> collectRelatedEquipment() {
         return Stream.concat(getEquipmentSet().stream(),
-                             getEquipmentTypes().stream().flatMap(EquipmentType::collectRelatedEquipment));
+                getEquipmentTypes().stream().flatMap(EquipmentType::collectRelatedEquipment));
     }
 
     public Stream<Equipment> collectRelatedEquipment(List<Long> equipmentIds) {
         return Stream.concat(getEquipmentSet().stream().filter(e -> equipmentIds.contains(e.getId())),
-                             getEquipmentTypes().stream().flatMap(et -> et.collectRelatedEquipment(equipmentIds)));
+                getEquipmentTypes().stream().flatMap(et -> et.collectRelatedEquipment(equipmentIds)));
     }
 
 

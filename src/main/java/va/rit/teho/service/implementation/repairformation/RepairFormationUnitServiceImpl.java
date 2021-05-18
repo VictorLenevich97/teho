@@ -66,21 +66,12 @@ public class RepairFormationUnitServiceImpl implements RepairFormationUnitServic
     }
 
     @Override
-    public List<RepairFormationUnitEquipmentStaff> getStaff(UUID sessionId, Long repairFormationUntId) {
-        return repairFormationUnitEquipmentStaffRepository
-                .findAllByRepairFormationUnitIdAndTehoSessionId(repairFormationUntId, sessionId);
-    }
-
-    @Override
     public RepairFormationUnit add(String name,
                                    RepairFormation repairFormation,
                                    WorkhoursDistributionInterval interval,
                                    RepairType repairType,
                                    RepairStationType repairStationType,
                                    int stationAmount) {
-        repairFormationUnitRepository.findByNameIgnoreCase(name).ifPresent(rfu -> {
-            throw new AlreadyExistsException("РВО", "название", name);
-        });
         long newId = repairFormationUnitRepository.getMaxId() + 1;
         RepairFormationUnit repairFormationUnit = new RepairFormationUnit(
                 newId, name, repairStationType, stationAmount, repairFormation, interval, repairType);
