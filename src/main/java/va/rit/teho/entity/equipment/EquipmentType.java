@@ -26,7 +26,7 @@ public class EquipmentType implements Serializable {
     @OneToMany(mappedBy = "parentType", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<EquipmentType> equipmentTypes;
 
-    @OneToMany(mappedBy = "equipmentType", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "equipmentType", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Equipment> equipmentSet;
 
     public EquipmentType() {

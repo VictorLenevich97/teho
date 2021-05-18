@@ -37,7 +37,7 @@ public class Formation implements Serializable {
     @OneToMany(mappedBy = "formation", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<RepairFormation> repairFormations;
 
-    @OneToMany(mappedBy = "parentFormation", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "parentFormation")
     private Set<Formation> childFormations;
 
     public Formation() {
