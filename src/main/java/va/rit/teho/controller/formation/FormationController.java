@@ -73,7 +73,7 @@ public class FormationController {
     public ResponseEntity<FormationDTO> updateFormation(@PathVariable @Positive Long formationId,
                                                         @Valid @RequestBody FormationDTO formationModel) {
         Formation formation;
-        if (formationModel.getParentFormation() == null) {
+        if (formationModel.getParentFormation() == null || formationModel.getParentFormation().getId() == null) {
             formation = formationService.update(formationId,
                     formationModel.getShortName(),
                     formationModel.getFullName());
