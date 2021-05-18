@@ -11,10 +11,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import va.rit.teho.dto.session.SessionDTO;
 import va.rit.teho.entity.session.TehoSession;
+import va.rit.teho.service.session.SessionCopyService;
 import va.rit.teho.service.session.SessionService;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -27,9 +26,11 @@ import java.util.stream.Collectors;
 public class SessionController {
 
     private final SessionService sessionService;
+    private final SessionCopyService sessionCopyService;
 
-    public SessionController(SessionService sessionService) {
+    public SessionController(SessionService sessionService, SessionCopyService sessionCopyService) {
         this.sessionService = sessionService;
+        this.sessionCopyService = sessionCopyService;
     }
 
     @GetMapping
@@ -49,7 +50,8 @@ public class SessionController {
     @ApiOperation(value = "Скопировать сессию")
     public ResponseEntity<SessionDTO> copySession(@ApiParam(value = "Ключ оригинальной сессии", required = true) @PathVariable UUID sessionId,
                                                   @ApiParam(value = "Данные о новой сессии", required = true) @Valid @RequestBody SessionDTO sessionDTO) {
-        TehoSession tehoSession = sessionService.copy(sessionId, sessionDTO.getName());
+        TehoSession tehoSession = sessionCopyService.copy(sessionId, sessionDTO.getName());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(SessionDTO.from(tehoSession));
     }
 

@@ -24,28 +24,8 @@ public class SessionServiceImpl implements SessionService {
 
     private final SessionRepository sessionRepository;
 
-    private final EquipmentPerFormationService equipmentPerFormationService;
-    private final RepairFormationUnitService repairFormationUnitService;
-    private final RepairCapabilitiesService repairCapabilitiesService;
-    private final LaborInputDistributionService laborInputDistributionService;
-    private final EquipmentRFUDistributionService equipmentRFUDistributionService;
-    private final FormationService formationService;
-    private final RepairFormationService repairFormationService;
-
-    public SessionServiceImpl(SessionRepository sessionRepository,
-                              EquipmentPerFormationService equipmentPerFormationService,
-                              RepairFormationUnitService repairFormationUnitService,
-                              RepairCapabilitiesService repairCapabilitiesService,
-                              LaborInputDistributionService laborInputDistributionService,
-                              EquipmentRFUDistributionService equipmentRFUDistributionService, FormationService formationService, RepairFormationService repairFormationService) {
+    public SessionServiceImpl(SessionRepository sessionRepository) {
         this.sessionRepository = sessionRepository;
-        this.equipmentPerFormationService = equipmentPerFormationService;
-        this.repairFormationUnitService = repairFormationUnitService;
-        this.repairCapabilitiesService = repairCapabilitiesService;
-        this.laborInputDistributionService = laborInputDistributionService;
-        this.equipmentRFUDistributionService = equipmentRFUDistributionService;
-        this.formationService = formationService;
-        this.repairFormationService = repairFormationService;
     }
 
     @Override
@@ -66,42 +46,10 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    @Transactional
-    public TehoSession copy(UUID sessionId, String name) {
-        get(sessionId); //проверка на существование
-        TehoSession newSession = create(name);
-        List<Formation> formationList = formationService.list(sessionId);
-        for (Formation formation : formationList) {
-            Formation newFormation;
-            if(formation.getParentFormation() == null || formation.getParentFormation().getId() == null) {
-                newFormation = formationService.add(newSession, formation.getShortName(), formation.getFullName());
-            } else {
-                newFormation = formationService.add(newSession, formation.getShortName(), formation.getFullName(), formation.getParentFormation().getId());
-            }
-            equipmentPerFormationService.copyEquipmentPerFormationWithIntensityData(sessionId, newSession.getId(), formation, newFormation);
-
-            List<RepairFormation> originalRepairFormations = repairFormationService.list(formation.getId());
-
-            for (RepairFormation originalRepairFormation : originalRepairFormations) {
-                RepairFormation newRepairFormation =
-                        repairFormationService.add(originalRepairFormation.getName(), originalRepairFormation.getRepairFormationType().getId(), newFormation.getId());
-
-                repairFormationUnitService.copyRFUAndStaff(sessionId, newSession.getId(), originalRepairFormation, newRepairFormation);
-            }
-//            repairCapabilitiesService.calculateAndUpdateRepairCapabilities(newSession.getId());
-            laborInputDistributionService.updateLaborInputDistribution(newSession.getId(), null, null);
-//            equipmentRFUDistributionService.distribute(newSession.getId(), null, null, null);
-
-
-        }
-        return newSession;
-    }
-
-    @Override
     public TehoSession get(UUID sessionId) {
         return sessionRepository
                 .findById(sessionId)
-                .orElseThrow(() -> new NotFoundException("Сессии с id = '" + sessionId.toString() + "' не существует!"));
+                .orElseThrow(() -> new NotFoundException("Сессии с id = '" + sessionId + "' не существует!"));
     }
 
     @Override
