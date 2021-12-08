@@ -1,9 +1,9 @@
 RPM_VERSION="1.0"
 
 #По необходимости изменить
-BACKEND_FOLDER=~/IdeaProjects/teho-backend
-FRONTEND_FOLDER=~/IdeaProjects/teho-frontend
-MAVEN_PATH=~/Software/idea-IU-203.7148.57/plugins/maven/lib/maven3/bin
+BACKEND_FOLDER=~/teho/teho-backend
+FRONTEND_FOLDER=~/teho/teho-frontend
+MAVEN_PATH=~/Software/idea-IC-203.5981.155/plugins/maven/lib/maven3/bin
 
 #Плейсхолдеры из teho.spec
 BACKEND_PATTERN="%BACKENDPATH%"
@@ -13,7 +13,7 @@ FRONTEND_NAME_PATTERN="%FRONTEND_NAME%"
 FRONTEND_VERSION_PATTERN="%FRONTEND_VERSION%"
 
 #Вычисляем название и версию frontend'a чтобы правильно подобрать имя AppImage файла
-FRONTEND_NAME=$(jq -r '.name' ${FRONTEND_FOLDER}/package.json)
+FRONTEND_NAME=$(jq -r '.build.productName' ${FRONTEND_FOLDER}/package.json)
 FRONTEND_VERSION=$(jq -r '.version' ${FRONTEND_FOLDER}/package.json)
 
 #Заменяем плейсхолдеры в teho.spec на реальные значения и сохраняем во временный файл teho_tmp.spec
